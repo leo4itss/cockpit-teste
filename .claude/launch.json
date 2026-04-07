@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dev",
+      "runtimeExecutable": "/Users/leonardolins/.nvm/versions/node/v22.14.0/bin/node",
+      "runtimeArgs": ["/Users/leonardolins/workspace/grupo-itss/cockpit-teste/node_modules/.bin/vite", "--port", "5173"],
+      "port": 5173
+    }
+  ]
+}
