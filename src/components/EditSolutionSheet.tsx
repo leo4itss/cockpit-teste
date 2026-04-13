@@ -30,7 +30,7 @@ function PlanCard({ plan, onRemove }: { plan: Plan; onRemove: () => void }) {
   const [expanded, setExpanded] = useState(true)
 
   const licensingText = plan.licensings.length > 0
-    ? plan.licensings.map(l => [l.tipoLicensa, l.modelos, l.maximo].filter(Boolean).join(' | ')).join('; ')
+    ? plan.licensings.map(l => [l.tipoLicenca, l.slots, l.modelo, l.usuarios].filter(Boolean).join(' | ')).join('; ')
     : null
 
   return (
@@ -204,10 +204,17 @@ export function EditSolutionSheet({ open, onClose, solution, onSave }: Props) {
           <div className="flex flex-col gap-7">
             <SectionTitle>Dados da solução</SectionTitle>
 
+            <Select
+              label="Tipo da solução"
+              options={TIPOS_SOLUCAO}
+              value={form.type}
+              onChange={e => set('type', e.target.value)}
+            />
+
             <Input
-              label="Nome da solução"
+              label="Apelido da solução"
               required
-              placeholder="Nome da solução"
+              placeholder="Apelido da solução"
               value={form.name}
               onChange={e => set('name', e.target.value)}
             />
@@ -217,13 +224,6 @@ export function EditSolutionSheet({ open, onClose, solution, onSave }: Props) {
               placeholder="Descrição"
               value={form.description}
               onChange={e => set('description', e.target.value)}
-            />
-
-            <Select
-              label="Tipo da solução"
-              options={TIPOS_SOLUCAO}
-              value={form.type}
-              onChange={e => set('type', e.target.value)}
             />
 
             {/* Info box */}

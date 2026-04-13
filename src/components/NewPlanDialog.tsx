@@ -12,19 +12,13 @@ interface Props {
   onSave: (plan: Plan) => void
 }
 
-const TIPO_LICENSA_OPTIONS = [
+const TIPO_LICENCA_OPTIONS = [
   { value: 'named', label: 'Named' },
   { value: 'concurrent', label: 'Concurrent' },
   { value: 'device', label: 'Device' },
 ]
 
-const MODELOS_OPTIONS = [
-  { value: 'mensal', label: 'Mensal' },
-  { value: 'anual', label: 'Anual' },
-  { value: 'perpetuo', label: 'Perpétuo' },
-]
-
-const MAXIMO_OPTIONS = [
+const SLOTS_OPTIONS = [
   { value: '10', label: '10' },
   { value: '25', label: '25' },
   { value: '50', label: '50' },
@@ -32,7 +26,57 @@ const MAXIMO_OPTIONS = [
   { value: 'ilimitado', label: 'Ilimitado' },
 ]
 
-const emptyLicensing = (): Licensing => ({ tipoLicensa: '', modelos: '', maximo: '' })
+const MODELO_OPTIONS = [
+  { value: 'mensal', label: 'Mensal' },
+  { value: 'anual', label: 'Anual' },
+  { value: 'perpetuo', label: 'Perpétuo' },
+]
+
+const USUARIOS_OPTIONS = [
+  { value: '10', label: '10' },
+  { value: '25', label: '25' },
+  { value: '50', label: '50' },
+  { value: '100', label: '100' },
+  { value: 'ilimitado', label: 'Ilimitado' },
+]
+
+const emptyLicensing = (): Licensing => ({
+  tipoLicenca: '',
+  slots: '',
+  modelo: '',
+  usuarios: '',
+  definirPreco: false,
+  precoAnual: '',
+  descontoMensal: '',
+  precoMes: '',
+})
+
+function calcPrecoMes(precoAnual: string, descontoMensal: string): string {
+  const anual = parseFloat(precoAnual.replace(',', '.'))
+  const desconto = parseFloat(descontoMensal.replace(',', '.'))
+  if (isNaN(anual) || isNaN(desconto)) return ''
+  return ((anual * (1 - desconto / 100)) / 12).toFixed(2).replace('.', ',')
+}
+
+function LicensingToggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={() => onChange(!checked)}
+      className={`relative inline-flex h-5 w-9 shrink-0 rounded-full border-2 border-transparent transition-colors focus:outline-none ${
+        checked ? 'bg-blue-600' : 'bg-gray-200'
+      }`}
+    >
+      <span
+        className={`inline-block h-4 w-4 rounded-full bg-white shadow-md transform transition-transform ${
+          checked ? 'translate-x-4' : 'translate-x-0'
+        }`}
+      />
+    </button>
+  )
+}
 
 export function NewPlanDialog({ open, onClose, onSave }: Props) {
   const [name, setName] = useState('')
@@ -47,8 +91,17 @@ export function NewPlanDialog({ open, onClose, onSave }: Props) {
     setLicensings(ls => ls.filter((_, i) => i !== index))
   }
 
-  function handleLicensingChange(index: number, field: keyof Licensing, value: string) {
-    setLicensings(ls => ls.map((l, i) => i === index ? { ...l, [field]: value } : l))
+  function handleLicensingChange(index: number, field: keyof Licensing, value: string | boolean) {
+    setLicensings(ls => ls.map((l, i) => {
+      if (i !== index) return l
+      const updated = { ...l, [field]: value }
+      if (field === 'precoAnual' || field === 'descontoMensal') {
+        const anual = field === 'precoAnual' ? value as string : l.precoAnual
+        const desconto = field === 'descontoMensal' ? value as string : l.descontoMensal
+        updated.precoMes = calcPrecoMes(anual, desconto)
+      }
+      return updated
+    }))
   }
 
   function handleSave() {
@@ -118,44 +171,98 @@ export function NewPlanDialog({ open, onClose, onSave }: Props) {
           {licensings.length > 0 && (
             <>
               <div className="border-t border-gray-100" />
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-6">
                 {licensings.map((licensing, i) => (
-                  <div key={i} className="flex gap-3 items-end">
-                    <div className="flex-1">
+                  <div key={i} className="flex flex-col gap-4">
+                    {/* Tipo de Licença + Minus */}
+                    <div className="flex items-end gap-3">
+                      <div className="flex-1">
+                        <Select
+                          label="Tipo de Licença"
+                          placeholder="selecione o tipo"
+                          options={TIPO_LICENCA_OPTIONS}
+                          value={licensing.tipoLicenca}
+                          onChange={e => handleLicensingChange(i, 'tipoLicenca', e.target.value)}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveLicensing(i)}
+                        className="shrink-0 w-8 h-8 flex items-center justify-center border border-gray-200 rounded-full bg-white shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:bg-gray-50 transition-colors mb-0.5"
+                        aria-label="Remover licenciamento"
+                      >
+                        <Minus className="w-4 h-4 text-[#030712]" />
+                      </button>
+                    </div>
+
+                    {/* Slots + Modelo + Usuários */}
+                    <div className="grid grid-cols-3 gap-3">
                       <Select
-                        label="Tipo de Licensa"
+                        label="Slots"
                         placeholder="Selecione"
-                        options={TIPO_LICENSA_OPTIONS}
-                        value={licensing.tipoLicensa}
-                        onChange={e => handleLicensingChange(i, 'tipoLicensa', e.target.value)}
+                        options={SLOTS_OPTIONS}
+                        value={licensing.slots}
+                        onChange={e => handleLicensingChange(i, 'slots', e.target.value)}
+                      />
+                      <Select
+                        label="Modelo"
+                        placeholder="Selecione"
+                        options={MODELO_OPTIONS}
+                        value={licensing.modelo}
+                        onChange={e => handleLicensingChange(i, 'modelo', e.target.value)}
+                      />
+                      <Select
+                        label="Usuários"
+                        placeholder="Selecione"
+                        options={USUARIOS_OPTIONS}
+                        value={licensing.usuarios}
+                        onChange={e => handleLicensingChange(i, 'usuarios', e.target.value)}
                       />
                     </div>
-                    <div className="flex-1">
-                      <Select
-                        label="Modelos"
-                        placeholder="Selecione"
-                        options={MODELOS_OPTIONS}
-                        value={licensing.modelos}
-                        onChange={e => handleLicensingChange(i, 'modelos', e.target.value)}
+
+                    {/* Definir preço toggle */}
+                    <div className="flex items-center gap-3">
+                      <LicensingToggle
+                        checked={licensing.definirPreco}
+                        onChange={v => handleLicensingChange(i, 'definirPreco', v)}
                       />
+                      <span className="text-sm text-[#030712]">Definir preço</span>
                     </div>
-                    <div className="flex-1">
-                      <Select
-                        label="Máximo"
-                        placeholder="Selecione"
-                        options={MAXIMO_OPTIONS}
-                        value={licensing.maximo}
-                        onChange={e => handleLicensingChange(i, 'maximo', e.target.value)}
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveLicensing(i)}
-                      className="shrink-0 w-8 h-8 flex items-center justify-center border border-gray-200 rounded-full bg-white shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:bg-gray-50 transition-colors mb-0.5"
-                      aria-label="Remover licenciamento"
-                    >
-                      <Minus className="w-4 h-4 text-[#030712]" />
-                    </button>
+
+                    {/* Pricing fields (when toggle ON) */}
+                    {licensing.definirPreco && (
+                      <div className="flex flex-col gap-3">
+                        <div className="grid grid-cols-3 gap-3">
+                          <Input
+                            label="Preço / ano (R$)"
+                            required
+                            placeholder="Digite o valor"
+                            value={licensing.precoAnual}
+                            onChange={e => handleLicensingChange(i, 'precoAnual', e.target.value)}
+                          />
+                          <Input
+                            label="Desconto p/ mensal (%)"
+                            required
+                            placeholder="Digite o valor"
+                            value={licensing.descontoMensal}
+                            onChange={e => handleLicensingChange(i, 'descontoMensal', e.target.value)}
+                          />
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-medium text-[#030712]">Preço / mês (R$)</label>
+                            <input
+                              readOnly
+                              value={licensing.precoMes || '00,00'}
+                              className="h-9 w-full rounded-md border border-gray-200 bg-gray-50 px-3 text-sm text-[#6b7280] outline-none"
+                            />
+                          </div>
+                        </div>
+                        <p className="text-xs text-[#6b7280] leading-snug">
+                          O preço mensal é calculado automaticamente aplicando o desconto sobre o preço anual dividido por 12.
+                        </p>
+                      </div>
+                    )}
+
+                    {i < licensings.length - 1 && <div className="border-t border-gray-100" />}
                   </div>
                 ))}
               </div>

@@ -58,7 +58,7 @@ function PlanItem({ plan }: { plan: Plan }) {
   const [expanded, setExpanded] = useState(false)
 
   const licensingLabel = plan.licensings.length > 0
-    ? plan.licensings.map(l => `${l.tipoLicensa} | ${l.modelos} | ${l.maximo}`).join('; ')
+    ? plan.licensings.map(l => [l.tipoLicenca, l.slots, l.modelo, l.usuarios].filter(Boolean).join(' | ')).join('; ')
     : null
 
   return (
@@ -122,7 +122,7 @@ export function SolutionDetailSheet({ open, onClose, solution, onEdit }: Props) 
             <SectionTitle>Informações básicas</SectionTitle>
           </div>
           <div className="flex flex-col gap-7">
-            <Field label="Nome da solução" value={solution.name} />
+            <Field label="Apelido da solução" value={solution.name} />
             <Field label="Descrição" value={solution.description} />
             <Field label="Tipo da solução" value={solution.type} />
             <Field label="Data de cadastro" value={solution.createdAt} />

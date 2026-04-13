@@ -55,9 +55,14 @@ export interface Account {
 }
 
 export interface Licensing {
-  tipoLicensa: string
-  modelos: string
-  maximo: string
+  tipoLicenca: string
+  slots: string
+  modelo: string
+  usuarios: string
+  definirPreco: boolean
+  precoAnual: string
+  descontoMensal: string
+  precoMes: string
 }
 
 export interface Plan {

@@ -171,8 +171,16 @@ export function NewSolutionSheet({ open, onClose, orgId, onSave }: Props) {
         <div className="flex flex-col gap-7">
           <SectionTitle>Dados da solução</SectionTitle>
 
+          <Select
+            label="Tipo da solução"
+            placeholder="Selecione"
+            options={TIPOS}
+            value={form.type}
+            onChange={e => set('type', e.target.value)}
+          />
+
           <Input
-            label="Nome da solução"
+            label="Apelido da solução"
             required
             placeholder="Como chama a solução?"
             value={form.name}
@@ -184,14 +192,6 @@ export function NewSolutionSheet({ open, onClose, orgId, onSave }: Props) {
             placeholder="Como chama a solução?"
             value={form.description}
             onChange={e => set('description', e.target.value)}
-          />
-
-          <Select
-            label="Tipo da solução"
-            placeholder="Selecione"
-            options={TIPOS}
-            value={form.type}
-            onChange={e => set('type', e.target.value)}
           />
 
           <InfoBox>
