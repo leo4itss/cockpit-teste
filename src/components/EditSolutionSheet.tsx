@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { ChevronUp, ChevronDown, MoreVertical, Check, CircleAlert, Plus } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { ChevronUp, ChevronDown, MoreVertical, CircleAlert, Pencil, Trash2 } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Input } from './ui/Input'
 import { Select } from './ui/Select'
@@ -26,52 +26,93 @@ function Divider() {
   return <div className="border-t border-[#e5e7eb] w-full" />
 }
 
-function PlanCard({ plan, onRemove }: { plan: Plan; onRemove: () => void }) {
+function PlanCard({
+  plan,
+  onEdit,
+  onRemove,
+}: {
+  plan: Plan
+  onEdit: () => void
+  onRemove: () => void
+}) {
   const [expanded, setExpanded] = useState(true)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   const licensingText = plan.licensings.length > 0
     ? plan.licensings.map(l => [l.tipoLicenca, l.slots, l.modelo, l.usuarios].filter(Boolean).join(' | ')).join('; ')
     : null
 
+  useEffect(() => {
+    if (!menuOpen) return
+    function handleOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleOutside)
+    return () => document.removeEventListener('mousedown', handleOutside)
+  }, [menuOpen])
+
   return (
-    <div className="bg-white border border-[#e5e7eb] rounded-md flex flex-col gap-2 pt-2 pb-4 px-5">
+    <div className="bg-white border border-[#e5e7eb] rounded-md flex flex-col pt-2 pb-4 px-5">
       {/* Plan header row */}
-      <div className="flex items-center gap-4 py-4">
+      <div className="flex items-center gap-4 py-2">
         <button
           type="button"
           onClick={() => setExpanded(v => !v)}
-          className="shrink-0 text-[#030712]"
+          className="shrink-0 text-[#6b7280]"
         >
           {expanded
-            ? <ChevronUp className="w-5 h-5" />
-            : <ChevronDown className="w-5 h-5" />
+            ? <ChevronUp className="w-4 h-4" />
+            : <ChevronDown className="w-4 h-4" />
           }
         </button>
-        <div className="flex flex-1 flex-col gap-1 min-w-0 overflow-hidden">
-          <p className="text-sm font-medium text-[#030712] leading-4 truncate">{plan.name}</p>
-          <p className="text-sm font-normal text-[#6b7280] leading-5 truncate">{plan.description}</p>
+        <div className="flex flex-1 flex-col gap-0.5 min-w-0 overflow-hidden">
+          <p className="text-sm font-semibold text-[#030712] leading-5 truncate">{plan.name}</p>
+          <p className="text-sm text-[#6b7280] leading-5 truncate">{plan.description}</p>
         </div>
-        <button
-          type="button"
-          onClick={onRemove}
-          className="w-9 h-9 flex items-center justify-center rounded-md hover:bg-gray-100 text-[#030712] transition-colors shrink-0"
-        >
-          <MoreVertical className="w-4 h-4" />
-        </button>
+
+        {/* Dropdown menu */}
+        <div className="relative shrink-0" ref={menuRef}>
+          <button
+            type="button"
+            onClick={() => setMenuOpen(v => !v)}
+            className="w-9 h-9 flex items-center justify-center rounded-md hover:bg-gray-100 text-[#6b7280] transition-colors"
+          >
+            <MoreVertical className="w-4 h-4" />
+          </button>
+
+          {menuOpen && (
+            <div className="absolute right-0 top-10 z-50 bg-white border border-[#e5e7eb] rounded-md shadow-lg py-1 min-w-[148px]">
+              <button
+                type="button"
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#030712] hover:bg-gray-50 transition-colors"
+                onClick={() => { setMenuOpen(false); onEdit() }}
+              >
+                <Pencil className="w-4 h-4 text-[#6b7280]" />
+                Editar
+              </button>
+              <button
+                type="button"
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                onClick={() => { setMenuOpen(false); onRemove() }}
+              >
+                <Trash2 className="w-4 h-4" />
+                Excluir
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Licensing row (when expanded) */}
       {expanded && licensingText && (
         <>
           <Divider />
-          <div className="flex items-start gap-4 py-4">
-            <div className="shrink-0 text-[#030712]">
-              <Check className="w-5 h-5" />
-            </div>
-            <div className="flex flex-1 flex-col gap-1 min-w-0">
-              <p className="text-sm font-medium text-[#030712] leading-4">Modelo de licenciamento</p>
-              <p className="text-sm font-normal text-[#6b7280] leading-5">{licensingText}</p>
-            </div>
+          <div className="flex flex-col gap-0.5 py-3">
+            <p className="text-sm font-medium text-[#030712] leading-5">Modelo de licenciamento</p>
+            <p className="text-sm text-[#6b7280] leading-5">{licensingText}</p>
           </div>
         </>
       )}
@@ -103,7 +144,8 @@ const MARKETPLACE_STATUS = [
 export function EditSolutionSheet({ open, onClose, solution, onSave }: Props) {
   const [form, setForm] = useState(() => buildForm(solution))
   const [plans, setPlans] = useState<Plan[]>(solution?.plans ?? [])
-  const [showNewPlan, setShowNewPlan] = useState(false)
+  const [planDialogOpen, setPlanDialogOpen] = useState(false)
+  const [editingPlanIndex, setEditingPlanIndex] = useState<number | null>(null)
 
   // Re-sync form when solution changes
   const [lastSolution, setLastSolution] = useState(solution)
@@ -134,12 +176,33 @@ export function EditSolutionSheet({ open, onClose, solution, onSave }: Props) {
     setForm(f => ({ ...f, [field]: value }))
   }
 
-  function handleAddPlan(plan: Plan) {
-    setPlans(prev => [...prev, plan])
+  function handleOpenNewPlan() {
+    setEditingPlanIndex(null)
+    setPlanDialogOpen(true)
+  }
+
+  function handleEditPlan(index: number) {
+    setEditingPlanIndex(index)
+    setPlanDialogOpen(true)
   }
 
   function handleRemovePlan(index: number) {
     setPlans(prev => prev.filter((_, i) => i !== index))
+  }
+
+  function handlePlanSave(plan: Plan) {
+    if (editingPlanIndex !== null) {
+      setPlans(prev => prev.map((p, i) => i === editingPlanIndex ? plan : p))
+    } else {
+      setPlans(prev => [...prev, plan])
+    }
+    setPlanDialogOpen(false)
+    setEditingPlanIndex(null)
+  }
+
+  function handlePlanDialogClose() {
+    setPlanDialogOpen(false)
+    setEditingPlanIndex(null)
   }
 
   function handleSave() {
@@ -162,6 +225,8 @@ export function EditSolutionSheet({ open, onClose, solution, onSave }: Props) {
   }
 
   if (!solution) return null
+
+  const editingPlan = editingPlanIndex !== null ? plans[editingPlanIndex] : undefined
 
   return (
     <>
@@ -230,7 +295,7 @@ export function EditSolutionSheet({ open, onClose, solution, onSave }: Props) {
             <div className="flex items-start gap-2 bg-[#f3f4f6] rounded-md px-3 py-4">
               <CircleAlert className="w-4 h-4 text-[#6b7280] shrink-0 mt-0.5" />
               <p className="text-sm text-[#6b7280] leading-5">
-                Escolha um nome único para o domínio. Este identificador não pode ser divulgado no sistema.
+                Inclua informações relevantes para destacar o propósito e os diferenciais da solução, facilitando a compreensão e a comparação com outras opções.
               </p>
             </div>
 
@@ -238,28 +303,30 @@ export function EditSolutionSheet({ open, onClose, solution, onSave }: Props) {
           </div>
 
           {/* ── Planos ──────────────────────────────────────── */}
-          <div className="flex flex-col gap-7">
-            <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between pb-3">
               <SectionTitle>Planos</SectionTitle>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowNewPlan(true)}
-                className="h-8 px-3 text-xs"
+              <button
+                type="button"
+                onClick={handleOpenNewPlan}
+                className="inline-flex items-center h-8 px-3 border border-[#e5e7eb] rounded-md text-xs font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors"
               >
-                <Plus className="w-3.5 h-3.5" />
                 Adicionar
-              </Button>
+              </button>
             </div>
 
             {plans.length === 0 ? (
-              <p className="text-sm text-[#6b7280]">Nenhum plano cadastrado.</p>
+              <div className="flex flex-col gap-1">
+                <p className="text-sm font-medium text-[#030712]">Nenhum plano disponível</p>
+                <p className="text-sm text-[#6b7280]">Adicione um plano para esta solução</p>
+              </div>
             ) : (
               <div className="flex flex-col gap-2">
                 {plans.map((plan, i) => (
                   <PlanCard
                     key={i}
                     plan={plan}
+                    onEdit={() => handleEditPlan(i)}
                     onRemove={() => handleRemovePlan(i)}
                   />
                 ))}
@@ -295,7 +362,6 @@ export function EditSolutionSheet({ open, onClose, solution, onSave }: Props) {
               onClick={() => set('marketplace', !form.marketplace)}
               className="flex items-start gap-3 w-fit"
             >
-              {/* Track */}
               <div className={`relative w-9 h-5 rounded-full transition-colors shrink-0 mt-0.5 ${form.marketplace ? 'bg-[#2563eb]' : 'bg-[#d1d5db]'}`}>
                 <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-4px_rgba(0,0,0,0.1)] transition-transform ${form.marketplace ? 'translate-x-[18px]' : 'translate-x-0.5'}`} />
               </div>
@@ -358,9 +424,10 @@ export function EditSolutionSheet({ open, onClose, solution, onSave }: Props) {
       </Sheet>
 
       <NewPlanDialog
-        open={showNewPlan}
-        onClose={() => setShowNewPlan(false)}
-        onSave={handleAddPlan}
+        open={planDialogOpen}
+        onClose={handlePlanDialogClose}
+        onSave={handlePlanSave}
+        initialPlan={editingPlan}
       />
     </>
   )

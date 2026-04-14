@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, Minus } from 'lucide-react'
 import { Dialog } from './ui/Dialog'
 import { Input } from './ui/Input'
@@ -10,6 +10,7 @@ interface Props {
   open: boolean
   onClose: () => void
   onSave: (plan: Plan) => void
+  initialPlan?: Plan
 }
 
 const TIPO_LICENCA_OPTIONS = [
@@ -78,10 +79,19 @@ function LicensingToggle({ checked, onChange }: { checked: boolean; onChange: (v
   )
 }
 
-export function NewPlanDialog({ open, onClose, onSave }: Props) {
+export function NewPlanDialog({ open, onClose, onSave, initialPlan }: Props) {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [licensings, setLicensings] = useState<Licensing[]>([])
+
+  // Sync state when dialog opens (support edit mode)
+  useEffect(() => {
+    if (open) {
+      setName(initialPlan?.name ?? '')
+      setDescription(initialPlan?.description ?? '')
+      setLicensings(initialPlan?.licensings ?? [])
+    }
+  }, [open, initialPlan])
 
   function handleAddLicensing() {
     setLicensings(ls => [...ls, emptyLicensing()])
@@ -123,7 +133,7 @@ export function NewPlanDialog({ open, onClose, onSave }: Props) {
     <Dialog
       open={open}
       onClose={handleClose}
-      title="Novo plano"
+      title={initialPlan ? 'Editar plano' : 'Novo plano'}
       className="max-w-2xl"
       footer={
         <>
