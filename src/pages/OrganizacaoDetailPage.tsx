@@ -37,7 +37,7 @@ export function OrganizacaoDetailPage() {
   const [tiposLicenca, setTiposLicenca] = useState<TipoLicenca[]>([])
   const [componentes, setComponentes] = useState<Componente[]>([])
   const [loading, setLoading] = useState(true)
-  const [loadError, setLoadError] = useState<string | null>(null)
+  const [loadError] = useState<string | null>(null)
   const [showDeleted, setShowDeleted] = useState(false)
 
   useEffect(() => {
