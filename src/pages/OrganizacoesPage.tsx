@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { NewOrganizationSheet } from '@/components/NewOrganizationSheet'
 import { api } from '@/api/client'
+import { organizations as mockOrgs } from '@/data/mock'
 import type { Organization } from '@/types'
 
 export function OrganizacoesPage() {
@@ -18,7 +19,11 @@ export function OrganizacoesPage() {
   useEffect(() => {
     api.getOrganizations()
       .then(data => { setOrgs(data); setLoading(false) })
-      .catch(err => { console.error(err); setError('Falha ao carregar organizações.'); setLoading(false) })
+      .catch(() => {
+        // API indisponível (ex: preview Vercel sem backend) — usa mock data
+        setOrgs(mockOrgs)
+        setLoading(false)
+      })
   }, [])
 
   const filtered = orgs.filter(o =>

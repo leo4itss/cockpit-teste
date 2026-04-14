@@ -14,6 +14,14 @@ import { SolutionDetailSheet } from '@/components/SolutionDetailSheet'
 import { EditSolutionSheet } from '@/components/EditSolutionSheet'
 import { ContractDetailSheet } from '@/components/ContractDetailSheet'
 import { api } from '@/api/client'
+import {
+  organizations as mockOrgs,
+  accounts as mockAccounts,
+  solutions as mockSolutions,
+  contracts as mockContracts,
+  tiposLicenca as mockTiposLicenca,
+  componentes as mockComponentes,
+} from '@/data/mock'
 import type { Account, Solution, Contract, Organization, Contact, TipoLicenca, Componente } from '@/types'
 
 type Tab = 'conta' | 'solucoes' | 'contrato' | 'marketplace'
@@ -49,9 +57,15 @@ export function OrganizacaoDetailPage() {
       setTiposLicenca(tipos)
       setComponentes(comps)
       setLoading(false)
-    }).catch(err => {
-      console.error(err)
-      setLoadError('Falha ao carregar dados da organização.')
+    }).catch(() => {
+      // API indisponível (ex: preview Vercel sem backend) — usa mock data
+      const mockOrg = mockOrgs.find(o => o.id === id) ?? null
+      setOrg(mockOrg)
+      setAccounts(mockAccounts.filter(a => a.orgId === id))
+      setSolutions(mockSolutions.filter(s => s.orgId === id))
+      setContracts(mockContracts.filter(c => c.orgId === id))
+      setTiposLicenca(mockTiposLicenca)
+      setComponentes(mockComponentes)
       setLoading(false)
     })
   }, [id])
