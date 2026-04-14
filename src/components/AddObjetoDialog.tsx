@@ -39,7 +39,7 @@ function buildRows(solutions: Solution[], orgName: string): Row[] {
         solucao: sol.name,
         orgContratada: orgName,
         plano: plan.name,
-        licenciamento: lic ? [lic.tipoLicenca, lic.slots, lic.modelo, lic.usuarios].filter(Boolean).join(' | ') || '—' : '—',
+        licenciamento: lic ? [lic.slots, lic.modelo, lic.usuarios].filter(Boolean).join(' | ') || '—' : '—',
         status: sol.status,
       })
     })

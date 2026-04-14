@@ -146,14 +146,14 @@ export const solutions: Solution[] = [
         name: 'Pro',
         description: 'Todas as features liberadas',
         licensings: [
-          { tipoLicenca: 'Por usuário', slots: '', modelo: 'Nominal', usuarios: 'Até 10 usuários', definirPreco: false, precoAnual: '', descontoMensal: '', precoMes: '' },
+          { tipoLicenca: ['slot', 'modelo', 'usuarios'], slots: '5 slots', modelo: 'Nominal', usuarios: '10 usuários', definirPreco: false, precoAnual: '', descontoMensal: '', precoMes: '' },
         ],
       },
       {
         name: 'Basic',
         description: 'Plano básico com recursos essenciais',
         licensings: [
-          { tipoLicenca: 'Por usuário', slots: '', modelo: 'Nominal', usuarios: 'Até 5 usuários', definirPreco: false, precoAnual: '', descontoMensal: '', precoMes: '' },
+          { tipoLicenca: ['slot', 'modelo', 'usuarios'], slots: '5 slots', modelo: 'Nominal', usuarios: '5 usuários', definirPreco: false, precoAnual: '', descontoMensal: '', precoMes: '' },
         ],
       },
     ],

@@ -40,7 +40,7 @@ function PlanCard({
   const menuRef = useRef<HTMLDivElement>(null)
 
   const licensingText = plan.licensings.length > 0
-    ? plan.licensings.map(l => [l.tipoLicenca, l.slots, l.modelo, l.usuarios].filter(Boolean).join(' | ')).join('; ')
+    ? plan.licensings.map(l => [l.slots, l.modelo, l.usuarios].filter(Boolean).join(' | ')).join('; ')
     : null
 
   useEffect(() => {
@@ -123,9 +123,10 @@ function PlanCard({
 /* ── options ─────────────────────────────────────────────── */
 
 const TIPOS_SOLUCAO = [
-  { value: 'Assistente', label: 'Assistente' },
-  { value: 'Enterprise', label: 'Enterprise' },
-  { value: 'Analytics', label: 'Analytics' },
+  { value: 'Assistente de IA',       label: 'Assistente de IA' },
+  { value: 'Base de conhecimento',   label: 'Base de conhecimento' },
+  { value: 'Enterprise',             label: 'Enterprise' },
+  { value: 'Analytics',              label: 'Analytics' },
 ]
 
 const ARQUITETOS = [
@@ -428,6 +429,7 @@ export function EditSolutionSheet({ open, onClose, solution, onSave }: Props) {
         onClose={handlePlanDialogClose}
         onSave={handlePlanSave}
         initialPlan={editingPlan}
+        solutionType={form.type}
       />
     </>
   )

@@ -55,10 +55,10 @@ export interface Account {
 }
 
 export interface Licensing {
-  tipoLicenca: string
-  slots: string
-  modelo: string
-  usuarios: string
+  tipoLicenca: string[]   // enabled dims: e.g. ['slot','modelo','usuarios'] or ['gigabytes','modelo','usuarios']
+  slots: string           // value for Slot (Assistente) or GigaBytes (Base de conhecimento)
+  modelo: string          // Nominal | Concorrente
+  usuarios: string        // 5 usuários | 10 usuários | 15 usuários | outro
   definirPreco: boolean
   precoAnual: string
   descontoMensal: string

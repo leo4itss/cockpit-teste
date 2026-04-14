@@ -65,9 +65,10 @@ const ARQUITETOS = [
 ]
 
 const TIPOS = [
-  { value: 'Assistente', label: 'Assistente' },
-  { value: 'Enterprise', label: 'Enterprise' },
-  { value: 'Padrão', label: 'Padrão' },
+  { value: 'Assistente de IA',     label: 'Assistente de IA' },
+  { value: 'Base de conhecimento', label: 'Base de conhecimento' },
+  { value: 'Enterprise',           label: 'Enterprise' },
+  { value: 'Padrão',               label: 'Padrão' },
 ]
 
 const STATUS_OPTIONS = [
@@ -327,6 +328,7 @@ export function NewSolutionSheet({ open, onClose, orgId, onSave }: Props) {
         open={planDialogOpen}
         onClose={() => setPlanDialogOpen(false)}
         onSave={plan => { addPlan(plan); setPlanDialogOpen(false) }}
+        solutionType={form.type}
       />
     </Sheet>
   )

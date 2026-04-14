@@ -55,7 +55,7 @@ function PlanItem({ plan }: { plan: Plan }) {
   const [expanded, setExpanded] = useState(false)
 
   const licensingLabel = plan.licensings.length > 0
-    ? plan.licensings.map(l => [l.tipoLicenca, l.slots, l.modelo, l.usuarios].filter(Boolean).join(' | ')).join('; ')
+    ? plan.licensings.map(l => [l.slots, l.modelo, l.usuarios].filter(Boolean).join(' | ')).join('; ')
     : null
 
   return (
