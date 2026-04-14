@@ -33,13 +33,21 @@ function buildRows(solutions: Solution[], orgName: string): Row[] {
   const rows: Row[] = []
   solutions.forEach(sol => {
     sol.plans.forEach(plan => {
-      const lic = plan.licensings[0]
+      // Monta label de licenciamento a partir do novo formato (tipoLicencaNome + range)
+      const licenciamento = plan.licensings.length > 0
+        ? plan.licensings.map(l => {
+            const range = [l.valorMinimo, l.valorMaximo].filter(Boolean).join('–')
+            const nome = l.tipoLicencaNome || l.tipoLicencaId
+            return range ? `${nome}: ${range} ${l.tipoLicencaUnidade ?? ''}`.trim() : nome
+          }).join(' · ') || '—'
+        : '—'
+
       rows.push({
         id: `${sol.id}-${plan.name}`,
         solucao: sol.name,
         orgContratada: orgName,
         plano: plan.name,
-        licenciamento: lic ? [lic.slots, lic.modelo, lic.usuarios].filter(Boolean).join(' | ') || '—' : '—',
+        licenciamento,
         status: sol.status,
       })
     })

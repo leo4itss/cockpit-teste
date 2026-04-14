@@ -5,13 +5,19 @@ import { Select } from './ui/Select'
 import { Button } from './ui/Button'
 import { Upload, CircleAlert, Plus, Trash2 } from 'lucide-react'
 import { NewPlanDialog } from './NewPlanDialog'
-import type { Solution, Plan } from '@/types'
+import { ComponenteSelector } from './ComponenteSelector'
+import { NewComponenteDialog } from './NewComponenteDialog'
+import { api } from '@/api/client'
+import type { Solution, Plan, TipoLicenca, Componente } from '@/types'
 
 interface Props {
   open: boolean
   onClose: () => void
   orgId: string
   onSave: (solution: Omit<Solution, 'id'>) => void
+  tiposLicenca: TipoLicenca[]
+  componentes: Componente[]
+  onComponenteCreated: (c: Componente) => void
 }
 
 /* ── sub-components ────────────────────────────────────── */
@@ -77,7 +83,15 @@ const STATUS_OPTIONS = [
   { value: 'Disponível', label: 'Disponível' },
 ]
 
-export function NewSolutionSheet({ open, onClose, orgId, onSave }: Props) {
+export function NewSolutionSheet({
+  open,
+  onClose,
+  orgId,
+  onSave,
+  tiposLicenca,
+  componentes,
+  onComponenteCreated,
+}: Props) {
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -91,11 +105,26 @@ export function NewSolutionSheet({ open, onClose, orgId, onSave }: Props) {
     marketplaceStatus: '',
   })
   const [plans, setPlans] = useState<Plan[]>([])
+  const [selectedComponenteIds, setSelectedComponenteIds] = useState<string[]>([])
   const [planDialogOpen, setPlanDialogOpen] = useState(false)
+  const [componenteDialogOpen, setComponenteDialogOpen] = useState(false)
 
   function set(field: string, value: string | boolean) {
     setForm(f => ({ ...f, [field]: value }))
   }
+
+  // Tipos de licença disponíveis = union dos tipos dos componentes selecionados.
+  // Se nenhum componente selecionado, exibe todos.
+  const tiposDisponiveis: TipoLicenca[] = selectedComponenteIds.length === 0
+    ? tiposLicenca
+    : (() => {
+        const ids = new Set(
+          componentes
+            .filter(c => selectedComponenteIds.includes(c.id))
+            .flatMap(c => c.tiposLicenca)
+        )
+        return tiposLicenca.filter(t => ids.has(t.id))
+      })()
 
   // Required fields validation
   const baseValid = form.name.trim() !== '' && form.arquitetoPAS !== ''
@@ -116,13 +145,21 @@ export function NewSolutionSheet({ open, onClose, orgId, onSave }: Props) {
       type: form.type,
       arquitetoPAS: form.arquitetoPAS,
       plans,
+      componenteIds: selectedComponenteIds,
       status: 'Ativo',
       createdAt: new Date().toISOString(),
     })
     // reset
     setForm({ name: '', description: '', type: '', arquitetoPAS: '', marketplace: false, link01: '', titleLink01: '', link02: '', titleLink02: '', marketplaceStatus: '' })
     setPlans([])
+    setSelectedComponenteIds([])
     onClose()
+  }
+
+  async function handleCreateComponente(data: Omit<Componente, 'id' | 'createdAt'>) {
+    const saved = await api.createComponente({ ...data, id: crypto.randomUUID(), createdAt: new Date().toISOString() })
+    onComponenteCreated(saved)
+    setSelectedComponenteIds(prev => [...prev, saved.id])
   }
 
   function addPlan(plan: Plan) {
@@ -200,6 +237,23 @@ export function NewSolutionSheet({ open, onClose, orgId, onSave }: Props) {
             Este identificador não pode ser divulgado no sistema.
           </InfoBox>
 
+          <Divider />
+        </div>
+
+        {/* ── Componentes ───────────────────────────────── */}
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <SectionTitle>Componentes</SectionTitle>
+          </div>
+          <p className="text-sm text-[#6b7280] -mt-2">
+            Selecione os módulos que compõem esta solução. Os tipos de licença disponíveis para os planos serão derivados dos componentes selecionados.
+          </p>
+          <ComponenteSelector
+            componentes={componentes}
+            value={selectedComponenteIds}
+            onChange={setSelectedComponenteIds}
+            onCreateNew={() => setComponenteDialogOpen(true)}
+          />
           <Divider />
         </div>
 
@@ -328,7 +382,14 @@ export function NewSolutionSheet({ open, onClose, orgId, onSave }: Props) {
         open={planDialogOpen}
         onClose={() => setPlanDialogOpen(false)}
         onSave={plan => { addPlan(plan); setPlanDialogOpen(false) }}
-        solutionType={form.type}
+        tiposLicenca={tiposDisponiveis}
+      />
+
+      <NewComponenteDialog
+        open={componenteDialogOpen}
+        onClose={() => setComponenteDialogOpen(false)}
+        onSave={handleCreateComponente}
+        tiposLicenca={tiposLicenca}
       />
     </Sheet>
   )

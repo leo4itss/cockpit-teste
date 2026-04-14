@@ -5,13 +5,19 @@ import { Input } from './ui/Input'
 import { Select } from './ui/Select'
 import { Button } from './ui/Button'
 import { NewPlanDialog } from './NewPlanDialog'
-import type { Solution, Plan } from '@/types'
+import { ComponenteSelector } from './ComponenteSelector'
+import { NewComponenteDialog } from './NewComponenteDialog'
+import { api } from '@/api/client'
+import type { Solution, Plan, TipoLicenca, Componente } from '@/types'
 
 interface Props {
   open: boolean
   onClose: () => void
   solution: Solution | null
   onSave: (solution: Solution) => void
+  tiposLicenca: TipoLicenca[]
+  componentes: Componente[]
+  onComponenteCreated: (c: Componente) => void
 }
 
 /* ── sub-components ─────────────────────────────────────── */
@@ -40,7 +46,11 @@ function PlanCard({
   const menuRef = useRef<HTMLDivElement>(null)
 
   const licensingText = plan.licensings.length > 0
-    ? plan.licensings.map(l => [l.slots, l.modelo, l.usuarios].filter(Boolean).join(' | ')).join('; ')
+    ? plan.licensings.map(l => {
+        const range = [l.valorMinimo, l.valorMaximo].filter(Boolean).join('–')
+        const nome = l.tipoLicencaNome || l.tipoLicencaId
+        return range ? `${nome}: ${range} ${l.tipoLicencaUnidade ?? ''}`.trim() : nome
+      }).join(' · ')
     : null
 
   useEffect(() => {
@@ -111,7 +121,7 @@ function PlanCard({
         <>
           <Divider />
           <div className="flex flex-col gap-0.5 py-3">
-            <p className="text-sm font-medium text-[#030712] leading-5">Modelo de licenciamento</p>
+            <p className="text-sm font-medium text-[#030712] leading-5">Tipos de licença</p>
             <p className="text-sm text-[#6b7280] leading-5">{licensingText}</p>
           </div>
         </>
@@ -142,11 +152,21 @@ const MARKETPLACE_STATUS = [
 
 /* ── main ─────────────────────────────────────────────────── */
 
-export function EditSolutionSheet({ open, onClose, solution, onSave }: Props) {
+export function EditSolutionSheet({
+  open,
+  onClose,
+  solution,
+  onSave,
+  tiposLicenca,
+  componentes,
+  onComponenteCreated,
+}: Props) {
   const [form, setForm] = useState(() => buildForm(solution))
   const [plans, setPlans] = useState<Plan[]>(solution?.plans ?? [])
+  const [selectedComponenteIds, setSelectedComponenteIds] = useState<string[]>(solution?.componenteIds ?? [])
   const [planDialogOpen, setPlanDialogOpen] = useState(false)
   const [editingPlanIndex, setEditingPlanIndex] = useState<number | null>(null)
+  const [componenteDialogOpen, setComponenteDialogOpen] = useState(false)
 
   // Re-sync form when solution changes
   const [lastSolution, setLastSolution] = useState(solution)
@@ -154,6 +174,7 @@ export function EditSolutionSheet({ open, onClose, solution, onSave }: Props) {
     setLastSolution(solution)
     setForm(buildForm(solution))
     setPlans(solution?.plans ?? [])
+    setSelectedComponenteIds(solution?.componenteIds ?? [])
   }
 
   function buildForm(s: Solution | null) {
@@ -176,6 +197,18 @@ export function EditSolutionSheet({ open, onClose, solution, onSave }: Props) {
   function set(field: string, value: string | boolean) {
     setForm(f => ({ ...f, [field]: value }))
   }
+
+  // Tipos disponíveis = union dos tipos dos componentes selecionados, ou todos se nenhum selecionado
+  const tiposDisponiveis: TipoLicenca[] = selectedComponenteIds.length === 0
+    ? tiposLicenca
+    : (() => {
+        const ids = new Set(
+          componentes
+            .filter(c => selectedComponenteIds.includes(c.id))
+            .flatMap(c => c.tiposLicenca)
+        )
+        return tiposLicenca.filter(t => ids.has(t.id))
+      })()
 
   function handleOpenNewPlan() {
     setEditingPlanIndex(null)
@@ -206,6 +239,12 @@ export function EditSolutionSheet({ open, onClose, solution, onSave }: Props) {
     setEditingPlanIndex(null)
   }
 
+  async function handleCreateComponente(data: Omit<Componente, 'id' | 'createdAt'>) {
+    const saved = await api.createComponente({ ...data, id: crypto.randomUUID(), createdAt: new Date().toISOString() })
+    onComponenteCreated(saved)
+    setSelectedComponenteIds(prev => [...prev, saved.id])
+  }
+
   function handleSave() {
     if (!solution) return
     onSave({
@@ -215,6 +254,7 @@ export function EditSolutionSheet({ open, onClose, solution, onSave }: Props) {
       type:              form.type,
       arquitetoPAS:      form.arquitetoPAS,
       plans,
+      componenteIds:     selectedComponenteIds,
       marketplace:       form.marketplace ? 'Ativo' : 'Inativo',
       link01:            form.link01,
       titleLink01:       form.titleLink01,
@@ -300,6 +340,21 @@ export function EditSolutionSheet({ open, onClose, solution, onSave }: Props) {
               </p>
             </div>
 
+            <Divider />
+          </div>
+
+          {/* ── Componentes ─────────────────────────────────── */}
+          <div className="flex flex-col gap-4">
+            <SectionTitle>Componentes</SectionTitle>
+            <p className="text-sm text-[#6b7280] -mt-2">
+              Os tipos de licença disponíveis para os planos são derivados dos componentes selecionados.
+            </p>
+            <ComponenteSelector
+              componentes={componentes}
+              value={selectedComponenteIds}
+              onChange={setSelectedComponenteIds}
+              onCreateNew={() => setComponenteDialogOpen(true)}
+            />
             <Divider />
           </div>
 
@@ -429,7 +484,14 @@ export function EditSolutionSheet({ open, onClose, solution, onSave }: Props) {
         onClose={handlePlanDialogClose}
         onSave={handlePlanSave}
         initialPlan={editingPlan}
-        solutionType={form.type}
+        tiposLicenca={tiposDisponiveis}
+      />
+
+      <NewComponenteDialog
+        open={componenteDialogOpen}
+        onClose={() => setComponenteDialogOpen(false)}
+        onSave={handleCreateComponente}
+        tiposLicenca={tiposLicenca}
       />
     </>
   )

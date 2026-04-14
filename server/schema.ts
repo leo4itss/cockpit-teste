@@ -1,5 +1,37 @@
-import { pgTable, text, integer, jsonb, timestamp } from 'drizzle-orm/pg-core'
+import { pgTable, text, integer, jsonb } from 'drizzle-orm/pg-core'
 
+// ── Tipos de Licença ─────────────────────────────────────────
+// Entidades independentes que descrevem dimensões de licenciamento
+// (ex: "Usuário nominal", "Tamanho de banco de dados").
+// Não usar enums fixos no código — cadastrar aqui e referênciar pelo id.
+export const tiposLicenca = pgTable('tipos_licenca', {
+  id: text('id').primaryKey(),
+  nome: text('nome').notNull(),
+  descricao: text('descricao'),
+  unidade: text('unidade').notNull().default(''), // ex: "usuários", "GB", "unidades", "tokens"
+  createdAt: text('created_at').notNull(),
+})
+
+// ── Componentes ───────────────────────────────────────────────
+// Módulos/serviços que compõem uma Solução. Cada componente expõe
+// opcionalmente uma URL de metadata (GET) cujo retorno esperado é:
+// {
+//   "componentId": string,
+//   "name": string,
+//   "version": string,
+//   "tiposLicenca": [{ "id": string, "nome": string, "unidade": string }]
+// }
+// O sistema valida a presença de "tiposLicenca" como array não-vazio.
+export const componentes = pgTable('componentes', {
+  id: text('id').primaryKey(),
+  nome: text('nome').notNull(),
+  descricao: text('descricao'),
+  metadataUrl: text('metadata_url'),
+  tiposLicenca: jsonb('tipos_licenca').notNull().default([]), // string[] — ids de tiposLicenca disponíveis
+  createdAt: text('created_at').notNull(),
+})
+
+// ── Organizations ─────────────────────────────────────────────
 export const organizations = pgTable('organizations', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
@@ -54,6 +86,7 @@ export const solutions = pgTable('solutions', {
   orgId: text('org_id').notNull().references(() => organizations.id),
   name: text('name').notNull(),
   plans: jsonb('plans').notNull().default([]),
+  componenteIds: jsonb('componente_ids').notNull().default([]), // string[] — ids de componentes usados
   description: text('description').notNull().default(''),
   type: text('type').notNull().default(''),
   arquitetoPAS: text('arquiteto_pas').notNull(),

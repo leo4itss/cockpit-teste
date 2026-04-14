@@ -1,13 +1,14 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { ChevronDown, ChevronUp, MoreVertical, Check } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Button } from './ui/Button'
-import type { Solution, Plan } from '@/types'
+import type { Solution, Plan, Componente } from '@/types'
 
 interface Props {
   open: boolean
   onClose: () => void
   solution: Solution | null
+  componentes?: Componente[]
   onEdit?: () => void
 }
 
@@ -51,12 +52,29 @@ function StatusBadge({ status }: { status: Solution['status'] }) {
   )
 }
 
-function PlanItem({ plan }: { plan: Plan }) {
+function PlanItem({ plan, onEdit }: { plan: Plan; onEdit: () => void }) {
   const [expanded, setExpanded] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
 
-  const licensingLabel = plan.licensings.length > 0
-    ? plan.licensings.map(l => [l.slots, l.modelo, l.usuarios].filter(Boolean).join(' | ')).join('; ')
+  const licensingText = plan.licensings.length > 0
+    ? plan.licensings.map(l => {
+        const range = [l.valorMinimo, l.valorMaximo].filter(Boolean).join('–')
+        const nome = l.tipoLicencaNome || l.tipoLicencaId
+        return range ? `${nome}: ${range} ${l.tipoLicencaUnidade ?? ''}`.trim() : nome
+      }).join(' · ')
     : null
+
+  useEffect(() => {
+    if (!menuOpen) return
+    function handleOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleOutside)
+    return () => document.removeEventListener('mousedown', handleOutside)
+  }, [menuOpen])
 
   return (
     <div className="bg-white border border-[#e5e7eb] rounded-md flex flex-col gap-2 pt-2 pb-4 px-5">
@@ -76,16 +94,35 @@ function PlanItem({ plan }: { plan: Plan }) {
             <p className="text-xs text-[#6b7280]">{plan.description}</p>
           )}
         </div>
-        <button className="text-[#6b7280] shrink-0 w-9 h-9 flex items-center justify-center rounded-md hover:bg-gray-100 transition-colors">
-          <MoreVertical className="w-4 h-4" />
-        </button>
+
+        {/* ⋮ dropdown — abre opção Editar (redireciona para EditSolutionSheet) */}
+        <div className="relative shrink-0" ref={menuRef}>
+          <button
+            className="text-[#6b7280] shrink-0 w-9 h-9 flex items-center justify-center rounded-md hover:bg-gray-100 transition-colors"
+            onClick={() => setMenuOpen(v => !v)}
+          >
+            <MoreVertical className="w-4 h-4" />
+          </button>
+
+          {menuOpen && (
+            <div className="absolute right-0 top-10 z-50 bg-white border border-[#e5e7eb] rounded-md shadow-lg py-1 min-w-[148px]">
+              <button
+                type="button"
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#030712] hover:bg-gray-50 transition-colors"
+                onClick={() => { setMenuOpen(false); onEdit() }}
+              >
+                Editar solução
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
-      {expanded && licensingLabel && (
+      {expanded && licensingText && (
         <>
           <Divider />
           <div className="px-1 py-2">
-            <Field label="Modelo de licenciamento" value={licensingLabel} />
+            <Field label="Tipos de licença" value={licensingText} />
           </div>
         </>
       )}
@@ -93,8 +130,12 @@ function PlanItem({ plan }: { plan: Plan }) {
   )
 }
 
-export function SolutionDetailSheet({ open, onClose, solution, onEdit }: Props) {
+export function SolutionDetailSheet({ open, onClose, solution, componentes = [], onEdit }: Props) {
   if (!solution) return null
+
+  const componentesVinculados = componentes.filter(c =>
+    (solution.componenteIds ?? []).includes(c.id)
+  )
 
   return (
     <Sheet open={open} onClose={onClose} title="Detalhe da solução" width="w-[768px]">
@@ -130,6 +171,24 @@ export function SolutionDetailSheet({ open, onClose, solution, onEdit }: Props) 
 
         <Divider />
 
+        {/* Componentes */}
+        {componentesVinculados.length > 0 && (
+          <>
+            <div className="flex flex-col gap-4">
+              <SectionTitle>Componentes</SectionTitle>
+              <div className="flex flex-col gap-2">
+                {componentesVinculados.map(c => (
+                  <div key={c.id} className="flex flex-col gap-0.5 px-4 py-3 border border-[#e5e7eb] rounded-md">
+                    <p className="text-sm font-medium text-[#030712]">{c.nome}</p>
+                    {c.descricao && <p className="text-xs text-[#6b7280]">{c.descricao}</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <Divider />
+          </>
+        )}
+
         {/* Planos */}
         <div className="flex flex-col gap-4">
           <SectionTitle>Planos</SectionTitle>
@@ -138,7 +197,7 @@ export function SolutionDetailSheet({ open, onClose, solution, onEdit }: Props) 
           ) : (
             <div className="flex flex-col gap-2">
               {solution.plans.map((plan, i) => (
-                <PlanItem key={i} plan={plan} />
+                <PlanItem key={i} plan={plan} onEdit={onEdit ?? (() => {})} />
               ))}
             </div>
           )}
@@ -151,7 +210,8 @@ export function SolutionDetailSheet({ open, onClose, solution, onEdit }: Props) 
           <SectionTitle>Marketplace</SectionTitle>
           <div className="flex flex-col gap-4">
             <Field label="Marketplace" value={solution.marketplace} />
-            {solution.marketplace === 'Ativo' && (
+            {/* Exibe campos de link sempre que houver dados, independente do status */}
+            {(solution.link01 || solution.link02 || solution.marketplaceStatus) && (
               <>
                 <Field label="Link 01" value={solution.link01} isLink />
                 <Field label="Título do Link 01" value={solution.titleLink01} />

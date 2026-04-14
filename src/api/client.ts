@@ -42,4 +42,26 @@ export const api = {
   createUser: (data: any) => request<any>('/api/users', { method: 'POST', body: JSON.stringify(data) }),
   updateUser: (id: string, data: any) => request<any>(`/api/users/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteUser: (id: string) => request<any>(`/api/users/${id}`, { method: 'DELETE' }),
+
+  // Tipos de Licença
+  getTiposLicenca: () => request<any[]>('/api/tipos-licenca'),
+  getTipoLicenca: (id: string) => request<any>(`/api/tipos-licenca/${id}`),
+  createTipoLicenca: (data: any) => request<any>('/api/tipos-licenca', { method: 'POST', body: JSON.stringify(data) }),
+  updateTipoLicenca: (id: string, data: any) => request<any>(`/api/tipos-licenca/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteTipoLicenca: (id: string) => request<any>(`/api/tipos-licenca/${id}`, { method: 'DELETE' }),
+
+  // Componentes
+  getComponentes: () => request<any[]>('/api/componentes'),
+  getComponente: (id: string) => request<any>(`/api/componentes/${id}`),
+  createComponente: (data: any) => request<any>('/api/componentes', { method: 'POST', body: JSON.stringify(data) }),
+  updateComponente: (id: string, data: any) => request<any>(`/api/componentes/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteComponente: (id: string) => request<any>(`/api/componentes/${id}`, { method: 'DELETE' }),
+
+  // Valida URL de metadata de um componente.
+  // Retorna { ok: true, data: {...} } ou { ok: false, error: string }
+  validateMetadataUrl: (url: string) =>
+    request<{ ok: boolean; data?: Record<string, unknown>; error?: string }>(
+      '/api/componentes/validate-metadata',
+      { method: 'POST', body: JSON.stringify({ url }) }
+    ),
 }

@@ -14,7 +14,7 @@ import { SolutionDetailSheet } from '@/components/SolutionDetailSheet'
 import { EditSolutionSheet } from '@/components/EditSolutionSheet'
 import { ContractDetailSheet } from '@/components/ContractDetailSheet'
 import { api } from '@/api/client'
-import type { Account, Solution, Contract, Organization, Contact } from '@/types'
+import type { Account, Solution, Contract, Organization, Contact, TipoLicenca, Componente } from '@/types'
 
 type Tab = 'conta' | 'solucoes' | 'contrato' | 'marketplace'
 
@@ -26,6 +26,8 @@ export function OrganizacaoDetailPage() {
   const [accounts, setAccounts] = useState<Account[]>([])
   const [solutions, setSolutions] = useState<Solution[]>([])
   const [contracts, setContracts] = useState<Contract[]>([])
+  const [tiposLicenca, setTiposLicenca] = useState<TipoLicenca[]>([])
+  const [componentes, setComponentes] = useState<Componente[]>([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [showDeleted, setShowDeleted] = useState(false)
@@ -37,11 +39,15 @@ export function OrganizacaoDetailPage() {
       api.getAccounts(id),
       api.getSolutions(id),
       api.getContracts(id),
-    ]).then(([orgData, accs, sols, conts]) => {
+      api.getTiposLicenca(),
+      api.getComponentes(),
+    ]).then(([orgData, accs, sols, conts, tipos, comps]) => {
       setOrg(orgData)
       setAccounts(accs)
       setSolutions(sols)
       setContracts(conts)
+      setTiposLicenca(tipos)
+      setComponentes(comps)
       setLoading(false)
     }).catch(err => {
       console.error(err)
@@ -460,7 +466,15 @@ export function OrganizacaoDetailPage() {
 
       {/* Create sheets */}
       <NewAccountSheet open={sheetAccount} onClose={() => setSheetAccount(false)} orgId={org.id} onSave={handleAddAccount} />
-      <NewSolutionSheet open={sheetSolution} onClose={() => setSheetSolution(false)} orgId={org.id} onSave={handleAddSolution} />
+      <NewSolutionSheet
+        open={sheetSolution}
+        onClose={() => setSheetSolution(false)}
+        orgId={org.id}
+        onSave={handleAddSolution}
+        tiposLicenca={tiposLicenca}
+        componentes={componentes}
+        onComponenteCreated={c => setComponentes(prev => [...prev, c])}
+      />
       <NewContractSheet open={sheetContract} onClose={() => setSheetContract(false)} orgId={org.id} orgName={org.name} solutions={solutions} onSave={handleAddContract} />
       <NewOrganizationSheet open={sheetEditOrg} onClose={() => setSheetEditOrg(false)} onSave={handleEditOrg} />
 
@@ -487,6 +501,7 @@ export function OrganizacaoDetailPage() {
         open={!!selectedSolution}
         onClose={() => setSelectedSolution(null)}
         solution={selectedSolution}
+        componentes={componentes}
         onEdit={() => selectedSolution && handleEditSolutionFromDetail(selectedSolution)}
       />
       {editingSolution && (
@@ -496,6 +511,9 @@ export function OrganizacaoDetailPage() {
           onClose={() => setEditingSolution(null)}
           solution={editingSolution}
           onSave={handleSaveSolution}
+          tiposLicenca={tiposLicenca}
+          componentes={componentes}
+          onComponenteCreated={c => setComponentes(prev => [...prev, c])}
         />
       )}
       <ContractDetailSheet

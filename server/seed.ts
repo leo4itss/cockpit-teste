@@ -1,12 +1,14 @@
 import 'dotenv/config'
 import { db } from './db'
-import { organizations, accounts, solutions, contracts, users } from './schema'
+import { organizations, accounts, solutions, contracts, users, tiposLicenca, componentes } from './schema'
 import {
   organizations as mockOrgs,
   accounts as mockAccounts,
   solutions as mockSolutions,
   contracts as mockContracts,
   users as mockUsers,
+  tiposLicenca as mockTiposLicenca,
+  componentes as mockComponentes,
 } from '../src/data/mock'
 
 async function seed() {
@@ -17,6 +19,8 @@ async function seed() {
   await db.delete(accounts)
   await db.delete(users)
   await db.delete(organizations)
+  await db.delete(componentes)
+  await db.delete(tiposLicenca)
 
   await db.insert(organizations).values(
     mockOrgs.map(o => ({
@@ -134,6 +138,29 @@ async function seed() {
     }))
   )
   console.log('✓ users')
+
+  await db.insert(tiposLicenca).values(
+    mockTiposLicenca.map(t => ({
+      id: t.id,
+      nome: t.nome,
+      descricao: t.descricao,
+      unidade: t.unidade,
+      createdAt: t.createdAt,
+    }))
+  )
+  console.log('✓ tipos de licença')
+
+  await db.insert(componentes).values(
+    mockComponentes.map(c => ({
+      id: c.id,
+      nome: c.nome,
+      descricao: c.descricao,
+      metadataUrl: c.metadataUrl,
+      tiposLicenca: c.tiposLicenca,
+      createdAt: c.createdAt,
+    }))
+  )
+  console.log('✓ componentes')
 
   console.log('Seed complete!')
   process.exit(0)
