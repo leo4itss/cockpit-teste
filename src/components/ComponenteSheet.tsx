@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Dialog } from './ui/Dialog'
+import { Sheet } from './ui/Sheet'
 import { Input } from './ui/Input'
 import { Button } from './ui/Button'
 import { MetadataUrlInput } from './MetadataUrlInput'
@@ -14,19 +14,17 @@ interface Props {
 }
 
 /**
- * Dialog para criar ou editar um Componente.
+ * Sheet lateral para criar ou editar um Componente.
  *
  * Um componente representa um módulo/serviço que compõe uma Solução.
- * Opcionalmente, pode expor uma URL de metadata para que o sistema
- * identifique dinamicamente os tipos de licença disponíveis.
- *
  * Campos:
  *  - Nome (obrigatório)
  *  - Descrição
- *  - URL de Metadata (com validação ao vivo)
- *  - Tipos de Licença disponíveis (seleção a partir dos tipos cadastrados)
+ *  - URL de Metadata — endpoint GET que retorna os tipos de licença disponíveis.
+ *    Formato esperado: { componentId, name, version, tiposLicenca: [{ id, nome, unidade }] }
+ *  - Tipos de Licença disponíveis (seleção manual como fallback quando não há metadataUrl)
  */
-export function NewComponenteDialog({ open, onClose, onSave, tiposLicenca, initialComponente }: Props) {
+export function ComponenteSheet({ open, onClose, onSave, tiposLicenca, initialComponente }: Props) {
   const [nome, setNome] = useState('')
   const [descricao, setDescricao] = useState('')
   const [metadataUrl, setMetadataUrl] = useState('')
@@ -75,11 +73,12 @@ export function NewComponenteDialog({ open, onClose, onSave, tiposLicenca, initi
   const canSave = nome.trim() !== ''
 
   return (
-    <Dialog
+    <Sheet
       open={open}
       onClose={handleClose}
       title={initialComponente ? 'Editar componente' : 'Novo componente'}
-      className="max-w-lg"
+      description="Configure o módulo que poderá ser selecionado ao criar soluções."
+      width="w-[560px]"
       footer={
         <>
           <Button variant="outline" onClick={handleClose}>Cancelar</Button>
@@ -93,36 +92,57 @@ export function NewComponenteDialog({ open, onClose, onSave, tiposLicenca, initi
         </>
       }
     >
-      <div className="flex flex-col gap-6">
-        <Input
-          label="Nome do componente"
-          required
-          placeholder="ex: PAS Core, Knowledge Base"
-          value={nome}
-          onChange={e => setNome(e.target.value)}
-          autoFocus
-        />
+      <div className="flex flex-col gap-8">
 
-        <Input
-          label="Descrição"
-          placeholder="Descreva brevemente o propósito deste componente"
-          value={descricao}
-          onChange={e => setDescricao(e.target.value)}
-        />
+        {/* Dados básicos */}
+        <div className="flex flex-col gap-5">
+          <Input
+            label="Nome do componente"
+            required
+            placeholder="ex: PAS Core, Knowledge Base, Doc Neia"
+            value={nome}
+            onChange={e => setNome(e.target.value)}
+            autoFocus
+          />
 
-        <MetadataUrlInput value={metadataUrl} onChange={setMetadataUrl} />
+          <Input
+            label="Descrição"
+            placeholder="Descreva brevemente o propósito deste componente"
+            value={descricao}
+            onChange={e => setDescricao(e.target.value)}
+          />
+        </div>
 
-        {/* Tipos de Licença disponíveis neste componente */}
+        <div className="border-t border-[#e5e7eb]" />
+
+        {/* URL de Metadata */}
         <div className="flex flex-col gap-3">
           <div>
-            <p className="text-sm font-medium text-[#030712]">Tipos de Licença disponíveis</p>
-            <p className="text-xs text-[#6b7280] mt-0.5">
-              Selecione quais tipos de licença este componente suporta.
+            <p className="text-base font-bold text-[#030712] leading-6">Metadata</p>
+            <p className="text-sm text-[#6b7280] mt-1">
+              Informe o endpoint GET que expõe os tipos de licença disponíveis neste componente.
+              O sistema consultará esta URL para derivar automaticamente as opções de licença.
+            </p>
+          </div>
+          <MetadataUrlInput value={metadataUrl} onChange={setMetadataUrl} />
+        </div>
+
+        <div className="border-t border-[#e5e7eb]" />
+
+        {/* Tipos de Licença disponíveis */}
+        <div className="flex flex-col gap-4">
+          <div>
+            <p className="text-base font-bold text-[#030712] leading-6">Tipos de Licença</p>
+            <p className="text-sm text-[#6b7280] mt-1">
+              Selecione manualmente quais tipos de licença este componente suporta.
+              Usado como fallback quando a URL de metadata não está configurada.
             </p>
           </div>
 
           {tiposLicenca.length === 0 ? (
-            <p className="text-sm text-[#6b7280]">Nenhum tipo de licença cadastrado.</p>
+            <p className="text-sm text-[#6b7280] bg-gray-50 rounded-md px-4 py-3">
+              Nenhum tipo de licença cadastrado no sistema.
+            </p>
           ) : (
             <div className="flex flex-col gap-2">
               {tiposLicenca.map(t => {
@@ -130,7 +150,7 @@ export function NewComponenteDialog({ open, onClose, onSave, tiposLicenca, initi
                 return (
                   <label
                     key={t.id}
-                    className={`flex items-start gap-3 px-3 py-2.5 border rounded-md cursor-pointer transition-colors ${
+                    className={`flex items-start gap-3 px-4 py-3 border rounded-md cursor-pointer transition-colors ${
                       checked
                         ? 'border-[#2563eb] bg-blue-50'
                         : 'border-[#e5e7eb] bg-white hover:bg-gray-50'
@@ -142,9 +162,11 @@ export function NewComponenteDialog({ open, onClose, onSave, tiposLicenca, initi
                       onChange={() => toggleTipo(t.id)}
                       className="mt-0.5 w-4 h-4 rounded border-[#e5e7eb] text-blue-600 shadow-sm cursor-pointer shrink-0"
                     />
-                    <div className="flex flex-col gap-0">
+                    <div className="flex flex-col gap-0.5 min-w-0">
                       <p className="text-sm font-medium text-[#030712] leading-5">{t.nome}</p>
-                      <p className="text-xs text-[#6b7280]">Unidade: {t.unidade}</p>
+                      <p className="text-xs text-[#6b7280]">
+                        {t.descricao ? `${t.descricao} · ` : ''}Unidade: {t.unidade}
+                      </p>
                     </div>
                   </label>
                 )
@@ -152,7 +174,8 @@ export function NewComponenteDialog({ open, onClose, onSave, tiposLicenca, initi
             </div>
           )}
         </div>
+
       </div>
-    </Dialog>
+    </Sheet>
   )
 }

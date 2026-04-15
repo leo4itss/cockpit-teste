@@ -104,7 +104,7 @@ export interface Solution {
   plans: Plan[]
   componenteIds?: string[]  // IDs dos componentes utilizados por esta solução
   description: string
-  type: string
+  type?: string
   arquitetoPAS: string
   status: 'Criado' | 'Ativo' | 'Inativo'
   createdAt: string

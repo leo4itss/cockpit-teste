@@ -1,14 +1,17 @@
 import { useState, useRef, useEffect } from 'react'
-import { ChevronUp, ChevronDown, MoreVertical, CircleAlert, Pencil, Trash2 } from 'lucide-react'
+import { ChevronUp, ChevronDown, MoreVertical, CircleAlert, Pencil, Trash2, Plus, Puzzle } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Input } from './ui/Input'
 import { Select } from './ui/Select'
 import { Button } from './ui/Button'
 import { NewPlanDialog } from './NewPlanDialog'
 import { ComponenteSelector } from './ComponenteSelector'
-import { NewComponenteDialog } from './NewComponenteDialog'
+import { ComponenteSelecaoSheet } from './ComponenteSelecaoSheet'
+import { ComponenteSheet } from './ComponenteSheet'
 import { api } from '@/api/client'
 import type { Solution, Plan, TipoLicenca, Componente } from '@/types'
+
+const THRESHOLD_INLINE = 5  // ≤ este valor: inline; > este valor: sheet
 
 interface Props {
   open: boolean
@@ -132,13 +135,6 @@ function PlanCard({
 
 /* ── options ─────────────────────────────────────────────── */
 
-const TIPOS_SOLUCAO = [
-  { value: 'Assistente de IA',       label: 'Assistente de IA' },
-  { value: 'Base de conhecimento',   label: 'Base de conhecimento' },
-  { value: 'Enterprise',             label: 'Enterprise' },
-  { value: 'Analytics',              label: 'Analytics' },
-]
-
 const ARQUITETOS = [
   { value: 'Marcelo', label: 'Marcelo' },
   { value: 'Ana Lima', label: 'Ana Lima' },
@@ -166,7 +162,10 @@ export function EditSolutionSheet({
   const [selectedComponenteIds, setSelectedComponenteIds] = useState<string[]>(solution?.componenteIds ?? [])
   const [planDialogOpen, setPlanDialogOpen] = useState(false)
   const [editingPlanIndex, setEditingPlanIndex] = useState<number | null>(null)
-  const [componenteDialogOpen, setComponenteDialogOpen] = useState(false)
+  const [componenteSelecaoOpen, setComponenteSelecaoOpen] = useState(false)
+  const [componenteSheetOpen, setComponenteSheetOpen] = useState(false)
+
+  const useInline = componentes.length <= THRESHOLD_INLINE
 
   // Re-sync form when solution changes
   const [lastSolution, setLastSolution] = useState(solution)
@@ -181,7 +180,6 @@ export function EditSolutionSheet({
     return {
       name:              s?.name              ?? '',
       description:       s?.description       ?? '',
-      type:              s?.type              ?? '',
       arquitetoPAS:      s?.arquitetoPAS      ?? '',
       marketplace:       s?.marketplace !== undefined && s?.marketplace !== null
                            ? s.marketplace !== 'Inativo'
@@ -251,7 +249,6 @@ export function EditSolutionSheet({
       ...solution,
       name:              form.name,
       description:       form.description,
-      type:              form.type,
       arquitetoPAS:      form.arquitetoPAS,
       plans,
       componenteIds:     selectedComponenteIds,
@@ -310,13 +307,6 @@ export function EditSolutionSheet({
           <div className="flex flex-col gap-7">
             <SectionTitle>Dados da solução</SectionTitle>
 
-            <Select
-              label="Tipo da solução"
-              options={TIPOS_SOLUCAO}
-              value={form.type}
-              onChange={e => set('type', e.target.value)}
-            />
-
             <Input
               label="Apelido da solução"
               required
@@ -345,16 +335,62 @@ export function EditSolutionSheet({
 
           {/* ── Componentes ─────────────────────────────────── */}
           <div className="flex flex-col gap-4">
-            <SectionTitle>Componentes</SectionTitle>
+            <div className="flex items-center justify-between">
+              <SectionTitle>Selecione os módulos que compõem essa solução</SectionTitle>
+            </div>
             <p className="text-sm text-[#6b7280] -mt-2">
-              Os tipos de licença disponíveis para os planos são derivados dos componentes selecionados.
+              Os tipos de licença disponíveis para os planos serão derivados automaticamente dos componentes selecionados.
             </p>
-            <ComponenteSelector
-              componentes={componentes}
-              value={selectedComponenteIds}
-              onChange={setSelectedComponenteIds}
-              onCreateNew={() => setComponenteDialogOpen(true)}
-            />
+
+            {useInline ? (
+              <ComponenteSelector
+                componentes={componentes}
+                value={selectedComponenteIds}
+                onChange={setSelectedComponenteIds}
+                onCreateNew={() => setComponenteSheetOpen(true)}
+              />
+            ) : (
+              <div className="flex flex-col gap-3">
+                <button
+                  type="button"
+                  onClick={() => setComponenteSelecaoOpen(true)}
+                  className="inline-flex items-center gap-1.5 h-9 px-4 border border-[#e5e7eb] rounded-md text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors w-fit"
+                >
+                  <Plus className="w-4 h-4" />
+                  Selecionar componentes
+                  {selectedComponenteIds.length > 0 && (
+                    <span className="ml-1 bg-blue-100 text-blue-700 text-xs font-semibold px-1.5 py-0.5 rounded-full">
+                      {selectedComponenteIds.length}
+                    </span>
+                  )}
+                </button>
+
+                {selectedComponenteIds.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {componentes
+                      .filter(c => selectedComponenteIds.includes(c.id))
+                      .map(c => (
+                        <span
+                          key={c.id}
+                          className="inline-flex items-center gap-1.5 h-7 pl-2.5 pr-1.5 border border-[#2563eb] bg-blue-50 rounded-md text-xs font-medium text-[#2563eb]"
+                        >
+                          <Puzzle className="w-3 h-3" />
+                          {c.nome}
+                          <button
+                            type="button"
+                            onClick={() => setSelectedComponenteIds(prev => prev.filter(id => id !== c.id))}
+                            className="ml-0.5 hover:text-blue-900 transition-colors"
+                            aria-label={`Remover ${c.nome}`}
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             <Divider />
           </div>
 
@@ -487,9 +523,17 @@ export function EditSolutionSheet({
         tiposLicenca={tiposDisponiveis}
       />
 
-      <NewComponenteDialog
-        open={componenteDialogOpen}
-        onClose={() => setComponenteDialogOpen(false)}
+      <ComponenteSelecaoSheet
+        open={componenteSelecaoOpen}
+        onClose={() => setComponenteSelecaoOpen(false)}
+        componentes={componentes}
+        value={selectedComponenteIds}
+        onChange={setSelectedComponenteIds}
+      />
+
+      <ComponenteSheet
+        open={componenteSheetOpen}
+        onClose={() => setComponenteSheetOpen(false)}
         onSave={handleCreateComponente}
         tiposLicenca={tiposLicenca}
       />

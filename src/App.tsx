@@ -5,6 +5,7 @@ import { OrganizacoesPage } from './pages/OrganizacoesPage'
 import { OrganizacaoDetailPage } from './pages/OrganizacaoDetailPage'
 import { AcessosPage } from './pages/AcessosPage'
 import { HomePage } from './pages/HomePage'
+import { ComponentesPage } from './pages/ComponentesPage'
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
           <Route index element={<Navigate to="/home" replace />} />
           <Route path="organizacoes" element={<OrganizacoesPage />} />
           <Route path="acessos" element={<AcessosPage />} />
+          <Route path="componentes" element={<ComponentesPage />} />
         </Route>
         <Route path="/organizacoes/:id" element={<DetailLayout />}>
           <Route index element={<OrganizacaoDetailPage />} />

@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Building2, Users, PanelLeft } from 'lucide-react'
+import { Building2, Users, PanelLeft, Puzzle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const ITSSIcon = () => (
@@ -111,6 +111,22 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
             >
               <Users className="w-4 h-4 shrink-0" />
               {!collapsed && <span className="whitespace-nowrap">Acessos</span>}
+            </NavLink>
+
+            <NavLink
+              to="/componentes"
+              className={({ isActive }) =>
+                cn(
+                  'flex items-center gap-2 h-8 px-2 rounded-md text-sm transition-colors',
+                  collapsed && 'justify-center px-2',
+                  isActive
+                    ? 'bg-gray-100 text-[#111827] font-medium'
+                    : 'text-[#030712] hover:bg-gray-100 font-normal'
+                )
+              }
+            >
+              <Puzzle className="w-4 h-4 shrink-0" />
+              {!collapsed && <span className="whitespace-nowrap">Componentes</span>}
             </NavLink>
           </div>
         </div>

@@ -224,7 +224,6 @@ export const solutions: Solution[] = [
       },
     ],
     description: 'Assistente de Design',
-    type: 'Assistente de IA',
     arquitetoPAS: 'Marcelo',
     status: 'Criado',
     createdAt: '23/03/2026',

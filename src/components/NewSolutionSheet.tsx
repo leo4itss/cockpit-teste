@@ -3,10 +3,11 @@ import { Sheet } from './ui/Sheet'
 import { Input } from './ui/Input'
 import { Select } from './ui/Select'
 import { Button } from './ui/Button'
-import { Upload, CircleAlert, Plus, Trash2 } from 'lucide-react'
+import { Upload, CircleAlert, Plus, Trash2, Puzzle } from 'lucide-react'
 import { NewPlanDialog } from './NewPlanDialog'
 import { ComponenteSelector } from './ComponenteSelector'
-import { NewComponenteDialog } from './NewComponenteDialog'
+import { ComponenteSelecaoSheet } from './ComponenteSelecaoSheet'
+import { ComponenteSheet } from './ComponenteSheet'
 import { api } from '@/api/client'
 import type { Solution, Plan, TipoLicenca, Componente } from '@/types'
 
@@ -22,10 +23,10 @@ interface Props {
 
 /* ── sub-components ────────────────────────────────────── */
 
+const THRESHOLD_INLINE = 5  // ≤ este valor: inline; > este valor: sheet
+
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="text-base font-bold text-[#030712] pb-3 leading-snug">{children}</p>
-  )
+  return <p className="text-base font-bold text-[#030712] pb-3 leading-snug">{children}</p>
 }
 
 function Divider() {
@@ -41,8 +42,6 @@ function InfoBox({ children }: { children: React.ReactNode }) {
   )
 }
 
-/* ── toggle ────────────────────────────────────────────── */
-
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
   return (
     <button
@@ -54,27 +53,18 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
         checked ? 'bg-blue-600' : 'bg-gray-200'
       }`}
     >
-      <span
-        className={`inline-block h-4 w-4 rounded-full bg-white shadow-md transform transition-transform ${
-          checked ? 'translate-x-4' : 'translate-x-0'
-        }`}
-      />
+      <span className={`inline-block h-4 w-4 rounded-full bg-white shadow-md transform transition-transform ${
+        checked ? 'translate-x-4' : 'translate-x-0'
+      }`} />
     </button>
   )
 }
 
-/* ── main ──────────────────────────────────────────────── */
+/* ── options ───────────────────────────────────────────── */
 
 const ARQUITETOS = [
   { value: 'marcelo', label: 'Marcelo Gomes' },
   { value: 'ana', label: 'Ana Lima' },
-]
-
-const TIPOS = [
-  { value: 'Assistente de IA',     label: 'Assistente de IA' },
-  { value: 'Base de conhecimento', label: 'Base de conhecimento' },
-  { value: 'Enterprise',           label: 'Enterprise' },
-  { value: 'Padrão',               label: 'Padrão' },
 ]
 
 const STATUS_OPTIONS = [
@@ -82,6 +72,8 @@ const STATUS_OPTIONS = [
   { value: 'Em breve', label: 'Em breve' },
   { value: 'Disponível', label: 'Disponível' },
 ]
+
+/* ── main ──────────────────────────────────────────────── */
 
 export function NewSolutionSheet({
   open,
@@ -95,7 +87,6 @@ export function NewSolutionSheet({
   const [form, setForm] = useState({
     name: '',
     description: '',
-    type: '',
     arquitetoPAS: '',
     marketplace: false,
     link01: '',
@@ -107,14 +98,16 @@ export function NewSolutionSheet({
   const [plans, setPlans] = useState<Plan[]>([])
   const [selectedComponenteIds, setSelectedComponenteIds] = useState<string[]>([])
   const [planDialogOpen, setPlanDialogOpen] = useState(false)
-  const [componenteDialogOpen, setComponenteDialogOpen] = useState(false)
+  const [componenteSelecaoOpen, setComponenteSelecaoOpen] = useState(false)
+  const [componenteSheetOpen, setComponenteSheetOpen] = useState(false)
+
+  const useInline = componentes.length <= THRESHOLD_INLINE
 
   function set(field: string, value: string | boolean) {
     setForm(f => ({ ...f, [field]: value }))
   }
 
-  // Tipos de licença disponíveis = union dos tipos dos componentes selecionados.
-  // Se nenhum componente selecionado, exibe todos.
+  // Tipos disponíveis para planos = union dos componentes selecionados (ou todos se nenhum)
   const tiposDisponiveis: TipoLicenca[] = selectedComponenteIds.length === 0
     ? tiposLicenca
     : (() => {
@@ -126,13 +119,12 @@ export function NewSolutionSheet({
         return tiposLicenca.filter(t => ids.has(t.id))
       })()
 
-  // Required fields validation
+  const selectedComponentes = componentes.filter(c => selectedComponenteIds.includes(c.id))
+
   const baseValid = form.name.trim() !== '' && form.arquitetoPAS !== ''
   const marketplaceValid = !form.marketplace || (
-    form.link01.trim() !== '' &&
-    form.titleLink01.trim() !== '' &&
-    form.link02.trim() !== '' &&
-    form.titleLink02.trim() !== ''
+    form.link01.trim() !== '' && form.titleLink01.trim() !== '' &&
+    form.link02.trim() !== '' && form.titleLink02.trim() !== ''
   )
   const canSave = baseValid && marketplaceValid
 
@@ -142,15 +134,13 @@ export function NewSolutionSheet({
       orgId,
       name: form.name,
       description: form.description,
-      type: form.type,
       arquitetoPAS: form.arquitetoPAS,
       plans,
       componenteIds: selectedComponenteIds,
       status: 'Ativo',
       createdAt: new Date().toISOString(),
     })
-    // reset
-    setForm({ name: '', description: '', type: '', arquitetoPAS: '', marketplace: false, link01: '', titleLink01: '', link02: '', titleLink02: '', marketplaceStatus: '' })
+    setForm({ name: '', description: '', arquitetoPAS: '', marketplace: false, link01: '', titleLink01: '', link02: '', titleLink02: '', marketplaceStatus: '' })
     setPlans([])
     setSelectedComponenteIds([])
     onClose()
@@ -162,10 +152,6 @@ export function NewSolutionSheet({
     setSelectedComponenteIds(prev => [...prev, saved.id])
   }
 
-  function addPlan(plan: Plan) {
-    setPlans(p => [...p, plan])
-  }
-
   return (
     <Sheet
       open={open}
@@ -174,11 +160,7 @@ export function NewSolutionSheet({
       footer={
         <>
           <Button variant="outline" onClick={onClose}>Cancelar</Button>
-          <Button
-            onClick={handleSave}
-            disabled={!canSave}
-            className={!canSave ? 'opacity-50 cursor-not-allowed' : ''}
-          >
+          <Button onClick={handleSave} disabled={!canSave} className={!canSave ? 'opacity-50 cursor-not-allowed' : ''}>
             Salvar
           </Button>
         </>
@@ -186,16 +168,14 @@ export function NewSolutionSheet({
     >
       <div className="flex flex-col gap-10">
 
-        {/* ── Ícone da solução ──────────────────────────── */}
+        {/* ── Ícone ──────────────────────────────────── */}
         <div className="flex flex-col gap-7">
           <div className="flex items-start gap-7">
             <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
               <span className="text-gray-400 text-lg">?</span>
             </div>
             <div className="flex flex-col gap-2 min-w-0">
-              <p className="text-sm text-gray-500 leading-snug">
-                Insira o ícone mobile da solução. Formato: 512×512 pixels.
-              </p>
+              <p className="text-sm text-gray-500 leading-snug">Insira o ícone mobile da solução. Formato: 512×512 pixels.</p>
               <button className="inline-flex items-center gap-2 h-9 px-4 border border-gray-200 rounded-md text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors w-fit">
                 <Upload className="w-4 h-4 text-gray-400" />
                 Escolher imagem
@@ -205,17 +185,9 @@ export function NewSolutionSheet({
           <Divider />
         </div>
 
-        {/* ── Dados da solução ──────────────────────────── */}
+        {/* ── Dados da solução ───────────────────────── */}
         <div className="flex flex-col gap-7">
           <SectionTitle>Dados da solução</SectionTitle>
-
-          <Select
-            label="Tipo da solução"
-            placeholder="Selecione"
-            options={TIPOS}
-            value={form.type}
-            onChange={e => set('type', e.target.value)}
-          />
 
           <Input
             label="Apelido da solução"
@@ -227,37 +199,81 @@ export function NewSolutionSheet({
 
           <Input
             label="Descrição"
-            placeholder="Como chama a solução?"
+            placeholder="Descreva brevemente a solução"
             value={form.description}
             onChange={e => set('description', e.target.value)}
           />
 
           <InfoBox>
-            Escolha um nome único para o domínio.{' '}
-            Este identificador não pode ser divulgado no sistema.
+            Escolha um nome único para o domínio. Este identificador não pode ser divulgado no sistema.
           </InfoBox>
 
           <Divider />
         </div>
 
-        {/* ── Componentes ───────────────────────────────── */}
+        {/* ── Componentes ────────────────────────────── */}
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <SectionTitle>Componentes</SectionTitle>
+            <SectionTitle>Selecione os módulos que compõem essa solução</SectionTitle>
           </div>
           <p className="text-sm text-[#6b7280] -mt-2">
-            Selecione os módulos que compõem esta solução. Os tipos de licença disponíveis para os planos serão derivados dos componentes selecionados.
+            Os tipos de licença disponíveis para os planos serão derivados automaticamente dos componentes selecionados.
           </p>
-          <ComponenteSelector
-            componentes={componentes}
-            value={selectedComponenteIds}
-            onChange={setSelectedComponenteIds}
-            onCreateNew={() => setComponenteDialogOpen(true)}
-          />
+
+          {useInline ? (
+            /* ≤ 5 componentes: seletor inline */
+            <ComponenteSelector
+              componentes={componentes}
+              value={selectedComponenteIds}
+              onChange={setSelectedComponenteIds}
+              onCreateNew={() => setComponenteSheetOpen(true)}
+            />
+          ) : (
+            /* > 5 componentes: botão que abre sheet de seleção */
+            <div className="flex flex-col gap-3">
+              <button
+                type="button"
+                onClick={() => setComponenteSelecaoOpen(true)}
+                className="inline-flex items-center gap-1.5 h-9 px-4 border border-[#e5e7eb] rounded-md text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors w-fit"
+              >
+                <Plus className="w-4 h-4" />
+                Selecionar componentes
+                {selectedComponenteIds.length > 0 && (
+                  <span className="ml-1 bg-blue-100 text-blue-700 text-xs font-semibold px-1.5 py-0.5 rounded-full">
+                    {selectedComponenteIds.length}
+                  </span>
+                )}
+              </button>
+
+              {/* Chips dos componentes selecionados */}
+              {selectedComponentes.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {selectedComponentes.map(c => (
+                    <span
+                      key={c.id}
+                      className="inline-flex items-center gap-1.5 h-7 pl-2.5 pr-1.5 border border-[#2563eb] bg-blue-50 rounded-md text-xs font-medium text-[#2563eb]"
+                    >
+                      <Puzzle className="w-3 h-3" />
+                      {c.nome}
+                      <button
+                        type="button"
+                        onClick={() => setSelectedComponenteIds(prev => prev.filter(id => id !== c.id))}
+                        className="ml-0.5 hover:text-blue-900 transition-colors"
+                        aria-label={`Remover ${c.nome}`}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           <Divider />
         </div>
 
-        {/* ── Planos ────────────────────────────────────── */}
+        {/* ── Planos ─────────────────────────────────── */}
         <div className="flex flex-col gap-7">
           <div className="flex items-center justify-between">
             <SectionTitle>Planos</SectionTitle>
@@ -294,10 +310,9 @@ export function NewSolutionSheet({
           <Divider />
         </div>
 
-        {/* ── Configuração PAS ──────────────────────────── */}
+        {/* ── Configuração PAS ───────────────────────── */}
         <div className="flex flex-col gap-7">
           <SectionTitle>Configuração PAS</SectionTitle>
-
           <Select
             label="Arquiteto PAS responsável"
             required
@@ -306,71 +321,32 @@ export function NewSolutionSheet({
             value={form.arquitetoPAS}
             onChange={e => set('arquitetoPAS', e.target.value)}
           />
-
           <Divider />
         </div>
 
-        {/* ── Marketplace ───────────────────────────────── */}
+        {/* ── Marketplace ────────────────────────────── */}
         <div className="flex flex-col gap-7">
           <SectionTitle>Marketplace</SectionTitle>
-
-          {/* Toggle */}
           <div className="flex items-start gap-3">
-            <Toggle
-              checked={form.marketplace}
-              onChange={v => set('marketplace', v)}
-            />
+            <Toggle checked={form.marketplace} onChange={v => set('marketplace', v)} />
             <div className="flex flex-col gap-1">
               <p className="text-sm font-medium text-[#030712] leading-none">Marketplace</p>
               <p className="text-sm text-gray-500">Ativar marketplace</p>
             </div>
           </div>
 
-          {/* Marketplace fields — only shown when toggled ON */}
           {form.marketplace && (
             <div className="flex flex-col gap-7">
               <div className="grid grid-cols-2 gap-4">
-                <Input
-                  label="Link 01"
-                  required
-                  placeholder="Cole aqui o link"
-                  value={form.link01}
-                  onChange={e => set('link01', e.target.value)}
-                />
-                <Input
-                  label="Título do Link 01"
-                  required
-                  placeholder="Digite o título do link"
-                  value={form.titleLink01}
-                  onChange={e => set('titleLink01', e.target.value)}
-                />
+                <Input label="Link 01" required placeholder="Cole aqui o link" value={form.link01} onChange={e => set('link01', e.target.value)} />
+                <Input label="Título do Link 01" required placeholder="Digite o título" value={form.titleLink01} onChange={e => set('titleLink01', e.target.value)} />
               </div>
-
               <div className="grid grid-cols-2 gap-4">
-                <Input
-                  label="Link 02"
-                  required
-                  placeholder="Cole aqui o link"
-                  value={form.link02}
-                  onChange={e => set('link02', e.target.value)}
-                />
-                <Input
-                  label="Título do Link 02"
-                  required
-                  placeholder="Digite o título do link"
-                  value={form.titleLink02}
-                  onChange={e => set('titleLink02', e.target.value)}
-                />
+                <Input label="Link 02" required placeholder="Cole aqui o link" value={form.link02} onChange={e => set('link02', e.target.value)} />
+                <Input label="Título do Link 02" required placeholder="Digite o título" value={form.titleLink02} onChange={e => set('titleLink02', e.target.value)} />
               </div>
-
               <div className="w-1/2">
-                <Select
-                  label="Status"
-                  placeholder="Selecione o status"
-                  options={STATUS_OPTIONS}
-                  value={form.marketplaceStatus}
-                  onChange={e => set('marketplaceStatus', e.target.value)}
-                />
+                <Select label="Status" placeholder="Selecione o status" options={STATUS_OPTIONS} value={form.marketplaceStatus} onChange={e => set('marketplaceStatus', e.target.value)} />
               </div>
             </div>
           )}
@@ -378,16 +354,25 @@ export function NewSolutionSheet({
 
       </div>
 
+      {/* Sub-sheets e dialogs */}
       <NewPlanDialog
         open={planDialogOpen}
         onClose={() => setPlanDialogOpen(false)}
-        onSave={plan => { addPlan(plan); setPlanDialogOpen(false) }}
+        onSave={plan => { setPlans(p => [...p, plan]); setPlanDialogOpen(false) }}
         tiposLicenca={tiposDisponiveis}
       />
 
-      <NewComponenteDialog
-        open={componenteDialogOpen}
-        onClose={() => setComponenteDialogOpen(false)}
+      <ComponenteSelecaoSheet
+        open={componenteSelecaoOpen}
+        onClose={() => setComponenteSelecaoOpen(false)}
+        componentes={componentes}
+        value={selectedComponenteIds}
+        onChange={setSelectedComponenteIds}
+      />
+
+      <ComponenteSheet
+        open={componenteSheetOpen}
+        onClose={() => setComponenteSheetOpen(false)}
         onSave={handleCreateComponente}
         tiposLicenca={tiposLicenca}
       />

@@ -393,7 +393,6 @@ export function OrganizacaoDetailPage() {
                         <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Nome da solução</th>
                         <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Planos</th>
                         <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Descrição</th>
-                        <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Tipo</th>
                         <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Arquiteto PAS</th>
                         <th className="text-center px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Status</th>
                       </tr>
@@ -408,7 +407,6 @@ export function OrganizacaoDetailPage() {
                           <td className="px-2 py-2 h-[52px] text-sm font-medium text-[#030712]">{s.name}</td>
                           <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{s.plans.map(p => p.name).join(', ')}</td>
                           <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{s.description}</td>
-                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{s.type}</td>
                           <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{s.arquitetoPAS}</td>
                           <td className="px-2 py-2 h-[52px] text-center">
                             <Badge variant="success">{s.status}</Badge>
