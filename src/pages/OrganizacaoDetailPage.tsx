@@ -142,16 +142,28 @@ export function OrganizacaoDetailPage() {
   )
 
   async function handleAddAccount(account: Omit<Account, 'id'>) {
-    const saved = await api.createAccount({ ...account, id: crypto.randomUUID() })
-    setAccounts(prev => [...prev, saved])
+    try {
+      const saved = await api.createAccount({ ...account, id: crypto.randomUUID() })
+      setAccounts(prev => [...prev, saved])
+    } catch {
+      alert('Erro ao salvar conta. Verifique se o servidor está rodando.')
+    }
   }
   async function handleAddSolution(solution: Omit<Solution, 'id'>) {
-    const saved = await api.createSolution({ ...solution, id: crypto.randomUUID() })
-    setSolutions(prev => [...prev, saved])
+    try {
+      const saved = await api.createSolution({ ...solution, id: crypto.randomUUID() })
+      setSolutions(prev => [...prev, saved])
+    } catch {
+      alert('Erro ao salvar solução. Verifique se o servidor está rodando.')
+    }
   }
   async function handleAddContract(contract: Omit<Contract, 'id'>) {
-    const saved = await api.createContract({ ...contract, id: crypto.randomUUID() })
-    setContracts(prev => [...prev, saved])
+    try {
+      const saved = await api.createContract({ ...contract, id: crypto.randomUUID() })
+      setContracts(prev => [...prev, saved])
+    } catch {
+      alert('Erro ao salvar contrato. Verifique se o servidor está rodando.')
+    }
   }
   async function handleEditOrg(data: Omit<Organization, 'id' | 'qtdContas' | 'qtdSolucoes' | 'qtdContratos' | 'contacts'>) {
     const saved = await api.updateOrganization(id!, { ...org, ...data })
