@@ -13,6 +13,7 @@ import { EditAccountSheet } from '@/components/EditAccountSheet'
 import { SolutionDetailSheet } from '@/components/SolutionDetailSheet'
 import { EditSolutionSheet } from '@/components/EditSolutionSheet'
 import { ContractDetailSheet } from '@/components/ContractDetailSheet'
+import { EditContractSheet } from '@/components/EditContractSheet'
 import { api } from '@/api/client'
 import {
   organizations as mockOrgs,
@@ -82,10 +83,12 @@ export function OrganizacaoDetailPage() {
   const [selectedSolution, setSelectedSolution] = useState<Solution | null>(null)
   const [editingSolution, setEditingSolution] = useState<Solution | null>(null)
   const [selectedContract, setSelectedContract] = useState<Contract | null>(null)
+  const [editingContract, setEditingContract] = useState<Contract | null>(null)
 
   // Transição suave Detail → Edit — useRef/useCallback DEVEM ficar antes de qualquer early return
   const pendingEditAccount = useRef<Account | null>(null)
   const pendingEditSolution = useRef<Solution | null>(null)
+  const pendingEditContract = useRef<Contract | null>(null)
 
   const handleEditAccountFromDetail = useCallback((account: Account) => {
     pendingEditAccount.current = account
@@ -102,6 +105,15 @@ export function OrganizacaoDetailPage() {
     setTimeout(() => {
       setEditingSolution(pendingEditSolution.current)
       pendingEditSolution.current = null
+    }, 340)
+  }, [])
+
+  const handleEditContractFromDetail = useCallback((contract: Contract) => {
+    pendingEditContract.current = contract
+    setSelectedContract(null)
+    setTimeout(() => {
+      setEditingContract(pendingEditContract.current)
+      pendingEditContract.current = null
     }, 340)
   }, [])
 
@@ -160,6 +172,12 @@ export function OrganizacaoDetailPage() {
     setSolutions(prev => prev.map(s => s.id === saved.id ? saved : s))
     setSelectedSolution(saved)
     setEditingSolution(null)
+  }
+  async function handleSaveContract(updated: Contract) {
+    const saved = await api.updateContract(updated.id, updated)
+    setContracts(prev => prev.map(c => c.id === saved.id ? saved : c))
+    setSelectedContract(saved)
+    setEditingContract(null)
   }
 
   const tabs: { key: Tab; label: string }[] = [
@@ -431,10 +449,8 @@ export function OrganizacaoDetailPage() {
                     <thead>
                       <tr className="bg-white border-b border-[#e5e7eb]">
                         <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Conta contratante</th>
-                        <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Organização contratada</th>
                         <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Soluções</th>
                         <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Plano</th>
-                        <th className="text-right px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Qtd contratada</th>
                         <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Data início</th>
                         <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Data término</th>
                         <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Renovação</th>
@@ -449,10 +465,15 @@ export function OrganizacaoDetailPage() {
                           onClick={() => setSelectedContract(c)}
                         >
                           <td className="px-2 py-2 h-[52px] text-sm font-medium text-[#030712]">{c.contratante}</td>
-                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.orgContratada}</td>
-                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.solucoes}</td>
-                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.plano}</td>
-                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712] text-right">{c.qtdContratada}</td>
+                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">
+                            <div className="flex items-center gap-1.5">
+                              <span>{c.objetos[0]?.solucao ?? '—'}</span>
+                              {c.objetos.length > 1 && (
+                                <span className="text-xs bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-full">+{c.objetos.length - 1}</span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.objetos[0]?.plano ?? '—'}</td>
                           <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.dataInicio}</td>
                           <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.dataTermino}</td>
                           <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.renovacao}</td>
@@ -532,7 +553,18 @@ export function OrganizacaoDetailPage() {
         open={!!selectedContract}
         onClose={() => setSelectedContract(null)}
         contract={selectedContract}
+        onEdit={() => selectedContract && handleEditContractFromDetail(selectedContract)}
       />
+      {editingContract && (
+        <EditContractSheet
+          key={editingContract.id}
+          open={!!editingContract}
+          onClose={() => setEditingContract(null)}
+          contract={editingContract}
+          solutions={solutions}
+          onSave={handleSaveContract}
+        />
+      )}
     </div>
   )
 }

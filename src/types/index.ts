@@ -97,6 +97,17 @@ export interface Plan {
   licensings: Licensing[]
 }
 
+// ── Objeto do Contrato ────────────────────────────────────────
+// Um contrato pode ter múltiplos objetos — cada um referencia uma
+// combinação de solução + plano + licenciamento + organização contratada.
+export interface ObjetoContrato {
+  solucao: string
+  orgContratada: string
+  plano: string
+  licenciamento: string
+  qtdContratada: number
+}
+
 export interface Solution {
   id: string
   orgId: string
@@ -120,11 +131,7 @@ export interface Contract {
   id: string
   orgId: string
   contratante: string
-  orgContratada: string
-  solucoes: string
-  plano: string
-  licenciamento?: string
-  qtdContratada: number
+  objetos: ObjetoContrato[]
   dataInicio: string
   dataTermino: string
   renovacao: string

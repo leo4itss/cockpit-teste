@@ -2,15 +2,10 @@ import { useState } from 'react'
 import { BadgeCheck } from 'lucide-react'
 import { Dialog } from './ui/Dialog'
 import { Button } from './ui/Button'
-import type { Solution } from '@/types'
+import type { Solution, ObjetoContrato } from '@/types'
 
-export interface ObjetoSelecionado {
-  solucao: string
-  orgContratada: string
-  plano: string
-  licenciamento: string
-  qtdContratada: number
-}
+// Alias mantido para compatibilidade com importadores existentes
+export type { ObjetoContrato as ObjetoSelecionado }
 
 interface Row {
   id: string
@@ -26,7 +21,7 @@ interface Props {
   onClose: () => void
   solutions: Solution[]
   orgName: string
-  onSave: (objetos: ObjetoSelecionado[]) => void
+  onSave: (objetos: ObjetoContrato[]) => void
 }
 
 function buildRows(solutions: Solution[], orgName: string): Row[] {
@@ -73,7 +68,7 @@ export function AddObjetoDialog({ open, onClose, solutions, orgName, onSave }: P
   }
 
   function handleSave() {
-    const objetos: ObjetoSelecionado[] = rows
+    const objetos: ObjetoContrato[] = rows
       .filter(r => selected.has(r.id))
       .map(r => ({
         solucao: r.solucao,

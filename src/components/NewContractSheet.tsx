@@ -5,8 +5,7 @@ import { Select } from './ui/Select'
 import { Input } from './ui/Input'
 import { Button } from './ui/Button'
 import { AddObjetoDialog } from './AddObjetoDialog'
-import type { ObjetoSelecionado } from './AddObjetoDialog'
-import type { Contract, Solution } from '@/types'
+import type { Contract, Solution, ObjetoContrato } from '@/types'
 
 interface Props {
   open: boolean
@@ -40,27 +39,22 @@ export function NewContractSheet({ open, onClose, orgId, orgName, solutions, onS
     dataTermino: '',
     renovacao: '',
   })
-  const [objetos, setObjetos] = useState<ObjetoSelecionado[]>([])
+  const [objetos, setObjetos] = useState<ObjetoContrato[]>([])
   const [dialogOpen, setDialogOpen] = useState(false)
 
   function set(field: string, value: string) {
     setForm(f => ({ ...f, [field]: value }))
   }
 
-  function handleObjetosSave(novos: ObjetoSelecionado[]) {
+  function handleObjetosSave(novos: ObjetoContrato[]) {
     setObjetos(prev => [...prev, ...novos])
   }
 
   function handleSave() {
-    const primeiro = objetos[0]
     onSave({
       orgId,
       contratante: orgName,
-      orgContratada: primeiro?.orgContratada ?? '',
-      solucoes: primeiro?.solucao ?? '',
-      plano: primeiro?.plano ?? '',
-      licenciamento: primeiro?.licenciamento ?? '',
-      qtdContratada: primeiro?.qtdContratada ?? 0,
+      objetos,
       dataInicio: form.dataInicio,
       dataTermino: form.dataTermino,
       renovacao: form.renovacao,
