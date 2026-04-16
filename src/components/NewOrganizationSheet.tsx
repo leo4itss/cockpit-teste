@@ -42,7 +42,7 @@ function Divider() {
   return <div className="border-t border-[#e5e7eb]" />
 }
 
-export function NewOrganizationSheet({ open, onClose, onSave }: Props) {
+export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props) {
   const [form, setForm] = useState({
     name: '', razaoSocial: '', docType: 'CNPJ', docNumber: '',
     businessSegment: '', officialSite: 'http://',
