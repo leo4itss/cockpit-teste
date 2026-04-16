@@ -91,10 +91,18 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
         description="Preencha os dados da Organização"
         width="w-[768px]"
         footer={
-          <>
-            <Button variant="secondary" onClick={onClose}>Cancelar</Button>
-            <Button onClick={handleSave}>Salvar</Button>
-          </>
+          <div className="flex items-center justify-between w-full">
+            {/* Ação destrutiva — só aparece no modo edição */}
+            {onDelete ? (
+              <Button variant="destructive" onClick={onDelete}>
+                Excluir organização
+              </Button>
+            ) : <span />}
+            <div className="flex items-center gap-2">
+              <Button variant="secondary" onClick={onClose}>Cancelar</Button>
+              <Button onClick={handleSave}>Salvar</Button>
+            </div>
+          </div>
         }
       >
         <div className="flex flex-col gap-10">
