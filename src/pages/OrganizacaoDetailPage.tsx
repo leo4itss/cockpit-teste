@@ -461,8 +461,8 @@ export function OrganizacaoDetailPage() {
                         <th className="text-left px-2 py-2.5 font-medium text-[#030712] opacity-40 h-10 w-[85px]">Planos</th>
                         {/* Descrição — 169px */}
                         <th className="text-left px-2 py-2.5 font-medium text-[#030712] opacity-40 h-10 w-[169px]">Descrição</th>
-                        {/* Módulos — 133px */}
-                        <th className="text-left px-2 py-2.5 font-medium text-[#030712] opacity-40 h-10 w-[133px]">Módulos</th>
+                        {/* Componentes — 133px */}
+                        <th className="text-left px-2 py-2.5 font-medium text-[#030712] opacity-40 h-10 w-[133px]">Componentes</th>
                         {/* Marketplace — 153px */}
                         <th className="text-left px-2 py-2.5 font-medium text-[#030712] opacity-40 h-10 w-[153px]">Marketplace</th>
                         {/* Arquiteto PAS — 120px, centralizado */}
