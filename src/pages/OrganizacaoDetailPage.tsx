@@ -452,13 +452,14 @@ export function OrganizacaoDetailPage() {
                         <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Subdomínio</th>
                         <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Arquiteto PAS</th>
                         <th className="text-center px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Status</th>
+                        <th className="w-10" />
                       </tr>
                     </thead>
                     <tbody>
                       {accounts.map(a => (
                         <tr
                           key={a.id}
-                          className="border-b border-[#e5e7eb] hover:bg-gray-50 cursor-pointer transition-colors"
+                          className="group border-b border-[#e5e7eb] hover:bg-gray-50 cursor-pointer transition-colors"
                           onClick={() => setSelectedAccount(a)}
                         >
                           <td className="px-2 py-2 h-[52px]">
