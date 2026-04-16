@@ -77,6 +77,8 @@ export const accounts = pgTable('accounts', {
   provisioningStatus: text('provisioning_status').notNull().default('PENDING'),
   arquitetoPAS: text('arquiteto_pas').notNull(),
   descricao: text('descricao'),
+  logo: text('logo'),                                    // data URL ou URL externa
+  isDefault: boolean('is_default').notNull().default(false), // conta padrão da org
   status: text('status').notNull().default('Criado'),
   createdAt: text('created_at').notNull(),
 })
