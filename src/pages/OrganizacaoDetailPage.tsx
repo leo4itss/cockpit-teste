@@ -641,6 +641,29 @@ export function OrganizacaoDetailPage() {
         </div>
       </div>
 
+      {/* Delete modals */}
+      <ConfirmDeleteModal
+        open={orgDeleteModal === 'org'}
+        onClose={() => setOrgDeleteModal(null)}
+        variant="org"
+        name={org?.name ?? ''}
+        onConfirm={handleDeleteOrg}
+      />
+      <ConfirmDeleteModal
+        open={orgDeleteModal === 'blocked'}
+        onClose={() => setOrgDeleteModal(null)}
+        variant="blocked"
+        name={org?.name ?? ''}
+        blocked={orgBlockedInfo ?? undefined}
+      />
+      <ConfirmDeleteModal
+        open={!!accountDeleteTarget}
+        onClose={() => setAccountDeleteTarget(null)}
+        variant="account"
+        name={accountDeleteTarget?.name ?? ''}
+        onConfirm={() => accountDeleteTarget && handleDeleteAccount(accountDeleteTarget)}
+      />
+
       {/* Create sheets */}
       <NewAccountSheet open={sheetAccount} onClose={() => setSheetAccount(false)} orgId={org.id} onSave={handleAddAccount} />
       <NewSolutionSheet
