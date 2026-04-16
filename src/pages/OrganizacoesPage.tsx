@@ -35,6 +35,27 @@ export function OrganizacoesPage() {
     o.domain.toLowerCase().includes(search.toLowerCase())
   )
 
+  async function handleDeleteOrg(org: Organization) {
+    try {
+      await api.deleteOrganization(org.id)
+      setOrgs(prev => prev.filter(o => o.id !== org.id))
+      setDeleteModal(null)
+      setDeleteTarget(null)
+    } catch (_err: any) {
+      // Tenta parsear erro 422 com dependências
+      try {
+        const res = await fetch(`/api/organizations/${org.id}`, { method: 'DELETE' })
+        if (res.status === 422) {
+          const body = await res.json()
+          setBlockedInfo({ activeAccounts: body.activeAccounts, activeContracts: body.activeContracts })
+          setDeleteModal('blocked')
+        }
+      } catch {
+        // fallback silencioso
+      }
+    }
+  }
+
   async function handleCreate(data: Omit<Organization, 'id' | 'qtdContas' | 'qtdSolucoes' | 'qtdContratos' | 'contacts'>) {
     const newOrg = await api.createOrganization({
       ...data,
