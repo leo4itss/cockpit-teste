@@ -53,17 +53,51 @@ function Separator() {
   return <div className="border-t border-gray-200 w-full" />
 }
 
-function ImageUploadRow({ description }: { description: string }) {
+function ImageUploadRow({
+  description,
+  preview,
+  onFileSelect,
+}: {
+  description: string
+  preview: string
+  onFileSelect: (dataUrl: string) => void
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => onFileSelect(ev.target?.result as string)
+    reader.readAsDataURL(file)
+  }
+
   return (
     <div className="flex items-start gap-7">
-      <div className="w-12 h-12 rounded-full bg-gray-100 shrink-0 overflow-hidden">
-        <div className="w-full h-full bg-gray-200 rounded-full" />
+      <div className="w-12 h-12 rounded-full bg-gray-100 shrink-0 overflow-hidden border border-[#e5e7eb]">
+        {preview
+          ? <img src={preview} alt="" className="w-full h-full object-cover" />
+          : <div className="w-full h-full bg-gray-200 rounded-full" />
+        }
       </div>
       <div className="flex flex-col gap-2 flex-1 min-w-0">
         <p className="text-sm text-[#6b7280] leading-5">{description}</p>
-        <Button variant="outline" size="sm" type="button" className="self-start">
+        {/* input oculto — acionado pelo botão abaixo */}
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleChange}
+        />
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          className="flex items-center gap-2 border border-[#e5e7eb] rounded-md px-4 h-9 text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors self-start"
+        >
+          <Upload className="w-4 h-4 text-[#6b7280]" />
           Escolher imagem
-        </Button>
+        </button>
       </div>
     </div>
   )
