@@ -140,6 +140,12 @@ export function NewSolutionSheet({
       componenteIds: selectedComponenteIds,
       status: 'Ativo',
       createdAt: new Date().toISOString(),
+      marketplace:       form.marketplace ? 'Ativo' : '',
+      link01:            form.link01,
+      titleLink01:       form.titleLink01,
+      link02:            form.link02,
+      titleLink02:       form.titleLink02,
+      marketplaceStatus: form.marketplaceStatus,
     })
     setForm({ name: '', description: '', arquitetoPAS: '', marketplace: false, link01: '', titleLink01: '', link02: '', titleLink02: '', marketplaceStatus: '' })
     setPlans([])

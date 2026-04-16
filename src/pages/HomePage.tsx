@@ -1,16 +1,16 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Bot, Database, School, Settings2, LayoutGrid, UserRound, Circle, Network, UserRoundCog } from 'lucide-react'
+import { AppWindow, Settings2, LayoutGrid, UserRound, Network, UserRoundCog } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Popover } from '@/components/ui/Popover'
 import { SettingsMenu } from '@/components/ui/SettingsMenu'
 import { ProfileModal } from '@/components/ui/ProfileModal'
 import { AppsMenu } from '@/components/ui/AppsMenu'
-import { cn } from '@/lib/utils'
-import type { LucideIcon } from 'lucide-react'
+import { api } from '@/api/client'
+import type { Solution } from '@/types'
 
-// ─── Logo ────────────────────────────────────────────────────────────────────
+// ─── Logo ─────────────────────────────────────────────────────────────────────
 
 const ITSSLogo = ({ onClick }: { onClick?: () => void }) => (
   <div className="flex items-center gap-2.5 cursor-pointer" onClick={onClick}>
@@ -30,111 +30,62 @@ const ITSSLogo = ({ onClick }: { onClick?: () => void }) => (
   </div>
 )
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-interface ActiveSolution {
-  icon: LucideIcon
-  title: string
-  description: string
-}
-
-interface MarketplaceSolution {
-  icon: LucideIcon
-  title: string
-  description: string
-  status: 'available' | 'soon'
-}
-
-// ─── Data ────────────────────────────────────────────────────────────────────
-
-const activeSolutions: ActiveSolution[] = [
-  {
-    icon: Bot,
-    title: 'Assistentes',
-    description: 'Assistentes de IA para apoiar tarefas e decisões.',
-  },
-  {
-    icon: Database,
-    title: 'Solução XYPTO',
-    description: 'Descrição da Solução XPTO',
-  },
-]
-
-const marketplaceSolutions: MarketplaceSolution[] = [
-  {
-    icon: School,
-    title: 'Trilhas de aprendizado',
-    description: 'Trilhas guiadas para aprendizado e evolução contínua.',
-    status: 'soon',
-  },
-  {
-    icon: Database,
-    title: 'Base de conhecimento',
-    description: 'Repositório central de conteúdos e documentos.',
-    status: 'available',
-  },
-  {
-    icon: Circle,
-    title: 'Solução 05',
-    description: 'Descrição breve da solução',
-    status: 'soon',
-  },
-]
-
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function IconBox({ icon: Icon, className }: { icon: LucideIcon; className?: string }) {
+function IconBox() {
   return (
-    <div
-      className={cn(
-        'w-8 h-8 rounded-[6px] bg-gray-100 border border-gray-200 flex items-center justify-center shrink-0',
-        className
-      )}
-    >
-      <Icon className="w-4 h-4 text-gray-600" />
+    <div className="w-8 h-8 rounded-[6px] bg-gray-100 border border-gray-200 flex items-center justify-center shrink-0">
+      <AppWindow className="w-4 h-4 text-gray-600" />
     </div>
   )
 }
 
-function ActiveSolutionCard({ icon, title, description }: ActiveSolution) {
+function ActiveSolutionCard({ solution }: { solution: Solution }) {
   return (
     <div className="bg-white border border-gray-200 rounded-xl shadow-[0_1px_3px_0_rgba(0,0,0,0.1),0_1px_2px_-1px_rgba(0,0,0,0.1)] flex flex-col justify-between py-6 overflow-hidden w-full h-full">
-      {/* Content */}
       <div className="flex flex-col items-start px-6 w-full">
         <div className="flex gap-4 items-start w-full">
-          <IconBox icon={icon} />
+          <IconBox />
           <div className="flex-1 flex flex-col gap-1 min-w-0">
-            <p className="text-sm font-medium text-[#030712] leading-4">{title}</p>
-            <p className="text-sm text-gray-500 leading-5">{description}</p>
+            <p className="text-sm font-medium text-[#030712] leading-4">{solution.name}</p>
+            <p className="text-sm text-gray-500 leading-5">{solution.description}</p>
           </div>
           <div className="flex items-start justify-end self-stretch shrink-0">
             <Badge variant="success">Ativo</Badge>
           </div>
         </div>
       </div>
-      {/* Footer */}
       <div className="flex flex-col items-start px-6 w-full mt-6">
         <div className="flex gap-2 items-center">
-          <Button size="md">Acessar</Button>
-          <Button variant="ghost" size="md">Saiba mais</Button>
+          {solution.link01 ? (
+            <a href={solution.link01} target="_blank" rel="noopener noreferrer">
+              <Button size="md">{solution.titleLink01 || 'Acessar'}</Button>
+            </a>
+          ) : (
+            <Button size="md">Acessar</Button>
+          )}
+          {solution.link02 && (
+            <a href={solution.link02} target="_blank" rel="noopener noreferrer">
+              <Button variant="ghost" size="md">{solution.titleLink02 || 'Saiba mais'}</Button>
+            </a>
+          )}
         </div>
       </div>
     </div>
   )
 }
 
-function MarketplaceCard({ icon, title, description, status }: MarketplaceSolution) {
-  const isSoon = status === 'soon'
+function MarketplaceCard({ solution }: { solution: Solution }) {
+  const isSoon = solution.marketplaceStatus === 'Em breve'
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl shadow-[0_1px_3px_0_rgba(0,0,0,0.1),0_1px_2px_-1px_rgba(0,0,0,0.1)] flex flex-col gap-6 py-6 overflow-hidden w-full">
-      {/* Content */}
       <div className="flex flex-col items-start px-6 w-full">
         <div className="flex gap-4 items-start w-full">
-          <IconBox icon={icon} />
+          <IconBox />
           <div className="flex-1 flex flex-col gap-1 min-w-0">
-            <p className="text-sm font-medium text-[#030712] leading-4">{title}</p>
-            <p className="text-sm text-gray-500 leading-5">{description}</p>
+            <p className="text-sm font-medium text-[#030712] leading-4">{solution.name}</p>
+            <p className="text-sm text-gray-500 leading-5">{solution.description}</p>
           </div>
           <div className="flex items-start justify-end self-stretch shrink-0">
             {isSoon ? (
@@ -145,14 +96,29 @@ function MarketplaceCard({ icon, title, description, status }: MarketplaceSoluti
           </div>
         </div>
       </div>
-      {/* Footer */}
       <div className="flex flex-col items-start px-6 w-full">
         <div className="flex gap-2 items-center">
-          <Button size="md" disabled={isSoon}>Adquirir</Button>
-          <Button variant="ghost" size="md">Saiba mais</Button>
+          {solution.link01 ? (
+            <a href={solution.link01} target="_blank" rel="noopener noreferrer">
+              <Button size="md" disabled={isSoon}>{solution.titleLink01 || 'Adquirir'}</Button>
+            </a>
+          ) : (
+            <Button size="md" disabled={isSoon}>Adquirir</Button>
+          )}
+          {solution.link02 && (
+            <a href={solution.link02} target="_blank" rel="noopener noreferrer">
+              <Button variant="ghost" size="md">{solution.titleLink02 || 'Saiba mais'}</Button>
+            </a>
+          )}
         </div>
       </div>
     </div>
+  )
+}
+
+function CardSkeleton() {
+  return (
+    <div className="bg-white border border-gray-200 rounded-xl h-[140px] animate-pulse" />
   )
 }
 
@@ -163,11 +129,30 @@ export function HomePage() {
   const [openPopover, setOpenPopover] = useState(false)
   const [openSettings, setOpenSettings] = useState(false)
   const [openProfile, setOpenProfile] = useState(false)
+
+  const [solutions, setSolutions] = useState<Solution[]>([])
+  const [loading, setLoading] = useState(true)
+
   const today = new Date().toLocaleDateString('pt-BR', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   })
+
+  useEffect(() => {
+    api.getSolutions()
+      .then(data => setSolutions(data))
+      .catch(() => {
+        // API indisponível — sem fallback na home (não há mock de "todas as soluções")
+      })
+      .finally(() => setLoading(false))
+  }, [])
+
+  // Soluções ativas: status Ativo, sem marketplace habilitado
+  const activeSolutions = solutions.filter(s => s.status === 'Ativo' && !s.marketplace)
+
+  // Soluções de marketplace: têm marketplace preenchido
+  const marketplaceSolutions = solutions.filter(s => s.marketplace)
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -183,20 +168,14 @@ export function HomePage() {
                 <p className="text-base font-medium text-[#030712]">Gerenciamento</p>
                 <div className="flex flex-col gap-2">
                   <button
-                    onClick={() => {
-                      navigate('/organizacoes')
-                      setOpenPopover(false)
-                    }}
+                    onClick={() => { navigate('/organizacoes'); setOpenPopover(false) }}
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[#111827] hover:bg-gray-100 rounded-md w-full text-left transition-colors"
                   >
                     <Network className="w-4 h-4 shrink-0" />
                     <span>Organizações</span>
                   </button>
                   <button
-                    onClick={() => {
-                      navigate('/acessos')
-                      setOpenPopover(false)
-                    }}
+                    onClick={() => { navigate('/acessos'); setOpenPopover(false) }}
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[#111827] hover:bg-gray-100 rounded-md w-full text-left transition-colors"
                   >
                     <UserRoundCog className="w-4 h-4 shrink-0" />
@@ -218,10 +197,7 @@ export function HomePage() {
           <SettingsMenu
             open={openSettings}
             onOpenChange={setOpenSettings}
-            onProfileClick={() => {
-              setOpenProfile(true)
-              setOpenSettings(false)
-            }}
+            onProfileClick={() => { setOpenProfile(true); setOpenSettings(false) }}
             onLogoutClick={() => console.log('Logout clicked')}
           >
             <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 cursor-pointer hover:ring-2 hover:ring-gray-300 transition-all">
@@ -236,10 +212,7 @@ export function HomePage() {
       <ProfileModal
         open={openProfile}
         onOpenChange={setOpenProfile}
-        onSave={() => {
-          console.log('Profile saved')
-          setOpenProfile(false)
-        }}
+        onSave={() => { setOpenProfile(false) }}
       />
 
       {/* Main */}
@@ -273,9 +246,17 @@ export function HomePage() {
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                {activeSolutions.map((solution) => (
-                  <ActiveSolutionCard key={solution.title} {...solution} />
-                ))}
+                {loading ? (
+                  <><CardSkeleton /><CardSkeleton /></>
+                ) : activeSolutions.length === 0 ? (
+                  <p className="col-span-2 text-sm text-gray-400 py-4">
+                    Nenhuma solução ativa disponível.
+                  </p>
+                ) : (
+                  activeSolutions.map(s => (
+                    <ActiveSolutionCard key={s.id} solution={s} />
+                  ))
+                )}
               </div>
             </div>
           </section>
@@ -292,9 +273,17 @@ export function HomePage() {
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                {marketplaceSolutions.map((solution) => (
-                  <MarketplaceCard key={solution.title} {...solution} />
-                ))}
+                {loading ? (
+                  <><CardSkeleton /><CardSkeleton /></>
+                ) : marketplaceSolutions.length === 0 ? (
+                  <p className="col-span-2 text-sm text-gray-400 py-4">
+                    Nenhuma solução no marketplace ainda.
+                  </p>
+                ) : (
+                  marketplaceSolutions.map(s => (
+                    <MarketplaceCard key={s.id} solution={s} />
+                  ))
+                )}
               </div>
             </div>
           </section>
