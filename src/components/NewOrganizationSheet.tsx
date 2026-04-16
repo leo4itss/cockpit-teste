@@ -69,7 +69,7 @@ export function NewOrganizationSheet({ open, onClose, onSave }: Props) {
   }
 
   function handleSave() {
-    onSave({ ...form, createdAt: new Date().toLocaleDateString('pt-BR') })
+    onSave({ ...form, logo: logoPreview || undefined, createdAt: new Date().toLocaleDateString('pt-BR') })
     onClose()
   }
 
