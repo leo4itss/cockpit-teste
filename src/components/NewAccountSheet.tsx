@@ -138,6 +138,7 @@ export function NewAccountSheet({ open, onClose, orgId, onSave }: Props) {
       name: form.name,
       subdomain: form.subdomain,
       arquitetoPAS: form.arquitetoPAS,
+      logo: logo || undefined,
       provisioningStatus: 'PENDING',
       status: 'Criado',
       createdAt: new Date().toLocaleDateString('pt-BR'),
@@ -148,6 +149,7 @@ export function NewAccountSheet({ open, onClose, orgId, onSave }: Props) {
       enderecoPostal: '', complemento: '', estado: '', cidade: '',
       arquitetoPAS: '', subdomain: '', descricao: '',
     })
+    setLogo('')
     onClose()
   }
 
