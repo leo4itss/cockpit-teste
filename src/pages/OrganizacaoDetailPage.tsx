@@ -497,22 +497,12 @@ export function OrganizacaoDetailPage() {
                           <td className="px-2 py-2 h-[52px] w-[169px] max-w-[169px]">
                             <span className="text-sm text-[#030712] block truncate whitespace-nowrap overflow-hidden">{s.description || '—'}</span>
                           </td>
-                          {/* Módulos — primeiro nome + badge "+N" se houver mais */}
-                          <td className="px-2 py-2 h-[52px] w-[133px] max-w-[133px]">
-                            {(() => {
-                              const nomes = (s.componenteIds ?? [])
-                                .map(cid => componentes.find(c => c.id === cid)?.nome)
-                                .filter(Boolean) as string[]
-                              if (nomes.length === 0) return <span className="text-sm text-[#9ca3af]">—</span>
-                              return (
-                                <div className="flex items-center gap-1 min-w-0">
-                                  <span className="text-sm text-[#030712] truncate">{nomes[0]}</span>
-                                  {nomes.length > 1 && (
-                                    <span className="text-xs bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-full shrink-0">+{nomes.length - 1}</span>
-                                  )}
-                                </div>
-                              )
-                            })()}
+                          {/* Componentes — count numérico */}
+                          <td className="px-2 py-2 h-[52px] w-[133px] text-sm text-[#030712]">
+                            {(s.componenteIds ?? []).length > 0
+                              ? (s.componenteIds ?? []).length
+                              : <span className="text-[#9ca3af]">—</span>
+                            }
                           </td>
                           {/* Marketplace — badge */}
                           <td className="px-2 py-2 h-[52px] w-[153px]">
