@@ -34,12 +34,13 @@ app.get('/api/organizations/:id', async (c) => {
 app.post('/api/organizations', async (c) => {
   const body = await c.req.json()
 
-  // Cria organização + conta default na mesma transação.
-  // Se a criação da conta falhar, a organização é revertida.
-  const { org } = await db.transaction(async (tx) => {
-    const [org] = await tx.insert(organizations).values(body).returning()
+  // neon-http não suporta transactions nativas.
+  // Usamos compensação manual: cria org → tenta criar conta default →
+  // se falhar, apaga a org (rollback por compensação).
+  const [org] = await db.insert(organizations).values(body).returning()
 
-    await tx.insert(accounts).values({
+  try {
+    await db.insert(accounts).values({
       id: crypto.randomUUID(),
       orgId: org.id,
       name: 'Conta Padrão',
@@ -50,9 +51,11 @@ app.post('/api/organizations', async (c) => {
       status: 'Criado',
       createdAt: new Date().toLocaleDateString('pt-BR'),
     })
-
-    return { org }
-  })
+  } catch (err) {
+    // Compensação: remove a org para não deixar registro órfão
+    await db.delete(organizations).where(eq(organizations.id, org.id))
+    throw err
+  }
 
   return c.json(org, 201)
 })
