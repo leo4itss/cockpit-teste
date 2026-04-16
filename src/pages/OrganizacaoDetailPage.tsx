@@ -287,13 +287,6 @@ export function OrganizacaoDetailPage() {
             >
               Editar
             </button>
-            <button
-              onClick={() => setOrgDeleteModal('org')}
-              className="p-2 rounded-md border border-[#e5e7eb] text-[#9ca3af] hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-colors shrink-0 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]"
-              title="Excluir organização"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
           </div>
         </div>
 
