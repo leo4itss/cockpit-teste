@@ -1,12 +1,14 @@
 import { cn } from '@/lib/utils'
+import { BadgeCheck } from 'lucide-react'
 
 interface BadgeProps {
   children: React.ReactNode
   variant?: 'success' | 'warning' | 'error' | 'info' | 'default' | 'secondary'
+  showIcon?: boolean   // exibe BadgeCheck 12×12 antes do texto
   className?: string
 }
 
-export function Badge({ children, variant = 'default', className }: BadgeProps) {
+export function Badge({ children, variant = 'default', showIcon = false, className }: BadgeProps) {
   return (
     <span
       className={cn(
@@ -22,6 +24,7 @@ export function Badge({ children, variant = 'default', className }: BadgeProps) 
         className
       )}
     >
+      {showIcon && <BadgeCheck className="w-3 h-3 shrink-0" />}
       {children}
     </span>
   )
