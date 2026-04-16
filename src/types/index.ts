@@ -54,6 +54,7 @@ export interface Account {
   isDefault?: boolean // true = conta padrão criada automaticamente com a org
   status: 'Criado' | 'Ativo' | 'Inativo'
   createdAt: string
+  deletedAt?: string  // null/undefined = ativa; preenchido = em quarentena (soft delete)
 }
 
 // ── Tipos de Licença ──────────────────────────────────────────
