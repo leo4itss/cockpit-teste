@@ -54,11 +54,38 @@ export interface Account {
   createdAt: string
 }
 
+// ── Tipos de Licença ──────────────────────────────────────────
+// Entidade independente — cadastrada no backend, não enum fixo.
+export interface TipoLicenca {
+  id: string
+  nome: string
+  descricao?: string
+  unidade: string  // ex: "usuários", "GB", "unidades", "tokens"
+  createdAt: string
+}
+
+// ── Componentes ───────────────────────────────────────────────
+// Módulos/serviços que compõem uma Solução.
+// metadataUrl (opcional): endpoint GET que retorna os tiposLicenca disponíveis.
+export interface Componente {
+  id: string
+  nome: string
+  descricao?: string
+  metadataUrl?: string
+  tiposLicenca: string[]  // array de TipoLicenca.id disponíveis neste componente
+  createdAt: string
+}
+
+// ── Licenciamento dentro de um Plano ──────────────────────────
+// Cada entrada referencia um TipoLicenca com restrições opcionais de
+// valor mínimo/máximo e configuração de preço.
 export interface Licensing {
-  tipoLicenca: string[]   // enabled dims: e.g. ['slot','modelo','usuarios'] or ['gigabytes','modelo','usuarios']
-  slots: string           // value for Slot (Assistente) or GigaBytes (Base de conhecimento)
-  modelo: string          // Nominal | Concorrente
-  usuarios: string        // 5 usuários | 10 usuários | 15 usuários | outro
+  tipoLicencaId: string          // FK → TipoLicenca.id
+  tipoLicencaNome?: string       // denormalizado para exibição
+  tipoLicencaUnidade?: string    // denormalizado para exibição
+  valorMinimo?: string           // quantidade mínima (opcional)
+  valorMaximo?: string           // quantidade máxima (opcional)
+  valor?: string                 // valor livre por licença
   definirPreco: boolean
   precoAnual: string
   descontoMensal: string
@@ -71,13 +98,25 @@ export interface Plan {
   licensings: Licensing[]
 }
 
+// ── Objeto do Contrato ────────────────────────────────────────
+// Um contrato pode ter múltiplos objetos — cada um referencia uma
+// combinação de solução + plano + licenciamento + organização contratada.
+export interface ObjetoContrato {
+  solucao: string
+  orgContratada: string
+  plano: string
+  licenciamento: string
+  qtdContratada: number
+}
+
 export interface Solution {
   id: string
   orgId: string
   name: string
   plans: Plan[]
+  componenteIds?: string[]  // IDs dos componentes utilizados por esta solução
   description: string
-  type: string
+  type?: string
   arquitetoPAS: string
   status: 'Criado' | 'Ativo' | 'Inativo'
   createdAt: string
@@ -93,11 +132,7 @@ export interface Contract {
   id: string
   orgId: string
   contratante: string
-  orgContratada: string
-  solucoes: string
-  plano: string
-  licenciamento?: string
-  qtdContratada: number
+  objetos: ObjetoContrato[]
   dataInicio: string
   dataTermino: string
   renovacao: string

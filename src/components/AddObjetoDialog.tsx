@@ -2,15 +2,10 @@ import { useState } from 'react'
 import { BadgeCheck } from 'lucide-react'
 import { Dialog } from './ui/Dialog'
 import { Button } from './ui/Button'
-import type { Solution } from '@/types'
+import type { Solution, ObjetoContrato } from '@/types'
 
-export interface ObjetoSelecionado {
-  solucao: string
-  orgContratada: string
-  plano: string
-  licenciamento: string
-  qtdContratada: number
-}
+// Alias mantido para compatibilidade com importadores existentes
+export type { ObjetoContrato as ObjetoSelecionado }
 
 interface Row {
   id: string
@@ -26,20 +21,28 @@ interface Props {
   onClose: () => void
   solutions: Solution[]
   orgName: string
-  onSave: (objetos: ObjetoSelecionado[]) => void
+  onSave: (objetos: ObjetoContrato[]) => void
 }
 
 function buildRows(solutions: Solution[], orgName: string): Row[] {
   const rows: Row[] = []
   solutions.forEach(sol => {
     sol.plans.forEach(plan => {
-      const lic = plan.licensings[0]
+      // Monta label de licenciamento a partir do novo formato (tipoLicencaNome + range)
+      const licenciamento = plan.licensings.length > 0
+        ? plan.licensings.map(l => {
+            const range = [l.valorMinimo, l.valorMaximo].filter(Boolean).join('–')
+            const nome = l.tipoLicencaNome || l.tipoLicencaId
+            return range ? `${nome}: ${range} ${l.tipoLicencaUnidade ?? ''}`.trim() : nome
+          }).join(' · ') || '—'
+        : '—'
+
       rows.push({
         id: `${sol.id}-${plan.name}`,
         solucao: sol.name,
         orgContratada: orgName,
         plano: plan.name,
-        licenciamento: lic ? [lic.slots, lic.modelo, lic.usuarios].filter(Boolean).join(' | ') || '—' : '—',
+        licenciamento,
         status: sol.status,
       })
     })
@@ -65,7 +68,7 @@ export function AddObjetoDialog({ open, onClose, solutions, orgName, onSave }: P
   }
 
   function handleSave() {
-    const objetos: ObjetoSelecionado[] = rows
+    const objetos: ObjetoContrato[] = rows
       .filter(r => selected.has(r.id))
       .map(r => ({
         solucao: r.solucao,

@@ -1,5 +1,39 @@
-import type { Organization, Account, Solution, Contract, User } from '../types'
+import type { Organization, Account, Solution, Contract, User, TipoLicenca, Componente } from '../types'
 
+// ── Tipos de Licença ──────────────────────────────────────────
+// Dados iniciais — refletidos no seed do banco.
+// NÃO adicionar novos tipos aqui como enum; cadastrar via API ou seed.
+export const tiposLicenca: TipoLicenca[] = [
+  { id: 'tl-1', nome: 'Usuário nominal',              descricao: 'Licença por usuário com acesso exclusivo (login único)',         unidade: 'usuários', createdAt: '01/01/2026' },
+  { id: 'tl-2', nome: 'Usuário concorrente',          descricao: 'Licença por sessão simultânea, independente de usuário',         unidade: 'sessões',  createdAt: '01/01/2026' },
+  { id: 'tl-3', nome: 'Tamanho de banco de dados',    descricao: 'Capacidade de armazenamento de dados da organização',            unidade: 'GB',       createdAt: '01/01/2026' },
+  { id: 'tl-4', nome: 'Quantidade de assistentes',    descricao: 'Número de assistentes de IA provisionados na plataforma',        unidade: 'unidades', createdAt: '01/01/2026' },
+  { id: 'tl-5', nome: 'Número de workspaces',         descricao: 'Espaços de trabalho separados por equipe ou projeto',            unidade: 'unidades', createdAt: '01/01/2026' },
+  { id: 'tl-6', nome: 'Quantidade de tokens/mensagens', descricao: 'Limite de tokens ou mensagens processadas por ciclo de fatura', unidade: 'tokens',   createdAt: '01/01/2026' },
+]
+
+// ── Componentes ───────────────────────────────────────────────
+// Módulos/serviços disponíveis para compor Soluções.
+export const componentes: Componente[] = [
+  {
+    id: 'comp-1',
+    nome: 'PAS Core',
+    descricao: 'Motor principal de assistentes de IA',
+    metadataUrl: undefined,
+    tiposLicenca: ['tl-1', 'tl-2', 'tl-4', 'tl-6'],  // nominal, concorrente, assistentes, tokens
+    createdAt: '01/01/2026',
+  },
+  {
+    id: 'comp-2',
+    nome: 'Knowledge Base',
+    descricao: 'Base de conhecimento vetorial',
+    metadataUrl: undefined,
+    tiposLicenca: ['tl-3', 'tl-5'],  // banco de dados, workspaces
+    createdAt: '01/01/2026',
+  },
+]
+
+// ── Organizations ─────────────────────────────────────────────
 export const organizations: Organization[] = [
   {
     id: '1',
@@ -141,24 +175,55 @@ export const solutions: Solution[] = [
     id: 's1',
     orgId: '1',
     name: 'Assistente de Design',
+    componenteIds: ['comp-1'],
     plans: [
       {
         name: 'Pro',
         description: 'Todas as features liberadas',
         licensings: [
-          { tipoLicenca: ['slot', 'modelo', 'usuarios'], slots: '5 slots', modelo: 'Nominal', usuarios: '10 usuários', definirPreco: false, precoAnual: '', descontoMensal: '', precoMes: '' },
+          {
+            tipoLicencaId: 'tl-1',
+            tipoLicencaNome: 'Usuário nominal',
+            tipoLicencaUnidade: 'usuários',
+            valorMinimo: '5',
+            valorMaximo: '50',
+            definirPreco: false,
+            precoAnual: '',
+            descontoMensal: '',
+            precoMes: '',
+          },
+          {
+            tipoLicencaId: 'tl-4',
+            tipoLicencaNome: 'Quantidade de assistentes',
+            tipoLicencaUnidade: 'unidades',
+            valorMinimo: '1',
+            valorMaximo: '10',
+            definirPreco: false,
+            precoAnual: '',
+            descontoMensal: '',
+            precoMes: '',
+          },
         ],
       },
       {
         name: 'Basic',
         description: 'Plano básico com recursos essenciais',
         licensings: [
-          { tipoLicenca: ['slot', 'modelo', 'usuarios'], slots: '5 slots', modelo: 'Nominal', usuarios: '5 usuários', definirPreco: false, precoAnual: '', descontoMensal: '', precoMes: '' },
+          {
+            tipoLicencaId: 'tl-1',
+            tipoLicencaNome: 'Usuário nominal',
+            tipoLicencaUnidade: 'usuários',
+            valorMinimo: '1',
+            valorMaximo: '10',
+            definirPreco: false,
+            precoAnual: '',
+            descontoMensal: '',
+            precoMes: '',
+          },
         ],
       },
     ],
     description: 'Assistente de Design',
-    type: 'Assistente',
     arquitetoPAS: 'Marcelo',
     status: 'Criado',
     createdAt: '23/03/2026',
@@ -169,6 +234,104 @@ export const solutions: Solution[] = [
     titleLink02: 'Saiba mais',
     marketplaceStatus: 'Em breve',
   },
+  {
+    id: 's2',
+    orgId: '1',
+    name: 'Base de Conhecimento PAS',
+    componenteIds: [],
+    plans: [
+      {
+        name: 'Starter',
+        description: 'Até 5 usuários e 10 GB de armazenamento',
+        licensings: [
+          {
+            tipoLicencaId: 'tl-1',
+            tipoLicencaNome: 'Usuário nominal',
+            tipoLicencaUnidade: 'usuários',
+            valorMinimo: '1',
+            valorMaximo: '5',
+            definirPreco: false,
+            precoAnual: '',
+            descontoMensal: '',
+            precoMes: '',
+          },
+        ],
+      },
+      {
+        name: 'Enterprise',
+        description: 'Usuários e armazenamento ilimitados',
+        licensings: [
+          {
+            tipoLicencaId: 'tl-1',
+            tipoLicencaNome: 'Usuário nominal',
+            tipoLicencaUnidade: 'usuários',
+            valorMinimo: '10',
+            valorMaximo: '500',
+            definirPreco: false,
+            precoAnual: '',
+            descontoMensal: '',
+            precoMes: '',
+          },
+          {
+            tipoLicencaId: 'tl-3',
+            tipoLicencaNome: 'Tamanho de banco de dados',
+            tipoLicencaUnidade: 'GB',
+            valorMinimo: '50',
+            valorMaximo: '1000',
+            definirPreco: false,
+            precoAnual: '',
+            descontoMensal: '',
+            precoMes: '',
+          },
+        ],
+      },
+    ],
+    description: 'Plataforma centralizada de conhecimento para equipes PAS',
+    arquitetoPAS: 'Carla',
+    status: 'Ativo',
+    createdAt: '01/04/2026',
+    marketplace: '',
+    link01: '',
+    titleLink01: '',
+    link02: '',
+    titleLink02: '',
+    marketplaceStatus: '',
+  },
+  {
+    id: 's3',
+    orgId: '2',
+    name: 'Cockpit Analytics',
+    componenteIds: [],
+    plans: [
+      {
+        name: 'Free',
+        description: 'Dashboards básicos sem limite de usuários',
+        licensings: [
+          {
+            tipoLicencaId: 'tl-2',
+            tipoLicencaNome: 'Conta (tenant)',
+            tipoLicencaUnidade: 'contas',
+            valorMinimo: '1',
+            valorMaximo: '1',
+            definirPreco: false,
+            precoAnual: '',
+            descontoMensal: '',
+            precoMes: '',
+          },
+        ],
+      },
+    ],
+    description: 'Visualização de métricas e KPIs em tempo real',
+    arquitetoPAS: 'Beatriz',
+    status: 'Ativo',
+    createdAt: '10/04/2026',
+    marketplace: 'Ativo',
+    link01: 'https://cockpit.example.com',
+    titleLink01: 'Acessar',
+    link02: 'https://cockpit.example.com/docs',
+    titleLink02: 'Documentação',
+    marketplaceStatus: 'Disponível',
+  },
 ]
 
 export const contracts: Contract[] = [
@@ -176,10 +339,15 @@ export const contracts: Contract[] = [
     id: 'c1',
     orgId: '1',
     contratante: 'Apple',
-    orgContratada: 'Lojas Americanas',
-    solucoes: 'PAS Enterprise',
-    plano: 'Pro',
-    qtdContratada: 50,
+    objetos: [
+      {
+        solucao: 'Assistente de Design',
+        orgContratada: 'Apple',
+        plano: 'Pro',
+        licenciamento: 'Usuário nominal: 5–50 usuários',
+        qtdContratada: 50,
+      },
+    ],
     dataInicio: '01/01/2026',
     dataTermino: '31/12/2026',
     renovacao: 'Anual',

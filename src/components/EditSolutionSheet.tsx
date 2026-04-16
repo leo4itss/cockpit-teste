@@ -1,17 +1,26 @@
 import { useState, useRef, useEffect } from 'react'
-import { ChevronUp, ChevronDown, MoreVertical, CircleAlert, Pencil, Trash2 } from 'lucide-react'
+import { ChevronUp, ChevronDown, MoreVertical, CircleAlert, Pencil, Trash2, Plus, Puzzle } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Input } from './ui/Input'
 import { Select } from './ui/Select'
 import { Button } from './ui/Button'
 import { NewPlanDialog } from './NewPlanDialog'
-import type { Solution, Plan } from '@/types'
+import { ComponenteSelector } from './ComponenteSelector'
+import { ComponenteSelecaoSheet } from './ComponenteSelecaoSheet'
+import { ComponenteSheet } from './ComponenteSheet'
+import { api } from '@/api/client'
+import type { Solution, Plan, TipoLicenca, Componente } from '@/types'
+
+const THRESHOLD_INLINE = 5  // ≤ este valor: inline; > este valor: sheet
 
 interface Props {
   open: boolean
   onClose: () => void
   solution: Solution | null
   onSave: (solution: Solution) => void
+  tiposLicenca: TipoLicenca[]
+  componentes: Componente[]
+  onComponenteCreated: (c: Componente) => void
 }
 
 /* ── sub-components ─────────────────────────────────────── */
@@ -39,9 +48,17 @@ function PlanCard({
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
-  const licensingText = plan.licensings.length > 0
-    ? plan.licensings.map(l => [l.slots, l.modelo, l.usuarios].filter(Boolean).join(' | ')).join('; ')
-    : null
+  const licensings = plan.licensings.map(l => {
+    const nome = l.tipoLicencaNome || l.tipoLicencaId
+    const unidade = l.tipoLicencaUnidade ?? ''
+    const min = l.valorMinimo?.trim()
+    const max = l.valorMaximo?.trim()
+    let range = ''
+    if (min && max) range = `${min}–${max} ${unidade}`.trim()
+    else if (min) range = `${min} ${unidade}`.trim()
+    else if (max) range = `Até ${max} ${unidade}`.trim()
+    return range ? `${nome}: ${range}` : nome
+  })
 
   useEffect(() => {
     if (!menuOpen) return
@@ -55,22 +72,24 @@ function PlanCard({
   }, [menuOpen])
 
   return (
-    <div className="bg-white border border-[#e5e7eb] rounded-md flex flex-col pt-2 pb-4 px-5">
-      {/* Plan header row */}
-      <div className="flex items-center gap-4 py-2">
+    <div className="border border-[#e5e7eb] rounded-lg overflow-hidden">
+      {/* Header */}
+      <div className="flex items-start gap-3 px-4 py-3">
         <button
           type="button"
           onClick={() => setExpanded(v => !v)}
-          className="shrink-0 text-[#6b7280]"
+          className="mt-0.5 text-[#6b7280] hover:text-[#030712] transition-colors shrink-0"
         >
           {expanded
             ? <ChevronUp className="w-4 h-4" />
             : <ChevronDown className="w-4 h-4" />
           }
         </button>
-        <div className="flex flex-1 flex-col gap-0.5 min-w-0 overflow-hidden">
-          <p className="text-sm font-semibold text-[#030712] leading-5 truncate">{plan.name}</p>
-          <p className="text-sm text-[#6b7280] leading-5 truncate">{plan.description}</p>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-[#030712] leading-5">{plan.name}</p>
+          {plan.description && (
+            <p className="text-xs text-[#6b7280] leading-4 mt-0.5">{plan.description}</p>
+          )}
         </div>
 
         {/* Dropdown menu */}
@@ -78,13 +97,12 @@ function PlanCard({
           <button
             type="button"
             onClick={() => setMenuOpen(v => !v)}
-            className="w-9 h-9 flex items-center justify-center rounded-md hover:bg-gray-100 text-[#6b7280] transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-100 text-[#6b7280] transition-colors"
           >
             <MoreVertical className="w-4 h-4" />
           </button>
-
           {menuOpen && (
-            <div className="absolute right-0 top-10 z-50 bg-white border border-[#e5e7eb] rounded-md shadow-lg py-1 min-w-[148px]">
+            <div className="absolute right-0 top-9 z-50 bg-white border border-[#e5e7eb] rounded-md shadow-lg py-1 min-w-[148px]">
               <button
                 type="button"
                 className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#030712] hover:bg-gray-50 transition-colors"
@@ -106,28 +124,25 @@ function PlanCard({
         </div>
       </div>
 
-      {/* Licensing row (when expanded) */}
-      {expanded && licensingText && (
-        <>
-          <Divider />
-          <div className="flex flex-col gap-0.5 py-3">
-            <p className="text-sm font-medium text-[#030712] leading-5">Modelo de licenciamento</p>
-            <p className="text-sm text-[#6b7280] leading-5">{licensingText}</p>
-          </div>
-        </>
+      {/* Licensings expandidos */}
+      {expanded && licensings.length > 0 && (
+        <div className="px-4 pb-4 pt-1 border-t border-[#e5e7eb] bg-[#fafafa]">
+          <p className="text-xs font-semibold text-[#030712] mb-2">Modelo de licenciamento</p>
+          <ul className="flex flex-col gap-1">
+            {licensings.map((text, i) => (
+              <li key={i} className="flex items-start gap-1.5 text-xs text-[#6b7280]">
+                <span className="mt-[3px] w-1 h-1 rounded-full bg-[#6b7280] shrink-0" />
+                {text}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   )
 }
 
 /* ── options ─────────────────────────────────────────────── */
-
-const TIPOS_SOLUCAO = [
-  { value: 'Assistente de IA',       label: 'Assistente de IA' },
-  { value: 'Base de conhecimento',   label: 'Base de conhecimento' },
-  { value: 'Enterprise',             label: 'Enterprise' },
-  { value: 'Analytics',              label: 'Analytics' },
-]
 
 const ARQUITETOS = [
   { value: 'Marcelo', label: 'Marcelo' },
@@ -142,11 +157,24 @@ const MARKETPLACE_STATUS = [
 
 /* ── main ─────────────────────────────────────────────────── */
 
-export function EditSolutionSheet({ open, onClose, solution, onSave }: Props) {
+export function EditSolutionSheet({
+  open,
+  onClose,
+  solution,
+  onSave,
+  tiposLicenca,
+  componentes,
+  onComponenteCreated,
+}: Props) {
   const [form, setForm] = useState(() => buildForm(solution))
   const [plans, setPlans] = useState<Plan[]>(solution?.plans ?? [])
+  const [selectedComponenteIds, setSelectedComponenteIds] = useState<string[]>(solution?.componenteIds ?? [])
   const [planDialogOpen, setPlanDialogOpen] = useState(false)
   const [editingPlanIndex, setEditingPlanIndex] = useState<number | null>(null)
+  const [componenteSelecaoOpen, setComponenteSelecaoOpen] = useState(false)
+  const [componenteSheetOpen, setComponenteSheetOpen] = useState(false)
+
+  const useInline = componentes.length <= THRESHOLD_INLINE
 
   // Re-sync form when solution changes
   const [lastSolution, setLastSolution] = useState(solution)
@@ -154,13 +182,13 @@ export function EditSolutionSheet({ open, onClose, solution, onSave }: Props) {
     setLastSolution(solution)
     setForm(buildForm(solution))
     setPlans(solution?.plans ?? [])
+    setSelectedComponenteIds(solution?.componenteIds ?? [])
   }
 
   function buildForm(s: Solution | null) {
     return {
       name:              s?.name              ?? '',
       description:       s?.description       ?? '',
-      type:              s?.type              ?? '',
       arquitetoPAS:      s?.arquitetoPAS      ?? '',
       marketplace:       s?.marketplace !== undefined && s?.marketplace !== null
                            ? s.marketplace !== 'Inativo'
@@ -176,6 +204,18 @@ export function EditSolutionSheet({ open, onClose, solution, onSave }: Props) {
   function set(field: string, value: string | boolean) {
     setForm(f => ({ ...f, [field]: value }))
   }
+
+  // Tipos disponíveis = union dos tipos dos componentes selecionados, ou todos se nenhum selecionado
+  const tiposDisponiveis: TipoLicenca[] = selectedComponenteIds.length === 0
+    ? tiposLicenca
+    : (() => {
+        const ids = new Set(
+          componentes
+            .filter(c => selectedComponenteIds.includes(c.id))
+            .flatMap(c => c.tiposLicenca)
+        )
+        return tiposLicenca.filter(t => ids.has(t.id))
+      })()
 
   function handleOpenNewPlan() {
     setEditingPlanIndex(null)
@@ -206,15 +246,21 @@ export function EditSolutionSheet({ open, onClose, solution, onSave }: Props) {
     setEditingPlanIndex(null)
   }
 
+  async function handleCreateComponente(data: Omit<Componente, 'id' | 'createdAt'>) {
+    const saved = await api.createComponente({ ...data, id: crypto.randomUUID(), createdAt: new Date().toISOString() })
+    onComponenteCreated(saved)
+    setSelectedComponenteIds(prev => [...prev, saved.id])
+  }
+
   function handleSave() {
     if (!solution) return
     onSave({
       ...solution,
       name:              form.name,
       description:       form.description,
-      type:              form.type,
       arquitetoPAS:      form.arquitetoPAS,
       plans,
+      componenteIds:     selectedComponenteIds,
       marketplace:       form.marketplace ? 'Ativo' : 'Inativo',
       link01:            form.link01,
       titleLink01:       form.titleLink01,
@@ -270,13 +316,6 @@ export function EditSolutionSheet({ open, onClose, solution, onSave }: Props) {
           <div className="flex flex-col gap-7">
             <SectionTitle>Dados da solução</SectionTitle>
 
-            <Select
-              label="Tipo da solução"
-              options={TIPOS_SOLUCAO}
-              value={form.type}
-              onChange={e => set('type', e.target.value)}
-            />
-
             <Input
               label="Apelido da solução"
               required
@@ -299,6 +338,67 @@ export function EditSolutionSheet({ open, onClose, solution, onSave }: Props) {
                 Inclua informações relevantes para destacar o propósito e os diferenciais da solução, facilitando a compreensão e a comparação com outras opções.
               </p>
             </div>
+
+            <Divider />
+          </div>
+
+          {/* ── Componentes ─────────────────────────────────── */}
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <SectionTitle>Selecione os módulos que compõem essa solução</SectionTitle>
+            </div>
+            <p className="text-sm text-[#6b7280] -mt-2">
+              Os tipos de licença disponíveis para os planos serão derivados automaticamente dos componentes selecionados.
+            </p>
+
+            {useInline ? (
+              <ComponenteSelector
+                componentes={componentes}
+                value={selectedComponenteIds}
+                onChange={setSelectedComponenteIds}
+                onCreateNew={() => setComponenteSheetOpen(true)}
+              />
+            ) : (
+              <div className="flex flex-col gap-3">
+                <button
+                  type="button"
+                  onClick={() => setComponenteSelecaoOpen(true)}
+                  className="inline-flex items-center gap-1.5 h-9 px-4 border border-[#e5e7eb] rounded-md text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors w-fit"
+                >
+                  <Plus className="w-4 h-4" />
+                  Selecionar componentes
+                  {selectedComponenteIds.length > 0 && (
+                    <span className="ml-1 bg-blue-100 text-blue-700 text-xs font-semibold px-1.5 py-0.5 rounded-full">
+                      {selectedComponenteIds.length}
+                    </span>
+                  )}
+                </button>
+
+                {selectedComponenteIds.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {componentes
+                      .filter(c => selectedComponenteIds.includes(c.id))
+                      .map(c => (
+                        <span
+                          key={c.id}
+                          className="inline-flex items-center gap-1.5 h-7 pl-2.5 pr-1.5 border border-[#2563eb] bg-blue-50 rounded-md text-xs font-medium text-[#2563eb]"
+                        >
+                          <Puzzle className="w-3 h-3" />
+                          {c.nome}
+                          <button
+                            type="button"
+                            onClick={() => setSelectedComponenteIds(prev => prev.filter(id => id !== c.id))}
+                            className="ml-0.5 hover:text-blue-900 transition-colors"
+                            aria-label={`Remover ${c.nome}`}
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             <Divider />
           </div>
@@ -429,7 +529,22 @@ export function EditSolutionSheet({ open, onClose, solution, onSave }: Props) {
         onClose={handlePlanDialogClose}
         onSave={handlePlanSave}
         initialPlan={editingPlan}
-        solutionType={form.type}
+        tiposLicenca={tiposDisponiveis}
+      />
+
+      <ComponenteSelecaoSheet
+        open={componenteSelecaoOpen}
+        onClose={() => setComponenteSelecaoOpen(false)}
+        componentes={componentes}
+        value={selectedComponenteIds}
+        onChange={setSelectedComponenteIds}
+      />
+
+      <ComponenteSheet
+        open={componenteSheetOpen}
+        onClose={() => setComponenteSheetOpen(false)}
+        onSave={handleCreateComponente}
+        tiposLicenca={tiposLicenca}
       />
     </>
   )

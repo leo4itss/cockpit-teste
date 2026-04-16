@@ -13,8 +13,17 @@ import { EditAccountSheet } from '@/components/EditAccountSheet'
 import { SolutionDetailSheet } from '@/components/SolutionDetailSheet'
 import { EditSolutionSheet } from '@/components/EditSolutionSheet'
 import { ContractDetailSheet } from '@/components/ContractDetailSheet'
+import { EditContractSheet } from '@/components/EditContractSheet'
 import { api } from '@/api/client'
-import type { Account, Solution, Contract, Organization, Contact } from '@/types'
+import {
+  organizations as mockOrgs,
+  accounts as mockAccounts,
+  solutions as mockSolutions,
+  contracts as mockContracts,
+  tiposLicenca as mockTiposLicenca,
+  componentes as mockComponentes,
+} from '@/data/mock'
+import type { Account, Solution, Contract, Organization, Contact, TipoLicenca, Componente } from '@/types'
 
 type Tab = 'conta' | 'solucoes' | 'contrato' | 'marketplace'
 
@@ -26,8 +35,10 @@ export function OrganizacaoDetailPage() {
   const [accounts, setAccounts] = useState<Account[]>([])
   const [solutions, setSolutions] = useState<Solution[]>([])
   const [contracts, setContracts] = useState<Contract[]>([])
+  const [tiposLicenca, setTiposLicenca] = useState<TipoLicenca[]>([])
+  const [componentes, setComponentes] = useState<Componente[]>([])
   const [loading, setLoading] = useState(true)
-  const [loadError, setLoadError] = useState<string | null>(null)
+  const [loadError] = useState<string | null>(null)
   const [showDeleted, setShowDeleted] = useState(false)
 
   useEffect(() => {
@@ -37,15 +48,25 @@ export function OrganizacaoDetailPage() {
       api.getAccounts(id),
       api.getSolutions(id),
       api.getContracts(id),
-    ]).then(([orgData, accs, sols, conts]) => {
+      api.getTiposLicenca(),
+      api.getComponentes(),
+    ]).then(([orgData, accs, sols, conts, tipos, comps]) => {
       setOrg(orgData)
       setAccounts(accs)
       setSolutions(sols)
       setContracts(conts)
+      setTiposLicenca(tipos)
+      setComponentes(comps)
       setLoading(false)
-    }).catch(err => {
-      console.error(err)
-      setLoadError('Falha ao carregar dados da organização.')
+    }).catch(() => {
+      // API indisponível (ex: preview Vercel sem backend) — usa mock data
+      const mockOrg = mockOrgs.find(o => o.id === id) ?? null
+      setOrg(mockOrg)
+      setAccounts(mockAccounts.filter(a => a.orgId === id))
+      setSolutions(mockSolutions.filter(s => s.orgId === id))
+      setContracts(mockContracts.filter(c => c.orgId === id))
+      setTiposLicenca(mockTiposLicenca)
+      setComponentes(mockComponentes)
       setLoading(false)
     })
   }, [id])
@@ -62,10 +83,12 @@ export function OrganizacaoDetailPage() {
   const [selectedSolution, setSelectedSolution] = useState<Solution | null>(null)
   const [editingSolution, setEditingSolution] = useState<Solution | null>(null)
   const [selectedContract, setSelectedContract] = useState<Contract | null>(null)
+  const [editingContract, setEditingContract] = useState<Contract | null>(null)
 
   // Transição suave Detail → Edit — useRef/useCallback DEVEM ficar antes de qualquer early return
   const pendingEditAccount = useRef<Account | null>(null)
   const pendingEditSolution = useRef<Solution | null>(null)
+  const pendingEditContract = useRef<Contract | null>(null)
 
   const handleEditAccountFromDetail = useCallback((account: Account) => {
     pendingEditAccount.current = account
@@ -82,6 +105,15 @@ export function OrganizacaoDetailPage() {
     setTimeout(() => {
       setEditingSolution(pendingEditSolution.current)
       pendingEditSolution.current = null
+    }, 340)
+  }, [])
+
+  const handleEditContractFromDetail = useCallback((contract: Contract) => {
+    pendingEditContract.current = contract
+    setSelectedContract(null)
+    setTimeout(() => {
+      setEditingContract(pendingEditContract.current)
+      pendingEditContract.current = null
     }, 340)
   }, [])
 
@@ -109,37 +141,82 @@ export function OrganizacaoDetailPage() {
     </div>
   )
 
+  // Tenta a API; se falhar (sem backend/sem .env), cai no fallback local
   async function handleAddAccount(account: Omit<Account, 'id'>) {
-    const saved = await api.createAccount({ ...account, id: crypto.randomUUID() })
-    setAccounts(prev => [...prev, saved])
+    const local: Account = { ...account, id: crypto.randomUUID() }
+    try {
+      const saved = await api.createAccount(local)
+      setAccounts(prev => [...prev, saved])
+    } catch {
+      setAccounts(prev => [...prev, local])
+    }
   }
   async function handleAddSolution(solution: Omit<Solution, 'id'>) {
-    const saved = await api.createSolution({ ...solution, id: crypto.randomUUID() })
-    setSolutions(prev => [...prev, saved])
+    const local: Solution = { ...solution, id: crypto.randomUUID() }
+    try {
+      const saved = await api.createSolution(local)
+      setSolutions(prev => [...prev, saved])
+    } catch {
+      setSolutions(prev => [...prev, local])
+    }
   }
   async function handleAddContract(contract: Omit<Contract, 'id'>) {
-    const saved = await api.createContract({ ...contract, id: crypto.randomUUID() })
-    setContracts(prev => [...prev, saved])
+    const local: Contract = { ...contract, id: crypto.randomUUID() }
+    try {
+      const saved = await api.createContract(local)
+      setContracts(prev => [...prev, saved])
+    } catch {
+      setContracts(prev => [...prev, local])
+    }
   }
   async function handleEditOrg(data: Omit<Organization, 'id' | 'qtdContas' | 'qtdSolucoes' | 'qtdContratos' | 'contacts'>) {
-    const saved = await api.updateOrganization(id!, { ...org, ...data })
-    setOrg(saved)
+    try {
+      const saved = await api.updateOrganization(id!, { ...org, ...data })
+      setOrg(saved)
+    } catch {
+      setOrg(prev => prev ? { ...prev, ...data } : prev)
+    }
   }
   async function handleSaveAccount(updated: Account) {
-    const saved = await api.updateAccount(updated.id, updated)
-    setAccounts(prev => prev.map(a => a.id === saved.id ? saved : a))
-    setSelectedAccount(saved)
+    try {
+      const saved = await api.updateAccount(updated.id, updated)
+      setAccounts(prev => prev.map(a => a.id === saved.id ? saved : a))
+      setSelectedAccount(saved)
+    } catch {
+      setAccounts(prev => prev.map(a => a.id === updated.id ? updated : a))
+      setSelectedAccount(updated)
+    }
     setEditingAccount(null)
   }
   async function handleUpdateContacts(contacts: Contact[]) {
-    const saved = await api.updateOrganization(id!, { ...org, contacts })
-    setOrg(saved)
+    try {
+      const saved = await api.updateOrganization(id!, { ...org, contacts })
+      setOrg(saved)
+    } catch {
+      setOrg(prev => prev ? { ...prev, contacts } : prev)
+    }
   }
   async function handleSaveSolution(updated: Solution) {
-    const saved = await api.updateSolution(updated.id, updated)
-    setSolutions(prev => prev.map(s => s.id === saved.id ? saved : s))
-    setSelectedSolution(saved)
+    try {
+      const saved = await api.updateSolution(updated.id, updated)
+      setSolutions(prev => prev.map(s => s.id === saved.id ? saved : s))
+      setSelectedSolution(saved)
+    } catch {
+      setSolutions(prev => prev.map(s => s.id === updated.id ? updated : s))
+      setSelectedSolution(updated)
+    }
     setEditingSolution(null)
+  }
+  async function handleSaveContract(updated: Contract) {
+    try {
+      const saved = await api.updateContract(updated.id, updated)
+      setContracts(prev => prev.map(c => c.id === saved.id ? saved : c))
+      setSelectedContract(saved)
+    } catch {
+      setContracts(prev => prev.map(c => c.id === updated.id ? updated : c))
+      setSelectedContract(updated)
+    }
+    setEditingContract(null)
   }
 
   const tabs: { key: Tab; label: string }[] = [
@@ -373,7 +450,6 @@ export function OrganizacaoDetailPage() {
                         <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Nome da solução</th>
                         <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Planos</th>
                         <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Descrição</th>
-                        <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Tipo</th>
                         <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Arquiteto PAS</th>
                         <th className="text-center px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Status</th>
                       </tr>
@@ -388,7 +464,6 @@ export function OrganizacaoDetailPage() {
                           <td className="px-2 py-2 h-[52px] text-sm font-medium text-[#030712]">{s.name}</td>
                           <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{s.plans.map(p => p.name).join(', ')}</td>
                           <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{s.description}</td>
-                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{s.type}</td>
                           <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{s.arquitetoPAS}</td>
                           <td className="px-2 py-2 h-[52px] text-center">
                             <Badge variant="success">{s.status}</Badge>
@@ -413,10 +488,8 @@ export function OrganizacaoDetailPage() {
                     <thead>
                       <tr className="bg-white border-b border-[#e5e7eb]">
                         <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Conta contratante</th>
-                        <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Organização contratada</th>
                         <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Soluções</th>
                         <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Plano</th>
-                        <th className="text-right px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Qtd contratada</th>
                         <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Data início</th>
                         <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Data término</th>
                         <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Renovação</th>
@@ -431,10 +504,15 @@ export function OrganizacaoDetailPage() {
                           onClick={() => setSelectedContract(c)}
                         >
                           <td className="px-2 py-2 h-[52px] text-sm font-medium text-[#030712]">{c.contratante}</td>
-                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.orgContratada}</td>
-                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.solucoes}</td>
-                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.plano}</td>
-                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712] text-right">{c.qtdContratada}</td>
+                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">
+                            <div className="flex items-center gap-1.5">
+                              <span>{c.objetos[0]?.solucao ?? '—'}</span>
+                              {c.objetos.length > 1 && (
+                                <span className="text-xs bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-full">+{c.objetos.length - 1}</span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.objetos[0]?.plano ?? '—'}</td>
                           <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.dataInicio}</td>
                           <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.dataTermino}</td>
                           <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.renovacao}</td>
@@ -460,7 +538,15 @@ export function OrganizacaoDetailPage() {
 
       {/* Create sheets */}
       <NewAccountSheet open={sheetAccount} onClose={() => setSheetAccount(false)} orgId={org.id} onSave={handleAddAccount} />
-      <NewSolutionSheet open={sheetSolution} onClose={() => setSheetSolution(false)} orgId={org.id} onSave={handleAddSolution} />
+      <NewSolutionSheet
+        open={sheetSolution}
+        onClose={() => setSheetSolution(false)}
+        orgId={org.id}
+        onSave={handleAddSolution}
+        tiposLicenca={tiposLicenca}
+        componentes={componentes}
+        onComponenteCreated={c => setComponentes(prev => [...prev, c])}
+      />
       <NewContractSheet open={sheetContract} onClose={() => setSheetContract(false)} orgId={org.id} orgName={org.name} solutions={solutions} onSave={handleAddContract} />
       <NewOrganizationSheet open={sheetEditOrg} onClose={() => setSheetEditOrg(false)} onSave={handleEditOrg} />
 
@@ -487,6 +573,7 @@ export function OrganizacaoDetailPage() {
         open={!!selectedSolution}
         onClose={() => setSelectedSolution(null)}
         solution={selectedSolution}
+        componentes={componentes}
         onEdit={() => selectedSolution && handleEditSolutionFromDetail(selectedSolution)}
       />
       {editingSolution && (
@@ -496,13 +583,27 @@ export function OrganizacaoDetailPage() {
           onClose={() => setEditingSolution(null)}
           solution={editingSolution}
           onSave={handleSaveSolution}
+          tiposLicenca={tiposLicenca}
+          componentes={componentes}
+          onComponenteCreated={c => setComponentes(prev => [...prev, c])}
         />
       )}
       <ContractDetailSheet
         open={!!selectedContract}
         onClose={() => setSelectedContract(null)}
         contract={selectedContract}
+        onEdit={() => selectedContract && handleEditContractFromDetail(selectedContract)}
       />
+      {editingContract && (
+        <EditContractSheet
+          key={editingContract.id}
+          open={!!editingContract}
+          onClose={() => setEditingContract(null)}
+          contract={editingContract}
+          solutions={solutions}
+          onSave={handleSaveContract}
+        />
+      )}
     </div>
   )
 }

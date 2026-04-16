@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils'
 import { X } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { flushSync } from 'react-dom'
 
 interface SheetProps {
   open: boolean
@@ -20,7 +21,12 @@ export function Sheet({ open, onClose, title, description, children, footer, wid
 
   useEffect(() => {
     if (open) {
-      setMounted(true)
+      // flushSync força o React a commitar setMounted(true) de forma síncrona,
+      // garantindo que o browser pinte o estado inicial (-translate-x-full)
+      // antes do rAF disparar a transição de entrada.
+      // Sem isso, React 18 pode batchar os dois setState no mesmo frame
+      // e a transition não executa.
+      flushSync(() => setMounted(true))
       requestAnimationFrame(() => setVisible(true))
     } else {
       setVisible(false)

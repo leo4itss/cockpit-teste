@@ -1,11 +1,13 @@
 import { Sheet } from './ui/Sheet'
 import { Badge } from './ui/Badge'
+import { Button } from './ui/Button'
 import type { Contract } from '@/types'
 
 interface Props {
   open: boolean
   onClose: () => void
   contract: Contract | null
+  onEdit?: () => void
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
@@ -25,7 +27,7 @@ function Field({ label, value }: { label: string; value?: string | number }) {
   )
 }
 
-export function ContractDetailSheet({ open, onClose, contract }: Props) {
+export function ContractDetailSheet({ open, onClose, contract, onEdit }: Props) {
   if (!contract) return null
 
   const statusVariant =
@@ -48,29 +50,53 @@ export function ContractDetailSheet({ open, onClose, contract }: Props) {
               <Badge variant={statusVariant}>{contract.status}</Badge>
             </div>
           </div>
+          {onEdit && (
+            <Button variant="outline" size="sm" onClick={onEdit}>Editar</Button>
+          )}
         </div>
 
         <Divider />
 
-        {/* Partes */}
-        <div className="flex flex-col gap-4">
-          <SectionTitle>Partes</SectionTitle>
-          <div className="flex flex-col gap-6">
-            <Field label="Conta contratante" value={contract.contratante} />
-            <Field label="Organização contratada" value={contract.orgContratada} />
-          </div>
-        </div>
+        {/* ID do contrato */}
+        <Field label="ID do contrato" value={`${contract.id.substring(0, 8)}…`} />
 
         <Divider />
 
-        {/* Solução e plano */}
+        {/* Objetos do contrato */}
         <div className="flex flex-col gap-4">
-          <SectionTitle>Solução e plano</SectionTitle>
-          <div className="flex flex-col gap-6">
-            <Field label="Solução" value={contract.solucoes} />
-            <Field label="Plano" value={contract.plano} />
-            <Field label="Quantidade contratada" value={contract.qtdContratada} />
-          </div>
+          <SectionTitle>Objetos do contrato</SectionTitle>
+
+          {contract.objetos.length === 0 ? (
+            <p className="text-sm text-gray-400">Nenhum objeto adicionado.</p>
+          ) : (
+            <div className="rounded-xl border border-[#e5e7eb] overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-[#e5e7eb]">
+                    {['Solução', 'Org. contratada', 'Plano', 'Licenciamento', 'Qtd'].map(col => (
+                      <th
+                        key={col}
+                        className="px-3 py-2.5 text-left text-xs font-medium text-[#030712] opacity-40 whitespace-nowrap"
+                      >
+                        {col}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {contract.objetos.map((obj, i) => (
+                    <tr key={i} className="border-b border-[#e5e7eb] last:border-0">
+                      <td className="px-3 py-3 text-sm text-[#030712]">{obj.solucao}</td>
+                      <td className="px-3 py-3 text-sm text-[#030712]">{obj.orgContratada}</td>
+                      <td className="px-3 py-3 text-sm text-[#030712]">{obj.plano}</td>
+                      <td className="px-3 py-3 text-sm text-[#030712] max-w-[200px] truncate">{obj.licenciamento}</td>
+                      <td className="px-3 py-3 text-sm text-[#030712]">{obj.qtdContratada}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         <Divider />
