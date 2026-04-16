@@ -36,18 +36,21 @@ export function ComponentesPage() {
 
   async function handleSave(data: Omit<Componente, 'id' | 'createdAt'>) {
     if (editingComponente) {
-      const saved = await api.updateComponente(editingComponente.id, {
-        ...editingComponente,
-        ...data,
-      })
-      setComponentes(prev => prev.map(c => c.id === saved.id ? saved : c))
+      const updated = { ...editingComponente, ...data }
+      try {
+        const saved = await api.updateComponente(editingComponente.id, updated)
+        setComponentes(prev => prev.map(c => c.id === saved.id ? saved : c))
+      } catch {
+        setComponentes(prev => prev.map(c => c.id === updated.id ? updated : c))
+      }
     } else {
-      const saved = await api.createComponente({
-        ...data,
-        id: crypto.randomUUID(),
-        createdAt: new Date().toISOString(),
-      })
-      setComponentes(prev => [...prev, saved])
+      const local: Componente = { ...data, id: crypto.randomUUID(), createdAt: new Date().toISOString() }
+      try {
+        const saved = await api.createComponente(local)
+        setComponentes(prev => [...prev, saved])
+      } catch {
+        setComponentes(prev => [...prev, local])
+      }
     }
   }
 

@@ -141,54 +141,81 @@ export function OrganizacaoDetailPage() {
     </div>
   )
 
+  // Tenta a API; se falhar (sem backend/sem .env), cai no fallback local
   async function handleAddAccount(account: Omit<Account, 'id'>) {
+    const local: Account = { ...account, id: crypto.randomUUID() }
     try {
-      const saved = await api.createAccount({ ...account, id: crypto.randomUUID() })
+      const saved = await api.createAccount(local)
       setAccounts(prev => [...prev, saved])
     } catch {
-      alert('Erro ao salvar conta. Verifique se o servidor está rodando.')
+      setAccounts(prev => [...prev, local])
     }
   }
   async function handleAddSolution(solution: Omit<Solution, 'id'>) {
+    const local: Solution = { ...solution, id: crypto.randomUUID() }
     try {
-      const saved = await api.createSolution({ ...solution, id: crypto.randomUUID() })
+      const saved = await api.createSolution(local)
       setSolutions(prev => [...prev, saved])
     } catch {
-      alert('Erro ao salvar solução. Verifique se o servidor está rodando.')
+      setSolutions(prev => [...prev, local])
     }
   }
   async function handleAddContract(contract: Omit<Contract, 'id'>) {
+    const local: Contract = { ...contract, id: crypto.randomUUID() }
     try {
-      const saved = await api.createContract({ ...contract, id: crypto.randomUUID() })
+      const saved = await api.createContract(local)
       setContracts(prev => [...prev, saved])
     } catch {
-      alert('Erro ao salvar contrato. Verifique se o servidor está rodando.')
+      setContracts(prev => [...prev, local])
     }
   }
   async function handleEditOrg(data: Omit<Organization, 'id' | 'qtdContas' | 'qtdSolucoes' | 'qtdContratos' | 'contacts'>) {
-    const saved = await api.updateOrganization(id!, { ...org, ...data })
-    setOrg(saved)
+    try {
+      const saved = await api.updateOrganization(id!, { ...org, ...data })
+      setOrg(saved)
+    } catch {
+      setOrg(prev => prev ? { ...prev, ...data } : prev)
+    }
   }
   async function handleSaveAccount(updated: Account) {
-    const saved = await api.updateAccount(updated.id, updated)
-    setAccounts(prev => prev.map(a => a.id === saved.id ? saved : a))
-    setSelectedAccount(saved)
+    try {
+      const saved = await api.updateAccount(updated.id, updated)
+      setAccounts(prev => prev.map(a => a.id === saved.id ? saved : a))
+      setSelectedAccount(saved)
+    } catch {
+      setAccounts(prev => prev.map(a => a.id === updated.id ? updated : a))
+      setSelectedAccount(updated)
+    }
     setEditingAccount(null)
   }
   async function handleUpdateContacts(contacts: Contact[]) {
-    const saved = await api.updateOrganization(id!, { ...org, contacts })
-    setOrg(saved)
+    try {
+      const saved = await api.updateOrganization(id!, { ...org, contacts })
+      setOrg(saved)
+    } catch {
+      setOrg(prev => prev ? { ...prev, contacts } : prev)
+    }
   }
   async function handleSaveSolution(updated: Solution) {
-    const saved = await api.updateSolution(updated.id, updated)
-    setSolutions(prev => prev.map(s => s.id === saved.id ? saved : s))
-    setSelectedSolution(saved)
+    try {
+      const saved = await api.updateSolution(updated.id, updated)
+      setSolutions(prev => prev.map(s => s.id === saved.id ? saved : s))
+      setSelectedSolution(saved)
+    } catch {
+      setSolutions(prev => prev.map(s => s.id === updated.id ? updated : s))
+      setSelectedSolution(updated)
+    }
     setEditingSolution(null)
   }
   async function handleSaveContract(updated: Contract) {
-    const saved = await api.updateContract(updated.id, updated)
-    setContracts(prev => prev.map(c => c.id === saved.id ? saved : c))
-    setSelectedContract(saved)
+    try {
+      const saved = await api.updateContract(updated.id, updated)
+      setContracts(prev => prev.map(c => c.id === saved.id ? saved : c))
+      setSelectedContract(saved)
+    } catch {
+      setContracts(prev => prev.map(c => c.id === updated.id ? updated : c))
+      setSelectedContract(updated)
+    }
     setEditingContract(null)
   }
 
