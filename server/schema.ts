@@ -1,4 +1,4 @@
-import { pgTable, text, integer, jsonb } from 'drizzle-orm/pg-core'
+import { pgTable, text, integer, jsonb, boolean } from 'drizzle-orm/pg-core'
 
 // ── Tipos de Licença ─────────────────────────────────────────
 // Entidades independentes que descrevem dimensões de licenciamento
