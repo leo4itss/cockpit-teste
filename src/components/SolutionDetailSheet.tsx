@@ -171,22 +171,39 @@ export function SolutionDetailSheet({ open, onClose, solution, componentes = [],
         <Divider />
 
         {/* Componentes */}
-        {componentesVinculados.length > 0 && (
-          <>
-            <div className="flex flex-col gap-4">
-              <SectionTitle>Componentes</SectionTitle>
-              <div className="flex flex-col gap-2">
-                {componentesVinculados.map(c => (
-                  <div key={c.id} className="flex flex-col gap-0.5 px-4 py-3 border border-[#e5e7eb] rounded-md">
-                    <p className="text-sm font-medium text-[#030712]">{c.nome}</p>
-                    {c.descricao && <p className="text-xs text-[#6b7280]">{c.descricao}</p>}
+        <div className="flex flex-col gap-4">
+          <SectionTitle>Componentes</SectionTitle>
+          {componentesVinculados.length === 0 ? (
+            <p className="text-sm text-[#6b7280] text-center py-2">
+              Nenhum componente vinculado a esta solução.
+            </p>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {componentesVinculados.map(c => (
+                <div
+                  key={c.id}
+                  className="flex items-start gap-[10px] px-4 py-3 border border-[#e5e7eb] rounded-lg"
+                >
+                  {/* Checkbox visual "checked" — apenas indicativo, não interativo */}
+                  <div className="w-4 h-4 rounded-[4px] bg-[#2563eb] flex items-center justify-center shrink-0 mt-0.5">
+                    <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                      <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
                   </div>
-                ))}
-              </div>
+                  {/* Nome + descrição */}
+                  <div className="flex flex-col gap-1 min-w-0">
+                    <p className="text-sm font-medium text-[#030712]">{c.nome}</p>
+                    {c.descricao && (
+                      <p className="text-sm text-[#6b7280] truncate">{c.descricao}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
-            <Divider />
-          </>
-        )}
+          )}
+        </div>
+
+        <Divider />
 
         {/* Planos */}
         <div className="flex flex-col gap-4">
