@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Copy, Phone, Mail } from 'lucide-react'
+import { Copy, Phone, Mail, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { ProvisioningDots } from '@/components/ProvisioningDots'
