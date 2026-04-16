@@ -180,6 +180,20 @@ export function OrganizacoesPage() {
         </div>
       )}
 
+      <ConfirmDeleteModal
+        open={deleteModal === 'org' && !!deleteTarget}
+        onClose={() => { setDeleteModal(null); setDeleteTarget(null) }}
+        variant="org"
+        name={deleteTarget?.name ?? ''}
+        onConfirm={() => deleteTarget && handleDeleteOrg(deleteTarget)}
+      />
+      <ConfirmDeleteModal
+        open={deleteModal === 'blocked'}
+        onClose={() => { setDeleteModal(null); setDeleteTarget(null) }}
+        variant="blocked"
+        name={deleteTarget?.name ?? ''}
+        blocked={blockedInfo ?? undefined}
+      />
       <NewOrganizationSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
