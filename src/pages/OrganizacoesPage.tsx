@@ -161,6 +161,17 @@ export function OrganizacoesPage() {
                   <td className="px-4 py-3">
                     <Badge variant={org.status === 'Ativo' ? 'success' : 'default'}>{org.status}</Badge>
                   </td>
+                  <td className="px-2 py-3 w-10" onClick={e => e.stopPropagation()}>
+                    <div className="relative group">
+                      <button
+                        onClick={() => { setDeleteTarget(org); setDeleteModal('org') }}
+                        className="p-1.5 rounded hover:bg-red-50 text-[#9ca3af] hover:text-red-600 transition-colors opacity-0 group-hover/row:opacity-100"
+                        title="Excluir organização"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
