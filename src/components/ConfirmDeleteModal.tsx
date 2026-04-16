@@ -6,7 +6,7 @@
 import { useState } from 'react'
 import { Modal } from './ui/Modal'
 import { Button } from './ui/Button'
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, Info } from 'lucide-react'
 
 interface BlockedInfo {
   activeAccounts: number
