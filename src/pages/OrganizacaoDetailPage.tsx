@@ -43,23 +43,31 @@ export function OrganizacaoDetailPage() {
 
   useEffect(() => {
     if (!id) return
+
+    // Separa as chamadas críticas (org + dados relacionados) das auxiliares
+    // (tipos-licenca e componentes) para que a falha de uma não derrube tudo.
+    // Em previews antigos que não têm esses endpoints, a org ainda carrega.
     Promise.all([
       api.getOrganization(id),
       api.getAccounts(id),
       api.getSolutions(id),
       api.getContracts(id),
-      api.getTiposLicenca(),
-      api.getComponentes(),
-    ]).then(([orgData, accs, sols, conts, tipos, comps]) => {
+    ]).then(async ([orgData, accs, sols, conts]) => {
       setOrg(orgData)
       setAccounts(accs)
       setSolutions(sols)
       setContracts(conts)
+
+      // Carrega auxiliares de forma independente — falha silenciosa
+      const [tipos, comps] = await Promise.all([
+        api.getTiposLicenca().catch(() => mockTiposLicenca),
+        api.getComponentes().catch(() => mockComponentes),
+      ])
       setTiposLicenca(tipos)
       setComponentes(comps)
       setLoading(false)
     }).catch(() => {
-      // API indisponível (ex: preview Vercel sem backend) — usa mock data
+      // API indisponível — usa mock data como fallback
       const mockOrg = mockOrgs.find(o => o.id === id) ?? null
       setOrg(mockOrg)
       setAccounts(mockAccounts.filter(a => a.orgId === id))
