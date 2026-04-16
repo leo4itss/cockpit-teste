@@ -451,30 +451,75 @@ export function OrganizacaoDetailPage() {
               {solutions.length === 0 ? (
                 <EmptyState message="Nenhuma solução criada" description="Crie uma solução e associe planos a ela." />
               ) : (
-                <div className="border border-[#e5e7eb] rounded-2xl overflow-x-auto">
-                  <table className="w-full text-sm whitespace-nowrap">
+                <div className="border border-[#e5e7eb] rounded-2xl overflow-x-auto p-4">
+                  <table className="w-full text-sm">
                     <thead>
-                      <tr className="bg-white border-b border-[#e5e7eb]">
-                        <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Nome da solução</th>
-                        <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Planos</th>
-                        <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Descrição</th>
-                        <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Arquiteto PAS</th>
-                        <th className="text-center px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Status</th>
+                      <tr className="border-b border-[#e5e7eb]">
+                        {/* Nome da solução — 183px */}
+                        <th className="text-left px-2 py-2.5 font-medium text-[#030712] opacity-40 h-10 w-[183px]">Nome da solução</th>
+                        {/* Planos — 85px */}
+                        <th className="text-left px-2 py-2.5 font-medium text-[#030712] opacity-40 h-10 w-[85px]">Planos</th>
+                        {/* Descrição — 169px */}
+                        <th className="text-left px-2 py-2.5 font-medium text-[#030712] opacity-40 h-10 w-[169px]">Descrição</th>
+                        {/* Tipo — 133px */}
+                        <th className="text-left px-2 py-2.5 font-medium text-[#030712] opacity-40 h-10 w-[133px]">Tipo</th>
+                        {/* Marketplace — 153px */}
+                        <th className="text-left px-2 py-2.5 font-medium text-[#030712] opacity-40 h-10 w-[153px]">Marketplace</th>
+                        {/* Arquiteto PAS — 120px, centralizado */}
+                        <th className="text-center px-2 py-2.5 font-medium text-[#030712] opacity-40 h-10 w-[120px]">Arquiteto PAS</th>
+                        {/* Status — 131px, centralizado */}
+                        <th className="text-center px-2 py-2.5 font-medium text-[#030712] opacity-40 h-10 w-[131px]">Status</th>
                       </tr>
                     </thead>
                     <tbody>
                       {solutions.map(s => (
                         <tr
                           key={s.id}
-                          className="border-b border-[#e5e7eb] hover:bg-gray-50 cursor-pointer transition-colors"
+                          className="border-b border-[#e5e7eb] last:border-b-0 hover:bg-gray-50 cursor-pointer transition-colors"
                           onClick={() => setSelectedSolution(s)}
                         >
-                          <td className="px-2 py-2 h-[52px] text-sm font-medium text-[#030712]">{s.name}</td>
-                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{s.plans.map(p => p.name).join(', ')}</td>
-                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{s.description}</td>
-                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{s.arquitetoPAS}</td>
-                          <td className="px-2 py-2 h-[52px] text-center">
-                            <Badge variant="success">{s.status}</Badge>
+                          {/* Nome + avatar */}
+                          <td className="px-2 py-2 h-[52px] w-[183px]">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div className="w-8 h-8 rounded-full bg-[#f3f4f6] shrink-0 overflow-hidden border border-[#e5e7eb] flex items-center justify-center">
+                                <span className="text-xs font-medium text-[#6b7280]">
+                                  {s.name.charAt(0).toUpperCase()}
+                                </span>
+                              </div>
+                              <span className="text-sm font-medium text-[#030712] truncate">{s.name}</span>
+                            </div>
+                          </td>
+                          {/* Planos — count */}
+                          <td className="px-2 py-2 h-[52px] w-[85px] text-sm text-[#030712]">
+                            {s.plans.length}
+                          </td>
+                          {/* Descrição — truncada */}
+                          <td className="px-2 py-2 h-[52px] w-[169px] max-w-[169px]">
+                            <span className="text-sm text-[#030712] block truncate whitespace-nowrap overflow-hidden">{s.description || '—'}</span>
+                          </td>
+                          {/* Tipo — truncado */}
+                          <td className="px-2 py-2 h-[52px] w-[133px] max-w-[133px]">
+                            <span className="text-sm text-[#030712] block truncate whitespace-nowrap overflow-hidden">{s.type || '—'}</span>
+                          </td>
+                          {/* Marketplace — badge */}
+                          <td className="px-2 py-2 h-[52px] w-[153px]">
+                            {s.marketplace
+                              ? <Badge variant="success" showIcon>{s.marketplace}</Badge>
+                              : <span className="text-sm text-[#9ca3af]">—</span>
+                            }
+                          </td>
+                          {/* Arquiteto PAS — centralizado */}
+                          <td className="px-2 py-2 h-[52px] w-[120px] text-sm text-[#030712] text-center">
+                            {s.arquitetoPAS || '—'}
+                          </td>
+                          {/* Status — badge centralizado */}
+                          <td className="px-2 py-2 h-[52px] w-[131px] text-center">
+                            <Badge
+                              variant={s.status === 'Ativo' ? 'success' : 'default'}
+                              showIcon={s.status === 'Ativo'}
+                            >
+                              {s.status}
+                            </Badge>
                           </td>
                         </tr>
                       ))}
