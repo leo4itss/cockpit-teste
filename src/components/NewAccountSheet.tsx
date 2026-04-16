@@ -108,6 +108,7 @@ export function NewAccountSheet({ open, onClose, orgId, onSave }: Props) {
   const [contatos, setContatos] = useState<Contato[]>([])
   const [showAdminDialog, setShowAdminDialog] = useState(false)
   const [admins, setAdmins] = useState<AdminUser[]>([])
+  const [logo, setLogo] = useState('')
 
   const [form, setForm] = useState({
     name: '',
