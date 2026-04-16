@@ -68,7 +68,29 @@ app.put('/api/organizations/:id', async (c) => {
 })
 
 app.delete('/api/organizations/:id', async (c) => {
-  await db.delete(organizations).where(eq(organizations.id, c.req.param('id')))
+  const id = c.req.param('id')
+
+  // Verificar dependências bloqueantes
+  const [orgAccounts, orgContracts] = await Promise.all([
+    db.select().from(accounts).where(eq(accounts.orgId, id)),
+    db.select().from(contracts).where(eq(contracts.orgId, id)),
+  ])
+  const activeAccounts = orgAccounts.filter((a: any) => a.status !== 'Excluído')
+  const activeContracts = orgContracts.filter((ct: any) => ct.status === 'Ativo')
+
+  if (activeAccounts.length > 0 || activeContracts.length > 0) {
+    return c.json({
+      error: 'dependencies',
+      activeAccounts: activeAccounts.length,
+      activeContracts: activeContracts.length,
+    }, 422)
+  }
+
+  // Cascata: excluir contas (já inativas/excluídas) e contratos
+  await db.delete(accounts).where(eq(accounts.orgId, id))
+  await db.delete(contracts).where(eq(contracts.orgId, id))
+  await db.delete(solutions).where(eq(solutions.orgId, id))
+  await db.delete(organizations).where(eq(organizations.id, id))
   return c.json({ ok: true })
 })
 
@@ -76,9 +98,22 @@ app.delete('/api/organizations/:id', async (c) => {
 
 app.get('/api/accounts', async (c) => {
   const orgId = c.req.query('orgId')
-  const rows = orgId
-    ? await db.select().from(accounts).where(eq(accounts.orgId, orgId))
-    : await db.select().from(accounts)
+  const includeDeleted = c.req.query('include_deleted') === 'true'
+
+  // Por padrão exclui contas em quarentena (deletedAt preenchido)
+  // Passa include_deleted=true para incluir contas em quarentena
+  const { isNull, isNotNull, and } = await import('drizzle-orm')
+
+  let rows
+  if (orgId) {
+    rows = includeDeleted
+      ? await db.select().from(accounts).where(eq(accounts.orgId, orgId))
+      : await db.select().from(accounts).where(and(eq(accounts.orgId, orgId), isNull(accounts.deletedAt)))
+  } else {
+    rows = includeDeleted
+      ? await db.select().from(accounts)
+      : await db.select().from(accounts).where(isNull(accounts.deletedAt))
+  }
   return c.json(rows)
 })
 
