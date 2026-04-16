@@ -235,6 +235,30 @@ export function OrganizacaoDetailPage() {
     setEditingContract(null)
   }
 
+  async function handleDeleteOrg() {
+    try {
+      await api.deleteOrganization(org!.id)
+      navigate('/organizacoes')
+    } catch {
+      const res = await fetch(`/api/organizations/${org!.id}`, { method: 'DELETE' })
+      if (res.status === 422) {
+        const body = await res.json()
+        setOrgBlockedInfo({ activeAccounts: body.activeAccounts, activeContracts: body.activeContracts })
+        setOrgDeleteModal('blocked')
+      }
+    }
+  }
+
+  async function handleDeleteAccount(account: Account) {
+    try {
+      await api.deleteAccount(account.id)
+      setAccounts(prev => prev.filter(a => a.id !== account.id))
+    } catch {
+      // silencioso
+    }
+    setAccountDeleteTarget(null)
+  }
+
   const tabs: { key: Tab; label: string }[] = [
     { key: 'conta', label: 'Conta' },
     { key: 'solucoes', label: 'Soluções e planos' },
