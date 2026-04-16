@@ -129,13 +129,14 @@ export function OrganizacoesPage() {
                 <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">Cidade</th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">Arquiteto PAS</th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">Status</th>
+                <th className="px-4 py-3 w-10" />
               </tr>
             </thead>
             <tbody>
               {filtered.map((org) => (
                 <tr
                   key={org.id}
-                  className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors bg-white"
+                  className="group/row border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors bg-white"
                   onClick={() => navigate(`/organizacoes/${org.id}`)}
                 >
                   <td className="px-4 py-3 font-medium text-gray-900">
