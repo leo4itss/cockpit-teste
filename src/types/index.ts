@@ -50,6 +50,8 @@ export interface Account {
   provisioningStatus: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED'
   arquitetoPAS: string
   descricao?: string
+  logo?: string       // data URL ou URL externa
+  isDefault?: boolean // true = conta padrão criada automaticamente com a org
   status: 'Criado' | 'Ativo' | 'Inativo'
   createdAt: string
 }
