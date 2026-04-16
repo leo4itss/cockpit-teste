@@ -1,10 +1,11 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Copy, Phone, Mail } from 'lucide-react'
+import { Copy, Phone, Mail, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { ProvisioningDots } from '@/components/ProvisioningDots'
 import { NewAccountSheet } from '@/components/NewAccountSheet'
+import { ConfirmDeleteModal } from '@/components/ConfirmDeleteModal'
 import { NewSolutionSheet } from '@/components/NewSolutionSheet'
 import { NewContractSheet } from '@/components/NewContractSheet'
 import { NewOrganizationSheet } from '@/components/NewOrganizationSheet'
@@ -84,6 +85,13 @@ export function OrganizacaoDetailPage() {
   const [sheetSolution, setSheetSolution] = useState(false)
   const [sheetContract, setSheetContract] = useState(false)
   const [sheetEditOrg, setSheetEditOrg] = useState(false)
+
+  // Delete org modal
+  const [orgDeleteModal, setOrgDeleteModal] = useState<'org' | 'blocked' | null>(null)
+  const [orgBlockedInfo, setOrgBlockedInfo] = useState<{ activeAccounts: number; activeContracts: number } | null>(null)
+
+  // Delete account modal
+  const [accountDeleteTarget, setAccountDeleteTarget] = useState<Account | null>(null)
 
   // Detail sheets
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null)
@@ -227,6 +235,30 @@ export function OrganizacaoDetailPage() {
     setEditingContract(null)
   }
 
+  async function handleDeleteOrg() {
+    try {
+      await api.deleteOrganization(org!.id)
+      navigate('/organizacoes')
+    } catch {
+      const res = await fetch(`/api/organizations/${org!.id}`, { method: 'DELETE' })
+      if (res.status === 422) {
+        const body = await res.json()
+        setOrgBlockedInfo({ activeAccounts: body.activeAccounts, activeContracts: body.activeContracts })
+        setOrgDeleteModal('blocked')
+      }
+    }
+  }
+
+  async function handleDeleteAccount(account: Account) {
+    try {
+      await api.deleteAccount(account.id)
+      setAccounts(prev => prev.filter(a => a.id !== account.id))
+    } catch {
+      // silencioso
+    }
+    setAccountDeleteTarget(null)
+  }
+
   const tabs: { key: Tab; label: string }[] = [
     { key: 'conta', label: 'Conta' },
     { key: 'solucoes', label: 'Soluções e planos' },
@@ -254,6 +286,13 @@ export function OrganizacaoDetailPage() {
               className="text-sm font-medium text-[#030712] bg-white border border-[#e5e7eb] rounded-md px-4 py-2 h-9 shrink-0 ml-4 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:bg-gray-50 transition-colors"
             >
               Editar
+            </button>
+            <button
+              onClick={() => setOrgDeleteModal('org')}
+              className="p-2 rounded-md border border-[#e5e7eb] text-[#9ca3af] hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-colors shrink-0 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]"
+              title="Excluir organização"
+            >
+              <Trash2 className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -413,13 +452,14 @@ export function OrganizacaoDetailPage() {
                         <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Subdomínio</th>
                         <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Arquiteto PAS</th>
                         <th className="text-center px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Status</th>
+                        <th className="w-10" />
                       </tr>
                     </thead>
                     <tbody>
                       {accounts.map(a => (
                         <tr
                           key={a.id}
-                          className="border-b border-[#e5e7eb] hover:bg-gray-50 cursor-pointer transition-colors"
+                          className="group border-b border-[#e5e7eb] hover:bg-gray-50 cursor-pointer transition-colors"
                           onClick={() => setSelectedAccount(a)}
                         >
                           <td className="px-2 py-2 h-[52px]">
@@ -435,6 +475,15 @@ export function OrganizacaoDetailPage() {
                           <td className="px-2 py-2 h-[52px] text-sm text-[#030712] text-center">{a.arquitetoPAS}</td>
                           <td className="px-2 py-2 h-[52px] text-center">
                             <Badge variant="success">{a.status}</Badge>
+                          </td>
+                          <td className="px-2 py-2 h-[52px] w-10" onClick={e => e.stopPropagation()}>
+                            <button
+                              onClick={() => setAccountDeleteTarget(a)}
+                              className="p-1.5 rounded hover:bg-red-50 text-[#9ca3af] hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100"
+                              title="Excluir conta"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
                           </td>
                         </tr>
                       ))}
@@ -592,6 +641,29 @@ export function OrganizacaoDetailPage() {
         </div>
       </div>
 
+      {/* Delete modals */}
+      <ConfirmDeleteModal
+        open={orgDeleteModal === 'org'}
+        onClose={() => setOrgDeleteModal(null)}
+        variant="org"
+        name={org?.name ?? ''}
+        onConfirm={handleDeleteOrg}
+      />
+      <ConfirmDeleteModal
+        open={orgDeleteModal === 'blocked'}
+        onClose={() => setOrgDeleteModal(null)}
+        variant="blocked"
+        name={org?.name ?? ''}
+        blocked={orgBlockedInfo ?? undefined}
+      />
+      <ConfirmDeleteModal
+        open={!!accountDeleteTarget}
+        onClose={() => setAccountDeleteTarget(null)}
+        variant="account"
+        name={accountDeleteTarget?.name ?? ''}
+        onConfirm={() => accountDeleteTarget && handleDeleteAccount(accountDeleteTarget)}
+      />
+
       {/* Create sheets */}
       <NewAccountSheet open={sheetAccount} onClose={() => setSheetAccount(false)} orgId={org.id} onSave={handleAddAccount} />
       <NewSolutionSheet
@@ -604,7 +676,12 @@ export function OrganizacaoDetailPage() {
         onComponenteCreated={c => setComponentes(prev => [...prev, c])}
       />
       <NewContractSheet open={sheetContract} onClose={() => setSheetContract(false)} orgId={org.id} orgName={org.name} solutions={solutions} onSave={handleAddContract} />
-      <NewOrganizationSheet open={sheetEditOrg} onClose={() => setSheetEditOrg(false)} onSave={handleEditOrg} />
+      <NewOrganizationSheet
+        open={sheetEditOrg}
+        onClose={() => setSheetEditOrg(false)}
+        onSave={handleEditOrg}
+        onDelete={() => { setSheetEditOrg(false); setOrgDeleteModal('org') }}
+      />
 
       {/* Detail sheets */}
       <AccountDetailSheet
