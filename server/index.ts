@@ -137,8 +137,25 @@ app.put('/api/accounts/:id', async (c) => {
 })
 
 app.delete('/api/accounts/:id', async (c) => {
-  await db.delete(accounts).where(eq(accounts.id, c.req.param('id')))
+  // Soft delete: marca deletedAt, não remove fisicamente
+  const [row] = await db
+    .update(accounts)
+    .set({ deletedAt: new Date().toISOString() })
+    .where(eq(accounts.id, c.req.param('id')))
+    .returning()
+  if (!row) return c.json({ error: 'Not found' }, 404)
   return c.json({ ok: true })
+})
+
+// Restaura conta em quarentena (cancela exclusão)
+app.patch('/api/accounts/:id/restaurar', async (c) => {
+  const [row] = await db
+    .update(accounts)
+    .set({ deletedAt: null })
+    .where(eq(accounts.id, c.req.param('id')))
+    .returning()
+  if (!row) return c.json({ error: 'Not found' }, 404)
+  return c.json(row)
 })
 
 // ── Solutions ─────────────────────────────────────────────────
