@@ -105,6 +105,13 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
   // --- ORG ---
   const canConfirm = typed === name
 
+  // Data prevista de exclusão permanente (hoje + 30 dias)
+  const exclusaoPermanente = new Date()
+  exclusaoPermanente.setDate(exclusaoPermanente.getDate() + 30)
+  const exclusaoFormatada = exclusaoPermanente.toLocaleDateString('pt-BR', {
+    day: '2-digit', month: 'long', year: 'numeric',
+  })
+
   return (
     <Modal
       open={open}
@@ -122,14 +129,32 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
     >
       <div className="flex flex-col gap-4 text-sm text-[#030712]">
         <p>
-          Esta ação é <strong>irreversível</strong>. Serão excluídos junto com a organização:
+          Esta organização entrará em um período de <strong>quarentena de 30 dias</strong> antes
+          de ser excluída permanentemente. Durante esse período, os seguintes itens
+          ficarão inacessíveis e serão excluídos permanentemente após 30 dias:
         </p>
         <ul className="flex flex-col gap-1.5 p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-xs list-disc list-outside pl-6">
           <li>Todas as contas vinculadas</li>
           <li>Todos os contratos</li>
           <li>Todas as soluções</li>
-          <li>Todos os dados são removidos permanentemente</li>
+          <li>Todos os dados associados</li>
         </ul>
+
+        {/* Bloco informativo — quarentena */}
+        <div className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+          <div className="flex flex-col gap-1 text-xs text-blue-800">
+            <p>
+              Durante os 30 dias de quarentena, você poderá cancelar a exclusão
+              acessando a opção <strong>"Cancelar exclusão"</strong> no menu de ações
+              da organização.
+            </p>
+            <p className="font-medium">
+              Exclusão permanente prevista para: {exclusaoFormatada}
+            </p>
+          </div>
+        </div>
+
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-[#030712]">
             Digite <strong>"{name}"</strong> para confirmar:
