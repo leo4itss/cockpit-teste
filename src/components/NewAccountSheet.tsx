@@ -170,9 +170,11 @@ export function NewAccountSheet({ open, onClose, orgId, onSave }: Props) {
 
         {/* Imagens */}
         <div className="flex flex-col gap-7">
-          <ImageUploadRow description="Insira o logo da organização. Isso ajudará a identificar a organização de forma mais fácil e visual no sistema." />
-          <ImageUploadRow description="Insira o favicon da conta. Isso será exibido na aba do navegador. Formato: 64x64 pixels." />
-          <ImageUploadRow description="Insira o banner da conta. Isso será exibido na tela de login. Formato: 180x180 pixels." />
+          <ImageUploadRow
+            description="Insira o logo da conta. Isso ajudará a identificar a conta de forma mais fácil e visual no sistema."
+            preview={logo}
+            onFileSelect={setLogo}
+          />
           <Separator />
         </div>
 
