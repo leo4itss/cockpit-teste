@@ -53,6 +53,16 @@ export function NewOrganizationSheet({ open, onClose, onSave }: Props) {
   const [contactDialogOpen, setContactDialogOpen] = useState(false)
   const [admins, setAdmins] = useState<AdminUser[]>([])
   const [adminDialogOpen, setAdminDialogOpen] = useState(false)
+  const [logoPreview, setLogoPreview] = useState<string>('')
+  const logoInputRef = useRef<HTMLInputElement>(null)
+
+  function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => setLogoPreview(ev.target?.result as string)
+    reader.readAsDataURL(file)
+  }
 
   function set(field: string, value: string) {
     setForm(f => ({ ...f, [field]: value }))
