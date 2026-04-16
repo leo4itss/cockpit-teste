@@ -39,8 +39,30 @@ app.get('/organizations/:id', async (c) => {
   return row ? c.json(row) : c.json({ error: 'Not found' }, 404)
 })
 app.post('/organizations', async (c) => {
-  const [row] = await db.insert(organizations).values(await c.req.json()).returning()
-  return c.json(row, 201)
+  const body = await c.req.json()
+
+  // neon-http não suporta transactions. Usamos compensação manual:
+  // cria org → tenta criar conta default → se falhar, apaga org.
+  const [org] = await db.insert(organizations).values(body).returning()
+
+  try {
+    await db.insert(accounts).values({
+      id: crypto.randomUUID(),
+      orgId: org.id,
+      name: 'Conta Padrão',
+      subdomain: `${org.domain}-default`,
+      arquitetoPAS: org.arquitetoPAS,
+      provisioningStatus: 'PENDING',
+      isDefault: true,
+      status: 'Criado',
+      createdAt: new Date().toLocaleDateString('pt-BR'),
+    })
+  } catch (err) {
+    await db.delete(organizations).where(eq(organizations.id, org.id))
+    throw err
+  }
+
+  return c.json(org, 201)
 })
 app.put('/organizations/:id', async (c) => {
   const [row] = await db.update(organizations).set(await c.req.json()).where(eq(organizations.id, c.req.param('id'))).returning()
