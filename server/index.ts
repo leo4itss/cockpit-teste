@@ -33,8 +33,28 @@ app.get('/api/organizations/:id', async (c) => {
 
 app.post('/api/organizations', async (c) => {
   const body = await c.req.json()
-  const [row] = await db.insert(organizations).values(body).returning()
-  return c.json(row, 201)
+
+  // Cria organização + conta default na mesma transação.
+  // Se a criação da conta falhar, a organização é revertida.
+  const { org } = await db.transaction(async (tx) => {
+    const [org] = await tx.insert(organizations).values(body).returning()
+
+    await tx.insert(accounts).values({
+      id: crypto.randomUUID(),
+      orgId: org.id,
+      name: 'Conta Padrão',
+      subdomain: `${org.domain}-default`,
+      arquitetoPAS: org.arquitetoPAS,
+      provisioningStatus: 'PENDING',
+      isDefault: true,
+      status: 'Criado',
+      createdAt: new Date().toLocaleDateString('pt-BR'),
+    })
+
+    return { org }
+  })
+
+  return c.json(org, 201)
 })
 
 app.put('/api/organizations/:id', async (c) => {
