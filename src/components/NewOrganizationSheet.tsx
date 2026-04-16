@@ -12,6 +12,7 @@ interface Props {
   open: boolean
   onClose: () => void
   onSave: (org: Omit<Organization, 'id' | 'qtdContas' | 'qtdSolucoes' | 'qtdContratos' | 'contacts'>) => void
+  onDelete?: () => void  // quando presente, exibe botão "Excluir organização" no footer
 }
 
 const STATES = [
