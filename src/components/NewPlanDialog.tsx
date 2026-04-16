@@ -21,8 +21,7 @@ function emptyLicensing(): Licensing {
     tipoLicencaId: '',
     tipoLicencaNome: '',
     tipoLicencaUnidade: '',
-    valorMinimo: '',
-    valorMaximo: '',
+    valor: '',
     definirPreco: false,
     precoAnual: '',
     descontoMensal: '',
@@ -163,7 +162,7 @@ export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca
                 {licensings.map((lic, i) => (
                   <div key={i} className="flex flex-col gap-4">
 
-                    {/* Tipo de Licença + remover */}
+                    {/* Tipo de Licença + Valor + remover */}
                     <div className="flex items-end gap-3">
                       <div className="flex-1">
                         <Select
@@ -175,6 +174,14 @@ export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca
                           onChange={e => handleLicensingChange(i, 'tipoLicencaId', e.target.value)}
                         />
                       </div>
+                      <div className="flex-1">
+                        <Input
+                          label="Valor"
+                          placeholder="digite o valor"
+                          value={lic.valor ?? ''}
+                          onChange={e => handleLicensingChange(i, 'valor', e.target.value)}
+                        />
+                      </div>
                       <button
                         type="button"
                         onClick={() => handleRemoveLicensing(i)}
@@ -183,22 +190,6 @@ export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca
                       >
                         <Minus className="w-4 h-4 text-[#030712]" />
                       </button>
-                    </div>
-
-                    {/* Valor mínimo e máximo */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <Input
-                        label={`Valor mínimo${lic.tipoLicencaUnidade ? ` (${lic.tipoLicencaUnidade})` : ''}`}
-                        placeholder="Opcional"
-                        value={lic.valorMinimo ?? ''}
-                        onChange={e => handleLicensingChange(i, 'valorMinimo', e.target.value)}
-                      />
-                      <Input
-                        label={`Valor máximo${lic.tipoLicencaUnidade ? ` (${lic.tipoLicencaUnidade})` : ''}`}
-                        placeholder="Opcional"
-                        value={lic.valorMaximo ?? ''}
-                        onChange={e => handleLicensingChange(i, 'valorMaximo', e.target.value)}
-                      />
                     </div>
 
                     {i < licensings.length - 1 && (

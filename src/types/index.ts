@@ -85,6 +85,7 @@ export interface Licensing {
   tipoLicencaUnidade?: string    // denormalizado para exibição
   valorMinimo?: string           // quantidade mínima (opcional)
   valorMaximo?: string           // quantidade máxima (opcional)
+  valor?: string                 // valor livre por licença
   definirPreco: boolean
   precoAnual: string
   descontoMensal: string
