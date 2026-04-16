@@ -48,13 +48,17 @@ function PlanCard({
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
-  const licensingText = plan.licensings.length > 0
-    ? plan.licensings.map(l => {
-        const range = [l.valorMinimo, l.valorMaximo].filter(Boolean).join('–')
-        const nome = l.tipoLicencaNome || l.tipoLicencaId
-        return range ? `${nome}: ${range} ${l.tipoLicencaUnidade ?? ''}`.trim() : nome
-      }).join(' · ')
-    : null
+  const licensings = plan.licensings.map(l => {
+    const nome = l.tipoLicencaNome || l.tipoLicencaId
+    const unidade = l.tipoLicencaUnidade ?? ''
+    const min = l.valorMinimo?.trim()
+    const max = l.valorMaximo?.trim()
+    let range = ''
+    if (min && max) range = `${min}–${max} ${unidade}`.trim()
+    else if (min) range = `${min} ${unidade}`.trim()
+    else if (max) range = `Até ${max} ${unidade}`.trim()
+    return range ? `${nome}: ${range}` : nome
+  })
 
   useEffect(() => {
     if (!menuOpen) return
@@ -68,22 +72,24 @@ function PlanCard({
   }, [menuOpen])
 
   return (
-    <div className="bg-white border border-[#e5e7eb] rounded-md flex flex-col pt-2 pb-4 px-5">
-      {/* Plan header row */}
-      <div className="flex items-center gap-4 py-2">
+    <div className="border border-[#e5e7eb] rounded-lg overflow-hidden">
+      {/* Header */}
+      <div className="flex items-start gap-3 px-4 py-3">
         <button
           type="button"
           onClick={() => setExpanded(v => !v)}
-          className="shrink-0 text-[#6b7280]"
+          className="mt-0.5 text-[#6b7280] hover:text-[#030712] transition-colors shrink-0"
         >
           {expanded
             ? <ChevronUp className="w-4 h-4" />
             : <ChevronDown className="w-4 h-4" />
           }
         </button>
-        <div className="flex flex-1 flex-col gap-0.5 min-w-0 overflow-hidden">
-          <p className="text-sm font-semibold text-[#030712] leading-5 truncate">{plan.name}</p>
-          <p className="text-sm text-[#6b7280] leading-5 truncate">{plan.description}</p>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-[#030712] leading-5">{plan.name}</p>
+          {plan.description && (
+            <p className="text-xs text-[#6b7280] leading-4 mt-0.5">{plan.description}</p>
+          )}
         </div>
 
         {/* Dropdown menu */}
@@ -91,13 +97,12 @@ function PlanCard({
           <button
             type="button"
             onClick={() => setMenuOpen(v => !v)}
-            className="w-9 h-9 flex items-center justify-center rounded-md hover:bg-gray-100 text-[#6b7280] transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-100 text-[#6b7280] transition-colors"
           >
             <MoreVertical className="w-4 h-4" />
           </button>
-
           {menuOpen && (
-            <div className="absolute right-0 top-10 z-50 bg-white border border-[#e5e7eb] rounded-md shadow-lg py-1 min-w-[148px]">
+            <div className="absolute right-0 top-9 z-50 bg-white border border-[#e5e7eb] rounded-md shadow-lg py-1 min-w-[148px]">
               <button
                 type="button"
                 className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#030712] hover:bg-gray-50 transition-colors"
@@ -119,15 +124,19 @@ function PlanCard({
         </div>
       </div>
 
-      {/* Licensing row (when expanded) */}
-      {expanded && licensingText && (
-        <>
-          <Divider />
-          <div className="flex flex-col gap-0.5 py-3">
-            <p className="text-sm font-medium text-[#030712] leading-5">Tipos de licença</p>
-            <p className="text-sm text-[#6b7280] leading-5">{licensingText}</p>
-          </div>
-        </>
+      {/* Licensings expandidos */}
+      {expanded && licensings.length > 0 && (
+        <div className="px-4 pb-4 pt-1 border-t border-[#e5e7eb] bg-[#fafafa]">
+          <p className="text-xs font-semibold text-[#030712] mb-2">Modelo de licenciamento</p>
+          <ul className="flex flex-col gap-1">
+            {licensings.map((text, i) => (
+              <li key={i} className="flex items-start gap-1.5 text-xs text-[#6b7280]">
+                <span className="mt-[3px] w-1 h-1 rounded-full bg-[#6b7280] shrink-0" />
+                {text}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   )

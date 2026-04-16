@@ -3,7 +3,8 @@ import { Sheet } from './ui/Sheet'
 import { Input } from './ui/Input'
 import { Select } from './ui/Select'
 import { Button } from './ui/Button'
-import { Upload, CircleAlert, Plus, Trash2, Puzzle } from 'lucide-react'
+import { Upload, CircleAlert, Plus, Puzzle } from 'lucide-react'
+import { PlanCard } from './PlanCard'
 import { NewPlanDialog } from './NewPlanDialog'
 import { ComponenteSelector } from './ComponenteSelector'
 import { ComponenteSelecaoSheet } from './ComponenteSelecaoSheet'
@@ -294,15 +295,11 @@ export function NewSolutionSheet({
           ) : (
             <div className="flex flex-col gap-2">
               {plans.map((plan, i) => (
-                <div key={i} className="flex items-center justify-between h-9 px-3 border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
-                  <span className="text-sm text-[#030712]">{plan.name}</span>
-                  <button
-                    onClick={() => setPlans(ps => ps.filter((_, j) => j !== i))}
-                    className="text-gray-400 hover:text-red-500 transition-colors"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
+                <PlanCard
+                  key={i}
+                  plan={plan}
+                  onRemove={() => setPlans(ps => ps.filter((_, j) => j !== i))}
+                />
               ))}
             </div>
           )}
