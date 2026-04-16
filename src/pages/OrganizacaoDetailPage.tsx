@@ -86,6 +86,13 @@ export function OrganizacaoDetailPage() {
   const [sheetContract, setSheetContract] = useState(false)
   const [sheetEditOrg, setSheetEditOrg] = useState(false)
 
+  // Delete org modal
+  const [orgDeleteModal, setOrgDeleteModal] = useState<'org' | 'blocked' | null>(null)
+  const [orgBlockedInfo, setOrgBlockedInfo] = useState<{ activeAccounts: number; activeContracts: number } | null>(null)
+
+  // Delete account modal
+  const [accountDeleteTarget, setAccountDeleteTarget] = useState<Account | null>(null)
+
   // Detail sheets
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null)
   const [editingAccount, setEditingAccount] = useState<Account | null>(null)
