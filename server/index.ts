@@ -68,7 +68,29 @@ app.put('/api/organizations/:id', async (c) => {
 })
 
 app.delete('/api/organizations/:id', async (c) => {
-  await db.delete(organizations).where(eq(organizations.id, c.req.param('id')))
+  const id = c.req.param('id')
+
+  // Verificar dependências bloqueantes
+  const [orgAccounts, orgContracts] = await Promise.all([
+    db.select().from(accounts).where(eq(accounts.orgId, id)),
+    db.select().from(contracts).where(eq(contracts.orgId, id)),
+  ])
+  const activeAccounts = orgAccounts.filter((a: any) => a.status !== 'Excluído')
+  const activeContracts = orgContracts.filter((ct: any) => ct.status === 'Ativo')
+
+  if (activeAccounts.length > 0 || activeContracts.length > 0) {
+    return c.json({
+      error: 'dependencies',
+      activeAccounts: activeAccounts.length,
+      activeContracts: activeContracts.length,
+    }, 422)
+  }
+
+  // Cascata: excluir contas (já inativas/excluídas) e contratos
+  await db.delete(accounts).where(eq(accounts.orgId, id))
+  await db.delete(contracts).where(eq(contracts.orgId, id))
+  await db.delete(solutions).where(eq(solutions.orgId, id))
+  await db.delete(organizations).where(eq(organizations.id, id))
   return c.json({ ok: true })
 })
 
