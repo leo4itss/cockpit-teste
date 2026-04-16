@@ -81,6 +81,7 @@ export const accounts = pgTable('accounts', {
   isDefault: boolean('is_default').notNull().default(false), // conta padrão da org
   status: text('status').notNull().default('Criado'),
   createdAt: text('created_at').notNull(),
+  deletedAt: text('deleted_at'),  // null = ativa; preenchido = em quarentena (soft delete)
 })
 
 export const solutions = pgTable('solutions', {
