@@ -16,6 +16,9 @@ export function OrganizacoesPage() {
   const [error] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<Organization | null>(null)
+  const [deleteModal, setDeleteModal] = useState<'org' | 'blocked' | null>(null)
+  const [blockedInfo, setBlockedInfo] = useState<{ activeAccounts: number; activeContracts: number } | null>(null)
 
   useEffect(() => {
     api.getOrganizations()
