@@ -103,13 +103,28 @@ export function NewOrganizationSheet({ open, onClose, onSave }: Props) {
             <SectionTitle>Logotipo</SectionTitle>
             <div className="flex items-start gap-7">
               <div className="w-12 h-12 rounded-full bg-[#f3f4f6] flex items-center justify-center shrink-0 overflow-hidden border border-[#e5e7eb]">
-                <span className="text-amber-600 text-sm font-bold">🍎</span>
+                {logoPreview
+                  ? <img src={logoPreview} alt="logo" className="w-full h-full object-cover" />
+                  : <span className="text-[#9ca3af] text-xs">Logo</span>
+                }
               </div>
               <div className="flex flex-col gap-2">
                 <p className="text-sm text-[#6b7280] leading-5">
                   Insira o logo da organização. Isso ajudará a identificar a organização de forma mais fácil e visual no sistema.
                 </p>
-                <button className="flex items-center gap-2 border border-[#e5e7eb] rounded-md px-4 h-9 text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors self-start">
+                {/* input oculto — acionado pelo botão abaixo */}
+                <input
+                  ref={logoInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleLogoChange}
+                />
+                <button
+                  type="button"
+                  onClick={() => logoInputRef.current?.click()}
+                  className="flex items-center gap-2 border border-[#e5e7eb] rounded-md px-4 h-9 text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors self-start"
+                >
                   <Upload className="w-4 h-4 text-[#6b7280]" />
                   Escolher imagem
                 </button>
