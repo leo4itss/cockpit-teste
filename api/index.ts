@@ -49,8 +49,8 @@ app.post('/organizations', async (c) => {
     await db.insert(accounts).values({
       id: crypto.randomUUID(),
       orgId: org.id,
-      name: 'Conta Padrão',
-      subdomain: `${org.domain}-default`,
+      name: org.name,
+      subdomain: org.domain,
       arquitetoPAS: org.arquitetoPAS,
       provisioningStatus: 'PENDING',
       isDefault: true,
