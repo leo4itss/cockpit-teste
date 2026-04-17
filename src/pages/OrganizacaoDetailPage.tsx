@@ -98,6 +98,9 @@ export function OrganizacaoDetailPage() {
   // Delete contract modal
   const [contractDeleteTarget, setContractDeleteTarget] = useState<Contract | null>(null)
 
+  // Delete solution modal
+  const [solutionDeleteTarget, setSolutionDeleteTarget] = useState<Solution | null>(null)
+
   // Detail sheets
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null)
   const [editingAccount, setEditingAccount] = useState<Account | null>(null)
