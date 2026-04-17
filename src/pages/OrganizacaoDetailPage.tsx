@@ -424,7 +424,16 @@ export function OrganizacaoDetailPage() {
                   <input
                     type="checkbox"
                     checked={showDeleted}
-                    onChange={e => setShowDeleted(e.target.checked)}
+                    onChange={async e => {
+                      const val = e.target.checked
+                      setShowDeleted(val)
+                      if (id) {
+                        try {
+                          const accs = await api.getAccounts(id, val)
+                          setAccounts(accs)
+                        } catch {}
+                      }
+                    }}
                     className="w-4 h-4 mt-[1px] rounded border border-[#e5e7eb] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] shrink-0 accent-[#2563eb] cursor-pointer"
                   />
                   <span className="text-sm font-medium text-[#030712] leading-none">Exibir contas deletadas</span>
