@@ -86,7 +86,7 @@ export function Sheet({ open, onClose, title, description, children, footer, wid
 
         {/* Footer */}
         {footer && (
-          <div className="border-t border-[#e5e7eb] px-5 py-6 flex justify-end gap-4 shrink-0">
+          <div className="border-t border-[#e5e7eb] px-5 py-6 flex items-center justify-end gap-4 shrink-0 w-full">
             {footer}
           </div>
         )}
