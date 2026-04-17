@@ -28,20 +28,23 @@ function Divider() {
 /* ── options ─────────────────────────────────────────────── */
 
 const STATES = [
-  { value: 'AC', label: 'Acre' }, { value: 'AL', label: 'Alagoas' },
-  { value: 'BA', label: 'Bahia' }, { value: 'CE', label: 'Ceará' },
-  { value: 'DF', label: 'Distrito Federal' }, { value: 'GO', label: 'Goiás' },
-  { value: 'MG', label: 'Minas Gerais' }, { value: 'PA', label: 'Pará' },
-  { value: 'PB', label: 'Paraíba' }, { value: 'PR', label: 'Paraná' },
-  { value: 'RJ', label: 'Rio de Janeiro' }, { value: 'RN', label: 'Rio Grande do Norte' },
-  { value: 'RS', label: 'Rio Grande do Sul' }, { value: 'SC', label: 'Santa Catarina' },
-  { value: 'SP', label: 'São Paulo' }, { value: 'SE', label: 'Sergipe' },
+  { value: 'Acre', label: 'Acre' }, { value: 'Alagoas', label: 'Alagoas' },
+  { value: 'Bahia', label: 'Bahia' }, { value: 'Ceará', label: 'Ceará' },
+  { value: 'Distrito Federal', label: 'Distrito Federal' }, { value: 'Goiás', label: 'Goiás' },
+  { value: 'Minas Gerais', label: 'Minas Gerais' }, { value: 'Pará', label: 'Pará' },
+  { value: 'Paraíba', label: 'Paraíba' }, { value: 'Paraná', label: 'Paraná' },
+  { value: 'Rio de Janeiro', label: 'Rio de Janeiro' }, { value: 'Rio Grande do Norte', label: 'Rio Grande do Norte' },
+  { value: 'Rio Grande do Sul', label: 'Rio Grande do Sul' }, { value: 'Santa Catarina', label: 'Santa Catarina' },
+  { value: 'São Paulo', label: 'São Paulo' }, { value: 'Sergipe', label: 'Sergipe' },
 ]
 
 const SEGMENTS = [
-  { value: 'agro', label: 'Agropecuário' }, { value: 'energia', label: 'Energia' },
-  { value: 'farma', label: 'Farmacêutico' }, { value: 'industrial', label: 'Serviços Industriais' },
-  { value: 'tech', label: 'Tecnologia' }, { value: 'varejo', label: 'Varejo' },
+  { value: 'Agropecuário', label: 'Agropecuário' },
+  { value: 'Energia', label: 'Energia' },
+  { value: 'Farmacêutico', label: 'Farmacêutico' },
+  { value: 'Serviços Industriais', label: 'Serviços Industriais' },
+  { value: 'Tecnologia', label: 'Tecnologia' },
+  { value: 'Varejo', label: 'Varejo' },
 ]
 
 const DOC_TYPES = [
@@ -52,8 +55,8 @@ const DOC_TYPES = [
 const PAISES = [{ value: 'Brasil', label: 'Brasil' }]
 
 const ARQUITETOS = [
-  { value: 'marcelo', label: 'Marcelo Gomes' },
-  { value: 'ana', label: 'Ana Lima' },
+  { value: 'Marcelo Gomes', label: 'Marcelo Gomes' },
+  { value: 'Ana Lima', label: 'Ana Lima' },
 ]
 
 /* ── main ─────────────────────────────────────────────────── */
