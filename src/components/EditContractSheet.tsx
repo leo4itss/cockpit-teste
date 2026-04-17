@@ -85,15 +85,13 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
         title="Editar Contrato"
         width="w-[768px]"
         footer={
-          <div className="flex items-center justify-between w-full">
-            <Button variant="destructive" onClick={onDelete}>
+          <>
+            <Button variant="destructive" onClick={onDelete} className="mr-auto">
               Excluir contrato
             </Button>
-            <div className="flex items-center gap-2">
-              <Button variant="secondary" onClick={onClose}>Cancelar</Button>
-              <Button onClick={handleSave}>Salvar</Button>
-            </div>
-          </div>
+            <Button variant="secondary" onClick={onClose}>Cancelar</Button>
+            <Button onClick={handleSave}>Salvar</Button>
+          </>
         }
       >
         <div className="flex flex-col gap-10">
