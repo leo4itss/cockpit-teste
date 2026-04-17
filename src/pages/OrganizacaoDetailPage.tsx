@@ -296,6 +296,18 @@ export function OrganizacaoDetailPage() {
     }
   }
 
+  async function handleDeleteContract() {
+    if (!contractDeleteTarget) return
+    try {
+      await api.deleteContract(contractDeleteTarget.id)
+      setContracts(prev => prev.filter(c => c.id !== contractDeleteTarget.id))
+    } catch {
+      // silencioso
+    }
+    setContractDeleteTarget(null)
+    setEditingContract(null)
+  }
+
   const tabs: { key: Tab; label: string }[] = [
     { key: 'conta', label: 'Conta' },
     { key: 'solucoes', label: 'Soluções e planos' },
