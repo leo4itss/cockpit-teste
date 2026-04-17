@@ -479,15 +479,15 @@ export function OrganizacaoDetailPage() {
               {accounts.length === 0 ? (
                 <EmptyState message="Nenhuma conta criada" description="Crie uma conta para provisionar o sistema." />
               ) : (
-                <div className="border border-[#e5e7eb] rounded-2xl overflow-x-auto">
-                  <table className="w-full text-sm whitespace-nowrap">
+                <div className="border border-[#e5e7eb] rounded-2xl p-4 overflow-hidden">
+                  <table className="w-full text-sm">
                     <thead>
-                      <tr className="bg-white border-b border-[#e5e7eb]">
-                        <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Nome</th>
-                        <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Provisionamento / Remoção</th>
-                        <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Subdomínio</th>
-                        <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Arquiteto PAS</th>
-                        <th className="text-center px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Status</th>
+                      <tr className="border-b border-[#e5e7eb]">
+                        <th className="text-left px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10 w-[184px]">Nome</th>
+                        <th className="text-left px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10 w-[169px] leading-snug">Provisionamento / Remoção</th>
+                        <th className="text-left px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10">Subdomínio</th>
+                        <th className="text-center px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10 w-[120px]">Arquiteto PAS</th>
+                        <th className="text-center px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10 w-[131px]">Status</th>
                         <th className="w-10" />
                       </tr>
                     </thead>
