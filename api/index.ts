@@ -98,9 +98,18 @@ app.delete('/organizations/:id', async (c) => {
 // ── Accounts ──────────────────────────────────────────────────
 app.get('/accounts', async (c) => {
   const orgId = c.req.query('orgId')
-  const rows = orgId
-    ? await db.select().from(accounts).where(eq(accounts.orgId, orgId))
-    : await db.select().from(accounts)
+  const includeDeleted = c.req.query('include_deleted') === 'true'
+
+  let rows
+  if (orgId) {
+    rows = includeDeleted
+      ? await db.select().from(accounts).where(eq(accounts.orgId, orgId))
+      : await db.select().from(accounts).where(and(eq(accounts.orgId, orgId), isNull(accounts.deletedAt)))
+  } else {
+    rows = includeDeleted
+      ? await db.select().from(accounts)
+      : await db.select().from(accounts).where(isNull(accounts.deletedAt))
+  }
   return c.json(rows)
 })
 app.get('/accounts/:id', async (c) => {
@@ -116,8 +125,24 @@ app.put('/accounts/:id', async (c) => {
   return row ? c.json(row) : c.json({ error: 'Not found' }, 404)
 })
 app.delete('/accounts/:id', async (c) => {
-  await db.delete(accounts).where(eq(accounts.id, c.req.param('id')))
+  // Soft delete: marca deletedAt, não remove fisicamente
+  const [row] = await db
+    .update(accounts)
+    .set({ deletedAt: new Date().toISOString() })
+    .where(eq(accounts.id, c.req.param('id')))
+    .returning()
+  if (!row) return c.json({ error: 'Not found' }, 404)
   return c.json({ ok: true })
+})
+// Restaura conta em quarentena (cancela exclusão)
+app.patch('/accounts/:id/restaurar', async (c) => {
+  const [row] = await db
+    .update(accounts)
+    .set({ deletedAt: null })
+    .where(eq(accounts.id, c.req.param('id')))
+    .returning()
+  if (!row) return c.json({ error: 'Not found' }, 404)
+  return c.json(row)
 })
 
 // ── Solutions ─────────────────────────────────────────────────
