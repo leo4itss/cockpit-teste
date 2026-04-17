@@ -311,6 +311,18 @@ export function OrganizacaoDetailPage() {
     setEditingContract(null)
   }
 
+  async function handleDeleteSolution() {
+    if (!solutionDeleteTarget) return
+    try {
+      await api.deleteSolution(solutionDeleteTarget.id)
+      setSolutions(prev => prev.filter(s => s.id !== solutionDeleteTarget.id))
+    } catch {
+      // silencioso
+    }
+    setSolutionDeleteTarget(null)
+    setEditingSolution(null)
+  }
+
   const tabs: { key: Tab; label: string }[] = [
     { key: 'conta', label: 'Conta' },
     { key: 'solucoes', label: 'Soluções e planos' },
