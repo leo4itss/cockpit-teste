@@ -753,6 +753,14 @@ export function OrganizacaoDetailPage() {
         blockedTitle="Não é possível excluir esta conta"
       />
 
+      <ConfirmDeleteModal
+        open={!!contractDeleteTarget}
+        onClose={() => setContractDeleteTarget(null)}
+        variant="contract"
+        name={contractDeleteTarget?.contratante ?? ''}
+        onConfirm={handleDeleteContract}
+      />
+
       {/* Create sheets */}
       <NewAccountSheet open={sheetAccount} onClose={() => setSheetAccount(false)} orgId={org.id} onSave={handleAddAccount} />
       <NewSolutionSheet
