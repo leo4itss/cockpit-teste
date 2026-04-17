@@ -10,6 +10,7 @@ interface Props {
   account: Account | null
   org: Organization | null
   onEdit?: () => void
+  onDelete?: (account: Account) => void
 }
 
 /* ── helpers ───────────────────────────────────────────── */
