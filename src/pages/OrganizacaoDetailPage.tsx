@@ -287,15 +287,6 @@ export function OrganizacaoDetailPage() {
     closeAccountDeleteModal()
   }
 
-  async function handleRestoreAccount(account: Account) {
-    try {
-      await api.restoreAccount(account.id)
-      setAccounts(prev => prev.map(a => a.id === account.id ? { ...a, deletedAt: undefined } : a))
-    } catch {
-      // silencioso
-    }
-  }
-
   async function handleDeleteContract() {
     if (!contractDeleteTarget) return
     try {
