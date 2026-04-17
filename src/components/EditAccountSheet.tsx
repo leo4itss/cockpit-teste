@@ -5,6 +5,7 @@ import { Input } from './ui/Input'
 import { Select } from './ui/Select'
 import { Button } from './ui/Button'
 import { NewContactDialog, type ContactData } from './NewContactDialog'
+import { AddAdminDialog, type AdminUser } from './AddAdminDialog'
 import type { Account, Organization, Contact } from '@/types'
 
 interface Props {
