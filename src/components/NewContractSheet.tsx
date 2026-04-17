@@ -34,7 +34,11 @@ const RENOVACAO_OPTIONS = [
   { value: 'Anual', label: 'Anual' },
 ]
 
-export function NewContractSheet({ open, onClose, orgId, orgName, solutions, onSave }: Props) {
+export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solutions, onSave }: Props) {
+  // Contas ativas (sem deletedAt) disponíveis para ser a contratante
+  const activeAccounts = accounts.filter(a => !a.deletedAt)
+
+  const [contratante, setContratante] = useState('')
   const [form, setForm] = useState({
     dataInicio: '',
     dataTermino: '',
