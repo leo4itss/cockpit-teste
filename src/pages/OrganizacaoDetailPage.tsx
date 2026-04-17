@@ -531,6 +531,18 @@ export function OrganizacaoDetailPage() {
                                 : <Badge variant="success" showIcon>{a.status}</Badge>
                               }
                             </td>
+                            <td className="px-2 py-2 h-[52px] text-center">
+                              {isDeleted && (
+                                <button
+                                  type="button"
+                                  title="Restaurar conta"
+                                  onClick={e => { e.stopPropagation(); handleRestoreAccount(a) }}
+                                  className="w-8 h-8 flex items-center justify-center mx-auto rounded-md text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                                >
+                                  <RotateCcw className="w-4 h-4" />
+                                </button>
+                              )}
+                            </td>
                           </tr>
                         )
                       })}
