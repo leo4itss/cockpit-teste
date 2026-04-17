@@ -251,11 +251,29 @@ export function OrganizacaoDetailPage() {
     }
   }
 
+  // Verifica dependências e abre o modal correto (confirm ou blocked)
+  function requestDeleteAccount(account: Account) {
+    const activeContracts = contracts.filter(
+      c => c.contratante === account.name && c.status === 'Ativo'
+    ).length
+    setAccountDeleteTarget(account)
+    if (activeContracts > 0) {
+      setAccountBlockedContracts(activeContracts)
+      setAccountDeleteModal('blocked')
+    } else {
+      setAccountDeleteModal('confirm')
+    }
+  }
+
+  function closeAccountDeleteModal() {
+    setAccountDeleteModal(null)
+    setAccountDeleteTarget(null)
+  }
+
   async function handleDeleteAccount(account: Account) {
     try {
       await api.deleteAccount(account.id)
       if (showDeleted) {
-        // Mantém na lista mas marcada como deletada
         setAccounts(prev => prev.map(a => a.id === account.id ? { ...a, deletedAt: new Date().toISOString() } : a))
       } else {
         setAccounts(prev => prev.filter(a => a.id !== account.id))
@@ -263,7 +281,7 @@ export function OrganizacaoDetailPage() {
     } catch {
       // silencioso
     }
-    setAccountDeleteTarget(null)
+    closeAccountDeleteModal()
   }
 
   async function handleRestoreAccount(account: Account) {
