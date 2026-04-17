@@ -10,36 +10,74 @@ interface Props {
 }
 
 export interface AdminUser {
-  email: string
   nome: string
+  sobrenome: string
+  email: string
+  usuario: string
   senha: string
 }
 
-function PasswordInput({
+/* ── sub-components ────────────────────────────────────── */
+
+function Field({
+  id,
+  label,
+  required,
+  type = 'text',
+  placeholder,
+  value,
+  onChange,
+}: {
+  id: string
+  label: string
+  required?: boolean
+  type?: string
+  placeholder?: string
+  value: string
+  onChange: (v: string) => void
+}) {
+  return (
+    <div className="flex flex-col gap-3">
+      <label htmlFor={id} className="text-sm font-medium text-[#030712]">
+        {label}{required && <span className="text-[#dc2626] ml-0.5">*</span>}
+      </label>
+      <input
+        id={id}
+        type={type}
+        className="h-9 w-full rounded-md border border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#030712] placeholder:text-[#6b7280] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        placeholder={placeholder}
+        value={value}
+        onChange={e => onChange(e.target.value)}
+      />
+    </div>
+  )
+}
+
+function PasswordField({
+  id,
   label,
   required,
   placeholder,
   value,
   onChange,
 }: {
+  id: string
   label: string
   required?: boolean
-  placeholder: string
+  placeholder?: string
   value: string
   onChange: (v: string) => void
 }) {
   const [show, setShow] = useState(false)
-  const inputId = label.toLowerCase().replace(/\s+/g, '-')
 
   return (
     <div className="flex flex-col gap-3">
-      <label htmlFor={inputId} className="text-sm font-medium text-[#030712]">
-        {label}
-        {required && <span className="text-[#dc2626] ml-0.5">*</span>}
+      <label htmlFor={id} className="text-sm font-medium text-[#030712]">
+        {label}{required && <span className="text-[#dc2626] ml-0.5">*</span>}
       </label>
       <div className="relative">
         <input
-          id={inputId}
+          id={id}
           type={show ? 'text' : 'password'}
           className="h-9 w-full rounded-md border border-[#e5e7eb] bg-white px-3 py-2 pr-9 text-sm text-[#030712] placeholder:text-[#6b7280] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           placeholder={placeholder}
@@ -51,6 +89,7 @@ function PasswordInput({
           onClick={() => setShow(s => !s)}
           className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b7280] hover:text-[#030712] transition-colors"
           tabIndex={-1}
+          aria-label={show ? 'Ocultar senha' : 'Mostrar senha'}
         >
           {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
         </button>
@@ -59,70 +98,87 @@ function PasswordInput({
   )
 }
 
+/* ── main ─────────────────────────────────────────────────── */
+
+const EMPTY = { nome: '', sobrenome: '', email: '', usuario: '', senha: '', confirmar: '' }
+
 export function AddAdminDialog({ open, onClose, onAdd }: Props) {
-  const [form, setForm] = useState<AdminUser & { confirmar: string }>({
-    email: '',
-    nome: '',
-    senha: '',
-    confirmar: '',
-  })
+  const [form, setForm] = useState(EMPTY)
 
   function set(field: string, value: string) {
     setForm(f => ({ ...f, [field]: value }))
   }
 
+  function handleClose() {
+    setForm(EMPTY)
+    onClose()
+  }
+
   function handleAdd() {
-    onAdd({ email: form.email, nome: form.nome, senha: form.senha })
-    setForm({ email: '', nome: '', senha: '', confirmar: '' })
+    onAdd({ nome: form.nome, sobrenome: form.sobrenome, email: form.email, usuario: form.usuario, senha: form.senha })
+    setForm(EMPTY)
     onClose()
   }
 
   return (
     <Modal
       open={open}
-      onClose={onClose}
+      onClose={handleClose}
       title="Novo usuário administrador"
+      maxWidth="max-w-[600px]"
       footer={
         <>
-          <Button variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
           <Button onClick={handleAdd}>Adicionar</Button>
         </>
       }
     >
       <div className="flex flex-col gap-7">
 
-        {/* E-mail */}
-        <div className="flex flex-col gap-3">
-          <label htmlFor="admin-email" className="text-sm font-medium text-[#030712]">
-            E-mail<span className="text-[#dc2626] ml-0.5">*</span>
-          </label>
-          <input
-            id="admin-email"
-            type="email"
-            className="h-9 w-full rounded-md border border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#030712] placeholder:text-[#6b7280] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="usuario@exemplo.com.br"
-            value={form.email}
-            onChange={e => set('email', e.target.value)}
+        {/* Nome + Sobrenome */}
+        <div className="grid grid-cols-2 gap-7">
+          <Field
+            id="admin-nome"
+            label="Nome"
+            required
+            placeholder="Nome"
+            value={form.nome}
+            onChange={v => set('nome', v)}
+          />
+          <Field
+            id="admin-sobrenome"
+            label="Sobrenome"
+            required
+            placeholder="Sobrenome"
+            value={form.sobrenome}
+            onChange={v => set('sobrenome', v)}
           />
         </div>
 
-        {/* Nome */}
-        <div className="flex flex-col gap-3">
-          <label htmlFor="admin-nome" className="text-sm font-medium text-[#030712]">
-            Nome<span className="text-[#dc2626] ml-0.5">*</span>
-          </label>
-          <input
-            id="admin-nome"
-            type="text"
-            className="h-9 w-full rounded-md border border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#030712] placeholder:text-[#6b7280] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Nome completo"
-            value={form.nome}
-            onChange={e => set('nome', e.target.value)}
-          />
-        </div>
+        {/* E-mail */}
+        <Field
+          id="admin-email"
+          label="E-mail"
+          required
+          type="email"
+          placeholder="usuario@exemplo.com.br"
+          value={form.email}
+          onChange={v => set('email', v)}
+        />
+
+        {/* Usuário/Login */}
+        <PasswordField
+          id="admin-usuario"
+          label="Usuário/Login"
+          required
+          placeholder="6+caracteres"
+          value={form.usuario}
+          onChange={v => set('usuario', v)}
+        />
 
         {/* Senha */}
-        <PasswordInput
+        <PasswordField
+          id="admin-senha"
           label="Senha"
           required
           placeholder="6+caracteres"
@@ -131,7 +187,8 @@ export function AddAdminDialog({ open, onClose, onAdd }: Props) {
         />
 
         {/* Confirme a Senha */}
-        <PasswordInput
+        <PasswordField
+          id="admin-confirmar"
           label="Confirme a Senha"
           required
           placeholder="Digite sua senha"
