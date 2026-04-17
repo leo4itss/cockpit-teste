@@ -439,14 +439,39 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
         </div>
 
         {/* ── Usuário administrador ─────────────────────────── */}
-        <div className="border border-gray-200 rounded-md flex items-center gap-2.5 px-4 py-3">
-          <p className="flex-1 text-sm font-medium text-[#030712]">
-            Usuário administrador<span className="text-red-600">*</span>
-          </p>
-          <Button variant="outline" size="sm">
-            <Plus className="w-3.5 h-3.5" />
-            Adicionar
-          </Button>
+        <div className="border border-gray-200 rounded-md bg-white px-5 pt-2 pb-4 flex flex-col">
+          <div className="flex items-center justify-between py-4">
+            <p className="text-sm font-medium text-[#030712]">
+              Usuário administrador<span className="text-red-600">*</span>
+            </p>
+            <Button variant="outline" size="sm" onClick={() => setAdminDialogOpen(true)}>
+              <Plus className="w-3.5 h-3.5" />
+              Adicionar
+            </Button>
+          </div>
+
+          {admins.length > 0 && (
+            <>
+              <div className="border-t border-gray-100" />
+              <div className="flex flex-col gap-3 pt-4">
+                {admins.map((admin, i) => (
+                  <div key={i} className="flex items-center justify-between gap-3 bg-gray-50 border border-gray-200 rounded-md px-4 py-2.5">
+                    <div className="flex flex-col min-w-0">
+                      <p className="text-sm font-medium text-[#030712]">{admin.nome} {admin.sobrenome}</p>
+                      <p className="text-xs text-[#6b7280]">{admin.email}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setAdmins(prev => prev.filter((_, idx) => idx !== i))}
+                      className="w-7 h-7 flex items-center justify-center rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors shrink-0"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
       </div>
