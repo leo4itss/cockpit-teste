@@ -505,7 +505,7 @@ export function OrganizacaoDetailPage() {
                           >
                             <td className="px-2 py-2 h-[52px]">
                               <div className="flex items-center gap-2">
-                                <div className={`w-8 h-10 rounded-full bg-[#f3f4f6] flex items-center justify-center text-sm shrink-0 ${isDeleted ? 'opacity-40' : ''}`}>{a.name.charAt(0)}</div>
+                                <div className={`w-8 h-8 rounded-full bg-[#f3f4f6] border border-[#e5e7eb] flex items-center justify-center text-sm font-medium text-[#6b7280] shrink-0 ${isDeleted ? 'opacity-40' : ''}`}>{a.name.charAt(0)}</div>
                                 <div className="flex flex-col min-w-0">
                                   <span className={`text-sm font-medium ${isDeleted ? 'text-[#9ca3af] line-through' : 'text-[#030712]'}`}>{a.name}</span>
                                   {isDeleted && exclusaoPermanente && (
