@@ -252,11 +252,25 @@ export function OrganizacaoDetailPage() {
   async function handleDeleteAccount(account: Account) {
     try {
       await api.deleteAccount(account.id)
-      setAccounts(prev => prev.filter(a => a.id !== account.id))
+      if (showDeleted) {
+        // Mantém na lista mas marcada como deletada
+        setAccounts(prev => prev.map(a => a.id === account.id ? { ...a, deletedAt: new Date().toISOString() } : a))
+      } else {
+        setAccounts(prev => prev.filter(a => a.id !== account.id))
+      }
     } catch {
       // silencioso
     }
     setAccountDeleteTarget(null)
+  }
+
+  async function handleRestoreAccount(account: Account) {
+    try {
+      await api.restoreAccount(account.id)
+      setAccounts(prev => prev.map(a => a.id === account.id ? { ...a, deletedAt: undefined } : a))
+    } catch {
+      // silencioso
+    }
   }
 
   const tabs: { key: Tab; label: string }[] = [
