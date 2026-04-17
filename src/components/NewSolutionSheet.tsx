@@ -212,7 +212,7 @@ export function NewSolutionSheet({
           />
 
           <InfoBox>
-            Escolha um nome único para o domínio. Este identificador não pode ser divulgado no sistema.
+            Inclua informações relevantes para destacar o propósito e os diferenciais da solução, facilitando a compreensão e a comparação com outras opções.
           </InfoBox>
 
           <Divider />
