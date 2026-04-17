@@ -809,10 +809,11 @@ export function OrganizacaoDetailPage() {
         onComponenteCreated={c => setComponentes(prev => [...prev, c])}
       />
       <NewContractSheet open={sheetContract} onClose={() => setSheetContract(false)} orgId={org.id} orgName={org.name} accounts={accounts} solutions={solutions} onSave={handleAddContract} />
-      <NewOrganizationSheet
+      <EditOrganizationSheet
         open={sheetEditOrg}
         onClose={() => setSheetEditOrg(false)}
-        onSave={handleEditOrg}
+        org={org}
+        onSave={updated => handleEditOrg(updated)}
         onDelete={() => { setSheetEditOrg(false); setOrgDeleteModal('org') }}
       />
 
