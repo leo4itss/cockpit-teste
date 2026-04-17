@@ -81,7 +81,7 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete }: 
   const [contacts, setContacts] = useState<Contact[]>(org.contacts ?? [])
   const [logoPreview, setLogoPreview] = useState<string>(org.logo ?? '')
   const [contactDialogOpen, setContactDialogOpen] = useState(false)
-  const [editingContact, setEditingContact] = useState<{ idx: number; data: Contato } | null>(null)
+  const [editingContact, setEditingContact] = useState<{ idx: number; data: ContactData } | null>(null)
   const [openMenuIdx, setOpenMenuIdx] = useState<number | null>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const logoInputRef = useRef<HTMLInputElement>(null)
