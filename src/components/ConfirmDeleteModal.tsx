@@ -42,7 +42,7 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
       <Modal
         open={open}
         onClose={handleClose}
-        title="Não é possível excluir esta organização"
+        title={blockedTitle ?? 'Não é possível excluir esta organização'}
         maxWidth="max-w-[480px]"
         footer={
           <Button variant="secondary" onClick={handleClose}>Fechar</Button>
