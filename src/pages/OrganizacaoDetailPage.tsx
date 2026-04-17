@@ -648,17 +648,19 @@ export function OrganizacaoDetailPage() {
               {contracts.length === 0 ? (
                 <EmptyState message="Nenhum contrato criado" description="Crie um contrato para esta organização." />
               ) : (
-                <div className="border border-[#e5e7eb] rounded-2xl overflow-x-auto">
-                  <table className="w-full text-sm whitespace-nowrap">
+                <div className="border border-[#e5e7eb] rounded-2xl p-4 overflow-hidden">
+                  <table className="w-full text-sm">
                     <thead>
-                      <tr className="bg-white border-b border-[#e5e7eb]">
-                        <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Conta contratante</th>
-                        <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Soluções</th>
-                        <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Plano</th>
-                        <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Data início</th>
-                        <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Data término</th>
-                        <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Renovação</th>
-                        <th className="text-center px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Status</th>
+                      <tr className="border-b border-[#e5e7eb]">
+                        <th className="text-left px-2 pb-2.5 align-bottom font-medium text-[#030712] opacity-40 h-10 w-[184px]">Conta contratante</th>
+                        <th className="text-left px-2 pb-2.5 align-bottom font-medium text-[#030712] opacity-40 h-10">Organização contratada</th>
+                        <th className="text-left px-2 pb-2.5 align-bottom font-medium text-[#030712] opacity-40 h-10 w-[169px]">Soluções</th>
+                        <th className="text-left px-2 pb-2.5 align-bottom font-medium text-[#030712] opacity-40 h-10 w-[85px]">Plano</th>
+                        <th className="text-left px-2 pb-2.5 align-bottom font-medium text-[#030712] opacity-40 h-10 w-[90px] leading-snug">Qtd contratada</th>
+                        <th className="text-right px-2 pb-2.5 align-bottom font-medium text-[#030712] opacity-40 h-10 w-[109px]">Data início</th>
+                        <th className="text-right px-2 pb-2.5 align-bottom font-medium text-[#030712] opacity-40 h-10 w-[109px]">Data término</th>
+                        <th className="text-center px-2 pb-2.5 align-bottom font-medium text-[#030712] opacity-40 h-10 w-[120px]">Renovação</th>
+                        <th className="text-center px-2 pb-2.5 align-bottom font-medium text-[#030712] opacity-40 h-10 w-[131px]">Status</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -668,21 +670,45 @@ export function OrganizacaoDetailPage() {
                           className="border-b border-[#e5e7eb] hover:bg-gray-50 cursor-pointer transition-colors"
                           onClick={() => setSelectedContract(c)}
                         >
-                          <td className="px-2 py-2 h-[52px] text-sm font-medium text-[#030712]">{c.contratante}</td>
-                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">
-                            <div className="flex items-center gap-1.5">
-                              <span>{c.objetos[0]?.solucao ?? '—'}</span>
+                          {/* Conta contratante — avatar + nome */}
+                          <td className="px-2 py-2 h-[52px]">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div className="w-8 h-8 rounded-full bg-[#f3f4f6] border border-[#e5e7eb] flex items-center justify-center text-sm font-medium text-[#6b7280] shrink-0">
+                                {c.contratante.charAt(0)}
+                              </div>
+                              <span className="text-sm font-medium text-[#030712] truncate">{c.contratante}</span>
+                            </div>
+                          </td>
+                          {/* Organização contratada */}
+                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712] truncate max-w-0">
+                            <span className="block truncate">{c.objetos[0]?.orgContratada ?? '—'}</span>
+                          </td>
+                          {/* Soluções */}
+                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712] w-[169px]">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <span className="truncate">{c.objetos[0]?.solucao ?? '—'}</span>
                               {c.objetos.length > 1 && (
-                                <span className="text-xs bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-full">+{c.objetos.length - 1}</span>
+                                <span className="text-xs bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-full shrink-0">+{c.objetos.length - 1}</span>
                               )}
                             </div>
                           </td>
+                          {/* Plano */}
                           <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.objetos[0]?.plano ?? '—'}</td>
+                          {/* Qtd contratada */}
+                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.objetos[0]?.qtdContratada ?? '—'}</td>
+                          {/* Datas */}
                           <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.dataInicio}</td>
                           <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.dataTermino}</td>
-                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.renovacao}</td>
+                          {/* Renovação */}
+                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712] text-center">{c.renovacao}</td>
+                          {/* Status */}
                           <td className="px-2 py-2 h-[52px] text-center">
-                            <Badge variant={c.status === 'Ativo' ? 'success' : c.status === 'Pendente' ? 'warning' : 'default'}>{c.status}</Badge>
+                            <Badge
+                              variant={c.status === 'Ativo' ? 'success' : c.status === 'Pendente' ? 'warning' : 'default'}
+                              showIcon={c.status === 'Ativo'}
+                            >
+                              {c.status}
+                            </Badge>
                           </td>
                         </tr>
                       ))}
