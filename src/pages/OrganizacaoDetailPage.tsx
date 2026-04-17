@@ -828,6 +828,10 @@ export function OrganizacaoDetailPage() {
           contract={editingContract}
           solutions={solutions}
           onSave={handleSaveContract}
+          onDelete={() => {
+            setContractDeleteTarget(editingContract)
+            setEditingContract(null)
+          }}
         />
       )}
     </div>
