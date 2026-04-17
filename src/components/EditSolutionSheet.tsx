@@ -286,6 +286,9 @@ export function EditSolutionSheet({
         width="w-[768px]"
         footer={
           <>
+            <Button variant="destructive" onClick={onDelete} className="mr-auto">
+              Excluir solução
+            </Button>
             <Button variant="outline" onClick={onClose}>Cancelar</Button>
             <Button onClick={handleSave}>Salvar</Button>
           </>
