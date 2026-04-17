@@ -5,13 +5,14 @@ import { Select } from './ui/Select'
 import { Input } from './ui/Input'
 import { Button } from './ui/Button'
 import { AddObjetoDialog } from './AddObjetoDialog'
-import type { Contract, Solution, ObjetoContrato } from '@/types'
+import type { Account, Contract, Solution, ObjetoContrato } from '@/types'
 
 interface Props {
   open: boolean
   onClose: () => void
   orgId: string
   orgName: string
+  accounts: Account[]
   solutions: Solution[]
   onSave: (contract: Omit<Contract, 'id'>) => void
 }
