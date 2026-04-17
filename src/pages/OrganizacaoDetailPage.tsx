@@ -522,7 +522,7 @@ export function OrganizacaoDetailPage() {
                             <td className="px-2 py-2 h-[52px] text-center">
                               {isDeleted
                                 ? <Badge variant="error">Em exclusão</Badge>
-                                : <Badge variant="success">{a.status}</Badge>
+                                : <Badge variant="success" showIcon>{a.status}</Badge>
                               }
                             </td>
                             <td className="px-2 py-2 h-[52px] w-10" onClick={e => e.stopPropagation()}>
