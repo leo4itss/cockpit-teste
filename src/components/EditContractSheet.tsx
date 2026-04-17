@@ -13,6 +13,7 @@ interface Props {
   contract: Contract
   solutions: Solution[]
   onSave: (contract: Contract) => void
+  onDelete?: () => void
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
