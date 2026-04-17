@@ -71,6 +71,7 @@ async function seed() {
       provisioningStatus: a.provisioningStatus,
       arquitetoPAS: a.arquitetoPAS,
       descricao: a.descricao,
+      isDefault: a.isDefault ?? false,
       status: a.status,
       createdAt: a.createdAt,
     }))
