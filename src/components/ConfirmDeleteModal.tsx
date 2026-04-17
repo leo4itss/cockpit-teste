@@ -75,6 +75,12 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
 
   // --- ACCOUNT ---
   if (variant === 'account') {
+    const exclusaoPermanente = new Date()
+    exclusaoPermanente.setDate(exclusaoPermanente.getDate() + 30)
+    const exclusaoFormatada = exclusaoPermanente.toLocaleDateString('pt-BR', {
+      day: '2-digit', month: 'long', year: 'numeric',
+    })
+
     return (
       <Modal
         open={open}
@@ -89,13 +95,19 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
         }
       >
         <div className="flex flex-col gap-4 text-sm text-[#030712]">
-          <p>Tem certeza que deseja excluir a conta <strong>"{name}"</strong>?</p>
-          <div className="flex flex-col gap-1.5 p-3 bg-red-50 border border-red-200 rounded-lg text-red-800">
-            <p className="font-medium">Esta ação é irreversível:</p>
-            <ul className="flex flex-col gap-1 pl-3 list-disc list-outside text-xs">
-              <li>A conta perderá acesso imediato a todas as soluções</li>
-              <li>Os dados serão preservados por 30 dias e então removidos permanentemente</li>
-            </ul>
+          <p>A conta <strong>"{name}"</strong> entrará em um período de <strong>quarentena de 30 dias</strong> antes de ser excluída permanentemente.</p>
+          <div className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+            <div className="flex flex-col gap-1 text-xs text-blue-800">
+              <p>
+                Durante os 30 dias de quarentena, você poderá cancelar a exclusão ativando
+                <strong> "Exibir contas deletadas"</strong> e clicando em{' '}
+                <RotateCcw className="inline w-3 h-3 mb-0.5" /> <strong>Cancelar exclusão</strong>.
+              </p>
+              <p className="font-medium">
+                Exclusão permanente prevista para: {exclusaoFormatada}
+              </p>
+            </div>
           </div>
         </div>
       </Modal>
