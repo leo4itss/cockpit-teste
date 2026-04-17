@@ -488,7 +488,6 @@ export function OrganizacaoDetailPage() {
                         <th className="text-left px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10">Subdomínio</th>
                         <th className="text-center px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10 w-[120px]">Arquiteto PAS</th>
                         <th className="text-center px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10 w-[131px]">Status</th>
-                        <th className="w-10" />
                       </tr>
                     </thead>
                     <tbody>
