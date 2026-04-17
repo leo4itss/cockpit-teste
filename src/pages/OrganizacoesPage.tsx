@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, Plus, FolderOpen } from 'lucide-react'
+import { Search, Plus, FolderOpen, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { NewOrganizationSheet } from '@/components/NewOrganizationSheet'
+import { ConfirmDeleteModal } from '@/components/ConfirmDeleteModal'
 import { api } from '@/api/client'
 import { organizations as mockOrgs } from '@/data/mock'
 import type { Organization } from '@/types'
@@ -15,6 +16,9 @@ export function OrganizacoesPage() {
   const [error] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<Organization | null>(null)
+  const [deleteModal, setDeleteModal] = useState<'org' | 'blocked' | null>(null)
+  const [blockedInfo, setBlockedInfo] = useState<{ activeAccounts: number; activeContracts: number } | null>(null)
 
   useEffect(() => {
     api.getOrganizations()
@@ -30,6 +34,27 @@ export function OrganizacoesPage() {
     o.name.toLowerCase().includes(search.toLowerCase()) ||
     o.domain.toLowerCase().includes(search.toLowerCase())
   )
+
+  async function handleDeleteOrg(org: Organization) {
+    try {
+      await api.deleteOrganization(org.id)
+      setOrgs(prev => prev.filter(o => o.id !== org.id))
+      setDeleteModal(null)
+      setDeleteTarget(null)
+    } catch (_err: any) {
+      // Tenta parsear erro 422 com dependências
+      try {
+        const res = await fetch(`/api/organizations/${org.id}`, { method: 'DELETE' })
+        if (res.status === 422) {
+          const body = await res.json()
+          setBlockedInfo({ activeAccounts: body.activeAccounts, activeContracts: body.activeContracts })
+          setDeleteModal('blocked')
+        }
+      } catch {
+        // fallback silencioso
+      }
+    }
+  }
 
   async function handleCreate(data: Omit<Organization, 'id' | 'qtdContas' | 'qtdSolucoes' | 'qtdContratos' | 'contacts'>) {
     const newOrg = await api.createOrganization({
@@ -104,13 +129,14 @@ export function OrganizacoesPage() {
                 <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">Cidade</th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">Arquiteto PAS</th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">Status</th>
+                <th className="px-4 py-3 w-10" />
               </tr>
             </thead>
             <tbody>
               {filtered.map((org) => (
                 <tr
                   key={org.id}
-                  className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors bg-white"
+                  className="group/row border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors bg-white"
                   onClick={() => navigate(`/organizacoes/${org.id}`)}
                 >
                   <td className="px-4 py-3 font-medium text-gray-900">
@@ -135,6 +161,17 @@ export function OrganizacoesPage() {
                   <td className="px-4 py-3">
                     <Badge variant={org.status === 'Ativo' ? 'success' : 'default'}>{org.status}</Badge>
                   </td>
+                  <td className="px-2 py-3 w-10" onClick={e => e.stopPropagation()}>
+                    <div className="relative group">
+                      <button
+                        onClick={() => { setDeleteTarget(org); setDeleteModal('org') }}
+                        className="p-1.5 rounded hover:bg-red-50 text-[#9ca3af] hover:text-red-600 transition-colors opacity-0 group-hover/row:opacity-100"
+                        title="Excluir organização"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -143,6 +180,20 @@ export function OrganizacoesPage() {
         </div>
       )}
 
+      <ConfirmDeleteModal
+        open={deleteModal === 'org' && !!deleteTarget}
+        onClose={() => { setDeleteModal(null); setDeleteTarget(null) }}
+        variant="org"
+        name={deleteTarget?.name ?? ''}
+        onConfirm={() => deleteTarget && handleDeleteOrg(deleteTarget)}
+      />
+      <ConfirmDeleteModal
+        open={deleteModal === 'blocked'}
+        onClose={() => { setDeleteModal(null); setDeleteTarget(null) }}
+        variant="blocked"
+        name={deleteTarget?.name ?? ''}
+        blocked={blockedInfo ?? undefined}
+      />
       <NewOrganizationSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}

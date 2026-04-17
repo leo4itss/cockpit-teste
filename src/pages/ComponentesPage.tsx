@@ -84,7 +84,7 @@ export function ComponentesPage() {
           <div className="flex flex-col gap-1">
             <h1 className="text-[30px] font-bold leading-9 text-[#030712]">Componentes</h1>
             <p className="text-base text-[#6b7280] leading-6">
-              Módulos e serviços disponíveis para compor soluções.
+              Componentes e serviços disponíveis para compor soluções.
             </p>
           </div>
           <Button onClick={handleOpenNew}>

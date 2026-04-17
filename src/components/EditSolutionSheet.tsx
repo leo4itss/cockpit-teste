@@ -345,7 +345,7 @@ export function EditSolutionSheet({
           {/* ── Componentes ─────────────────────────────────── */}
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
-              <SectionTitle>Selecione os módulos que compõem essa solução</SectionTitle>
+              <SectionTitle>Selecione os componentes que compõem essa solução</SectionTitle>
             </div>
             <p className="text-sm text-[#6b7280] -mt-2">
               Os tipos de licença disponíveis para os planos serão derivados automaticamente dos componentes selecionados.
