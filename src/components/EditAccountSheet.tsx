@@ -483,6 +483,12 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
       onAdd={handleContactAdd}
       initialData={editingContact?.data}
     />
+
+    <AddAdminDialog
+      open={adminDialogOpen}
+      onClose={() => setAdminDialogOpen(false)}
+      onAdd={admin => setAdmins(prev => [...prev, admin])}
+    />
     </>
   )
 }
