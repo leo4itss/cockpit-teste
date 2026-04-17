@@ -18,6 +18,7 @@ interface Props {
   onClose: () => void
   solution: Solution | null
   onSave: (solution: Solution) => void
+  onDelete?: () => void
   tiposLicenca: TipoLicenca[]
   componentes: Componente[]
   onComponenteCreated: (c: Componente) => void
