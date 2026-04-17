@@ -117,8 +117,8 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete }: 
     reader.readAsDataURL(file)
   }
 
-  function handleContactAdd(contato: Contato) {
-    const contact: Contact = { name: contato.nome, role: contato.cargo, phone: contato.telefone ?? '', email: contato.email ?? '' }
+  function handleContactAdd(data: ContactData) {
+    const contact: Contact = { name: data.name, role: data.role, phone: data.phone, email: data.email }
     if (editingContact !== null) {
       setContacts(prev => prev.map((c, i) => i === editingContact.idx ? contact : c))
     } else {
@@ -129,7 +129,7 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete }: 
 
   function handleEditContact(idx: number) {
     const c = contacts[idx]
-    setEditingContact({ idx, data: { nome: c.name, cargo: c.role, telefone: c.phone, email: c.email } })
+    setEditingContact({ idx, data: { name: c.name, role: c.role, country: 'Brasil (+55)', phone: c.phone, contactMethod: '', email: c.email, notes: '' } })
     setOpenMenuIdx(null)
     setContactDialogOpen(true)
   }
