@@ -536,7 +536,7 @@ export function OrganizacaoDetailPage() {
                                 </button>
                               ) : (
                                 <button
-                                  onClick={() => setAccountDeleteTarget(a)}
+                                  onClick={() => requestDeleteAccount(a)}
                                   className="p-1.5 rounded hover:bg-red-50 text-[#9ca3af] hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100"
                                   title="Excluir conta"
                                 >
