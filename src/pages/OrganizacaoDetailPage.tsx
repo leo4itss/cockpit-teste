@@ -95,6 +95,9 @@ export function OrganizacaoDetailPage() {
   const [accountDeleteModal, setAccountDeleteModal] = useState<'confirm' | 'blocked' | null>(null)
   const [accountBlockedContracts, setAccountBlockedContracts] = useState(0)
 
+  // Delete contract modal
+  const [contractDeleteTarget, setContractDeleteTarget] = useState<Contract | null>(null)
+
   // Detail sheets
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null)
   const [editingAccount, setEditingAccount] = useState<Account | null>(null)
