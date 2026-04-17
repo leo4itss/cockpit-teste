@@ -472,37 +472,61 @@ export function OrganizacaoDetailPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {accounts.map(a => (
-                        <tr
-                          key={a.id}
-                          className="group border-b border-[#e5e7eb] hover:bg-gray-50 cursor-pointer transition-colors"
-                          onClick={() => setSelectedAccount(a)}
-                        >
-                          <td className="px-2 py-2 h-[52px]">
-                            <div className="flex items-center gap-2">
-                              <div className="w-8 h-10 rounded-full bg-[#f3f4f6] flex items-center justify-center text-sm shrink-0">{a.name.charAt(0)}</div>
-                              <span className="text-sm font-medium text-[#030712]">{a.name}</span>
-                            </div>
-                          </td>
-                          <td className="px-2 py-2 h-[52px]">
-                            <ProvisioningDots status={a.provisioningStatus} />
-                          </td>
-                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{a.subdomain}</td>
-                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712] text-center">{a.arquitetoPAS}</td>
-                          <td className="px-2 py-2 h-[52px] text-center">
-                            <Badge variant="success">{a.status}</Badge>
-                          </td>
-                          <td className="px-2 py-2 h-[52px] w-10" onClick={e => e.stopPropagation()}>
-                            <button
-                              onClick={() => setAccountDeleteTarget(a)}
-                              className="p-1.5 rounded hover:bg-red-50 text-[#9ca3af] hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100"
-                              title="Excluir conta"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
+                      {accounts.map(a => {
+                        const isDeleted = !!a.deletedAt
+                        const exclusaoPermanente = isDeleted
+                          ? new Date(new Date(a.deletedAt!).getTime() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR')
+                          : null
+                        return (
+                          <tr
+                            key={a.id}
+                            className={`group border-b border-[#e5e7eb] transition-colors ${isDeleted ? 'bg-red-50/40' : 'hover:bg-gray-50 cursor-pointer'}`}
+                            onClick={() => !isDeleted && setSelectedAccount(a)}
+                          >
+                            <td className="px-2 py-2 h-[52px]">
+                              <div className="flex items-center gap-2">
+                                <div className={`w-8 h-10 rounded-full bg-[#f3f4f6] flex items-center justify-center text-sm shrink-0 ${isDeleted ? 'opacity-40' : ''}`}>{a.name.charAt(0)}</div>
+                                <div className="flex flex-col min-w-0">
+                                  <span className={`text-sm font-medium ${isDeleted ? 'text-[#9ca3af] line-through' : 'text-[#030712]'}`}>{a.name}</span>
+                                  {isDeleted && exclusaoPermanente && (
+                                    <span className="text-xs text-red-500 leading-none mt-0.5">Exclusão em {exclusaoPermanente}</span>
+                                  )}
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-2 py-2 h-[52px]">
+                              {isDeleted ? <span className="text-xs text-[#9ca3af]">—</span> : <ProvisioningDots status={a.provisioningStatus} />}
+                            </td>
+                            <td className={`px-2 py-2 h-[52px] text-sm ${isDeleted ? 'text-[#9ca3af]' : 'text-[#030712]'}`}>{a.subdomain}</td>
+                            <td className={`px-2 py-2 h-[52px] text-sm text-center ${isDeleted ? 'text-[#9ca3af]' : 'text-[#030712]'}`}>{a.arquitetoPAS}</td>
+                            <td className="px-2 py-2 h-[52px] text-center">
+                              {isDeleted
+                                ? <Badge variant="error">Em exclusão</Badge>
+                                : <Badge variant="success">{a.status}</Badge>
+                              }
+                            </td>
+                            <td className="px-2 py-2 h-[52px] w-10" onClick={e => e.stopPropagation()}>
+                              {isDeleted ? (
+                                <button
+                                  onClick={() => handleRestoreAccount(a)}
+                                  className="p-1.5 rounded hover:bg-green-50 text-[#9ca3af] hover:text-green-600 transition-colors opacity-0 group-hover:opacity-100"
+                                  title="Cancelar exclusão"
+                                >
+                                  <RotateCcw className="w-4 h-4" />
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => setAccountDeleteTarget(a)}
+                                  className="p-1.5 rounded hover:bg-red-50 text-[#9ca3af] hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100"
+                                  title="Excluir conta"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        )
+                      })}
                     </tbody>
                   </table>
                 </div>
