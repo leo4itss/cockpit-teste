@@ -789,6 +789,14 @@ export function OrganizacaoDetailPage() {
         onConfirm={handleDeleteContract}
       />
 
+      <ConfirmDeleteModal
+        open={!!solutionDeleteTarget}
+        onClose={() => setSolutionDeleteTarget(null)}
+        variant="solution"
+        name={solutionDeleteTarget?.name ?? ''}
+        onConfirm={handleDeleteSolution}
+      />
+
       {/* Create sheets */}
       <NewAccountSheet open={sheetAccount} onClose={() => setSheetAccount(false)} orgId={org.id} onSave={handleAddAccount} />
       <NewSolutionSheet
