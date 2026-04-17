@@ -23,7 +23,7 @@ interface Props {
   blockedTitle?: string   // título customizável para o variant 'blocked'
 }
 
-export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, blocked }: Props) {
+export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, blocked, blockedTitle }: Props) {
   const [typed, setTyped] = useState('')
 
   function handleClose() {
