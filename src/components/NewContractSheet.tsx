@@ -58,13 +58,14 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
   function handleSave() {
     onSave({
       orgId,
-      contratante: orgName,
+      contratante: contratante || activeAccounts[0]?.name || orgName,
       objetos,
       dataInicio: form.dataInicio,
       dataTermino: form.dataTermino,
       renovacao: form.renovacao,
       status: 'Ativo',
     })
+    setContratante('')
     setObjetos([])
     setForm({ dataInicio: '', dataTermino: '', renovacao: '' })
     onClose()
