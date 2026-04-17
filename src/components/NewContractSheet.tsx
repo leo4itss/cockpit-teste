@@ -93,9 +93,10 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
 
             <Select
               label="Conta contratante (onde as soluções desse contrato vão aparecer)"
-              options={[{ value: orgName, label: orgName }]}
-              value={orgName}
-              onChange={() => {}}
+              options={activeAccounts.map(a => ({ value: a.name, label: a.name }))}
+              placeholder="Selecione uma conta"
+              value={contratante}
+              onChange={e => setContratante(e.target.value)}
             />
 
             {/* Card de soluções / planos / licenciamentos */}
