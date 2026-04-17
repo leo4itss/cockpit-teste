@@ -111,6 +111,8 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
   const [editingContact, setEditingContact] = useState<{ idx: number; data: ContactData } | null>(null)
   const [openMenuIdx, setOpenMenuIdx] = useState<number | null>(null)
   const menuRef = useRef<HTMLDivElement>(null)
+  const [admins, setAdmins] = useState<AdminUser[]>([])
+  const [adminDialogOpen, setAdminDialogOpen] = useState(false)
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
