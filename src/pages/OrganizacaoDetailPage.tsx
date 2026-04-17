@@ -845,6 +845,10 @@ export function OrganizacaoDetailPage() {
           onClose={() => setEditingSolution(null)}
           solution={editingSolution}
           onSave={handleSaveSolution}
+          onDelete={() => {
+            setSolutionDeleteTarget(editingSolution)
+            setEditingSolution(null)
+          }}
           tiposLicenca={tiposLicenca}
           componentes={componentes}
           onComponenteCreated={c => setComponentes(prev => [...prev, c])}
