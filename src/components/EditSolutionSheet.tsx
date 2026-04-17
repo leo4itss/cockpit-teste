@@ -163,6 +163,7 @@ export function EditSolutionSheet({
   onClose,
   solution,
   onSave,
+  onDelete,
   tiposLicenca,
   componentes,
   onComponenteCreated,
