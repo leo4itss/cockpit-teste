@@ -20,6 +20,7 @@ interface Props {
   name: string            // nome da org ou conta
   onConfirm?: () => void  // não usado em 'blocked'
   blocked?: BlockedInfo   // usado em 'blocked'
+  blockedTitle?: string   // título customizável para o variant 'blocked'
 }
 
 export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, blocked }: Props) {
