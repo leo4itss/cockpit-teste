@@ -433,7 +433,7 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete }: 
         </div>
       </Sheet>
 
-      <AddContatoDialog
+      <NewContactDialog
         open={contactDialogOpen}
         onClose={() => { setContactDialogOpen(false); setEditingContact(null) }}
         onAdd={handleContactAdd}
