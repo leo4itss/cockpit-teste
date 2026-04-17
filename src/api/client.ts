@@ -16,11 +16,18 @@ export const api = {
   deleteOrganization: (id: string) => request<any>(`/api/organizations/${id}`, { method: 'DELETE' }),
 
   // Accounts
-  getAccounts: (orgId?: string) => request<any[]>(`/api/accounts${orgId ? `?orgId=${orgId}` : ''}`),
+  getAccounts: (orgId?: string, includeDeleted = false) => {
+    const params = new URLSearchParams()
+    if (orgId) params.set('orgId', orgId)
+    if (includeDeleted) params.set('include_deleted', 'true')
+    const qs = params.toString()
+    return request<any[]>(`/api/accounts${qs ? `?${qs}` : ''}`)
+  },
   getAccount: (id: string) => request<any>(`/api/accounts/${id}`),
   createAccount: (data: any) => request<any>('/api/accounts', { method: 'POST', body: JSON.stringify(data) }),
   updateAccount: (id: string, data: any) => request<any>(`/api/accounts/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteAccount: (id: string) => request<any>(`/api/accounts/${id}`, { method: 'DELETE' }),
+  restoreAccount: (id: string) => request<any>(`/api/accounts/${id}/restaurar`, { method: 'PATCH' }),
 
   // Solutions
   getSolutions: (orgId?: string) => request<any[]>(`/api/solutions${orgId ? `?orgId=${orgId}` : ''}`),
