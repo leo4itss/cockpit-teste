@@ -368,7 +368,33 @@ export function EditSolutionSheet({
               Os tipos de licença disponíveis para os planos serão derivados automaticamente dos componentes selecionados.
             </p>
 
-            {useInline ? (
+            {hasActiveContract ? (
+              /* ── Modo somente leitura (contrato ativo) ── */
+              <div className="flex flex-col gap-3">
+                <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-md px-3 py-2.5">
+                  <CircleAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <p className="text-xs text-amber-800 leading-snug">
+                    Esta solução possui contratos ativos. Os componentes não podem ser alterados. Para incluir novos componentes, crie uma nova solução.
+                  </p>
+                </div>
+                {selectedComponenteIds.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {componentes
+                      .filter(c => selectedComponenteIds.includes(c.id))
+                      .map(c => (
+                        <span
+                          key={c.id}
+                          className="inline-flex items-center gap-1.5 h-7 pl-2.5 pr-2.5 border border-gray-300 bg-gray-100 rounded-md text-xs font-medium text-[#6b7280]"
+                        >
+                          <Puzzle className="w-3 h-3" />
+                          {c.nome}
+                        </span>
+                      ))}
+                  </div>
+                )}
+              </div>
+            ) : useInline ? (
+              /* ── Modo inline (≤ 5 componentes) ── */
               <ComponenteSelector
                 componentes={componentes}
                 value={selectedComponenteIds}
@@ -376,6 +402,7 @@ export function EditSolutionSheet({
                 onCreateNew={() => setComponenteSheetOpen(true)}
               />
             ) : (
+              /* ── Modo sheet (> 5 componentes) ── */
               <div className="flex flex-col gap-3">
                 <button
                   type="button"
