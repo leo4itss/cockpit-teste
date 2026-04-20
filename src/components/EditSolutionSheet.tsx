@@ -9,7 +9,7 @@ import { ComponenteSelector } from './ComponenteSelector'
 import { ComponenteSelecaoSheet } from './ComponenteSelecaoSheet'
 import { ComponenteSheet } from './ComponenteSheet'
 import { api } from '@/api/client'
-import type { Solution, Plan, TipoLicenca, Componente } from '@/types'
+import type { Solution, Plan, TipoLicenca, Componente, Contract } from '@/types'
 
 const THRESHOLD_INLINE = 5  // ≤ este valor: inline; > este valor: sheet
 
