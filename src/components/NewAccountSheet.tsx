@@ -324,17 +324,6 @@ export function NewAccountSheet({ open, onClose, orgId, onSave }: Props) {
             value={form.subdomain}
             onChange={e => set('subdomain', e.target.value)}
           />
-
-          <div className="flex flex-col gap-3">
-            <label className="text-sm font-medium text-[#030712]">Descrição</label>
-            <textarea
-              className="w-full min-h-[64px] rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-[#030712] placeholder:text-[#6b7280] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-              placeholder="Digite uma descrição para a conta"
-              value={form.descricao}
-              onChange={e => set('descricao', e.target.value)}
-              rows={3}
-            />
-          </div>
         </div>
 
         {/* Contatos e Usuário administrador */}
