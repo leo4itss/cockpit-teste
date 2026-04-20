@@ -462,9 +462,9 @@ export function OrganizacaoDetailPage() {
                   : 'Marketplace'}
               </h2>
               <p className="text-base text-[#6b7280] leading-6">
-                {tab === 'conta' ? 'Descrição da conta.'
-                  : tab === 'solucoes' ? 'Descrição de solução e plano'
-                  : tab === 'contrato' ? 'Descrição de contrato.'
+                {tab === 'conta' ? 'Gerencie as contas vinculadas a esta organização, incluindo usuários, acessos e configurações de cada conta.'
+                  : tab === 'solucoes' ? 'Visualize e edite as soluções contratadas por esta organização, seus planos e os componentes que as compõem.'
+                  : tab === 'contrato' ? 'Acompanhe os contratos ativos e histórico de contratações desta organização, com detalhes de vigência e objetos contratados.'
                   : 'Esta funcionalidade estará disponível em breve.'}
               </p>
             </div>
