@@ -22,6 +22,7 @@ interface Props {
   tiposLicenca: TipoLicenca[]
   componentes: Componente[]
   onComponenteCreated: (c: Componente) => void
+  contracts?: Contract[]
 }
 
 /* ── sub-components ─────────────────────────────────────── */
