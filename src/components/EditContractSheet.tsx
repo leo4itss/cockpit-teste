@@ -86,7 +86,7 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
         width="w-[768px]"
         footer={
           <>
-            <Button variant="destructive" onClick={onDelete} className="mr-auto">
+            <Button variant="ghost" onClick={onDelete} className="mr-auto text-red-600 hover:bg-red-50">
               Excluir contrato
             </Button>
             <Button variant="secondary" onClick={onClose}>Cancelar</Button>
