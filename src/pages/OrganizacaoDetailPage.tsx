@@ -419,12 +419,12 @@ export function OrganizacaoDetailPage() {
             <Field label="Subdomínio" value={org.domain} />
           </FieldGroup>
 
+          {/* Organizações vinculadas — oculto temporariamente (funcionalidade não pronta)
           <hr className="border-[#e5e7eb]" />
-
-          {/* Organizações vinculadas */}
           <FieldGroup title="Organizações vinculadas">
             <p className="text-sm font-medium text-[#030712]">Não há organizações vinculadas</p>
           </FieldGroup>
+          */}
 
         </div>
       </aside>
