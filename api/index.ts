@@ -162,7 +162,34 @@ app.post('/solutions', async (c) => {
   return c.json(row, 201)
 })
 app.put('/solutions/:id', async (c) => {
-  const [row] = await db.update(solutions).set(await c.req.json()).where(eq(solutions.id, c.req.param('id'))).returning()
+  const id = c.req.param('id')
+  const body = await c.req.json()
+
+  // Se componenteIds está sendo alterado, verificar se há contratos ativos
+  if (body.componenteIds !== undefined) {
+    const [current] = await db.select().from(solutions).where(eq(solutions.id, id))
+    if (!current) return c.json({ error: 'Not found' }, 404)
+
+    const sortedCurrent = JSON.stringify([...(current.componenteIds ?? [])].sort())
+    const sortedNew = JSON.stringify([...(body.componenteIds ?? [])].sort())
+
+    if (sortedCurrent !== sortedNew) {
+      const activeContracts = await db.select().from(contracts)
+        .where(and(eq(contracts.orgId, current.orgId), eq(contracts.status, 'Ativo')))
+
+      const hasActive = activeContracts.some(ct =>
+        Array.isArray(ct.objetos) && (ct.objetos as any[]).some(o => o.solucao === current.name)
+      )
+
+      if (hasActive) {
+        return c.json({
+          error: 'Esta solução possui contratos ativos. Os componentes não podem ser alterados. Para incluir novos componentes, crie uma nova solução.',
+        }, 422)
+      }
+    }
+  }
+
+  const [row] = await db.update(solutions).set(body).where(eq(solutions.id, id)).returning()
   return row ? c.json(row) : c.json({ error: 'Not found' }, 404)
 })
 app.delete('/solutions/:id', async (c) => {
