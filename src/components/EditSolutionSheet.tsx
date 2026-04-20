@@ -298,7 +298,7 @@ export function EditSolutionSheet({
         width="w-[768px]"
         footer={
           <>
-            <Button variant="destructive" onClick={onDelete} className="mr-auto">
+            <Button variant="ghost" onClick={onDelete} className="mr-auto text-red-600 hover:bg-red-50">
               Excluir solução
             </Button>
             <Button variant="outline" onClick={onClose}>Cancelar</Button>
