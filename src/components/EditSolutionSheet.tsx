@@ -180,6 +180,16 @@ export function EditSolutionSheet({
 
   const useInline = componentes.length <= THRESHOLD_INLINE
 
+  // Verifica se existe contrato ativo vinculado a esta solução
+  const hasActiveContract = !!(
+    solution &&
+    contracts?.some(
+      c => c.status === 'Ativo' &&
+        Array.isArray(c.objetos) &&
+        c.objetos.some((o: any) => o.solucao === solution.name)
+    )
+  )
+
   // Re-sync form when solution changes
   const [lastSolution, setLastSolution] = useState(solution)
   if (solution !== lastSolution) {
