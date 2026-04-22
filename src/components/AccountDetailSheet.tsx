@@ -1,4 +1,4 @@
-import { Copy, Phone, Mail, ExternalLink, CircleAlert, Trash2 } from 'lucide-react'
+import { Copy, Phone, Mail, ExternalLink } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Button } from './ui/Button'
 import { ProvisioningDots } from './ProvisioningDots'
