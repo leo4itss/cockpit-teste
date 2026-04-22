@@ -76,7 +76,7 @@ export function ComponenteSheet({ open, onClose, onSave, tiposLicenca, initialCo
     <Sheet
       open={open}
       onClose={handleClose}
-      title={initialComponente ? 'Editar componente' : 'Novo componente'}
+      title={initialComponente ? 'Editar componente' : 'Adicionar componente'}
       description="Configure o componente que poderá ser selecionado ao criar soluções."
       width="w-[560px]"
       footer={
