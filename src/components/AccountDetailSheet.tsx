@@ -206,25 +206,6 @@ export function AccountDetailSheet({ open, onClose, account, org, onEdit, onDele
 
       </div>
 
-      {/* Footer danger zone */}
-      <div className="mt-8 flex flex-col gap-4">
-        <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-md px-4 py-3">
-          <CircleAlert className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-          <p className="text-sm text-amber-800 leading-snug">
-            Excluir esta conta remove o tenant do ambiente: deleção do banco de dados, configuração no Cloudflare e recursos associados.
-            A conta entra em <strong>quarentena de 30 dias</strong> antes da remoção permanente.
-          </p>
-        </div>
-        <div className="flex justify-end">
-          <button
-            onClick={() => account && onDelete?.(account)}
-            className="inline-flex items-center gap-2 h-9 px-4 rounded-md bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition-colors"
-          >
-            <Trash2 className="w-4 h-4" />
-            Excluir tenant
-          </button>
-        </div>
-      </div>
     </Sheet>
   )
 }
