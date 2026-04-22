@@ -208,7 +208,7 @@ function EmptyState({ search, onNew }: { search: string; onNew: () => void }) {
       </div>
       <Button onClick={onNew} variant="outline">
         <Plus className="w-4 h-4 mr-1.5" />
-        Novo componente
+        Adicionar componente
       </Button>
     </div>
   )
