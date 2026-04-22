@@ -824,10 +824,6 @@ export function OrganizacaoDetailPage() {
         account={selectedAccount}
         org={org}
         onEdit={() => selectedAccount && handleEditAccountFromDetail(selectedAccount)}
-        onDelete={account => {
-          setSelectedAccount(null)
-          setTimeout(() => requestDeleteAccount(account), 340)
-        }}
       />
       {editingAccount && (
         <EditAccountSheet
