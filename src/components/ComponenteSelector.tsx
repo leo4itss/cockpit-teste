@@ -62,7 +62,7 @@ export function ComponenteSelector({ componentes, value, onChange, onCreateNew }
               className="flex items-center gap-1.5 h-9 px-3 border border-dashed border-[#d1d5db] rounded-md text-sm text-[#6b7280] hover:border-[#9ca3af] hover:text-[#030712] transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
-              Novo componente
+              Adicionar componente
             </button>
           )}
         </>
