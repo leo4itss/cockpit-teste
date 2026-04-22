@@ -89,7 +89,7 @@ const ESTADOS = [
 
 /* ── main ─────────────────────────────────────────────────── */
 
-export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdateContacts }: Props) {
+export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdateContacts, onDelete }: Props) {
   const [form, setForm] = useState({
     name:           account.name,
     razaoSocial:    account.razaoSocial    ?? org.razaoSocial    ?? '',
