@@ -838,6 +838,11 @@ export function OrganizacaoDetailPage() {
           org={org}
           onSave={handleSaveAccount}
           onUpdateContacts={handleUpdateContacts}
+          onDelete={() => {
+            const acc = editingAccount
+            setEditingAccount(null)
+            setTimeout(() => requestDeleteAccount(acc), 340)
+          }}
         />
       )}
       <SolutionDetailSheet
