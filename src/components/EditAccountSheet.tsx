@@ -15,6 +15,7 @@ interface Props {
   org: Organization
   onSave: (account: Account) => void
   onUpdateContacts?: (contacts: Contact[]) => void
+  onDelete?: () => void
 }
 
 /* ── sub-components ────────────────────────────────────── */
