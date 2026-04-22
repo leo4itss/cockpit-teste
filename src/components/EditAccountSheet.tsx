@@ -183,6 +183,11 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
       width="w-[768px]"
       footer={
         <>
+          {onDelete && (
+            <Button variant="ghost" onClick={onDelete} className="mr-auto text-red-600 hover:bg-red-50">
+              Excluir conta
+            </Button>
+          )}
           <Button variant="secondary" onClick={onClose}>Cancelar</Button>
           <Button onClick={handleSave}>Salvar</Button>
         </>
