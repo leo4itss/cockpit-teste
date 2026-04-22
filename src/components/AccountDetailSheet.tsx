@@ -71,7 +71,7 @@ function StatusBadge({ status }: { status: Account['status'] }) {
 
 /* ── main component ─────────────────────────────────────── */
 
-export function AccountDetailSheet({ open, onClose, account, org, onEdit, onDelete }: Props) {
+export function AccountDetailSheet({ open, onClose, account, org, onEdit }: Props) {
   if (!account || !org) return null
 
   const accessUrl = `http://${account.subdomain}.hml.pas.app.br/assistant`
