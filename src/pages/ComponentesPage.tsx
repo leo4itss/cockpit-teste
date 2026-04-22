@@ -89,7 +89,7 @@ export function ComponentesPage() {
           </div>
           <Button onClick={handleOpenNew}>
             <Plus className="w-4 h-4 mr-1.5" />
-            Novo componente
+            Adicionar componente
           </Button>
         </div>
       </div>
