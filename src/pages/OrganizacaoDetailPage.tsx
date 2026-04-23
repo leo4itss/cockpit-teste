@@ -494,7 +494,11 @@ export function OrganizacaoDetailPage() {
                   if (tab === 'conta') setSheetAccount(true)
                   else if (tab === 'solucoes') setSheetSolution(true)
                   else if (tab === 'contrato') setSheetContract(true)
-                }}>Criar</Button>
+                }}>
+                  {tab === 'conta' ? 'Criar Conta'
+                    : tab === 'solucoes' ? 'Habilitar Solução'
+                    : 'Vincular Contrato'}
+                </Button>
               )}
             </div>
           </div>
