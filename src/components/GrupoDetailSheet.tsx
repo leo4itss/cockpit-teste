@@ -91,6 +91,7 @@ export function GrupoDetailSheet({ open, onClose, grupo, onUpdate, onDelete }: P
   }
 
   function handleCancelEdit() {
+    if (!grupo) return
     setNome(grupo.nome)
     setDescricao(grupo.descricao ?? '')
     setStatus(grupo.status)
