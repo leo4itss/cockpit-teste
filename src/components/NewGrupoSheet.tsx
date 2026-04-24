@@ -52,8 +52,12 @@ export function NewGrupoSheet({ open, onClose, onSave }: Props) {
   async function handleSave() {
     if (!nome.trim()) return
     setSaving(true)
-    await onSave({ nome: nome.trim(), descricao: descricao.trim() || undefined, status, membroIds })
-    setSaving(false)
+    try {
+      await onSave({ nome: nome.trim(), descricao: descricao.trim() || undefined, status, membroIds })
+    } catch (err) {
+      console.error('Erro ao salvar grupo:', err)
+      setSaving(false)
+    }
   }
 
   async function handleVincular(ids: string[]) {
