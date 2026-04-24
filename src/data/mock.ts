@@ -444,7 +444,6 @@ export const users: User[] = [
     telefone: '(62) 9 7777-6666',
     area: 'Arquitetura',
     cargo: 'Arquiteto PAS',
-    papel: 'Arquiteto',
     etiquetas: '',
     formatoData: 'DD/MM/YYYY',
     formatoHora: '24h',
