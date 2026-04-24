@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Building2, Users, PanelLeft, Puzzle } from 'lucide-react'
+import { Building2, Users, PanelLeft, Puzzle, Shield } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const ITSSIcon = () => (
