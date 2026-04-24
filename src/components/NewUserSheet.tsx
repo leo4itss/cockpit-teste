@@ -87,7 +87,6 @@ export function NewUserSheet({ open, onClose, onSave }: Props) {
       telefone: form.telefone,
       area: form.area,
       cargo: form.cargo,
-      papel: form.papel,
       etiquetas: form.etiquetas,
       formatoData: form.formatoData,
       formatoHora: form.formatoHora,
