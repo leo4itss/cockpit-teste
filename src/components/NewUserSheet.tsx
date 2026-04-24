@@ -23,11 +23,6 @@ const AREAS = [
   { value: 'Suporte', label: 'Suporte' },
 ]
 
-const ROLES = [
-  { value: 'Administrador', label: 'Administrador' },
-  { value: 'Gerente', label: 'Gerente' },
-  { value: 'Usuário', label: 'Usuário' },
-]
 
 const TIMEZONES = [
   { value: 'America/Sao_Paulo', label: 'America/São Paulo' },
