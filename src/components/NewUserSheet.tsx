@@ -213,14 +213,6 @@ export function NewUserSheet({ open, onClose, onSave }: Props) {
             onChange={e => set('cargo', e.target.value)}
           />
 
-          <Select
-            label="Papel"
-            options={ROLES}
-            placeholder="Selecione o papel"
-            value={form.papel}
-            onChange={e => set('papel', e.target.value)}
-          />
-
           <div className="border border-gray-200 rounded-md flex items-center gap-2.5 px-4 py-3 w-full">
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-[#030712] leading-4">
