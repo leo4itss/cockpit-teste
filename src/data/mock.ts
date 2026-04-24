@@ -410,7 +410,6 @@ export const users: User[] = [
     telefone: '(62) 9 8546-9889',
     area: 'Tecnologia',
     cargo: 'Administrador',
-    papel: 'Administrador',
     etiquetas: '',
     formatoData: 'DD/MM/YYYY',
     formatoHora: '24h',
