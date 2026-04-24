@@ -152,7 +152,6 @@ export interface User {
   telefone: string
   area: string
   cargo: string
-  papel: string
   etiquetas: string
   formatoData: string
   formatoHora: string
@@ -161,4 +160,53 @@ export interface User {
   ultimoAcesso: string
   createdAt: string
   avatar?: string
+  // grupos carregados sob demanda (não persistido na tabela users)
+  grupos?: Grupo[]
+}
+
+// ── Grupos e Permissões (RBAC) ────────────────────────────────
+
+export interface Grupo {
+  id: string
+  nome: string
+  descricao?: string
+  status: 'Ativo' | 'Inativo'
+  createdAt: string
+  // enriquecido pelo backend
+  qtdMembros?: number
+}
+
+export interface UsuarioGrupo {
+  id: string
+  userId: string
+  grupoId: string
+  assignedAt: string
+}
+
+// Permissão individual declarada pelo componente via metadata
+export interface ComponentePermissaoDisponivel {
+  id: string
+  nome: string
+}
+
+// Objeto importado do metadata do componente
+export interface ComponenteObjeto {
+  id: string
+  componenteId: string
+  objetoId: string
+  nome: string
+  descricao?: string
+  permissoesDisponiveis: ComponentePermissaoDisponivel[]
+  importadoEm: string
+}
+
+// Permissões que um grupo tem sobre um objeto de componente
+export interface GrupoPermissao {
+  id: string
+  grupoId: string
+  componenteObjetoId: string
+  permissoesAtivas: string[]  // IDs das permissões ativas
+  createdAt: string
+  // enriquecido pelo backend
+  objeto?: ComponenteObjeto
 }
