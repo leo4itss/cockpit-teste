@@ -71,4 +71,36 @@ export const api = {
       '/api/componentes/validate-metadata',
       { method: 'POST', body: JSON.stringify({ url }) }
     ),
+
+  // Importa objetos de permissionamento do metadata do componente
+  importarObjetosComponente: (componenteId: string) =>
+    request<{ ok: boolean; importados: number }>(`/api/componentes/${componenteId}/importar-objetos`, { method: 'POST' }),
+
+  // Objetos de componentes disponíveis para permissionamento
+  getComponenteObjetos: (componenteId?: string) =>
+    request<any[]>(`/api/componente-objetos${componenteId ? `?componenteId=${componenteId}` : ''}`),
+
+  // Grupos
+  getGrupos: () => request<any[]>('/api/grupos'),
+  getGrupo: (id: string) => request<any>(`/api/grupos/${id}`),
+  createGrupo: (data: any) => request<any>('/api/grupos', { method: 'POST', body: JSON.stringify(data) }),
+  updateGrupo: (id: string, data: any) => request<any>(`/api/grupos/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteGrupo: (id: string) => request<any>(`/api/grupos/${id}`, { method: 'DELETE' }),
+
+  // Membros de um grupo
+  getMembrosGrupo: (grupoId: string) => request<any[]>(`/api/grupos/${grupoId}/membros`),
+  addMembroGrupo: (grupoId: string, userId: string) =>
+    request<any>(`/api/grupos/${grupoId}/membros`, { method: 'POST', body: JSON.stringify({ userId }) }),
+  removeMembroGrupo: (grupoId: string, userId: string) =>
+    request<any>(`/api/grupos/${grupoId}/membros/${userId}`, { method: 'DELETE' }),
+
+  // Grupos de um usuário
+  getGruposUser: (userId: string) => request<any[]>(`/api/users/${userId}/grupos`),
+
+  // Permissões de um grupo sobre objetos de componentes
+  getPermissoesGrupo: (grupoId: string) => request<any[]>(`/api/grupos/${grupoId}/permissoes`),
+  salvarPermissaoGrupo: (grupoId: string, data: { componenteObjetoId: string; permissoesAtivas: string[] }) =>
+    request<any>(`/api/grupos/${grupoId}/permissoes`, { method: 'POST', body: JSON.stringify(data) }),
+  removerPermissaoGrupo: (grupoId: string, permissaoId: string) =>
+    request<any>(`/api/grupos/${grupoId}/permissoes/${permissaoId}`, { method: 'DELETE' }),
 }
