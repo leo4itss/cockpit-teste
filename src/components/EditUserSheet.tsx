@@ -107,7 +107,6 @@ export function EditUserSheet({ open, onClose, user, onSave }: Props) {
       telefone: form.telefone,
       area: form.area,
       cargo: form.cargo,
-      papel: form.papel,
       etiquetas: form.etiquetas,
       formatoData: form.formatoData,
       formatoHora: form.formatoHora,
