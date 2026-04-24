@@ -11,8 +11,12 @@ import {
   users,
   tiposLicenca,
   componentes,
+  grupos,
+  usuarioGrupos,
+  componenteObjetos,
+  grupoPermissoes,
 } from './schema'
-import { eq } from 'drizzle-orm'
+import { eq, inArray } from 'drizzle-orm'
 
 const app = new Hono()
 
