@@ -10,6 +10,7 @@ import type { User, Grupo } from '@/types'
 
 export function AcessosPage() {
   const [users, setUsers] = useState<User[]>([])
+  const [gruposPorUser, setGruposPorUser] = useState<Record<string, Grupo[]>>({})
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [showNewUserSheet, setShowNewUserSheet] = useState(false)
