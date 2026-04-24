@@ -362,6 +362,193 @@ app.post('/api/componentes/validate-metadata', async (c) => {
   }
 })
 
+// ── Grupos ────────────────────────────────────────────────────
+
+app.get('/api/grupos', async (c) => {
+  const rows = await db.select().from(grupos)
+  // Enriquecer com contagem de membros
+  const enriched = await Promise.all(rows.map(async (g) => {
+    const membros = await db.select().from(usuarioGrupos).where(eq(usuarioGrupos.grupoId, g.id))
+    return { ...g, qtdMembros: membros.length }
+  }))
+  return c.json(enriched)
+})
+
+app.get('/api/grupos/:id', async (c) => {
+  const [row] = await db.select().from(grupos).where(eq(grupos.id, c.req.param('id')))
+  if (!row) return c.json({ error: 'Not found' }, 404)
+  return c.json(row)
+})
+
+app.post('/api/grupos', async (c) => {
+  const body = await c.req.json()
+  const { membroIds, ...grupoData } = body
+  const [grupo] = await db.insert(grupos).values(grupoData).returning()
+  // Vincular membros iniciais, se informados
+  if (Array.isArray(membroIds) && membroIds.length > 0) {
+    await db.insert(usuarioGrupos).values(
+      membroIds.map((userId: string) => ({
+        id: crypto.randomUUID(),
+        userId,
+        grupoId: grupo.id,
+        assignedAt: new Date().toISOString(),
+      }))
+    )
+  }
+  return c.json(grupo, 201)
+})
+
+app.put('/api/grupos/:id', async (c) => {
+  const body = await c.req.json()
+  const [row] = await db.update(grupos).set(body).where(eq(grupos.id, c.req.param('id'))).returning()
+  if (!row) return c.json({ error: 'Not found' }, 404)
+  return c.json(row)
+})
+
+app.delete('/api/grupos/:id', async (c) => {
+  const id = c.req.param('id')
+  await db.delete(grupoPermissoes).where(eq(grupoPermissoes.grupoId, id))
+  await db.delete(usuarioGrupos).where(eq(usuarioGrupos.grupoId, id))
+  await db.delete(grupos).where(eq(grupos.id, id))
+  return c.json({ ok: true })
+})
+
+// ── Membros de um grupo ───────────────────────────────────────
+
+app.get('/api/grupos/:id/membros', async (c) => {
+  const grupoId = c.req.param('id')
+  const relacoes = await db.select().from(usuarioGrupos).where(eq(usuarioGrupos.grupoId, grupoId))
+  if (relacoes.length === 0) return c.json([])
+  const userIds = relacoes.map(r => r.userId)
+  const membros = await db.select().from(users).where(inArray(users.id, userIds))
+  return c.json(membros)
+})
+
+app.post('/api/grupos/:id/membros', async (c) => {
+  const grupoId = c.req.param('id')
+  const { userId } = await c.req.json()
+  const [row] = await db.insert(usuarioGrupos).values({
+    id: crypto.randomUUID(),
+    userId,
+    grupoId,
+    assignedAt: new Date().toISOString(),
+  }).returning()
+  return c.json(row, 201)
+})
+
+app.delete('/api/grupos/:grupoId/membros/:userId', async (c) => {
+  const { grupoId, userId } = c.req.param()
+  const { and } = await import('drizzle-orm')
+  await db.delete(usuarioGrupos).where(
+    and(eq(usuarioGrupos.grupoId, grupoId), eq(usuarioGrupos.userId, userId))
+  )
+  return c.json({ ok: true })
+})
+
+// ── Grupos de um usuário ──────────────────────────────────────
+
+app.get('/api/users/:id/grupos', async (c) => {
+  const userId = c.req.param('id')
+  const relacoes = await db.select().from(usuarioGrupos).where(eq(usuarioGrupos.userId, userId))
+  if (relacoes.length === 0) return c.json([])
+  const grupoIds = relacoes.map(r => r.grupoId)
+  const gruposDoUser = await db.select().from(grupos).where(inArray(grupos.id, grupoIds))
+  return c.json(gruposDoUser)
+})
+
+// ── Permissões de um grupo (sobre objetos de componentes) ─────
+
+app.get('/api/grupos/:id/permissoes', async (c) => {
+  const grupoId = c.req.param('id')
+  const perms = await db.select().from(grupoPermissoes).where(eq(grupoPermissoes.grupoId, grupoId))
+  // Enriquecer com dados do objeto
+  const enriched = await Promise.all(perms.map(async (p) => {
+    const [obj] = await db.select().from(componenteObjetos).where(eq(componenteObjetos.id, p.componenteObjetoId))
+    return { ...p, objeto: obj ?? null }
+  }))
+  return c.json(enriched)
+})
+
+app.post('/api/grupos/:id/permissoes', async (c) => {
+  const grupoId = c.req.param('id')
+  const { componenteObjetoId, permissoesAtivas } = await c.req.json()
+  // Upsert: se já existe vínculo para este objeto, atualiza; senão, cria
+  const [existing] = await db.select().from(grupoPermissoes).where(
+    eq(grupoPermissoes.grupoId, grupoId)
+  ).then(rows => rows.filter(r => r.componenteObjetoId === componenteObjetoId))
+  if (existing) {
+    const [updated] = await db.update(grupoPermissoes)
+      .set({ permissoesAtivas })
+      .where(eq(grupoPermissoes.id, existing.id))
+      .returning()
+    return c.json(updated)
+  }
+  const [row] = await db.insert(grupoPermissoes).values({
+    id: crypto.randomUUID(),
+    grupoId,
+    componenteObjetoId,
+    permissoesAtivas,
+    createdAt: new Date().toISOString(),
+  }).returning()
+  return c.json(row, 201)
+})
+
+app.delete('/api/grupos/:grupoId/permissoes/:permissaoId', async (c) => {
+  await db.delete(grupoPermissoes).where(eq(grupoPermissoes.id, c.req.param('permissaoId')))
+  return c.json({ ok: true })
+})
+
+// ── Objetos de componentes (importados via metadata) ──────────
+
+app.get('/api/componente-objetos', async (c) => {
+  const componenteId = c.req.query('componenteId')
+  const rows = componenteId
+    ? await db.select().from(componenteObjetos).where(eq(componenteObjetos.componenteId, componenteId))
+    : await db.select().from(componenteObjetos)
+  return c.json(rows)
+})
+
+// Importa objetos do endpoint de metadata do componente e persiste em componente_objetos.
+// Contrato esperado: { componentId, name, version, objetos: [{ id, nome, descricao?, permissoes: [{ id, nome }] }] }
+app.post('/api/componentes/:id/importar-objetos', async (c) => {
+  const componenteId = c.req.param('id')
+  const [comp] = await db.select().from(componentes).where(eq(componentes.id, componenteId))
+  if (!comp) return c.json({ error: 'Componente não encontrado' }, 404)
+  if (!comp.metadataUrl) return c.json({ error: 'Componente não tem metadataUrl configurada' }, 400)
+
+  try {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 5000)
+    const res = await fetch(comp.metadataUrl, { signal: controller.signal })
+    clearTimeout(timeout)
+    if (!res.ok) return c.json({ error: `Metadata retornou status ${res.status}` }, 502)
+
+    const data = await res.json() as { objetos?: Array<{ id: string; nome: string; descricao?: string; permissoes: Array<{ id: string; nome: string }> }> }
+    if (!Array.isArray(data.objetos) || data.objetos.length === 0) {
+      return c.json({ error: 'Metadata não contém "objetos" como array não-vazio' }, 422)
+    }
+
+    const agora = new Date().toISOString()
+    // Remove objetos anteriores deste componente e reimporta
+    await db.delete(componenteObjetos).where(eq(componenteObjetos.componenteId, componenteId))
+    const inserted = await db.insert(componenteObjetos).values(
+      data.objetos.map(obj => ({
+        id: crypto.randomUUID(),
+        componenteId,
+        objetoId: obj.id,
+        nome: obj.nome,
+        descricao: obj.descricao ?? null,
+        permissoesDisponiveis: obj.permissoes,
+        importadoEm: agora,
+      }))
+    ).returning()
+    return c.json({ ok: true, importados: inserted.length })
+  } catch (err: unknown) {
+    const msg = err instanceof Error && err.name === 'AbortError' ? 'Timeout na requisição de metadata' : 'Falha ao acessar metadata'
+    return c.json({ error: msg }, 502)
+  }
+})
+
 // ── Start ─────────────────────────────────────────────────────
 
 serve({ fetch: app.fetch, port: 3001 }, () => {
