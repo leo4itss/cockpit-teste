@@ -114,6 +114,54 @@ export const contracts = pgTable('contracts', {
   status: text('status').notNull().default('Pendente'),
 })
 
+// ── Grupos ────────────────────────────────────────────────────
+// Substituem o conceito de "papel" fixo (Administrador/Gerente/Usuário).
+// Cada grupo agrega membros e um conjunto de permissões sobre objetos de componentes.
+export const grupos = pgTable('grupos', {
+  id: text('id').primaryKey(),
+  nome: text('nome').notNull(),
+  descricao: text('descricao'),
+  status: text('status').notNull().default('Ativo'), // 'Ativo' | 'Inativo'
+  createdAt: text('created_at').notNull(),
+})
+
+// Membros de um grupo (relação N:N entre users e grupos)
+export const usuarioGrupos = pgTable('usuario_grupos', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id),
+  grupoId: text('grupo_id').notNull().references(() => grupos.id),
+  assignedAt: text('assigned_at').notNull(),
+})
+
+// Objetos importados do metadata do componente.
+// Contrato esperado do endpoint de metadata:
+// {
+//   "componentId": string,
+//   "name": string,
+//   "version": string,
+//   "objetos": [{ "id": string, "nome": string, "descricao": string?,
+//                 "permissoes": [{ "id": string, "nome": string }] }]
+// }
+// Componentes simples expõem um único objeto "root" com permissões genéricas.
+export const componenteObjetos = pgTable('componente_objetos', {
+  id: text('id').primaryKey(),
+  componenteId: text('componente_id').notNull().references(() => componentes.id),
+  objetoId: text('objeto_id').notNull(),   // id vindo do metadata do componente
+  nome: text('nome').notNull(),
+  descricao: text('descricao'),
+  permissoesDisponiveis: jsonb('permissoes_disponiveis').notNull().default([]), // [{ id, nome }]
+  importadoEm: text('importado_em').notNull(),
+})
+
+// Permissões atribuídas a um grupo sobre um objeto de componente
+export const grupoPermissoes = pgTable('grupo_permissoes', {
+  id: text('id').primaryKey(),
+  grupoId: text('grupo_id').notNull().references(() => grupos.id),
+  componenteObjetoId: text('componente_objeto_id').notNull().references(() => componenteObjetos.id),
+  permissoesAtivas: jsonb('permissoes_ativas').notNull().default([]), // string[] de IDs de permissão
+  createdAt: text('created_at').notNull(),
+})
+
 export const users = pgTable('users', {
   id: text('id').primaryKey(),
   nomeCompleto: text('nome_completo').notNull(),
