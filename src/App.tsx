@@ -5,6 +5,7 @@ import { OrganizacoesPage } from './pages/OrganizacoesPage'
 import { OrganizacaoDetailPage } from './pages/OrganizacaoDetailPage'
 import { AcessosPage } from './pages/AcessosPage'
 import { GruposPage } from './pages/GruposPage'
+import { GrupoDetailPage } from './pages/GrupoDetailPage'
 import { HomePage } from './pages/HomePage'
 import { ComponentesPage } from './pages/ComponentesPage'
 
@@ -22,6 +23,9 @@ export default function App() {
         </Route>
         <Route path="/organizacoes/:id" element={<DetailLayout />}>
           <Route index element={<OrganizacaoDetailPage />} />
+        </Route>
+        <Route path="/grupos/:id" element={<DetailLayout />}>
+          <Route index element={<GrupoDetailPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
