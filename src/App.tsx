@@ -17,6 +17,7 @@ export default function App() {
           <Route index element={<Navigate to="/home" replace />} />
           <Route path="organizacoes" element={<OrganizacoesPage />} />
           <Route path="acessos" element={<AcessosPage />} />
+          <Route path="grupos" element={<GruposPage />} />
           <Route path="componentes" element={<ComponentesPage />} />
         </Route>
         <Route path="/organizacoes/:id" element={<DetailLayout />}>
