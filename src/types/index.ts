@@ -174,6 +174,7 @@ export interface Grupo {
   createdAt: string
   // enriquecido pelo backend
   qtdMembros?: number
+  qtdObjetos?: number
 }
 
 export interface UsuarioGrupo {
