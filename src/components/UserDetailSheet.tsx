@@ -1,7 +1,9 @@
+import { useState, useEffect } from 'react'
 import { Sheet } from './ui/Sheet'
 import { Button } from './ui/Button'
 import { Check } from 'lucide-react'
-import type { User } from '@/types'
+import { api } from '@/api/client'
+import type { User, Grupo } from '@/types'
 
 interface Props {
   open: boolean
