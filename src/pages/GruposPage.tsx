@@ -16,10 +16,10 @@ export function GruposPage() {
   const [selectedGrupo, setSelectedGrupo] = useState<Grupo | null>(null)
 
   useEffect(() => {
-    api.getGrupos().then(data => {
-      setGrupos(data)
-      setLoading(false)
-    })
+    api.getGrupos()
+      .then(data => setGrupos(data))
+      .catch(() => {})
+      .finally(() => setLoading(false))
   }, [])
 
   const filteredGrupos = useMemo(() => {
