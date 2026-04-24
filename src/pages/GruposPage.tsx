@@ -35,7 +35,7 @@ export function GruposPage() {
       id: crypto.randomUUID(),
       createdAt: new Date().toLocaleDateString('pt-BR'),
     })
-    setGrupos(prev => [...prev, { ...grupo, qtdMembros: data.membroIds?.length ?? 0 }])
+    setGrupos(prev => [...prev, { ...grupo, qtdMembros: data.membroIds?.length ?? 0, qtdObjetos: 0 }])
     setShowNewSheet(false)
   }
 
