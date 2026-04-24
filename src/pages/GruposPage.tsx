@@ -1,19 +1,18 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Search, Plus, Ellipsis, BadgeCheck, Circle, FilePen, Trash2 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/Button'
 import { Popover } from '@/components/ui/Popover'
 import { NewGrupoSheet } from '@/components/NewGrupoSheet'
-import { GrupoDetailSheet } from '@/components/GrupoDetailSheet'
 import { api } from '@/api/client'
 import type { Grupo } from '@/types'
 
 export function GruposPage() {
+  const navigate = useNavigate()
   const [grupos, setGrupos] = useState<Grupo[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [showNewSheet, setShowNewSheet] = useState(false)
-  const [showDetailSheet, setShowDetailSheet] = useState(false)
-  const [selectedGrupo, setSelectedGrupo] = useState<Grupo | null>(null)
 
   useEffect(() => {
     api.getGrupos()
@@ -40,27 +39,18 @@ export function GruposPage() {
     setShowNewSheet(false)
   }
 
-  function handleOpenDetail(grupo: Grupo) {
-    setSelectedGrupo(grupo)
-    setShowDetailSheet(true)
-  }
-
-  async function handleUpdate(updated: Grupo) {
-    setGrupos(prev => prev.map(g => g.id === updated.id ? { ...g, ...updated } : g))
-    setSelectedGrupo(updated)
-  }
-
-  async function handleDelete(id: string) {
+  async function handleDelete(id: string, e: React.MouseEvent) {
+    e.stopPropagation()
+    if (!confirm('Excluir este grupo?')) return
     await api.deleteGrupo(id)
     setGrupos(prev => prev.filter(g => g.id !== id))
-    setShowDetailSheet(false)
   }
 
   return (
     <div>
       {/* Header */}
       <div className="flex items-center justify-between px-8 py-4">
-        <h1 className="text-2xl font-bold leading-8 text-[#030712]">Grupos e Permissões</h1>
+        <h1 className="text-2xl font-bold leading-8 text-[#030712]">Grupos</h1>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
             <Search className="w-4 h-4 text-gray-400 opacity-50" />
@@ -88,28 +78,30 @@ export function GruposPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[220px]">Nome</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[280px]">Descrição</th>
-                <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 min-w-[100px]">Membros</th>
-                <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 min-w-[120px]">Status</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[220px]">Grupos</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[260px]">Descrição</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 w-[90px]">Usuários</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 w-[120px]">Funcionalidades</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 w-[120px]">Status</th>
                 <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 w-[80px]">Ações</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-500">Carregando...</td>
+                  <td colSpan={6} className="px-4 py-8 text-center text-sm text-gray-500">Carregando...</td>
                 </tr>
               ) : filteredGrupos.length > 0 ? (
                 filteredGrupos.map(grupo => (
                   <tr
                     key={grupo.id}
                     className="border-b border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
-                    onClick={() => handleOpenDetail(grupo)}
+                    onClick={() => navigate(`/grupos/${grupo.id}`)}
                   >
                     <td className="px-4 py-3 text-sm font-medium text-[#030712]">{grupo.nome}</td>
-                    <td className="px-4 py-3 text-sm text-gray-500 truncate max-w-[280px]">{grupo.descricao ?? '—'}</td>
+                    <td className="px-4 py-3 text-sm text-gray-500 truncate max-w-[260px]">{grupo.descricao ?? '—'}</td>
                     <td className="px-4 py-3 text-sm text-center text-[#030712]">{grupo.qtdMembros ?? 0}</td>
+                    <td className="px-4 py-3 text-sm text-center text-[#030712]">{grupo.qtdObjetos ?? 0}</td>
                     <td className="px-4 py-3 text-center">
                       {grupo.status === 'Ativo' ? (
                         <span className="inline-flex items-center gap-1 bg-green-200 text-green-700 text-xs font-semibold rounded-[2px] px-2 py-1">
@@ -128,14 +120,14 @@ export function GruposPage() {
                         content={
                           <div className="flex flex-col gap-1 min-w-[163px]">
                             <button
-                              onClick={() => handleOpenDetail(grupo)}
+                              onClick={() => navigate(`/grupos/${grupo.id}`)}
                               className="flex items-center gap-2 w-full px-3 py-2 text-sm font-medium text-[#030712] hover:bg-gray-100 rounded-md transition-colors text-left"
                             >
                               <FilePen className="w-4 h-4 shrink-0" />
                               Gerenciar grupo
                             </button>
                             <button
-                              onClick={async () => { if (confirm(`Excluir o grupo "${grupo.nome}"?`)) await handleDelete(grupo.id) }}
+                              onClick={e => handleDelete(grupo.id, e)}
                               className="flex items-center gap-2 w-full px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-colors text-left"
                             >
                               <Trash2 className="w-4 h-4 shrink-0" />
@@ -153,7 +145,7 @@ export function GruposPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-500">
+                  <td colSpan={6} className="px-4 py-8 text-center text-sm text-gray-500">
                     {searchQuery ? 'Nenhum grupo encontrado' : 'Nenhum grupo criado ainda'}
                   </td>
                 </tr>
@@ -167,14 +159,6 @@ export function GruposPage() {
         open={showNewSheet}
         onClose={() => setShowNewSheet(false)}
         onSave={handleCreate}
-      />
-
-      <GrupoDetailSheet
-        open={showDetailSheet}
-        onClose={() => setShowDetailSheet(false)}
-        grupo={selectedGrupo}
-        onUpdate={handleUpdate}
-        onDelete={handleDelete}
       />
     </div>
   )
