@@ -19,9 +19,17 @@ export function AcessosPage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
 
   useEffect(() => {
-    api.getUsers().then(data => {
+    api.getUsers().then(async data => {
       setUsers(data)
       setLoading(false)
+      // Carrega grupos de cada usuário em paralelo
+      const entries = await Promise.all(
+        data.map(async (u: User) => {
+          const grupos = await api.getGruposUser(u.id).catch(() => [])
+          return [u.id, grupos] as [string, Grupo[]]
+        })
+      )
+      setGruposPorUser(Object.fromEntries(entries))
     })
   }, [])
 
