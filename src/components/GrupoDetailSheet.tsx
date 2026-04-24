@@ -150,7 +150,7 @@ export function GrupoDetailSheet({ open, onClose, grupo, onUpdate, onDelete }: P
               <Select
                 label="Status"
                 value={status}
-                onChange={v => setStatus(v as 'Ativo' | 'Inativo')}
+                onChange={e => setStatus(e.target.value as 'Ativo' | 'Inativo')}
                 options={STATUS_OPTIONS}
               />
               <div className="flex gap-2">
