@@ -427,7 +427,6 @@ export const users: User[] = [
     telefone: '(11) 9 9999-8888',
     area: 'Comercial',
     cargo: 'Gerente',
-    papel: 'Gerente',
     etiquetas: '',
     formatoData: 'DD/MM/YYYY',
     formatoHora: '24h',
