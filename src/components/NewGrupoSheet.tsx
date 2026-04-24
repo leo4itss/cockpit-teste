@@ -104,7 +104,7 @@ export function NewGrupoSheet({ open, onClose, onSave }: Props) {
           <Select
             label="Status"
             value={status}
-            onChange={v => setStatus(v as 'Ativo' | 'Inativo')}
+            onChange={e => setStatus(e.target.value as 'Ativo' | 'Inativo')}
             options={STATUS_OPTIONS}
           />
         </div>
