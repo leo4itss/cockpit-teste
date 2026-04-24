@@ -44,6 +44,14 @@ function Field({ label, value }: { label: string; value: string }) {
 }
 
 export function UserDetailSheet({ open, onClose, user, onEdit }: Props) {
+  const [grupos, setGrupos] = useState<Grupo[]>([])
+
+  useEffect(() => {
+    if (open && user) {
+      api.getGruposUser(user.id).then(setGrupos).catch(() => setGrupos([]))
+    }
+  }, [open, user])
+
   if (!user) return null
 
   return (
