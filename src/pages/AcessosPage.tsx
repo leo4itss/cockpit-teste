@@ -134,7 +134,19 @@ export function AcessosPage() {
                     </td>
                     <td className="px-4 py-3 text-sm text-[#030712]">{user.usuario}</td>
                     <td className="px-4 py-3 text-sm text-[#030712]">{user.email}</td>
-                    <td className="px-4 py-3 text-sm text-[#030712]">{user.papel}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap gap-1">
+                        {(gruposPorUser[user.id] ?? []).length === 0 ? (
+                          <span className="text-sm text-gray-400">—</span>
+                        ) : (
+                          (gruposPorUser[user.id] ?? []).map(g => (
+                            <span key={g.id} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700">
+                              {g.nome}
+                            </span>
+                          ))
+                        )}
+                      </div>
+                    </td>
                     <td className="px-4 py-3 text-center">
                       {user.status === 'Ativo' ? (
                         <span className="inline-flex items-center gap-1 bg-green-200 text-green-700 text-xs font-semibold rounded-[2px] px-2 py-1">
