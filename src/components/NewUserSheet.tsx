@@ -109,7 +109,6 @@ export function NewUserSheet({ open, onClose, onSave }: Props) {
       telefone: '',
       area: '',
       cargo: '',
-      papel: '',
       etiquetas: '',
       formatoData: 'DD/MM/YYYY',
       formatoHora: '24h',
