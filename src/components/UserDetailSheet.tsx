@@ -111,7 +111,20 @@ export function UserDetailSheet({ open, onClose, user, onEdit }: Props) {
           <SectionLegend>Informações Profissionais</SectionLegend>
           <Field label="Área" value={user.area} />
           <Field label="Cargo" value={user.cargo} />
-          <Field label="Papel" value={user.papel} />
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-[#030712]">Grupos</label>
+            <div className="bg-gray-50 rounded-md px-3 py-2 flex flex-wrap gap-1.5 min-h-[36px]">
+              {grupos.length === 0 ? (
+                <span className="text-sm text-[#6b7280]">Sem grupos atribuídos</span>
+              ) : (
+                grupos.map(g => (
+                  <span key={g.id} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-white border border-gray-200 text-gray-700">
+                    {g.nome}
+                  </span>
+                ))
+              )}
+            </div>
+          </div>
           <Field label="Etiquetas de classificação" value={user.etiquetas} />
           <Separator />
         </FieldGroup>
