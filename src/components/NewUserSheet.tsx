@@ -4,6 +4,7 @@ import { Input } from './ui/Input'
 import { Select } from './ui/Select'
 import { Button } from './ui/Button'
 import type { User } from '@/types'
+// papel removido da UI — acesso é gerenciado por Grupos
 
 interface Props {
   open: boolean
