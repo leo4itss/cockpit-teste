@@ -4,6 +4,7 @@ import { DetailLayout } from './components/DetailLayout'
 import { OrganizacoesPage } from './pages/OrganizacoesPage'
 import { OrganizacaoDetailPage } from './pages/OrganizacaoDetailPage'
 import { AcessosPage } from './pages/AcessosPage'
+import { GruposPage } from './pages/GruposPage'
 import { HomePage } from './pages/HomePage'
 import { ComponentesPage } from './pages/ComponentesPage'
 
