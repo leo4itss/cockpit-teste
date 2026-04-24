@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Check, ChevronDown, ChevronRight } from 'lucide-react'
-import { Dialog } from './ui/Dialog'
+import { Search, X } from 'lucide-react'
 import { Button } from './ui/Button'
 import { api } from '@/api/client'
 import type { ComponenteObjeto, GrupoPermissao, Componente } from '@/types'
@@ -15,18 +14,19 @@ interface Props {
 
 interface ObjetoState {
   objeto: ComponenteObjeto
-  componente: Componente
+  componente: Componente | undefined
   permissoesAtivas: string[]
-  expandido: boolean
 }
 
 export function VincularObjetosDialog({ open, onClose, grupoId, permissoesExistentes, onSave }: Props) {
   const [objetosState, setObjetosState] = useState<ObjetoState[]>([])
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
     if (!open) return
+    setSearch('')
     setLoading(true)
     Promise.all([api.getComponenteObjetos(), api.getComponentes()]).then(([objetos, componentes]) => {
       const state: ObjetoState[] = objetos.map((obj: ComponenteObjeto) => {
@@ -36,7 +36,6 @@ export function VincularObjetosDialog({ open, onClose, grupoId, permissoesExiste
           objeto: obj,
           componente: comp,
           permissoesAtivas: (existente?.permissoesAtivas as string[]) ?? [],
-          expandido: !!existente,
         }
       })
       setObjetosState(state)
@@ -44,10 +43,18 @@ export function VincularObjetosDialog({ open, onClose, grupoId, permissoesExiste
     })
   }, [open, permissoesExistentes])
 
-  // Agrupa por componente para exibição
+  const filtrado = useMemo(() => {
+    const q = search.toLowerCase()
+    if (!q) return objetosState
+    return objetosState.filter(item =>
+      item.objeto.nome.toLowerCase().includes(q) ||
+      (item.componente?.nome ?? '').toLowerCase().includes(q)
+    )
+  }, [objetosState, search])
+
   const porComponente = useMemo(() => {
-    const map = new Map<string, { componente: Componente; objetos: ObjetoState[] }>()
-    for (const item of objetosState) {
+    const map = new Map<string, { componente: Componente | undefined; objetos: ObjetoState[] }>()
+    for (const item of filtrado) {
       const compId = item.objeto.componenteId
       if (!map.has(compId)) {
         map.set(compId, { componente: item.componente, objetos: [] })
@@ -55,7 +62,7 @@ export function VincularObjetosDialog({ open, onClose, grupoId, permissoesExiste
       map.get(compId)!.objetos.push(item)
     }
     return Array.from(map.values())
-  }, [objetosState])
+  }, [filtrado])
 
   function togglePermissao(objetoId: string, permId: string) {
     setObjetosState(prev => prev.map(item => {
@@ -67,15 +74,8 @@ export function VincularObjetosDialog({ open, onClose, grupoId, permissoesExiste
     }))
   }
 
-  function toggleExpandido(objetoId: string) {
-    setObjetosState(prev => prev.map(item =>
-      item.objeto.id === objetoId ? { ...item, expandido: !item.expandido } : item
-    ))
-  }
-
   async function handleSave() {
     setSaving(true)
-    // Salva somente objetos que têm pelo menos uma permissão ativa
     const comPermissoes = objetosState.filter(o => o.permissoesAtivas.length > 0)
     await Promise.all(comPermissoes.map(o =>
       api.salvarPermissaoGrupo(grupoId, {
@@ -88,103 +88,128 @@ export function VincularObjetosDialog({ open, onClose, grupoId, permissoesExiste
     onClose()
   }
 
+  if (!open) return null
+
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      title="Vincular objetos"
-      description="Selecione os objetos e configure as permissões para este grupo."
-      className="max-w-2xl"
-      footer={
-        <>
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-xl flex flex-col w-full max-w-4xl mx-4 max-h-[90vh]">
+        {/* Close */}
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 p-1 rounded text-gray-400 hover:text-gray-600 opacity-70"
+        >
+          <X className="w-4 h-4" />
+        </button>
+
+        {/* Header */}
+        <div className="p-6 pb-0">
+          <p className="text-lg font-semibold text-[#030712]">Vincular objetos</p>
+        </div>
+
+        {/* Subheader with search */}
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+          <p className="text-base font-medium text-[#030712]">
+            {objetosState.filter(o => o.permissoesAtivas.length > 0).length} objeto{objetosState.filter(o => o.permissoesAtivas.length > 0).length !== 1 ? 's' : ''} configurado{objetosState.filter(o => o.permissoesAtivas.length > 0).length !== 1 ? 's' : ''}
+          </p>
+          <div className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-md">
+            <Search className="w-4 h-4 text-gray-400 opacity-50" />
+            <input
+              type="text"
+              placeholder="Buscar"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="text-sm outline-none bg-transparent text-[#030712] placeholder:text-[#6b7280] w-28"
+            />
+            {search && (
+              <button onClick={() => setSearch('')} className="text-gray-400 hover:text-gray-600">
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="flex-1 overflow-auto p-6">
+          {loading ? (
+            <p className="text-sm text-gray-400 text-center py-8">Carregando objetos disponíveis...</p>
+          ) : porComponente.length === 0 ? (
+            <div className="py-8 text-center">
+              <p className="text-sm font-medium text-gray-600">Nenhum objeto disponível</p>
+              <p className="text-xs text-gray-400 mt-1">
+                Para vincular objetos, os componentes precisam ter sua metadata importada.
+              </p>
+            </div>
+          ) : (
+            <div className="border border-gray-200 rounded-2xl overflow-hidden">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-200">
+                    <th className="px-3 py-2.5 text-left text-sm font-medium text-gray-600 opacity-40 w-[280px]">Objeto</th>
+                    <th className="px-3 py-2.5 text-left text-sm font-medium text-gray-600 opacity-40">Permissões</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {porComponente.map(({ componente, objetos }) => (
+                    <>
+                      {/* Component group header */}
+                      <tr key={`comp-${componente?.id ?? 'unknown'}`} className="bg-gray-50 border-b border-gray-200">
+                        <td colSpan={2} className="px-3 py-2">
+                          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                            {componente?.nome ?? 'Componente desconhecido'}
+                          </p>
+                        </td>
+                      </tr>
+                      {objetos.map(item => (
+                        <tr key={item.objeto.id} className="border-b border-gray-200 last:border-0 hover:bg-gray-50">
+                          <td className="px-3 py-3">
+                            <p className="text-sm font-medium text-[#030712]">{item.objeto.nome}</p>
+                            {item.objeto.descricao && (
+                              <p className="text-xs text-gray-400 mt-0.5 truncate max-w-[250px]">{item.objeto.descricao}</p>
+                            )}
+                          </td>
+                          <td className="px-3 py-3">
+                            <div className="flex flex-wrap gap-2">
+                              {item.objeto.permissoesDisponiveis.map(perm => {
+                                const ativa = item.permissoesAtivas.includes(perm.id)
+                                return (
+                                  <button
+                                    key={perm.id}
+                                    type="button"
+                                    onClick={() => togglePermissao(item.objeto.id, perm.id)}
+                                    className={`px-3 py-1.5 rounded-md text-sm font-medium border transition-colors ${
+                                      ativa
+                                        ? 'bg-[#030712] text-white border-[#030712]'
+                                        : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:bg-gray-50'
+                                    }`}
+                                  >
+                                    {perm.nome}
+                                  </button>
+                                )
+                              })}
+                              {item.objeto.permissoesDisponiveis.length === 0 && (
+                                <span className="text-xs text-gray-400 italic">Sem permissões definidas</span>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-gray-200">
           <Button variant="outline" onClick={onClose} disabled={saving}>Cancelar</Button>
           <Button onClick={handleSave} disabled={saving || loading}>
             {saving ? 'Salvando...' : 'Salvar permissões'}
           </Button>
-        </>
-      }
-    >
-      {loading ? (
-        <p className="text-sm text-gray-400 text-center py-6">Carregando objetos disponíveis...</p>
-      ) : porComponente.length === 0 ? (
-        <div className="flex flex-col gap-2 py-6 text-center">
-          <p className="text-sm font-medium text-gray-600">Nenhum objeto disponível</p>
-          <p className="text-xs text-gray-400">
-            Para vincular objetos, os componentes precisam ter sua metadata importada.<br />
-            Acesse a tela de Componentes e clique em "Importar metadata".
-          </p>
         </div>
-      ) : (
-        <div className="flex flex-col gap-4 max-h-[60vh] overflow-y-auto pr-1">
-          {porComponente.map(({ componente, objetos }) => (
-            <div key={componente?.id ?? 'unknown'} className="border border-gray-200 rounded-xl overflow-hidden">
-              {/* Header do componente */}
-              <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
-                <p className="text-sm font-semibold text-[#030712]">{componente?.nome ?? 'Componente desconhecido'}</p>
-                {componente?.descricao && (
-                  <p className="text-xs text-gray-400 mt-0.5">{componente.descricao}</p>
-                )}
-              </div>
-
-              {/* Objetos do componente */}
-              <div className="divide-y divide-gray-100">
-                {objetos.map(item => (
-                  <div key={item.objeto.id}>
-                    {/* Linha do objeto */}
-                    <button
-                      type="button"
-                      onClick={() => toggleExpandido(item.objeto.id)}
-                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors text-left"
-                    >
-                      <div className="flex items-center gap-2">
-                        {item.expandido
-                          ? <ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />
-                          : <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
-                        }
-                        <div>
-                          <p className="text-sm font-medium text-[#030712]">{item.objeto.nome}</p>
-                          {item.objeto.descricao && (
-                            <p className="text-xs text-gray-400">{item.objeto.descricao}</p>
-                          )}
-                        </div>
-                      </div>
-                      {item.permissoesAtivas.length > 0 && (
-                        <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded shrink-0">
-                          {item.permissoesAtivas.length} permiss{item.permissoesAtivas.length === 1 ? 'ão' : 'ões'}
-                        </span>
-                      )}
-                    </button>
-
-                    {/* Permissões do objeto */}
-                    {item.expandido && (
-                      <div className="px-10 pb-3 pt-1 flex flex-wrap gap-2">
-                        {item.objeto.permissoesDisponiveis.map(perm => {
-                          const ativa = item.permissoesAtivas.includes(perm.id)
-                          return (
-                            <button
-                              key={perm.id}
-                              type="button"
-                              onClick={() => togglePermissao(item.objeto.id, perm.id)}
-                              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium border transition-colors ${
-                                ativa
-                                  ? 'bg-[#030712] text-white border-[#030712]'
-                                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
-                              }`}
-                            >
-                              {ativa && <Check className="w-3 h-3" />}
-                              {perm.nome}
-                            </button>
-                          )
-                        })}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </Dialog>
+      </div>
+    </div>
   )
 }
