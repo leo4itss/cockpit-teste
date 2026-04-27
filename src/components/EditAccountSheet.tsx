@@ -404,28 +404,24 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
 
                   {/* Phone / email items */}
                   <div className="flex flex-col gap-2 pb-2">
-                    <div className="border border-gray-200 rounded-md flex items-center gap-4 px-4 h-10">
+                    <div className="border border-gray-200 rounded-md flex items-center gap-4 px-4 py-2">
                       <MessageCircleMore className="w-5 h-5 text-[#030712] shrink-0" />
                       <span className="flex-1 text-sm font-medium text-[#030712]">{contact.phone}</span>
                       <button
                         type="button"
-                        onClick={() => navigator.clipboard.writeText(contact.phone)}
                         className="w-9 h-9 flex items-center justify-center rounded-md hover:bg-gray-100 text-[#030712] transition-colors shrink-0"
-                        title="Copiar"
                       >
-                        <Copy className="w-4 h-4" />
+                        <MoreVertical className="w-4 h-4" />
                       </button>
                     </div>
-                    <div className="border border-gray-200 rounded-md flex items-center gap-4 px-4 h-10">
+                    <div className="border border-gray-200 rounded-md flex items-center gap-4 px-4 py-2">
                       <Mail className="w-5 h-5 text-[#030712] shrink-0" />
                       <span className="flex-1 text-sm font-medium text-[#030712]">{contact.email}</span>
                       <button
                         type="button"
-                        onClick={() => navigator.clipboard.writeText(contact.email)}
                         className="w-9 h-9 flex items-center justify-center rounded-md hover:bg-gray-100 text-[#030712] transition-colors shrink-0"
-                        title="Copiar"
                       >
-                        <Copy className="w-4 h-4" />
+                        <MoreVertical className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
