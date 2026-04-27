@@ -6,6 +6,7 @@ import { NewUserSheet } from '@/components/NewUserSheet'
 import { UserDetailSheet } from '@/components/UserDetailSheet'
 import { EditUserSheet } from '@/components/EditUserSheet'
 import { api } from '@/api/client'
+import { useCanManageUsers, useCanManageGroups } from '@/authz'
 import type { User, Grupo } from '@/types'
 
 export function AcessosPage() {
