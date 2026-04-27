@@ -156,7 +156,7 @@ export function SolutionDetailSheet({ open, onClose, solution, componentes = [],
         <div className="flex flex-col gap-4">
           <SectionTitle>Informações básicas</SectionTitle>
           <div className="flex flex-col gap-4">
-            <Field label="Apelido da solução" value={solution.name} />
+            <Field label="Nome da instância da solução" value={solution.name} />
             <Field label="Descrição" value={solution.description} />
             <Field label="Data de cadastro" value={solution.createdAt} />
             <Field label="Arquiteto PAS responsável" value={solution.arquitetoPAS} />
