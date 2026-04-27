@@ -68,10 +68,13 @@ export function GruposPage() {
               <button onClick={() => setSearchQuery('')} className="text-gray-400 hover:text-gray-600">×</button>
             )}
           </div>
-          <Button onClick={() => setShowNewSheet(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Novo grupo
-          </Button>
+          {/* canManageGroups: account_admin ou org_admin from organization */}
+          {canManageGroupsFlag && (
+            <Button onClick={() => setShowNewSheet(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Novo grupo
+            </Button>
+          )}
         </div>
       </div>
 
