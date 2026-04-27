@@ -416,17 +416,18 @@ export function GrupoDetailPage() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-200">
-                      <th className="px-3 py-2.5 text-left text-sm font-medium text-gray-600 opacity-40">Objeto</th>
-                      <th className="px-3 py-2.5 text-left text-sm font-medium text-gray-600 opacity-40">Permissões ativas</th>
-                      <th className="px-3 py-2.5 text-center text-sm font-medium text-gray-600 opacity-40 w-[80px]">Ações</th>
+                      <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Objeto</th>
+                      <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Role FGA</th>
+                      <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Permite</th>
+                      <th className="px-3 py-2.5 w-[60px]" />
                     </tr>
                   </thead>
                   <tbody>
                     {loadingPermissoes ? (
-                      <tr><td colSpan={3} className="px-4 py-8 text-center text-sm text-gray-400">Carregando...</td></tr>
+                      <tr><td colSpan={4} className="px-4 py-8 text-center text-sm text-gray-400">Carregando...</td></tr>
                     ) : permissoes.length === 0 ? (
                       <tr>
-                        <td colSpan={3} className="px-4 py-8 text-center text-sm text-gray-400">
+                        <td colSpan={4} className="px-4 py-8 text-center text-sm text-gray-400">
                           Nenhum objeto vinculado.{' '}
                           <button onClick={() => setShowVincularObjetos(true)} className="text-blue-600 hover:underline">
                             Vincular objetos
@@ -434,38 +435,53 @@ export function GrupoDetailPage() {
                         </td>
                       </tr>
                     ) : (
-                      permissoes.map(p => (
-                        <tr key={p.id} className="border-b border-gray-200 last:border-0 hover:bg-gray-50">
-                          <td className="px-3 py-3 text-sm font-medium text-[#030712]">
-                            {p.objeto?.nome ?? '—'}
-                          </td>
-                          <td className="px-3 py-3">
-                            <div className="flex flex-wrap gap-1">
-                              {(p.permissoesAtivas as string[]).length === 0 ? (
-                                <span className="text-xs text-gray-400">Nenhuma permissão</span>
-                              ) : (
-                                (p.permissoesAtivas as string[]).map(permId => {
-                                  const label = p.objeto?.permissoesDisponiveis?.find(pd => pd.id === permId)?.nome ?? permId
-                                  return (
-                                    <span key={permId} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
-                                      {label}
-                                    </span>
-                                  )
-                                })
+                      permissoes.map(p => {
+                        // roleId é o role FGA ativo (viewer | editor | manager)
+                        const roleId = (p.permissoesAtivas as string[])[0] ?? null
+                        const meta = roleId ? FGA_ROLE_META[roleId] : null
+                        return (
+                          <tr key={p.id} className="border-b border-gray-200 last:border-0 hover:bg-gray-50">
+                            {/* Objeto */}
+                            <td className="px-3 py-3">
+                              <p className="text-sm font-medium text-[#030712]">{p.objeto?.nome ?? '—'}</p>
+                              {p.objeto?.descricao && (
+                                <p className="text-xs text-gray-400 mt-0.5">{p.objeto.descricao}</p>
                               )}
-                            </div>
-                          </td>
-                          <td className="px-3 py-3 text-center">
-                            <button
-                              onClick={() => handleRemoverPermissao(p.id)}
-                              className="p-1.5 hover:bg-red-50 rounded-md text-red-400 hover:text-red-600 transition-colors"
-                              title="Remover vínculo"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </td>
-                        </tr>
-                      ))
+                            </td>
+                            {/* Role badge */}
+                            <td className="px-3 py-3">
+                              {meta ? (
+                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-xs font-medium ${meta.badge}`}>
+                                  {meta.icon}
+                                  {meta.label}
+                                </span>
+                              ) : (
+                                <span className="text-xs text-gray-300 italic">—</span>
+                              )}
+                            </td>
+                            {/* Permissões que o role habilita */}
+                            <td className="px-3 py-3">
+                              <div className="flex flex-wrap gap-1">
+                                {meta ? meta.unlocks.map(p => (
+                                  <span key={p} className="font-mono text-[10px] text-gray-400 bg-gray-50 border border-gray-100 px-1.5 py-0.5 rounded">
+                                    {p}
+                                  </span>
+                                )) : null}
+                              </div>
+                            </td>
+                            {/* Ação */}
+                            <td className="px-3 py-3 text-center">
+                              <button
+                                onClick={() => handleRemoverPermissao(p.id)}
+                                className="p-1.5 hover:bg-red-50 rounded-md text-gray-300 hover:text-red-500 transition-colors"
+                                title="Remover vínculo"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </td>
+                          </tr>
+                        )
+                      })
                     )}
                   </tbody>
                 </table>
