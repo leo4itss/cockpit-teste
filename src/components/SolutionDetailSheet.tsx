@@ -203,12 +203,16 @@ export function SolutionDetailSheet({ open, onClose, solution, componentes = [],
         {/* Planos */}
         <div className="flex flex-col gap-4">
           <SectionTitle>Planos</SectionTitle>
-          {solution.plans.length === 0 ? (
+          {localPlans.length === 0 ? (
             <p className="text-sm text-[#6b7280]">Nenhum plano cadastrado.</p>
           ) : (
             <div className="flex flex-col gap-2">
-              {solution.plans.map((plan, i) => (
-                <PlanItem key={i} plan={plan} onEdit={onEdit ?? (() => {})} />
+              {localPlans.map((plan, i) => (
+                <PlanItem
+                  key={i}
+                  plan={plan}
+                  onRemove={() => setLocalPlans(ps => ps.filter((_, j) => j !== i))}
+                />
               ))}
             </div>
           )}
