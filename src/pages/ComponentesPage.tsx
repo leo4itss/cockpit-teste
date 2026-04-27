@@ -92,10 +92,13 @@ export function ComponentesPage() {
               Componentes e serviços disponíveis para compor soluções.
             </p>
           </div>
-          <Button onClick={handleOpenNew}>
-            <Plus className="w-4 h-4 mr-1.5" />
-            Adicionar componente
-          </Button>
+          {/* canManageComponent: manager ou account_admin */}
+          {canManage && (
+            <Button onClick={handleOpenNew}>
+              <Plus className="w-4 h-4 mr-1.5" />
+              Adicionar componente
+            </Button>
+          )}
         </div>
       </div>
 
