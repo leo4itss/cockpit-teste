@@ -5,20 +5,31 @@ import { eq } from 'drizzle-orm'
 
 const agora = new Date().toISOString()
 
+// ── Roles FGA — usados como permissoesDisponiveis em cada objeto ─────────────
+// Mapeiam diretamente para as relações do modelo FGA:
+//
+//   type component
+//     define viewer:  [user, group#member]  → can_view
+//     define editor:  [user, group#member]  → can_edit + can_view
+//     define manager: [user, group#member]  → can_manage + can_edit + can_view
+//
+// Quando um grupo tem permissoesAtivas: ['editor'] sobre um objeto,
+// isso representa a tupla FGA:  group:<id>#member → editor → component:<objId>
+const FGA_ROLES = [
+  { id: 'viewer',  nome: 'Viewer'  },
+  { id: 'editor',  nome: 'Editor'  },
+  { id: 'manager', nome: 'Manager' },
+]
+
 const objetos = [
-  // PAS Core
+  // PAS Core (comp-1)
   {
     id: 'obj-pascore-assistentes',
     componenteId: 'comp-1',
     objetoId: 'assistentes',
     nome: 'Assistentes',
     descricao: 'Gerenciamento de assistentes de IA',
-    permissoesDisponiveis: [
-      { id: 'perm-visualizar', nome: 'Visualizar' },
-      { id: 'perm-criar', nome: 'Criar' },
-      { id: 'perm-editar', nome: 'Editar' },
-      { id: 'perm-excluir', nome: 'Excluir' },
-    ],
+    permissoesDisponiveis: FGA_ROLES,
     importadoEm: agora,
   },
   {
@@ -27,11 +38,7 @@ const objetos = [
     objetoId: 'sessoes',
     nome: 'Sessões',
     descricao: 'Histórico de sessões de conversa',
-    permissoesDisponiveis: [
-      { id: 'perm-visualizar', nome: 'Visualizar' },
-      { id: 'perm-excluir', nome: 'Excluir' },
-      { id: 'perm-exportar', nome: 'Exportar' },
-    ],
+    permissoesDisponiveis: FGA_ROLES,
     importadoEm: agora,
   },
   {
@@ -40,10 +47,7 @@ const objetos = [
     objetoId: 'configuracoes',
     nome: 'Configurações',
     descricao: 'Configurações do componente PAS Core',
-    permissoesDisponiveis: [
-      { id: 'perm-visualizar', nome: 'Visualizar' },
-      { id: 'perm-editar', nome: 'Editar' },
-    ],
+    permissoesDisponiveis: FGA_ROLES,
     importadoEm: agora,
   },
   {
@@ -52,53 +56,35 @@ const objetos = [
     objetoId: 'usuarios',
     nome: 'Usuários',
     descricao: 'Gestão de usuários no PAS Core',
-    permissoesDisponiveis: [
-      { id: 'perm-visualizar', nome: 'Visualizar' },
-      { id: 'perm-criar', nome: 'Criar' },
-      { id: 'perm-editar', nome: 'Editar' },
-      { id: 'perm-excluir', nome: 'Excluir' },
-      { id: 'perm-admin', nome: 'Administrar' },
-    ],
+    permissoesDisponiveis: FGA_ROLES,
     importadoEm: agora,
   },
-  // Knowledge Base
+  // Knowledge Base (comp-2)
   {
     id: 'obj-kb-bases',
     componenteId: 'comp-2',
     objetoId: 'bases',
     nome: 'Bases de conhecimento',
     descricao: 'Coleções de documentos indexados',
-    permissoesDisponiveis: [
-      { id: 'perm-visualizar', nome: 'Visualizar' },
-      { id: 'perm-criar', nome: 'Criar' },
-      { id: 'perm-editar', nome: 'Editar' },
-      { id: 'perm-excluir', nome: 'Excluir' },
-    ],
+    permissoesDisponiveis: FGA_ROLES,
     importadoEm: agora,
   },
   {
     id: 'obj-kb-documentos',
     componenteId: 'comp-2',
     objetoId: 'documentos',
-    nome: 'Documentos',
+    nome: 'Arquivos e documentos nas bases',
     descricao: 'Arquivos e documentos nas bases',
-    permissoesDisponiveis: [
-      { id: 'perm-visualizar', nome: 'Visualizar' },
-      { id: 'perm-upload', nome: 'Upload' },
-      { id: 'perm-excluir', nome: 'Excluir' },
-    ],
+    permissoesDisponiveis: FGA_ROLES,
     importadoEm: agora,
   },
   {
-    id: 'obj-kb-integrações',
+    id: 'obj-kb-integracoes',
     componenteId: 'comp-2',
     objetoId: 'integracoes',
     nome: 'Integrações',
     descricao: 'Conectores externos para indexação',
-    permissoesDisponiveis: [
-      { id: 'perm-visualizar', nome: 'Visualizar' },
-      { id: 'perm-configurar', nome: 'Configurar' },
-    ],
+    permissoesDisponiveis: FGA_ROLES,
     importadoEm: agora,
   },
 ]
