@@ -80,52 +80,45 @@ export function ComponentesPage() {
     <div className="flex flex-col h-full">
       {/* Page header */}
       <div className="border-b border-[#e5e7eb] bg-white shrink-0">
-        <div className="flex items-center justify-between px-8 py-6">
-          <div className="flex flex-col gap-1">
-            <h1 className="text-[30px] font-bold leading-9 text-[#030712]">Componentes</h1>
-            <p className="text-base text-[#6b7280] leading-6">
-              Componentes e serviços disponíveis para compor soluções.
-            </p>
+        <div className="flex items-center justify-between px-8 py-4 h-[72px]">
+          <h1 className="text-2xl font-bold text-[#030712]">Componentes</h1>
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6b7280] opacity-50 pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Buscar"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="h-9 pl-9 pr-3 w-[160px] border border-[#e5e7eb] rounded-md text-sm text-[#030712] placeholder:text-[#9ca3af] outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors bg-white shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]"
+              />
+            </div>
+            <Button onClick={handleOpenNew}>
+              <Plus className="w-4 h-4 mr-1.5" />
+              Adicionar componente
+            </Button>
           </div>
-          <Button onClick={handleOpenNew}>
-            <Plus className="w-4 h-4 mr-1.5" />
-            Adicionar componente
-          </Button>
         </div>
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto p-8 flex flex-col gap-5">
-
-        {/* Search bar */}
-        <div className="relative max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6b7280] pointer-events-none" />
-          <input
-            type="text"
-            placeholder="Buscar componente..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="w-full h-9 pl-9 pr-3 border border-[#e5e7eb] rounded-md text-sm text-[#030712] placeholder:text-[#9ca3af] outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors bg-white shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]"
-          />
-        </div>
+      <div className="flex-1 overflow-auto p-8">
 
         {/* Table */}
         {loading ? (
           <p className="text-sm text-[#6b7280]">Carregando...</p>
         ) : filtered.length === 0 ? (
-          <EmptyState
-            search={search}
-            onNew={handleOpenNew}
-          />
+          <EmptyState search={search} onNew={handleOpenNew} />
         ) : (
           <div className="border border-[#e5e7eb] rounded-2xl overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-white border-b border-[#e5e7eb]">
-                  <th className="text-left px-4 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Nome</th>
-                  <th className="text-left px-4 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Descrição</th>
-                  <th className="text-left px-4 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Tipos de Licença</th>
-                  <th className="text-left px-4 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Metadata</th>
+                  <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Nome</th>
+                  <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Descrição</th>
+                  <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Tipos de Licensa</th>
+                  <th className="text-center px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Arquiteto PAS</th>
+                  <th className="text-center px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -135,39 +128,33 @@ export function ComponentesPage() {
                     className="border-b border-[#e5e7eb] last:border-0 hover:bg-gray-50 cursor-pointer transition-colors"
                     onClick={() => handleOpenEdit(c)}
                   >
-                    <td className="px-4 py-3 h-[52px]">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-md bg-[#f3f4f6] border border-[#e5e7eb] flex items-center justify-center shrink-0">
-                          <Puzzle className="w-4 h-4 text-[#6b7280]" />
+                    <td className="px-2 py-2 h-[52px]">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-md bg-[#f3f4f6] border border-[#e5e7eb] flex items-center justify-center shrink-0 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
+                          <Cpu className="w-4 h-4 text-[#6b7280]" />
                         </div>
                         <span className="text-sm font-medium text-[#030712]">{c.nome}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 h-[52px] text-sm text-[#6b7280] max-w-[240px] truncate">
+                    <td className="px-2 py-2 h-[52px] text-sm text-[#030712] max-w-[200px] truncate">
                       {c.descricao || '—'}
                     </td>
-                    <td className="px-4 py-3 h-[52px] text-sm text-[#030712]">
+                    <td className="px-2 py-2 h-[52px] text-sm text-[#030712] max-w-[300px] truncate">
                       {c.tiposLicenca.length === 0 ? (
                         <span className="text-[#9ca3af]">—</span>
                       ) : (
-                        <span className="truncate max-w-[220px] block" title={tiposNomes(c.tiposLicenca)}>
-                          {c.tiposLicenca.length} tipo{c.tiposLicenca.length > 1 ? 's' : ''}
-                          <span className="text-[#6b7280] ml-1">
-                            ({tiposNomes(c.tiposLicenca)})
-                          </span>
+                        <span title={tiposNomes(c.tiposLicenca)}>
+                          {c.tiposLicenca.length} tipo{c.tiposLicenca.length > 1 ? 's' : ''}{' '}
+                          <span className="text-[#6b7280]">({tiposNomes(c.tiposLicenca)})</span>
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3 h-[52px]">
-                      {c.metadataUrl ? (
-                        <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-700">
-                          Configurada
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
-                          Não configurada
-                        </span>
-                      )}
+                    <td className="px-2 py-2 h-[52px] text-sm text-center text-[#030712]">—</td>
+                    <td className="px-2 py-2 h-[52px] text-center">
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-sm bg-green-200 text-green-700">
+                        <BadgeCheck className="w-3 h-3" />
+                        Ativo
+                      </span>
                     </td>
                   </tr>
                 ))}
