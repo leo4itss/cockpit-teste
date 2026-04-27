@@ -10,6 +10,11 @@ import { useCanManageUsers, useCanManageGroups } from '@/authz'
 import type { User, Grupo } from '@/types'
 
 export function AcessosPage() {
+  // Permissões FGA — PoC usa conta/org padrão 'a1'/'1' (Apple)
+  // Em produção: derivar do contexto da conta ativa do usuário logado
+  const canManageUsersFlag = useCanManageUsers()
+  const canManageGroupsFlag = useCanManageGroups()
+
   const [users, setUsers] = useState<User[]>([])
   const [gruposPorUser, setGruposPorUser] = useState<Record<string, Grupo[]>>({})
   const [loading, setLoading] = useState(true)
