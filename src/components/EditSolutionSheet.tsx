@@ -571,13 +571,6 @@ export function EditSolutionSheet({
         value={selectedComponenteIds}
         onChange={setSelectedComponenteIds}
       />
-
-      <ComponenteSheet
-        open={componenteSheetOpen}
-        onClose={() => setComponenteSheetOpen(false)}
-        onSave={handleCreateComponente}
-        tiposLicenca={tiposLicenca}
-      />
     </>
   )
 }
