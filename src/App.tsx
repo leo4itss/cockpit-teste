@@ -12,6 +12,7 @@ import { ComponentesPage } from './pages/ComponentesPage'
 
 export default function App() {
   return (
+    <AuthProvider>
     <BrowserRouter>
       <Routes>
         <Route path="/home" element={<HomePage />} />
