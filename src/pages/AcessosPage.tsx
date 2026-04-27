@@ -98,10 +98,13 @@ export function AcessosPage() {
               </button>
             )}
           </div>
-          <Button onClick={() => setShowNewUserSheet(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Novo usuário
-          </Button>
+          {/* canManageUsers: account_admin ou org_admin from organization */}
+          {canManageUsersFlag && (
+            <Button onClick={() => setShowNewUserSheet(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Novo usuário
+            </Button>
+          )}
         </div>
       </div>
 
