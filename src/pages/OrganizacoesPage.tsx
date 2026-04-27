@@ -89,9 +89,12 @@ export function OrganizacoesPage() {
               className="text-sm bg-transparent outline-none text-[#030712] placeholder:text-[#6b7280] w-40"
             />
           </div>
-          <Button onClick={() => setSheetOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" /> Criar
-          </Button>
+          {/* canCreateOrganization: apenas platform_admin */}
+          {canCreate && (
+            <Button onClick={() => setSheetOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" /> Criar
+            </Button>
+          )}
         </div>
       </div>
 
