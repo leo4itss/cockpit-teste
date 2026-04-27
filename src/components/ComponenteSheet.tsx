@@ -107,6 +107,7 @@ export function ComponenteSheet({ open, onClose, onSave, tiposLicenca, initialCo
 
           <Input
             label="Descrição"
+            required
             placeholder="Descreva brevemente o propósito deste componente"
             value={descricao}
             onChange={e => setDescricao(e.target.value)}
