@@ -1,6 +1,6 @@
 import 'dotenv/config'
 import { db } from './db'
-import { componenteObjetos } from './schema'
+import { componenteObjetos, grupoPermissoes } from './schema'
 import { eq } from 'drizzle-orm'
 
 const agora = new Date().toISOString()
