@@ -172,7 +172,6 @@ export function EditSolutionSheet({
   const [planDialogOpen, setPlanDialogOpen] = useState(false)
   const [editingPlanIndex, setEditingPlanIndex] = useState<number | null>(null)
   const [componenteSelecaoOpen, setComponenteSelecaoOpen] = useState(false)
-  const [componenteSheetOpen, setComponenteSheetOpen] = useState(false)
 
   const useInline = componentes.length <= THRESHOLD_INLINE
 
