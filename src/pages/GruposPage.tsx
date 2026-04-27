@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button'
 import { Popover } from '@/components/ui/Popover'
 import { NewGrupoSheet } from '@/components/NewGrupoSheet'
 import { api } from '@/api/client'
+import { useCanManageGroups } from '@/authz'
 import type { Grupo } from '@/types'
 
 export function GruposPage() {
