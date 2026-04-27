@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { ChevronDown, ChevronUp, MoreVertical, Check } from 'lucide-react'
+import { ChevronDown, ChevronUp, Trash2, Check } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Button } from './ui/Button'
 import type { Solution, Plan, Componente } from '@/types'
@@ -10,6 +10,7 @@ interface Props {
   solution: Solution | null
   componentes?: Componente[]
   onEdit?: () => void
+  onSave?: (solution: Solution) => void
 }
 
 function Field({ label, value, isLink }: { label: string; value?: string; isLink?: boolean }) {
