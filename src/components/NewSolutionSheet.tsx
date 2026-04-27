@@ -222,7 +222,6 @@ export function NewSolutionSheet({
               componentes={componentes}
               value={selectedComponenteIds}
               onChange={setSelectedComponenteIds}
-              onCreateNew={() => setComponenteSheetOpen(true)}
             />
           ) : (
             /* > 5 componentes: botão que abre sheet de seleção */
