@@ -12,8 +12,10 @@ import type { Organization } from '@/types'
 
 export function OrganizacoesPage() {
   const navigate = useNavigate()
-  // Permissões FGA — criar org é exclusivo do platform_admin
+  // Permissões FGA — criar/excluir org é exclusivo do platform_admin
   const canCreate = useCanCreateOrganization()
+  // authz engine + contexto para cheques por linha (dentro do map)
+  const { currentUser, relations } = useAuth()
   const [orgs, setOrgs] = useState<Organization[]>([])
   const [loading, setLoading] = useState(true)
   const [error] = useState<string | null>(null)
