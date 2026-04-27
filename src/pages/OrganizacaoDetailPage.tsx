@@ -865,7 +865,6 @@ export function OrganizacaoDetailPage() {
           }}
           tiposLicenca={tiposLicenca}
           componentes={componentes}
-          onComponenteCreated={c => setComponentes(prev => [...prev, c])}
           contracts={contracts}
         />
       )}
