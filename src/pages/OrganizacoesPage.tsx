@@ -7,6 +7,7 @@ import { NewOrganizationSheet } from '@/components/NewOrganizationSheet'
 import { ConfirmDeleteModal } from '@/components/ConfirmDeleteModal'
 import { api } from '@/api/client'
 import { organizations as mockOrgs } from '@/data/mock'
+import { useCanCreateOrganization, useCanManageAccounts } from '@/authz'
 import type { Organization } from '@/types'
 
 export function OrganizacoesPage() {
