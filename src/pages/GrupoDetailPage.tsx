@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { BadgeCheck, Check, Pencil, Link, Trash2, X } from 'lucide-react'
+import { BadgeCheck, Check, Pencil, Link, Trash2, X, Eye, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
