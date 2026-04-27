@@ -11,6 +11,37 @@ import type { Grupo, User, GrupoPermissao } from '@/types'
 
 type Tab = 'membros' | 'objetos'
 
+// ── Mapeamento de roles FGA → visual + descrição ──────────────────────────
+// Cada role representa uma relação do modelo FGA para type component:
+//   viewer  → can_view
+//   editor  → can_edit + can_view
+//   manager → can_manage + can_edit + can_view
+const FGA_ROLE_META: Record<string, {
+  label: string
+  icon: React.ReactNode
+  badge: string
+  unlocks: string[]
+}> = {
+  viewer: {
+    label: 'Viewer',
+    icon: <Eye className="w-3 h-3" />,
+    badge: 'bg-sky-50 text-sky-700 border-sky-200',
+    unlocks: ['can_view'],
+  },
+  editor: {
+    label: 'Editor',
+    icon: <Pencil className="w-3 h-3" />,
+    badge: 'bg-violet-50 text-violet-700 border-violet-200',
+    unlocks: ['can_view', 'can_edit'],
+  },
+  manager: {
+    label: 'Manager',
+    icon: <Settings className="w-3 h-3" />,
+    badge: 'bg-amber-50 text-amber-700 border-amber-200',
+    unlocks: ['can_view', 'can_edit', 'can_manage'],
+  },
+}
+
 const STATUS_OPTIONS = [
   { value: 'Ativo', label: 'Ativo' },
   { value: 'Inativo', label: 'Inativo' },
