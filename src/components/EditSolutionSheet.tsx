@@ -388,7 +388,6 @@ export function EditSolutionSheet({
                 componentes={componentes}
                 value={selectedComponenteIds}
                 onChange={setSelectedComponenteIds}
-                onCreateNew={() => setComponenteSheetOpen(true)}
               />
             ) : (
               /* ── Modo sheet (> 5 componentes) ── */
