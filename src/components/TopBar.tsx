@@ -45,6 +45,7 @@ export function TopBar({ collapsed, onExpand }: TopBarProps) {
 
       {/* Icons */}
       <div className="flex items-center gap-4">
+        <PersonaSwitcher />
         <AppsMenu open={openApps} onOpenChange={setOpenApps}>
           <button className="w-9 h-9 flex items-center justify-center border border-gray-200 rounded-md hover:bg-gray-50 text-gray-500 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors">
             <LayoutGrid className="w-4 h-4" />
