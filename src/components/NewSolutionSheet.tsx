@@ -96,7 +96,6 @@ export function NewSolutionSheet({
   const [selectedComponenteIds, setSelectedComponenteIds] = useState<string[]>([])
   const [planDialogOpen, setPlanDialogOpen] = useState(false)
   const [componenteSelecaoOpen, setComponenteSelecaoOpen] = useState(false)
-  const [componenteSheetOpen, setComponenteSheetOpen] = useState(false)
 
   const useInline = componentes.length <= THRESHOLD_INLINE
 
