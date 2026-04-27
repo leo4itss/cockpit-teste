@@ -114,9 +114,11 @@ export function OrganizacoesPage() {
             Ainda não há organizações cadastradas no sistema.<br />
             Crie uma nova organização para provisionar a conta.
           </p>
-          <Button onClick={() => setSheetOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" /> Criar organização
-          </Button>
+          {canCreate && (
+            <Button onClick={() => setSheetOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" /> Criar organização
+            </Button>
+          )}
         </div>
       ) : (
         <div className="px-8 pt-6 pb-8">
