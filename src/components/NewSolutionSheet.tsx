@@ -80,7 +80,6 @@ export function NewSolutionSheet({
   onSave,
   tiposLicenca,
   componentes,
-  onComponenteCreated,
 }: Props) {
   const [form, setForm] = useState({
     name: '',
