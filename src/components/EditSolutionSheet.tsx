@@ -19,7 +19,6 @@ interface Props {
   onDelete?: () => void
   tiposLicenca: TipoLicenca[]
   componentes: Componente[]
-  onComponenteCreated: (c: Componente) => void
   contracts?: Contract[]
 }
 
