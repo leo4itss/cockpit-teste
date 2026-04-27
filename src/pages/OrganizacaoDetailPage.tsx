@@ -850,6 +850,7 @@ export function OrganizacaoDetailPage() {
         solution={selectedSolution}
         componentes={componentes}
         onEdit={() => selectedSolution && handleEditSolutionFromDetail(selectedSolution)}
+        onSave={handleSaveSolution}
       />
       {editingSolution && (
         <EditSolutionSheet
