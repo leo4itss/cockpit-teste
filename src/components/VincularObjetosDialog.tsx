@@ -1,8 +1,43 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Search, X } from 'lucide-react'
+import { Search, X, Eye, Pencil, Settings } from 'lucide-react'
 import { Button } from './ui/Button'
 import { api } from '@/api/client'
 import type { ComponenteObjeto, GrupoPermissao, Componente } from '@/types'
+
+// ── Roles FGA para type component ────────────────────────────────────────────
+// Cada role mapeia para relações do modelo OpenFGA:
+//   viewer  → define viewer:  [user, group#member]  → can_view
+//   editor  → define editor:  [user, group#member]  → can_edit + can_view
+//   manager → define manager: [user, group#member]  → can_manage + can_edit + can_view
+//
+// Quando salvo, permissoesAtivas: ['editor'] representa a tupla FGA:
+//   group:<grupoId>#member @editor component:<objetoId>
+const FGA_ROLES = [
+  {
+    id: 'viewer' as const,
+    label: 'Viewer',
+    description: 'Somente leitura',
+    icon: <Eye className="w-3.5 h-3.5" />,
+    unlocks: ['can_view'],
+    activeClass: 'bg-sky-600 text-white border-sky-600',
+  },
+  {
+    id: 'editor' as const,
+    label: 'Editor',
+    description: 'Leitura e escrita',
+    icon: <Pencil className="w-3.5 h-3.5" />,
+    unlocks: ['can_view', 'can_edit'],
+    activeClass: 'bg-violet-600 text-white border-violet-600',
+  },
+  {
+    id: 'manager' as const,
+    label: 'Manager',
+    description: 'Controle total',
+    icon: <Settings className="w-3.5 h-3.5" />,
+    unlocks: ['can_view', 'can_edit', 'can_manage'],
+    activeClass: 'bg-amber-500 text-white border-amber-500',
+  },
+]
 
 interface Props {
   open: boolean
@@ -15,7 +50,8 @@ interface Props {
 interface ObjetoState {
   objeto: ComponenteObjeto
   componente: Componente | undefined
-  permissoesAtivas: string[]
+  // Um único role FGA ativo por objeto (viewer | editor | manager | null)
+  roleAtivo: string | null
 }
 
 export function VincularObjetosDialog({ open, onClose, grupoId, permissoesExistentes, onSave }: Props) {
@@ -32,11 +68,10 @@ export function VincularObjetosDialog({ open, onClose, grupoId, permissoesExiste
       const state: ObjetoState[] = objetos.map((obj: ComponenteObjeto) => {
         const comp = componentes.find((c: Componente) => c.id === obj.componenteId)
         const existente = permissoesExistentes.find(p => p.componenteObjetoId === obj.id)
-        return {
-          objeto: obj,
-          componente: comp,
-          permissoesAtivas: (existente?.permissoesAtivas as string[]) ?? [],
-        }
+        const ativos = (existente?.permissoesAtivas as string[]) ?? []
+        // Seleciona o role de maior privilégio salvo (manager > editor > viewer)
+        const roleAtivo = (['manager', 'editor', 'viewer'] as const).find(r => ativos.includes(r)) ?? null
+        return { objeto: obj, componente: comp, roleAtivo }
       })
       setObjetosState(state)
       setLoading(false)
@@ -56,31 +91,30 @@ export function VincularObjetosDialog({ open, onClose, grupoId, permissoesExiste
     const map = new Map<string, { componente: Componente | undefined; objetos: ObjetoState[] }>()
     for (const item of filtrado) {
       const compId = item.objeto.componenteId
-      if (!map.has(compId)) {
-        map.set(compId, { componente: item.componente, objetos: [] })
-      }
+      if (!map.has(compId)) map.set(compId, { componente: item.componente, objetos: [] })
       map.get(compId)!.objetos.push(item)
     }
     return Array.from(map.values())
   }, [filtrado])
 
-  function togglePermissao(objetoId: string, permId: string) {
+  const configurados = objetosState.filter(o => o.roleAtivo !== null).length
+
+  function setRole(objetoId: string, roleId: string) {
     setObjetosState(prev => prev.map(item => {
       if (item.objeto.id !== objetoId) return item
-      const ativas = item.permissoesAtivas.includes(permId)
-        ? item.permissoesAtivas.filter(id => id !== permId)
-        : [...item.permissoesAtivas, permId]
-      return { ...item, permissoesAtivas: ativas }
+      // Toggle: clicando no mesmo role remove; outro role substitui
+      return { ...item, roleAtivo: item.roleAtivo === roleId ? null : roleId }
     }))
   }
 
   async function handleSave() {
     setSaving(true)
-    const comPermissoes = objetosState.filter(o => o.permissoesAtivas.length > 0)
-    await Promise.all(comPermissoes.map(o =>
+    const comRole = objetosState.filter(o => o.roleAtivo !== null)
+    await Promise.all(comRole.map(o =>
       api.salvarPermissaoGrupo(grupoId, {
         componenteObjetoId: o.objeto.id,
-        permissoesAtivas: o.permissoesAtivas,
+        // Tupla FGA: group:<grupoId>#member @<roleAtivo> component:<objetoId>
+        permissoesAtivas: [o.roleAtivo!],
       })
     ))
     setSaving(false)
@@ -94,23 +128,37 @@ export function VincularObjetosDialog({ open, onClose, grupoId, permissoesExiste
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
       <div className="relative bg-white rounded-2xl shadow-xl flex flex-col w-full max-w-4xl mx-4 max-h-[90vh]">
+
         {/* Close */}
-        <button
-          onClick={onClose}
-          className="absolute right-4 top-4 p-1 rounded text-gray-400 hover:text-gray-600 opacity-70"
-        >
+        <button onClick={onClose} className="absolute right-4 top-4 p-1 rounded text-gray-400 hover:text-gray-600 opacity-70">
           <X className="w-4 h-4" />
         </button>
 
         {/* Header */}
-        <div className="p-6 pb-0">
+        <div className="p-6 pb-3">
           <p className="text-lg font-semibold text-[#030712]">Vincular objetos</p>
+          <p className="text-sm text-gray-400 mt-1">
+            Atribua um <strong>role FGA</strong> por objeto. O role define quais relações o grupo terá sobre o componente.
+          </p>
         </div>
 
-        {/* Subheader with search */}
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <p className="text-base font-medium text-[#030712]">
-            {objetosState.filter(o => o.permissoesAtivas.length > 0).length} objeto{objetosState.filter(o => o.permissoesAtivas.length > 0).length !== 1 ? 's' : ''} configurado{objetosState.filter(o => o.permissoesAtivas.length > 0).length !== 1 ? 's' : ''}
+        {/* Legenda dos roles */}
+        <div className="px-6 pb-3 flex items-center gap-4 flex-wrap">
+          {FGA_ROLES.map(role => (
+            <div key={role.id} className="flex items-center gap-1.5">
+              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-xs font-medium ${role.activeClass}`}>
+                {role.icon} {role.label}
+              </span>
+              <span className="text-gray-300 text-xs">→</span>
+              <span className="font-mono text-[10px] text-gray-400">{role.unlocks.join(' · ')}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Subheader */}
+        <div className="px-6 py-3 border-b border-gray-200 flex items-center justify-between">
+          <p className="text-sm font-medium text-[#030712]">
+            {configurados} objeto{configurados !== 1 ? 's' : ''} configurado{configurados !== 1 ? 's' : ''}
           </p>
           <div className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-md">
             <Search className="w-4 h-4 text-gray-400 opacity-50" />
@@ -132,27 +180,24 @@ export function VincularObjetosDialog({ open, onClose, grupoId, permissoesExiste
         {/* Table */}
         <div className="flex-1 overflow-auto p-6">
           {loading ? (
-            <p className="text-sm text-gray-400 text-center py-8">Carregando objetos disponíveis...</p>
+            <p className="text-sm text-gray-400 text-center py-8">Carregando objetos...</p>
           ) : porComponente.length === 0 ? (
             <div className="py-8 text-center">
               <p className="text-sm font-medium text-gray-600">Nenhum objeto disponível</p>
-              <p className="text-xs text-gray-400 mt-1">
-                Para vincular objetos, os componentes precisam ter sua metadata importada.
-              </p>
+              <p className="text-xs text-gray-400 mt-1">Importe a metadata do componente primeiro.</p>
             </div>
           ) : (
             <div className="border border-gray-200 rounded-2xl overflow-hidden">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-200">
-                    <th className="px-3 py-2.5 text-left text-sm font-medium text-gray-600 opacity-40 w-[280px]">Objeto</th>
-                    <th className="px-3 py-2.5 text-left text-sm font-medium text-gray-600 opacity-40">Permissões</th>
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide w-[280px]">Objeto</th>
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Role FGA</th>
                   </tr>
                 </thead>
                 <tbody>
                   {porComponente.map(({ componente, objetos }) => (
                     <>
-                      {/* Component group header */}
                       <tr key={`comp-${componente?.id ?? 'unknown'}`} className="bg-gray-50 border-b border-gray-200">
                         <td colSpan={2} className="px-3 py-2">
                           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
@@ -169,26 +214,28 @@ export function VincularObjetosDialog({ open, onClose, grupoId, permissoesExiste
                             )}
                           </td>
                           <td className="px-3 py-3">
-                            <div className="flex flex-wrap gap-2">
-                              {item.objeto.permissoesDisponiveis.map(perm => {
-                                const ativa = item.permissoesAtivas.includes(perm.id)
+                            <div className="flex items-center gap-2">
+                              {FGA_ROLES.map(role => {
+                                const ativo = item.roleAtivo === role.id
                                 return (
                                   <button
-                                    key={perm.id}
+                                    key={role.id}
                                     type="button"
-                                    onClick={() => togglePermissao(item.objeto.id, perm.id)}
-                                    className={`px-3 py-1.5 rounded-md text-sm font-medium border transition-colors ${
-                                      ativa
-                                        ? 'bg-[#030712] text-white border-[#030712]'
-                                        : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:bg-gray-50'
+                                    onClick={() => setRole(item.objeto.id, role.id)}
+                                    title={`${role.description} — ${role.unlocks.join(', ')}`}
+                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium border transition-colors ${
+                                      ativo
+                                        ? role.activeClass
+                                        : 'bg-white text-gray-500 border-gray-200 hover:border-gray-400 hover:bg-gray-50'
                                     }`}
                                   >
-                                    {perm.nome}
+                                    {role.icon}
+                                    {role.label}
                                   </button>
                                 )
                               })}
-                              {item.objeto.permissoesDisponiveis.length === 0 && (
-                                <span className="text-xs text-gray-400 italic">Sem permissões definidas</span>
+                              {item.roleAtivo === null && (
+                                <span className="text-xs text-gray-300 italic ml-1">sem acesso</span>
                               )}
                             </div>
                           </td>
