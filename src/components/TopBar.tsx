@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { SettingsMenu } from './ui/SettingsMenu'
 import { ProfileModal } from './ui/ProfileModal'
 import { AppsMenu } from './ui/AppsMenu'
+import { PersonaSwitcher } from './PersonaSwitcher'
 
 interface TopBarProps {
   collapsed: boolean
