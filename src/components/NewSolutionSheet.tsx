@@ -360,13 +360,6 @@ export function NewSolutionSheet({
         value={selectedComponenteIds}
         onChange={setSelectedComponenteIds}
       />
-
-      <ComponenteSheet
-        open={componenteSheetOpen}
-        onClose={() => setComponenteSheetOpen(false)}
-        onSave={handleCreateComponente}
-        tiposLicenca={tiposLicenca}
-      />
     </Sheet>
   )
 }
