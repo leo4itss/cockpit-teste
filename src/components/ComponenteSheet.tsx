@@ -70,7 +70,7 @@ export function ComponenteSheet({ open, onClose, onSave, tiposLicenca, initialCo
     onClose()
   }
 
-  const canSave = nome.trim() !== ''
+  const canSave = nome.trim() !== '' && descricao.trim() !== ''
 
   return (
     <Sheet
