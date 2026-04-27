@@ -20,6 +20,11 @@ export function useCurrentUser() {
   return useAuth().currentUser
 }
 
+/** Recarrega as relações de grupo do banco (chamar após salvar permissões). */
+export function useReloadGroupRelations() {
+  return useAuth().reloadGroupRelations
+}
+
 // ── Organization ─────────────────────────────────────────────────────────────
 
 export function useCanViewOrganization(orgId: string): boolean {
