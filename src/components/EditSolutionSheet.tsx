@@ -255,12 +255,6 @@ export function EditSolutionSheet({
     setEditingPlanIndex(null)
   }
 
-  async function handleCreateComponente(data: Omit<Componente, 'id' | 'createdAt'>) {
-    const saved = await api.createComponente({ ...data, id: crypto.randomUUID(), createdAt: new Date().toISOString() })
-    onComponenteCreated(saved)
-    setSelectedComponenteIds(prev => [...prev, saved.id])
-  }
-
   function handleSave() {
     if (!solution) return
     onSave({
