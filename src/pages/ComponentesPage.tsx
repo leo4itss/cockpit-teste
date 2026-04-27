@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button'
 import { ComponenteSheet } from '@/components/ComponenteSheet'
 import { api } from '@/api/client'
 import { tiposLicenca as mockTiposLicenca, componentes as mockComponentes } from '@/data/mock'
+import { useCanDeleteComponent, useCanManageComponent } from '@/authz'
 import type { TipoLicenca, Componente } from '@/types'
 
 export function ComponentesPage() {
