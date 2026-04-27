@@ -8,8 +8,6 @@ import { PlanCard } from './PlanCard'
 import { NewPlanDialog } from './NewPlanDialog'
 import { ComponenteSelector } from './ComponenteSelector'
 import { ComponenteSelecaoSheet } from './ComponenteSelecaoSheet'
-import { ComponenteSheet } from './ComponenteSheet'
-import { api } from '@/api/client'
 import type { Solution, Plan, TipoLicenca, Componente } from '@/types'
 
 interface Props {
@@ -19,7 +17,6 @@ interface Props {
   onSave: (solution: Omit<Solution, 'id'>) => void
   tiposLicenca: TipoLicenca[]
   componentes: Componente[]
-  onComponenteCreated: (c: Componente) => void
 }
 
 /* ── sub-components ────────────────────────────────────── */
