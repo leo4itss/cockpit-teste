@@ -8,6 +8,10 @@ import { useCanDeleteComponent, useCanManageComponent } from '@/authz'
 import type { TipoLicenca, Componente } from '@/types'
 
 export function ComponentesPage() {
+  // canManageComponent: manager ou account_admin from account (PoC: conta 'a1')
+  // canDeleteComponent: account_admin from account
+  const canManage = useCanManageComponent('comp-1') // representa qualquer comp (verifica papel global)
+  const canDelete = useCanDeleteComponent()
   const [componentes, setComponentes] = useState<Componente[]>([])
   const [tiposLicenca, setTiposLicenca] = useState<TipoLicenca[]>([])
   const [loading, setLoading] = useState(true)
