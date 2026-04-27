@@ -12,6 +12,8 @@ import type { Organization } from '@/types'
 
 export function OrganizacoesPage() {
   const navigate = useNavigate()
+  // Permissões FGA — criar org é exclusivo do platform_admin
+  const canCreate = useCanCreateOrganization()
   const [orgs, setOrgs] = useState<Organization[]>([])
   const [loading, setLoading] = useState(true)
   const [error] = useState<string | null>(null)
