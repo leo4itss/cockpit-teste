@@ -92,6 +92,8 @@ const objetos = [
 async function seed() {
   console.log('Populando objetos de componentes...')
 
+  // Remove FK dependentes antes de deletar os objetos
+  await db.delete(grupoPermissoes)
   await db.delete(componenteObjetos).where(eq(componenteObjetos.componenteId, 'comp-1'))
   await db.delete(componenteObjetos).where(eq(componenteObjetos.componenteId, 'comp-2'))
 
