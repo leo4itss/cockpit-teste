@@ -340,13 +340,6 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
             onChange={e => set('arquitetoPAS', e.target.value)}
           />
 
-          <Input
-            label="Subdomínio"
-            required
-            value={account.subdomain}
-            disabled
-          />
-
           <Divider />
         </div>
 
