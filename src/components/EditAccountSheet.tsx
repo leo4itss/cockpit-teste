@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Upload, MessageCircleMore, Mail, MoreVertical, Plus, Copy, Pencil, Trash2 } from 'lucide-react'
+import { Upload, MessageCircleMore, Mail, MoreVertical, Plus, Pencil, Trash2 } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Input } from './ui/Input'
 import { Select } from './ui/Select'
