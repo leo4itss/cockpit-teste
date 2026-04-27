@@ -143,7 +143,11 @@ export function OrganizacoesPage() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((org) => (
+              {filtered.map((org) => {
+                // Cheque por linha: canViewOrganization garante que a linha foi carregada;
+                // canManageAccounts determina visibilidade do ícone de exclusão.
+                const canManageThisOrg = authzEngine.canManageAccounts(currentUser.id, org.id, relations)
+                return (
                 <tr
                   key={org.id}
                   className="group/row border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors bg-white"
