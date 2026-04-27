@@ -10,6 +10,8 @@ import type { Grupo } from '@/types'
 
 export function GruposPage() {
   const navigate = useNavigate()
+  // canManageGroups: account_admin ou org_admin from organization
+  const canManageGroupsFlag = useCanManageGroups()
   const [grupos, setGrupos] = useState<Grupo[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
