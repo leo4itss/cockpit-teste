@@ -53,10 +53,8 @@ function StatusBadge({ status }: { status: Solution['status'] }) {
   )
 }
 
-function PlanItem({ plan, onEdit }: { plan: Plan; onEdit: () => void }) {
+function PlanItem({ plan, onRemove }: { plan: Plan; onRemove: () => void }) {
   const [expanded, setExpanded] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
-  const menuRef = useRef<HTMLDivElement>(null)
 
   const licensingText = plan.licensings.length > 0
     ? plan.licensings.map(l => {
@@ -65,17 +63,6 @@ function PlanItem({ plan, onEdit }: { plan: Plan; onEdit: () => void }) {
         return range ? `${nome}: ${range} ${l.tipoLicencaUnidade ?? ''}`.trim() : nome
       }).join(' · ')
     : null
-
-  useEffect(() => {
-    if (!menuOpen) return
-    function handleOutside(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleOutside)
-    return () => document.removeEventListener('mousedown', handleOutside)
-  }, [menuOpen])
 
   return (
     <div className="bg-white border border-[#e5e7eb] rounded-md flex flex-col gap-2 pt-2 pb-4 px-5">
@@ -95,28 +82,14 @@ function PlanItem({ plan, onEdit }: { plan: Plan; onEdit: () => void }) {
             <p className="text-xs text-[#6b7280]">{plan.description}</p>
           )}
         </div>
-
-        {/* ⋮ dropdown — abre opção Editar (redireciona para EditSolutionSheet) */}
-        <div className="relative shrink-0" ref={menuRef}>
-          <button
-            className="text-[#6b7280] shrink-0 w-9 h-9 flex items-center justify-center rounded-md hover:bg-gray-100 transition-colors"
-            onClick={() => setMenuOpen(v => !v)}
-          >
-            <MoreVertical className="w-4 h-4" />
-          </button>
-
-          {menuOpen && (
-            <div className="absolute right-0 top-10 z-50 bg-white border border-[#e5e7eb] rounded-md shadow-lg py-1 min-w-[148px]">
-              <button
-                type="button"
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#030712] hover:bg-gray-50 transition-colors"
-                onClick={() => { setMenuOpen(false); onEdit() }}
-              >
-                Editar solução
-              </button>
-            </div>
-          )}
-        </div>
+        <button
+          type="button"
+          onClick={onRemove}
+          className="text-[#6b7280] hover:text-red-500 shrink-0 w-9 h-9 flex items-center justify-center rounded-md hover:bg-gray-100 transition-colors"
+          aria-label="Remover plano"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
       </div>
 
       {expanded && licensingText && (
