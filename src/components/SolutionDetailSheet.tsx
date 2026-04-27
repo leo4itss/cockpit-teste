@@ -104,15 +104,36 @@ function PlanItem({ plan, onRemove }: { plan: Plan; onRemove: () => void }) {
   )
 }
 
-export function SolutionDetailSheet({ open, onClose, solution, componentes = [], onEdit }: Props) {
+export function SolutionDetailSheet({ open, onClose, solution, componentes = [], onEdit, onSave }: Props) {
+  const [localPlans, setLocalPlans] = useState(solution?.plans ?? [])
+
+  useEffect(() => {
+    setLocalPlans(solution?.plans ?? [])
+  }, [solution])
+
   if (!solution) return null
 
   const componentesVinculados = componentes.filter(c =>
     (solution.componenteIds ?? []).includes(c.id)
   )
 
+  function handleSave() {
+    onSave?.({ ...solution!, plans: localPlans })
+  }
+
   return (
-    <Sheet open={open} onClose={onClose} title="Detalhe da solução" width="w-[768px]">
+    <Sheet
+      open={open}
+      onClose={onClose}
+      title="Detalhe da solução"
+      width="w-[768px]"
+      footer={
+        <>
+          <Button variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button onClick={handleSave}>Salvar</Button>
+        </>
+      }
+    >
       <div className="flex flex-col gap-6">
 
         {/* Avatar + nome + status + botão editar */}
