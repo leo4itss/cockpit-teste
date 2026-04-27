@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Search, Plus, Puzzle } from 'lucide-react'
+import { Search, Plus, Cpu, BadgeCheck } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { ComponenteSheet } from '@/components/ComponenteSheet'
 import { api } from '@/api/client'
