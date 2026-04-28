@@ -121,7 +121,7 @@ function ContactItem({
       {/* nome + cargo + menu ⋯ */}
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="text-sm font-medium text-[#030712] leading-5">{contact.nome}</p>
+          <p className="text-base font-semibold text-[#030712] leading-6">{contact.nome}</p>
           {contact.cargo && (
             <p className="text-sm text-[#6b7280] leading-5">{contact.cargo}</p>
           )}
@@ -129,34 +129,34 @@ function ContactItem({
         <EllipsisMenu onEdit={onEdit} onRemove={onRemove} editLabel="Editar contato" removeLabel="Remover contato" />
       </div>
 
-      {/* telefones — cada um numa linha com borda */}
+      {/* telefones — cada um numa linha com borda arredondada */}
       {phones.map((t, i) => (
-        <div key={i} className="flex items-center gap-2 mt-2 border border-[#e5e7eb] rounded-md px-3 py-2">
+        <div key={i} className="flex items-center gap-3 mt-2 border border-[#e5e7eb] rounded-xl px-4 py-3">
           {t.meio === 'chat'
-            ? <MessageCircle className="w-4 h-4 text-[#6b7280] shrink-0" />
-            : <Phone className="w-4 h-4 text-[#6b7280] shrink-0" />
+            ? <MessageCircle className="w-5 h-5 text-[#6b7280] shrink-0" />
+            : <Phone className="w-5 h-5 text-[#6b7280] shrink-0" />
           }
-          <span className="flex-1 text-sm text-[#6b7280] truncate">{t.numero}</span>
+          <span className="flex-1 text-sm text-[#030712] truncate">{t.numero}</span>
           <button
             type="button"
             onClick={() => navigator.clipboard.writeText(t.numero)}
-            className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#f3f4f6] transition-colors shrink-0"
+            className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[#f3f4f6] transition-colors shrink-0"
           >
-            <Copy className="w-3.5 h-3.5 text-[#6b7280]" />
+            <Copy className="w-4 h-4 text-[#6b7280]" />
           </button>
         </div>
       ))}
 
-      {/* e-mails — cada um numa linha com borda */}
+      {/* e-mails — cada um numa linha com borda arredondada */}
       {emails.map((email, i) => (
-        <div key={i} className="flex items-center gap-2 mt-2 border border-[#e5e7eb] rounded-md px-3 py-2">
-          <span className="flex-1 text-sm text-[#6b7280] truncate">{email}</span>
+        <div key={i} className="flex items-center gap-3 mt-2 border border-[#e5e7eb] rounded-xl px-4 py-3">
+          <span className="flex-1 text-sm text-[#030712] truncate">{email}</span>
           <button
             type="button"
             onClick={() => navigator.clipboard.writeText(email)}
-            className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#f3f4f6] transition-colors shrink-0"
+            className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[#f3f4f6] transition-colors shrink-0"
           >
-            <Copy className="w-3.5 h-3.5 text-[#6b7280]" />
+            <Copy className="w-4 h-4 text-[#6b7280]" />
           </button>
         </div>
       ))}
