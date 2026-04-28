@@ -1,9 +1,9 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Sheet } from './ui/Sheet'
 import { Input } from './ui/Input'
 import { Select } from './ui/Select'
 import { Button } from './ui/Button'
-import { Upload, Plus, Info } from 'lucide-react'
+import { Upload, Plus, Info, MoreHorizontal, MessageCircle, Phone, Copy } from 'lucide-react'
 import { AddContatoDialog, type Contato } from './AddContatoDialog'
 import { AddAdminDialog, type AdminUser } from './AddAdminDialog'
 import type { Organization } from '@/types'
@@ -48,6 +48,119 @@ function Divider() {
   return <div className="border-t border-[#e5e7eb]" />
 }
 
+/* ── Ellipsis menu ──────────────────────────────────────────── */
+
+interface EllipsisMenuProps {
+  onEdit: () => void
+  onRemove: () => void
+  editLabel?: string
+  removeLabel?: string
+}
+
+function EllipsisMenu({ onEdit, onRemove, editLabel = 'Editar', removeLabel = 'Remover' }: EllipsisMenuProps) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [open])
+
+  return (
+    <div className="relative shrink-0" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[#f3f4f6] transition-colors text-[#6b7280]"
+      >
+        <MoreHorizontal className="w-4 h-4" />
+      </button>
+      {open && (
+        <div className="absolute right-0 top-9 z-50 w-48 bg-white border border-[#e5e7eb] rounded-md shadow-lg py-1">
+          <button
+            type="button"
+            onClick={() => { setOpen(false); onEdit() }}
+            className="w-full text-left px-3 py-2 text-sm text-[#030712] hover:bg-[#f3f4f6] transition-colors"
+          >
+            {editLabel}
+          </button>
+          <button
+            type="button"
+            onClick={() => { setOpen(false); onRemove() }}
+            className="w-full text-left px-3 py-2 text-sm text-[#dc2626] hover:bg-red-50 transition-colors"
+          >
+            {removeLabel}
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ── Contact item ───────────────────────────────────────────── */
+
+function ContactItem({ contact, onEdit, onRemove }: { contact: Contato; onEdit: () => void; onRemove: () => void }) {
+  return (
+    <div className="flex flex-col gap-2 px-4 py-3 border-t border-[#e5e7eb] first:border-t-0">
+      <div className="flex items-center gap-2">
+        <div className="flex-1 min-w-0">
+          <span className="text-sm font-medium text-[#030712]">{contact.nome}</span>
+          {contact.cargo && <span className="text-sm text-[#6b7280] ml-2">{contact.cargo}</span>}
+        </div>
+        <EllipsisMenu onEdit={onEdit} onRemove={onRemove} editLabel="Editar contato" removeLabel="Remover contato" />
+      </div>
+      {contact.telefones.filter(t => t.numero).map((t, i) => (
+        <div key={i} className="flex items-center gap-2 text-sm text-[#6b7280]">
+          {t.meio === 'chat'
+            ? <MessageCircle className="w-3.5 h-3.5 shrink-0" />
+            : <Phone className="w-3.5 h-3.5 shrink-0" />
+          }
+          <span className="flex-1 truncate">{t.numero}</span>
+          <button
+            type="button"
+            onClick={() => navigator.clipboard.writeText(t.numero)}
+            className="p-1 hover:bg-[#f3f4f6] rounded transition-colors"
+          >
+            <Copy className="w-3 h-3" />
+          </button>
+        </div>
+      ))}
+      {contact.emails.filter(Boolean).map((email, i) => (
+        <div key={i} className="flex items-center gap-2 text-sm text-[#6b7280]">
+          <span className="flex-1 truncate">{email}</span>
+          <button
+            type="button"
+            onClick={() => navigator.clipboard.writeText(email)}
+            className="p-1 hover:bg-[#f3f4f6] rounded transition-colors"
+          >
+            <Copy className="w-3 h-3" />
+          </button>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/* ── Admin item ─────────────────────────────────────────────── */
+
+function AdminItem({ admin, onEdit, onRemove }: { admin: AdminUser; onEdit: () => void; onRemove: () => void }) {
+  return (
+    <div className="flex items-center gap-2 px-4 py-3 border-t border-[#e5e7eb]">
+      <div className="flex-1 min-w-0">
+        <span className="text-sm font-medium text-[#030712]">{admin.nome} {admin.sobrenome}</span>
+        {admin.email && <span className="text-sm text-[#6b7280] ml-2 truncate">{admin.email}</span>}
+      </div>
+      <EllipsisMenu onEdit={onEdit} onRemove={onRemove} editLabel="Editar usuário" removeLabel="Remover usuário" />
+    </div>
+  )
+}
+
+/* ── Main component ─────────────────────────────────────────── */
+
 export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props) {
   const [form, setForm] = useState({
     name: '', razaoSocial: '', docType: 'CNPJ', docNumber: '',
@@ -89,8 +202,16 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
     setContacts(prev => [...prev, contact])
   }
 
+  function handleRemoveContact(idx: number) {
+    setContacts(prev => prev.filter((_, i) => i !== idx))
+  }
+
   function handleAddAdmin(admin: AdminUser) {
     setAdmins(prev => [...prev, admin])
+  }
+
+  function handleRemoveAdmin(idx: number) {
+    setAdmins(prev => prev.filter((_, i) => i !== idx))
   }
 
   return (
@@ -209,47 +330,34 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
           {/* ── Contatos ───────────────────────────────────── */}
           <div>
             <SectionTitle>Contatos</SectionTitle>
-            <div className="flex flex-col gap-4">
-              {contacts.length === 0 && admins.length === 0 && (
-                <div className="mb-3">
-                  <p className="text-sm font-medium text-[#030712] leading-none mb-1">
-                    Não há contatos adicionados
-                  </p>
-                  <p className="text-sm text-[#6b7280] leading-5">
-                    Adicione contatos responsáveis pela organização.
-                  </p>
-                </div>
-              )}
+            <div className="flex flex-col gap-3">
 
-              {contacts.length > 0 && (
-                <div className="flex flex-col gap-2">
+              {/* Contatos card */}
+              {contacts.length > 0 ? (
+                <div className="border border-[#e5e7eb] rounded-md overflow-hidden">
+                  <div className="flex items-center px-4 py-3">
+                    <p className="flex-1 text-sm font-medium text-[#030712]">
+                      Contatos<span className="text-[#dc2626] ml-0.5">*</span>
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setContactDialogOpen(true)}
+                      className="flex items-center gap-1.5 text-sm font-medium text-[#030712] hover:text-blue-600 transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      Adicionar
+                    </button>
+                  </div>
                   {contacts.map((c, i) => (
-                    <div key={i} className="flex items-center gap-3 border border-[#e5e7eb] rounded-md px-4 py-2.5 text-sm">
-                      <div className="flex-1 min-w-0">
-                        <span className="font-medium text-[#030712]">{c.nome}</span>
-                        {c.cargo && <span className="text-[#6b7280] ml-2">{c.cargo}</span>}
-                      </div>
-                      {c.emails?.[0] && <span className="text-[#6b7280] text-xs truncate max-w-[200px]">{c.emails[0]}</span>}
-                    </div>
+                    <ContactItem
+                      key={i}
+                      contact={c}
+                      onEdit={() => setContactDialogOpen(true)}
+                      onRemove={() => handleRemoveContact(i)}
+                    />
                   ))}
                 </div>
-              )}
-
-              {admins.length > 0 && (
-                <div className="flex flex-col gap-2">
-                  {admins.map((a, i) => (
-                    <div key={i} className="flex items-center gap-3 border border-[#e5e7eb] rounded-md px-4 py-2.5 text-sm">
-                      <div className="flex-1 min-w-0">
-                        <span className="font-medium text-[#030712]">{a.nome}</span>
-                      </div>
-                      <span className="text-[#6b7280] text-xs truncate max-w-[200px]">{a.email}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <div className="flex flex-col gap-2">
-                {/* Card: Contatos */}
+              ) : (
                 <div className="flex items-center gap-2.5 border border-[#e5e7eb] rounded-md px-4 py-3">
                   <div className="flex flex-col gap-1 flex-1 min-w-0">
                     <p className="text-sm font-medium text-[#030712] leading-4">
@@ -268,8 +376,34 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
                     Adicionar
                   </button>
                 </div>
+              )}
 
-                {/* Card: Usuário administrador */}
+              {/* Usuário administrador card */}
+              {admins.length > 0 ? (
+                <div className="border border-[#e5e7eb] rounded-md overflow-hidden">
+                  <div className="flex items-center px-4 py-3">
+                    <p className="flex-1 text-sm font-medium text-[#030712]">
+                      Usuário administrador<span className="text-[#030712] ml-0.5">*</span>
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setAdminDialogOpen(true)}
+                      className="flex items-center gap-1.5 text-sm font-medium text-[#030712] hover:text-blue-600 transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      Adicionar
+                    </button>
+                  </div>
+                  {admins.map((a, i) => (
+                    <AdminItem
+                      key={i}
+                      admin={a}
+                      onEdit={() => setAdminDialogOpen(true)}
+                      onRemove={() => handleRemoveAdmin(i)}
+                    />
+                  ))}
+                </div>
+              ) : (
                 <div className="flex items-center gap-2.5 border border-[#e5e7eb] rounded-md px-4 py-3">
                   <div className="flex flex-col gap-1 flex-1 min-w-0">
                     <p className="text-sm font-medium text-[#030712] leading-4">
@@ -288,7 +422,8 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
                     Adicionar
                   </button>
                 </div>
-              </div>
+              )}
+
             </div>
           </div>
 
