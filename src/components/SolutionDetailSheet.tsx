@@ -127,12 +127,6 @@ export function SolutionDetailSheet({ open, onClose, solution, componentes = [],
       onClose={onClose}
       title="Detalhe da solução"
       width="w-[768px]"
-      footer={
-        <>
-          <Button variant="outline" onClick={onClose}>Cancelar</Button>
-          <Button onClick={handleSave}>Salvar</Button>
-        </>
-      }
     >
       <div className="flex flex-col gap-6">
 
