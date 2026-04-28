@@ -143,7 +143,7 @@ export function ContractDetailSheet({ open, onClose, contract, onEdit }: Props) 
                     </div>
                     <div className="flex flex-col gap-1 w-[140px] shrink-0">
                       <p className="text-xs font-medium text-[#030712]">Status da publicação</p>
-                      <ProvisioningDots status="Provisionado" />
+                      <ProvisioningDots status="COMPLETED" />
                     </div>
                   </div>
                 </div>
