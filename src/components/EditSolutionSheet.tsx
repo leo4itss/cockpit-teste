@@ -200,15 +200,11 @@ export function EditSolutionSheet({
     setForm(f => ({ ...f, [field]: value }))
   }
 
-  // Tipos disponíveis = union dos tipos dos componentes selecionados, ou todos se nenhum selecionado
-  const tiposDisponiveis: TipoLicenca[] = selectedComponenteIds.length === 0
+  // Tipos disponíveis = union dos tipos dos componentes vinculados à solução
+  const tiposDisponiveis: TipoLicenca[] = componentesVinculados.length === 0
     ? tiposLicenca
     : (() => {
-        const ids = new Set(
-          componentes
-            .filter(c => selectedComponenteIds.includes(c.id))
-            .flatMap(c => c.tiposLicenca)
-        )
+        const ids = new Set(componentesVinculados.flatMap(c => c.tiposLicenca))
         return tiposLicenca.filter(t => ids.has(t.id))
       })()
 
