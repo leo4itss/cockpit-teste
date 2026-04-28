@@ -80,7 +80,8 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
 
   function handleSave() {
     if (!canSave) return
-    onSave({ ...form, logo: logoPreview || undefined, createdAt: new Date().toLocaleDateString('pt-BR') })
+    const businessSegment = form.businessSegment === 'outro' ? outroSegmento.trim() || 'Outro' : form.businessSegment
+    onSave({ ...form, businessSegment, logo: logoPreview || undefined, createdAt: new Date().toLocaleDateString('pt-BR') })
     onClose()
   }
 
