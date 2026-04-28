@@ -41,8 +41,6 @@ const ARQUITETOS = [
   { value: 'ana', label: 'Ana Lima' },
 ]
 
-/* ── helpers ──────────────────────────────────────────────── */
-
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return <p className="text-base font-bold text-[#030712] pb-3 leading-6">{children}</p>
 }
@@ -52,14 +50,13 @@ function Divider() {
 }
 
 /* ── Ellipsis dropdown ────────────────────────────────────── */
-
 function EllipsisMenu({
-  onEdit, onRemove, editLabel = 'Editar', removeLabel = 'Remover',
+  onEdit, onRemove, editLabel, removeLabel,
 }: {
   onEdit: () => void
   onRemove: () => void
-  editLabel?: string
-  removeLabel?: string
+  editLabel: string
+  removeLabel: string
 }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -74,7 +71,7 @@ function EllipsisMenu({
   }, [open])
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative shrink-0" ref={ref}>
       <button
         type="button"
         onClick={() => setOpen(v => !v)}
@@ -82,7 +79,6 @@ function EllipsisMenu({
       >
         <MoreVertical className="w-4 h-4" />
       </button>
-
       {open && (
         <div className="absolute right-0 top-9 z-50 w-52 bg-white border border-[#e5e7eb] rounded-md shadow-md py-1">
           <button
@@ -107,125 +103,7 @@ function EllipsisMenu({
   )
 }
 
-/* ── Contact item ─────────────────────────────────────────── */
-
-function ContactItem({
-  contact, onEdit, onRemove,
-}: { contact: Contato; onEdit: () => void; onRemove: () => void }) {
-  const phones = contact.telefones.filter(t => t.numero.trim())
-  const emails = contact.emails.filter(e => e.trim())
-
-  return (
-    <div className="px-4 py-3 border-t border-[#e5e7eb]">
-
-      {/* nome + cargo + menu ⋯ */}
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <p className="text-base font-semibold text-[#030712] leading-6">{contact.nome}</p>
-          {contact.cargo && (
-            <p className="text-sm text-[#6b7280] leading-5">{contact.cargo}</p>
-          )}
-        </div>
-        <EllipsisMenu onEdit={onEdit} onRemove={onRemove} editLabel="Editar contato" removeLabel="Remover contato" />
-      </div>
-
-      {/* telefones — cada um numa linha com borda arredondada */}
-      {phones.map((t, i) => (
-        <div key={i} className="flex items-center gap-3 mt-2 border border-[#e5e7eb] rounded-xl px-4 py-3">
-          {t.meio === 'chat'
-            ? <MessageCircle className="w-5 h-5 text-[#6b7280] shrink-0" />
-            : <Phone className="w-5 h-5 text-[#6b7280] shrink-0" />
-          }
-          <span className="flex-1 text-sm text-[#030712] truncate">{t.numero}</span>
-          <button
-            type="button"
-            onClick={() => navigator.clipboard.writeText(t.numero)}
-            className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[#f3f4f6] transition-colors shrink-0"
-          >
-            <Copy className="w-4 h-4 text-[#6b7280]" />
-          </button>
-        </div>
-      ))}
-
-      {/* e-mails — cada um numa linha com borda arredondada */}
-      {emails.map((email, i) => (
-        <div key={i} className="flex items-center gap-3 mt-2 border border-[#e5e7eb] rounded-xl px-4 py-3">
-          <span className="flex-1 text-sm text-[#030712] truncate">{email}</span>
-          <button
-            type="button"
-            onClick={() => navigator.clipboard.writeText(email)}
-            className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[#f3f4f6] transition-colors shrink-0"
-          >
-            <Copy className="w-4 h-4 text-[#6b7280]" />
-          </button>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-/* ── Admin item ───────────────────────────────────────────── */
-
-function AdminItem({
-  admin, onEdit, onRemove,
-}: { admin: AdminUser; onEdit: () => void; onRemove: () => void }) {
-  return (
-    <div className="px-4 py-3 border-t border-[#e5e7eb]">
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <p className="text-sm font-medium text-[#030712] leading-5">
-            {admin.nome}{admin.sobrenome ? ` ${admin.sobrenome}` : ''}
-          </p>
-          {admin.email && (
-            <p className="text-sm text-[#6b7280] leading-5 truncate">{admin.email}</p>
-          )}
-        </div>
-        <EllipsisMenu onEdit={onEdit} onRemove={onRemove} editLabel="Editar usuário" removeLabel="Remover usuário" />
-      </div>
-    </div>
-  )
-}
-
-/* ── Card de contatos / admin ─────────────────────────────── */
-
-function ContactCard({
-  title, required = true, description, onAdd, children,
-}: {
-  title: string
-  required?: boolean
-  description: string
-  onAdd: () => void
-  children?: React.ReactNode
-}) {
-  return (
-    <div className="border border-[#e5e7eb] rounded-md">
-      {/* cabeçalho sempre visível */}
-      <div className="flex items-start gap-3 px-4 py-3">
-        <div className="flex flex-col gap-1 flex-1 min-w-0">
-          <p className="text-sm font-medium text-[#030712] leading-4">
-            {title}
-            {required && <span className="text-[#dc2626] ml-0.5">*</span>}
-          </p>
-          <p className="text-sm text-[#6b7280] leading-5">{description}</p>
-        </div>
-        <button
-          type="button"
-          onClick={onAdd}
-          className="flex items-center gap-1.5 text-sm font-medium text-[#030712] border border-[#e5e7eb] rounded-md px-3 py-1.5 hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors shrink-0"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          Adicionar
-        </button>
-      </div>
-
-      {/* itens (renderizados com border-t própria) */}
-      {children}
-    </div>
-  )
-}
-
 /* ── Main ─────────────────────────────────────────────────── */
-
 export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props) {
   const [form, setForm] = useState({
     name: '', razaoSocial: '', docType: 'CNPJ', docNumber: '',
@@ -249,7 +127,7 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
 
   const canSave = form.name.trim() !== '' && form.razaoSocial.trim() !== '' && form.docNumber.trim() !== ''
 
-  function set(field: string, value: string) {
+  function setField(field: string, value: string) {
     setForm(f => ({ ...f, [field]: value }))
   }
 
@@ -270,7 +148,6 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
     onClose()
   }
 
-  /* contato */
   function openAddContact() { setEditingContactIdx(null); setContactDialogOpen(true) }
   function openEditContact(i: number) { setEditingContactIdx(i); setContactDialogOpen(true) }
   function handleSaveContact(c: Contato) {
@@ -282,7 +159,6 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
     setEditingContactIdx(null)
   }
 
-  /* admin */
   function openAddAdmin() { setEditingAdminIdx(null); setAdminDialogOpen(true) }
   function openEditAdmin(i: number) { setEditingAdminIdx(i); setAdminDialogOpen(true) }
   function handleSaveAdmin(a: AdminUser) {
@@ -357,21 +233,21 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
             <SectionTitle>Informações básicas</SectionTitle>
             <div className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-4">
-                <Input label="Nome da organização" required placeholder="Digite o nome da organização" value={form.name} onChange={e => set('name', e.target.value)} />
-                <Input label="Razão social" required placeholder="Qual a razão social?" value={form.razaoSocial} onChange={e => set('razaoSocial', e.target.value)} />
+                <Input label="Nome da organização" required placeholder="Digite o nome da organização" value={form.name} onChange={e => setField('name', e.target.value)} />
+                <Input label="Razão social" required placeholder="Qual a razão social?" value={form.razaoSocial} onChange={e => setField('razaoSocial', e.target.value)} />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <Select label="Tipo do documento" options={[{ value: 'CNPJ', label: 'CNPJ' }, { value: 'CPF', label: 'CPF' }]} value={form.docType} onChange={e => set('docType', e.target.value)} />
-                <Input label="Número do documento" required placeholder="00-000-000/0000-00" value={form.docNumber} onChange={e => set('docNumber', e.target.value)} />
+                <Select label="Tipo do documento" options={[{ value: 'CNPJ', label: 'CNPJ' }, { value: 'CPF', label: 'CPF' }]} value={form.docType} onChange={e => setField('docType', e.target.value)} />
+                <Input label="Número do documento" required placeholder="00-000-000/0000-00" value={form.docNumber} onChange={e => setField('docNumber', e.target.value)} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-3">
-                  <Select label="Segmento de negócio" options={SEGMENTS} placeholder="Escolha o segmento" value={form.businessSegment} onChange={e => set('businessSegment', e.target.value)} />
+                  <Select label="Segmento de negócio" options={SEGMENTS} placeholder="Escolha o segmento" value={form.businessSegment} onChange={e => setField('businessSegment', e.target.value)} />
                   {form.businessSegment === 'outro' && (
                     <Input placeholder="Descreva o segmento de negócio" value={outroSegmento} onChange={e => setOutroSegmento(e.target.value)} />
                   )}
                 </div>
-                <Input label="Site oficial" required placeholder="http://" value={form.officialSite} onChange={e => set('officialSite', e.target.value)} />
+                <Input label="Site oficial" required placeholder="http://" value={form.officialSite} onChange={e => setField('officialSite', e.target.value)} />
               </div>
             </div>
           </div>
@@ -383,14 +259,14 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
             <SectionTitle>Endereço</SectionTitle>
             <div className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-4">
-                <Select label="País / Região" options={[{ value: 'Brasil', label: 'Brasil' }]} value={form.country} onChange={e => set('country', e.target.value)} />
-                <Input label="CEP" required placeholder="Digite o CEP" value={form.zipCode} onChange={e => set('zipCode', e.target.value)} />
+                <Select label="País / Região" options={[{ value: 'Brasil', label: 'Brasil' }]} value={form.country} onChange={e => setField('country', e.target.value)} />
+                <Input label="CEP" required placeholder="Digite o CEP" value={form.zipCode} onChange={e => setField('zipCode', e.target.value)} />
               </div>
-              <Input label="Endereço postal" required placeholder="Digite o endereço completo, inclusive número" value={form.address} onChange={e => set('address', e.target.value)} />
-              <Input label="Complemento" required placeholder="Complemento do local" value={form.complement} onChange={e => set('complement', e.target.value)} />
+              <Input label="Endereço postal" required placeholder="Digite o endereço completo, inclusive número" value={form.address} onChange={e => setField('address', e.target.value)} />
+              <Input label="Complemento" required placeholder="Complemento do local" value={form.complement} onChange={e => setField('complement', e.target.value)} />
               <div className="grid grid-cols-2 gap-4">
-                <Select label="Estado" options={STATES} placeholder="Selecione" value={form.state} onChange={e => set('state', e.target.value)} />
-                <Input label="Cidade" required placeholder="Digite a cidade" value={form.city} onChange={e => set('city', e.target.value)} />
+                <Select label="Estado" options={STATES} placeholder="Selecione" value={form.state} onChange={e => setField('state', e.target.value)} />
+                <Input label="Cidade" required placeholder="Digite a cidade" value={form.city} onChange={e => setField('city', e.target.value)} />
               </div>
             </div>
           </div>
@@ -402,49 +278,130 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
             <SectionTitle>Contatos</SectionTitle>
             <div className="flex flex-col gap-3">
 
-              {/* Mensagem de estado vazio — só quando ambas as listas estão vazias */}
+              {/* Mensagem vazio: só aparece quando ambas as listas estão vazias */}
               {contacts.length === 0 && admins.length === 0 && (
                 <div className="mb-1">
-                  <p className="text-sm font-medium text-[#030712] leading-none mb-1">
-                    Não há contatos adicionados
-                  </p>
-                  <p className="text-sm text-[#6b7280] leading-5">
-                    Adicione contatos responsáveis pela organização.
-                  </p>
+                  <p className="text-sm font-medium text-[#030712] leading-none mb-1">Não há contatos adicionados</p>
+                  <p className="text-sm text-[#6b7280] leading-5">Adicione contatos responsáveis pela organização.</p>
                 </div>
               )}
 
-              {/* Card Contatos */}
-              <ContactCard
-                title="Contatos"
-                description="Adicione pessoas de referência para comunicação com a organização. Esses contatos não recebem acesso ao sistema automaticamente."
-                onAdd={openAddContact}
-              >
-                {contacts.map((c, i) => (
-                  <ContactItem
-                    key={i}
-                    contact={c}
-                    onEdit={() => openEditContact(i)}
-                    onRemove={() => setContacts(prev => prev.filter((_, j) => j !== i))}
-                  />
-                ))}
-              </ContactCard>
+              {/* ── Card Contatos ─────────────────────── */}
+              <div className="border border-[#e5e7eb] rounded-md">
 
-              {/* Card Usuário administrador */}
-              <ContactCard
-                title="Usuário administrador"
-                description="Defina quem terá acesso inicial para administrar a organização no sistema."
-                onAdd={openAddAdmin}
-              >
+                {/* header do card */}
+                <div className="flex items-start gap-3 px-4 py-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[#030712] leading-4">
+                      Contatos<span className="text-[#dc2626] ml-0.5">*</span>
+                    </p>
+                    <p className="text-sm text-[#6b7280] leading-5 mt-1">
+                      Adicione pessoas de referência para comunicação com a organização. Esses contatos não recebem acesso ao sistema automaticamente.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={openAddContact}
+                    className="flex items-center gap-1.5 text-sm font-medium text-[#030712] border border-[#e5e7eb] rounded-md px-3 py-1.5 hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors shrink-0"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    Adicionar
+                  </button>
+                </div>
+
+                {/* itens de contato */}
+                {contacts.map((c, i) => {
+                  const phones = c.telefones.filter(t => t.numero.trim())
+                  const emails = c.emails.filter(e => e.trim())
+                  return (
+                    <div key={i} className="border-t border-[#e5e7eb] px-4 py-3">
+                      {/* nome + cargo + ⋮ */}
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="text-base font-semibold text-[#030712] leading-6">{c.nome}</p>
+                          {c.cargo && <p className="text-sm text-[#6b7280] leading-5">{c.cargo}</p>}
+                        </div>
+                        <EllipsisMenu
+                          onEdit={() => openEditContact(i)}
+                          onRemove={() => setContacts(prev => prev.filter((_, j) => j !== i))}
+                          editLabel="Editar contato"
+                          removeLabel="Remover contato"
+                        />
+                      </div>
+                      {/* telefones */}
+                      {phones.map((t, pi) => (
+                        <div key={pi} className="flex items-center gap-3 mt-2 border border-[#e5e7eb] rounded-xl px-4 py-3">
+                          {t.meio === 'chat'
+                            ? <MessageCircle className="w-5 h-5 text-[#6b7280] shrink-0" />
+                            : <Phone className="w-5 h-5 text-[#6b7280] shrink-0" />
+                          }
+                          <span className="flex-1 text-sm text-[#030712] truncate">{t.numero}</span>
+                          <button type="button" onClick={() => navigator.clipboard.writeText(t.numero)}
+                            className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[#f3f4f6] transition-colors shrink-0">
+                            <Copy className="w-4 h-4 text-[#6b7280]" />
+                          </button>
+                        </div>
+                      ))}
+                      {/* e-mails */}
+                      {emails.map((email, ei) => (
+                        <div key={ei} className="flex items-center gap-3 mt-2 border border-[#e5e7eb] rounded-xl px-4 py-3">
+                          <span className="flex-1 text-sm text-[#030712] truncate">{email}</span>
+                          <button type="button" onClick={() => navigator.clipboard.writeText(email)}
+                            className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[#f3f4f6] transition-colors shrink-0">
+                            <Copy className="w-4 h-4 text-[#6b7280]" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )
+                })}
+
+              </div>
+
+              {/* ── Card Usuário administrador ─────────── */}
+              <div className="border border-[#e5e7eb] rounded-md">
+
+                {/* header do card */}
+                <div className="flex items-start gap-3 px-4 py-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[#030712] leading-4">
+                      Usuário administrador<span className="text-[#dc2626] ml-0.5">*</span>
+                    </p>
+                    <p className="text-sm text-[#6b7280] leading-5 mt-1">
+                      Defina quem terá acesso inicial para administrar a organização no sistema.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={openAddAdmin}
+                    className="flex items-center gap-1.5 text-sm font-medium text-[#030712] border border-[#e5e7eb] rounded-md px-3 py-1.5 hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors shrink-0"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    Adicionar
+                  </button>
+                </div>
+
+                {/* itens de admin */}
                 {admins.map((a, i) => (
-                  <AdminItem
-                    key={i}
-                    admin={a}
-                    onEdit={() => openEditAdmin(i)}
-                    onRemove={() => setAdmins(prev => prev.filter((_, j) => j !== i))}
-                  />
+                  <div key={i} className="border-t border-[#e5e7eb] px-4 py-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-base font-semibold text-[#030712] leading-6">
+                          {a.nome}{a.sobrenome ? ` ${a.sobrenome}` : ''}
+                        </p>
+                        {a.email && <p className="text-sm text-[#6b7280] leading-5 truncate">{a.email}</p>}
+                      </div>
+                      <EllipsisMenu
+                        onEdit={() => openEditAdmin(i)}
+                        onRemove={() => setAdmins(prev => prev.filter((_, j) => j !== i))}
+                        editLabel="Editar usuário"
+                        removeLabel="Remover usuário"
+                      />
+                    </div>
+                  </div>
                 ))}
-              </ContactCard>
+
+              </div>
 
             </div>
           </div>
@@ -461,7 +418,7 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
                 options={ARQUITETOS}
                 placeholder="Escolha o arquiteto"
                 value={form.arquitetoPAS}
-                onChange={e => set('arquitetoPAS', e.target.value)}
+                onChange={e => setField('arquitetoPAS', e.target.value)}
               />
               <div className="flex flex-col gap-2">
                 <Input
@@ -469,7 +426,7 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
                   required
                   placeholder="Digite o subdomínio (usar somente letras minúsculas)"
                   value={form.domain}
-                  onChange={e => set('domain', e.target.value)}
+                  onChange={e => setField('domain', e.target.value)}
                 />
                 <div className="flex items-center gap-2 bg-blue-100 px-3 py-3 rounded-md">
                   <Info className="w-4 h-4 text-[#030712] shrink-0" />
