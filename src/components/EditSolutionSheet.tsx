@@ -160,7 +160,6 @@ export function EditSolutionSheet({
   onDelete,
   tiposLicenca,
   componentes,
-  contracts,
 }: Props) {
   const [form, setForm] = useState(() => buildForm(solution))
   const [plans, setPlans] = useState<Plan[]>(solution?.plans ?? [])
