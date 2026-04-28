@@ -89,7 +89,7 @@ function PasswordField({
           onClick={() => setShow(s => !s)}
           className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b7280] hover:text-[#030712] transition-colors"
           tabIndex={-1}
-          aria-label={show ? 'Ocultar senha' : 'Mostrar senha'}
+          aria-label={show ? 'Ocultar' : 'Mostrar'}
         >
           {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
         </button>
@@ -128,7 +128,7 @@ export function AddAdminDialog({ open, onClose, onAdd }: Props) {
       maxWidth="max-w-[600px]"
       footer={
         <>
-          <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
+          <Button variant="outline" onClick={handleClose}>Cancelar</Button>
           <Button onClick={handleAdd}>Adicionar</Button>
         </>
       }
@@ -141,7 +141,7 @@ export function AddAdminDialog({ open, onClose, onAdd }: Props) {
             id="admin-nome"
             label="Nome"
             required
-            placeholder="Nome"
+            placeholder="Digite o nome"
             value={form.nome}
             onChange={v => set('nome', v)}
           />
@@ -149,7 +149,7 @@ export function AddAdminDialog({ open, onClose, onAdd }: Props) {
             id="admin-sobrenome"
             label="Sobrenome"
             required
-            placeholder="Sobrenome"
+            placeholder="Digite o sobrenome"
             value={form.sobrenome}
             onChange={v => set('sobrenome', v)}
           />
@@ -161,7 +161,7 @@ export function AddAdminDialog({ open, onClose, onAdd }: Props) {
           label="E-mail"
           required
           type="email"
-          placeholder="usuario@exemplo.com.br"
+          placeholder="Digite o e-mail"
           value={form.email}
           onChange={v => set('email', v)}
         />
@@ -171,7 +171,7 @@ export function AddAdminDialog({ open, onClose, onAdd }: Props) {
           id="admin-usuario"
           label="Usuário/Login"
           required
-          placeholder="6+caracteres"
+          placeholder="Digite o nome do usuário"
           value={form.usuario}
           onChange={v => set('usuario', v)}
         />
@@ -181,7 +181,7 @@ export function AddAdminDialog({ open, onClose, onAdd }: Props) {
           id="admin-senha"
           label="Senha"
           required
-          placeholder="6+caracteres"
+          placeholder="Digite a senha"
           value={form.senha}
           onChange={v => set('senha', v)}
         />
@@ -191,7 +191,7 @@ export function AddAdminDialog({ open, onClose, onAdd }: Props) {
           id="admin-confirmar"
           label="Confirme a Senha"
           required
-          placeholder="Digite sua senha"
+          placeholder="Confirme sua senha"
           value={form.confirmar}
           onChange={v => set('confirmar', v)}
         />
