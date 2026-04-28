@@ -30,6 +30,7 @@ const SEGMENTS = [
   { value: 'agro', label: 'Agropecuário' }, { value: 'energia', label: 'Energia' },
   { value: 'farma', label: 'Farmacêutico' }, { value: 'industrial', label: 'Serviços Industriais' },
   { value: 'tech', label: 'Tecnologia' }, { value: 'varejo', label: 'Varejo' },
+  { value: 'outro', label: 'Outro' },
 ]
 
 const ARQUITETOS = [
