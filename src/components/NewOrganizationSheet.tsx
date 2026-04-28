@@ -217,7 +217,7 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
                         <span className="font-medium text-[#030712]">{c.nome}</span>
                         {c.cargo && <span className="text-[#6b7280] ml-2">{c.cargo}</span>}
                       </div>
-                      {c.email && <span className="text-[#6b7280] text-xs truncate max-w-[200px]">{c.email}</span>}
+                      {c.emails?.[0] && <span className="text-[#6b7280] text-xs truncate max-w-[200px]">{c.emails[0]}</span>}
                     </div>
                   ))}
                 </div>
