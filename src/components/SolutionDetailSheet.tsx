@@ -52,7 +52,7 @@ function StatusBadge({ status }: { status: Solution['status'] }) {
   )
 }
 
-function PlanItem({ plan, onRemove }: { plan: Plan; onRemove: () => void }) {
+function PlanItem({ plan }: { plan: Plan }) {
   const [expanded, setExpanded] = useState(false)
 
   const licensingText = plan.licensings.length > 0
@@ -81,14 +81,6 @@ function PlanItem({ plan, onRemove }: { plan: Plan; onRemove: () => void }) {
             <p className="text-xs text-[#6b7280]">{plan.description}</p>
           )}
         </div>
-        <button
-          type="button"
-          onClick={onRemove}
-          className="text-[#6b7280] hover:text-red-500 shrink-0 w-9 h-9 flex items-center justify-center rounded-md hover:bg-gray-100 transition-colors"
-          aria-label="Remover plano"
-        >
-          <Trash2 className="w-4 h-4" />
-        </button>
       </div>
 
       {expanded && licensingText && (
