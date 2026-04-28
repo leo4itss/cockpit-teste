@@ -159,7 +159,6 @@ export function AddObjetoDialog({ open, onClose, solutions, orgName, onSave }: P
                       </div>
                     </td>
                     <td className="px-2 py-3 text-sm text-[#030712] whitespace-nowrap">{row.orgContratada}</td>
-                    <td className="px-2 py-3 text-sm text-[#030712] whitespace-nowrap">{row.solucao}</td>
                     <td className="px-2 py-3 text-sm text-[#030712] whitespace-nowrap">{row.plano}</td>
                     <td className="px-2 py-3 text-sm text-[#030712] max-w-[260px] truncate">{row.licenciamento}</td>
                     <td className="px-2 py-3">
