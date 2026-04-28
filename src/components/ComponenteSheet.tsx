@@ -8,6 +8,7 @@ interface Props {
   open: boolean
   onClose: () => void
   onSave: (data: Omit<Componente, 'id' | 'createdAt'>) => Promise<void>
+  onDelete?: () => void
   initialComponente?: Componente
 }
 
