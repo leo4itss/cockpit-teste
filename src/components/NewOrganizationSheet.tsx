@@ -4,7 +4,7 @@ import { Input } from './ui/Input'
 import { Select } from './ui/Select'
 import { Button } from './ui/Button'
 import {
-  Upload, Plus, Info, MoreHorizontal,
+  Upload, Plus, Info, MoreVertical,
   MessageCircle, Phone, Copy, Pencil, Trash2,
 } from 'lucide-react'
 import { AddContatoDialog, type Contato } from './AddContatoDialog'
