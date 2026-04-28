@@ -5,7 +5,7 @@ import { Input } from './ui/Input'
 import { Select } from './ui/Select'
 import { Button } from './ui/Button'
 import { NewPlanDialog } from './NewPlanDialog'
-import type { Solution, Plan, TipoLicenca, Componente } from '@/types'
+import type { Solution, Plan, TipoLicenca, Componente, Contract } from '@/types'
 
 interface Props {
   open: boolean
