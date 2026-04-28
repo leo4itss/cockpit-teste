@@ -80,7 +80,7 @@ function EllipsisMenu({
         onClick={() => setOpen(v => !v)}
         className="w-8 h-8 flex items-center justify-center rounded-md text-[#6b7280] hover:bg-[#f3f4f6] transition-colors"
       >
-        <MoreHorizontal className="w-4 h-4" />
+        <MoreVertical className="w-4 h-4" />
       </button>
 
       {open && (
