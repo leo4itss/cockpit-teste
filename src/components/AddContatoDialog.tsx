@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Plus, MessageCircle, Phone } from 'lucide-react'
 import { Modal } from './ui/Modal'
-import { Input } from './ui/Input'
 import { Button } from './ui/Button'
 
 interface Props {
@@ -14,7 +13,7 @@ export interface Contato {
   nome: string
   cargo: string
   telefones: TelefoneEntry[]
-  email: string
+  emails: string[]
   observacao: string
 }
 
@@ -30,16 +29,18 @@ const PAISES = [
   { value: 'Portugal (+351)', label: 'Portugal (+351)' },
 ]
 
-export function AddContatoDialog({ open, onClose, onAdd }: Props) {
-  const [form, setForm] = useState<Contato>({
-    nome: '',
-    cargo: '',
-    telefones: [{ pais: 'Brasil (+55)', numero: '', meio: '' }],
-    email: '',
-    observacao: '',
-  })
+const EMPTY_FORM: Contato = {
+  nome: '',
+  cargo: '',
+  telefones: [{ pais: 'Brasil (+55)', numero: '', meio: '' }],
+  emails: [''],
+  observacao: '',
+}
 
-  function setField(field: keyof Contato, value: string) {
+export function AddContatoDialog({ open, onClose, onAdd }: Props) {
+  const [form, setForm] = useState<Contato>(EMPTY_FORM)
+
+  function setField<K extends keyof Contato>(field: K, value: Contato[K]) {
     setForm(f => ({ ...f, [field]: value }))
   }
 
@@ -57,34 +58,46 @@ export function AddContatoDialog({ open, onClose, onAdd }: Props) {
     }))
   }
 
+  function setEmail(idx: number, value: string) {
+    setForm(f => ({
+      ...f,
+      emails: f.emails.map((e, i) => i === idx ? value : e),
+    }))
+  }
+
+  function addEmail() {
+    setForm(f => ({ ...f, emails: [...f.emails, ''] }))
+  }
+
   function handleAdd() {
     onAdd(form)
-    setForm({
-      nome: '', cargo: '',
-      telefones: [{ pais: 'Brasil (+55)', numero: '', meio: '' }],
-      email: '', observacao: '',
-    })
+    setForm(EMPTY_FORM)
+    onClose()
+  }
+
+  function handleClose() {
+    setForm(EMPTY_FORM)
     onClose()
   }
 
   return (
     <Modal
       open={open}
-      onClose={onClose}
+      onClose={handleClose}
       title="Novo contato"
       footer={
         <>
-          <Button variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button variant="outline" onClick={handleClose}>Cancelar</Button>
           <Button onClick={handleAdd}>Adicionar</Button>
         </>
       }
     >
       <div className="flex flex-col gap-7">
 
-        {/* Nome — 352px (não full width, conforme design) */}
+        {/* Nome do contato — ~352px */}
         <div className="flex flex-col gap-3">
           <label className="text-sm font-medium text-[#030712]">
-            Nome<span className="text-[#dc2626] ml-0.5">*</span>
+            Nome do contato<span className="text-[#dc2626] ml-0.5">*</span>
           </label>
           <input
             type="text"
@@ -95,7 +108,7 @@ export function AddContatoDialog({ open, onClose, onAdd }: Props) {
           />
         </div>
 
-        {/* Cargo — 352px */}
+        {/* Cargo — ~352px */}
         <div className="flex flex-col gap-3">
           <label className="text-sm font-medium text-[#030712]">
             Cargo<span className="text-[#dc2626] ml-0.5">*</span>
@@ -109,7 +122,7 @@ export function AddContatoDialog({ open, onClose, onAdd }: Props) {
           />
         </div>
 
-        {/* Telefones — full width */}
+        {/* Telefones */}
         <div className="flex flex-col gap-3">
           {form.telefones.map((tel, idx) => (
             <TelefoneRow
@@ -125,20 +138,25 @@ export function AddContatoDialog({ open, onClose, onAdd }: Props) {
         {/* Separator */}
         <div className="border-t border-[#e5e7eb]" />
 
-        {/* Email — full width */}
-        <Input
-          label="Email"
-          placeholder="marcelo.gomes@grupoitss.com.br"
-          value={form.email}
-          onChange={e => setField('email', e.target.value)}
-        />
+        {/* Emails */}
+        <div className="flex flex-col gap-3">
+          {form.emails.map((email, idx) => (
+            <EmailRow
+              key={idx}
+              email={email}
+              isFirst={idx === 0}
+              isLast={idx === form.emails.length - 1}
+              onChange={val => setEmail(idx, val)}
+              onAdd={idx === form.emails.length - 1 ? addEmail : undefined}
+            />
+          ))}
+        </div>
 
-        {/* Observação — full width, ~96px */}
+        {/* Observação */}
         <div className="flex flex-col gap-3">
           <label className="text-sm font-medium text-[#030712]">Observação</label>
           <textarea
-            className="w-full rounded-md border border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#030712] placeholder:text-[#6b7280] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-            style={{ height: '80px' }}
+            className="w-full rounded-md border border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#030712] placeholder:text-[#6b7280] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none min-h-[64px]"
             placeholder="Anote aqui observações sobre esse contato"
             value={form.observacao}
             onChange={e => setField('observacao', e.target.value)}
@@ -151,6 +169,7 @@ export function AddContatoDialog({ open, onClose, onAdd }: Props) {
 }
 
 /* ─── Linha de telefone ─────────────────────────────────────────── */
+
 interface TelefoneRowProps {
   telefone: TelefoneEntry
   isFirst: boolean
@@ -171,19 +190,15 @@ function RadioIcon({
     <button
       type="button"
       onClick={onClick}
-      className="flex items-center gap-2 p-1 rounded hover:bg-gray-50 transition-colors"
+      className="flex items-center gap-1.5 p-1 rounded hover:bg-gray-50 transition-colors"
     >
-      {/* Radio circle */}
       <div
         className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 transition-colors ${
-          selected
-            ? 'border-blue-500 bg-white'
-            : 'border-[#e5e7eb] bg-white'
+          selected ? 'border-blue-500 bg-white' : 'border-[#e5e7eb] bg-white'
         }`}
       >
         {selected && <div className="w-2 h-2 rounded-full bg-blue-500" />}
       </div>
-      {/* Ícone */}
       <Icon className={`w-4 h-4 ${selected ? 'text-blue-500' : 'text-[#6b7280]'}`} />
     </button>
   )
@@ -193,7 +208,7 @@ function TelefoneRow({ telefone, isFirst, onChange, onAdd }: TelefoneRowProps) {
   return (
     <div className="flex items-end gap-2 w-full">
 
-      {/* País / Região — flex-1 (~187px) */}
+      {/* País / Região */}
       <div className="flex flex-col gap-3 flex-1 min-w-0">
         {isFirst && (
           <label className="text-sm font-medium text-[#030712]">País / Região</label>
@@ -214,7 +229,7 @@ function TelefoneRow({ telefone, isFirst, onChange, onAdd }: TelefoneRowProps) {
         </div>
       </div>
 
-      {/* Número — flex-1 (~187px) */}
+      {/* Número */}
       <div className="flex flex-col gap-3 flex-1 min-w-0">
         {isFirst && (
           <label className="text-sm font-medium text-[#030712]">Número</label>
@@ -228,10 +243,10 @@ function TelefoneRow({ telefone, isFirst, onChange, onAdd }: TelefoneRowProps) {
         />
       </div>
 
-      {/* Meio de contato — ~162px fixo */}
+      {/* Usar este número como */}
       <div className="flex flex-col gap-3 shrink-0">
         {isFirst && (
-          <label className="text-sm font-medium text-[#030712]">Meio de contato</label>
+          <label className="text-sm font-medium text-[#030712]">Usar este número como</label>
         )}
         <div className="flex items-center gap-1 h-9">
           <RadioIcon
@@ -247,17 +262,55 @@ function TelefoneRow({ telefone, isFirst, onChange, onAdd }: TelefoneRowProps) {
         </div>
       </div>
 
-      {/* Botão + — 32px, circle outline */}
+      {/* Botão + */}
       {onAdd && (
         <button
           type="button"
           onClick={onAdd}
-          className="w-8 h-8 rounded-full border border-[#e5e7eb] bg-white flex items-center justify-center shrink-0 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:bg-gray-50 transition-colors mb-0.5"
+          className="w-8 h-8 rounded-full border border-[#e5e7eb] bg-white flex items-center justify-center shrink-0 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:bg-gray-50 transition-colors"
         >
           <Plus className="w-4 h-4 text-[#030712]" />
         </button>
       )}
 
+    </div>
+  )
+}
+
+/* ─── Linha de email ─────────────────────────────────────────────── */
+
+interface EmailRowProps {
+  email: string
+  isFirst: boolean
+  isLast: boolean
+  onChange: (value: string) => void
+  onAdd?: () => void
+}
+
+function EmailRow({ email, isFirst, onChange, onAdd }: EmailRowProps) {
+  return (
+    <div className="flex items-end gap-2 w-full">
+      <div className="flex flex-col gap-3 flex-1 min-w-0">
+        {isFirst && (
+          <label className="text-sm font-medium text-[#030712]">Email</label>
+        )}
+        <input
+          type="email"
+          className="h-9 w-full rounded-md border border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#030712] placeholder:text-[#6b7280] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="Digite seu email"
+          value={email}
+          onChange={e => onChange(e.target.value)}
+        />
+      </div>
+      {onAdd && (
+        <button
+          type="button"
+          onClick={onAdd}
+          className="w-8 h-8 rounded-full border border-[#e5e7eb] bg-white flex items-center justify-center shrink-0 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:bg-gray-50 transition-colors"
+        >
+          <Plus className="w-4 h-4 text-[#030712]" />
+        </button>
+      )}
     </div>
   )
 }
