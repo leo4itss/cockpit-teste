@@ -107,6 +107,15 @@ export function ComponenteSheet({ open, onClose, onSave, onDelete, initialCompon
       width="w-[560px]"
       footer={
         <>
+          {isEditing && onDelete && (
+            <Button
+              variant="ghost"
+              onClick={onDelete}
+              className="mr-auto text-red-600 hover:bg-red-50"
+            >
+              Excluir componente
+            </Button>
+          )}
           <Button variant="outline" onClick={handleClose}>cancelar</Button>
           <Button
             onClick={handleSave}
