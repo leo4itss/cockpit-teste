@@ -129,7 +129,7 @@ export function AddAdminDialog({ open, onClose, onAdd, initialAdmin }: Props) {
     <Modal
       open={open}
       onClose={handleClose}
-      title="Novo usuário administrador"
+      title={initialAdmin ? 'Editar usuário administrador' : 'Novo usuário administrador'}
       maxWidth="max-w-[600px]"
       footer={
         <>
