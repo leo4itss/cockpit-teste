@@ -496,8 +496,8 @@ export function OrganizacaoDetailPage() {
                   else if (tab === 'contrato') setSheetContract(true)
                 }}>
                   {tab === 'conta' ? 'Criar Conta'
-                    : tab === 'solucoes' ? 'Habilitar Solução'
-                    : 'Vincular Contrato'}
+                    : tab === 'solucoes' ? 'Criar Solução'
+                    : 'Criar Contrato'}
                 </Button>
               )}
             </div>
