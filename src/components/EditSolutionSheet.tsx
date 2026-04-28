@@ -330,87 +330,28 @@ export function EditSolutionSheet({
             <Divider />
           </div>
 
-          {/* ── Componentes ─────────────────────────────────── */}
+          {/* ── Componentes (somente leitura) ───────────────── */}
           <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <SectionTitle>Selecione os componentes que compõem essa solução</SectionTitle>
-            </div>
+            <SectionTitle>Componentes</SectionTitle>
             <p className="text-sm text-[#6b7280] -mt-2">
-              Os tipos de licença disponíveis para os planos serão derivados automaticamente dos componentes selecionados.
+              Os componentes não podem ser alterados após a criação da solução.
             </p>
 
-            {hasActiveContract ? (
-              /* ── Modo somente leitura (contrato ativo) ── */
-              <div className="flex flex-col gap-3">
-                <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-md px-3 py-2.5">
-                  <CircleAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                  <p className="text-xs text-amber-800 leading-snug">
-                    Esta solução possui contratos ativos. Os componentes não podem ser alterados. Para incluir novos componentes, crie uma nova solução.
-                  </p>
-                </div>
-                {selectedComponenteIds.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {componentes
-                      .filter(c => selectedComponenteIds.includes(c.id))
-                      .map(c => (
-                        <span
-                          key={c.id}
-                          className="inline-flex items-center gap-1.5 h-7 pl-2.5 pr-2.5 border border-gray-300 bg-gray-100 rounded-md text-xs font-medium text-[#6b7280]"
-                        >
-                          <Puzzle className="w-3 h-3" />
-                          {c.nome}
-                        </span>
-                      ))}
-                  </div>
-                )}
-              </div>
-            ) : useInline ? (
-              /* ── Modo inline (≤ 5 componentes) ── */
-              <ComponenteSelector
-                componentes={componentes}
-                value={selectedComponenteIds}
-                onChange={setSelectedComponenteIds}
-              />
+            {componentesVinculados.length === 0 ? (
+              <p className="text-sm text-[#9ca3af]">Nenhum componente vinculado.</p>
             ) : (
-              /* ── Modo sheet (> 5 componentes) ── */
-              <div className="flex flex-col gap-3">
-                <button
-                  type="button"
-                  onClick={() => setComponenteSelecaoOpen(true)}
-                  className="inline-flex items-center gap-1.5 h-9 px-4 border border-[#e5e7eb] rounded-md text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors w-fit"
-                >
-                  <Plus className="w-4 h-4" />
-                  Selecionar componentes
-                  {selectedComponenteIds.length > 0 && (
-                    <span className="ml-1 bg-blue-100 text-blue-700 text-xs font-semibold px-1.5 py-0.5 rounded-full">
-                      {selectedComponenteIds.length}
-                    </span>
-                  )}
-                </button>
-
-                {selectedComponenteIds.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {componentes
-                      .filter(c => selectedComponenteIds.includes(c.id))
-                      .map(c => (
-                        <span
-                          key={c.id}
-                          className="inline-flex items-center gap-1.5 h-7 pl-2.5 pr-1.5 border border-[#2563eb] bg-blue-50 rounded-md text-xs font-medium text-[#2563eb]"
-                        >
-                          <Puzzle className="w-3 h-3" />
-                          {c.nome}
-                          <button
-                            type="button"
-                            onClick={() => setSelectedComponenteIds(prev => prev.filter(id => id !== c.id))}
-                            className="ml-0.5 hover:text-blue-900 transition-colors"
-                            aria-label={`Remover ${c.nome}`}
-                          >
-                            ×
-                          </button>
-                        </span>
-                      ))}
+              <div className="flex flex-col gap-2">
+                {componentesVinculados.map(c => (
+                  <div
+                    key={c.id}
+                    className="flex flex-col gap-0.5 px-4 py-3 border border-[#e5e7eb] rounded-lg bg-[#f9fafb]"
+                  >
+                    <p className="text-sm font-medium text-[#030712]">{c.nome}</p>
+                    {c.descricao && (
+                      <p className="text-sm text-[#6b7280]">{c.descricao}</p>
+                    )}
                   </div>
-                )}
+                ))}
               </div>
             )}
 
