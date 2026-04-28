@@ -1,15 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
-import { ChevronUp, ChevronDown, MoreVertical, CircleAlert, Pencil, Trash2, Plus, Puzzle } from 'lucide-react'
+import { ChevronUp, ChevronDown, MoreVertical, CircleAlert, Pencil, Trash2, Plus } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Input } from './ui/Input'
 import { Select } from './ui/Select'
 import { Button } from './ui/Button'
 import { NewPlanDialog } from './NewPlanDialog'
-import { ComponenteSelector } from './ComponenteSelector'
-import { ComponenteSelecaoSheet } from './ComponenteSelecaoSheet'
-import type { Solution, Plan, TipoLicenca, Componente, Contract } from '@/types'
-
-const THRESHOLD_INLINE = 5  // ≤ este valor: inline; > este valor: sheet
+import type { Solution, Plan, TipoLicenca, Componente } from '@/types'
 
 interface Props {
   open: boolean
