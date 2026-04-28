@@ -11,6 +11,7 @@ interface SheetProps {
   children: React.ReactNode
   footer?: React.ReactNode
   width?: string
+  headerAction?: React.ReactNode
 }
 
 const DURATION = 320
