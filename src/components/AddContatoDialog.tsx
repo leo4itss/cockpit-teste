@@ -89,7 +89,7 @@ export function AddContatoDialog({ open, onClose, onAdd, initialContato }: Props
     <Modal
       open={open}
       onClose={handleClose}
-      title="Novo contato"
+      title={initialContato ? 'Editar contato' : 'Novo contato'}
       footer={
         <>
           <Button variant="outline" onClick={handleClose}>Cancelar</Button>
