@@ -12,7 +12,7 @@ interface Props {
   open: boolean
   onClose: () => void
   onSave: (org: Omit<Organization, 'id' | 'qtdContas' | 'qtdSolucoes' | 'qtdContratos' | 'contacts'>) => void
-  onDelete?: () => void  // quando presente, exibe botão "Excluir organização" no footer
+  onDelete?: () => void
 }
 
 const STATES = [
@@ -30,6 +30,11 @@ const SEGMENTS = [
   { value: 'agro', label: 'Agropecuário' }, { value: 'energia', label: 'Energia' },
   { value: 'farma', label: 'Farmacêutico' }, { value: 'industrial', label: 'Serviços Industriais' },
   { value: 'tech', label: 'Tecnologia' }, { value: 'varejo', label: 'Varejo' },
+]
+
+const ARQUITETOS = [
+  { value: 'marcelo', label: 'Marcelo Gomes' },
+  { value: 'ana', label: 'Ana Lima' },
 ]
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
@@ -57,6 +62,8 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
   const [logoPreview, setLogoPreview] = useState<string>('')
   const logoInputRef = useRef<HTMLInputElement>(null)
 
+  const canSave = form.name.trim() !== '' && form.razaoSocial.trim() !== '' && form.docNumber.trim() !== ''
+
   function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -70,6 +77,7 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
   }
 
   function handleSave() {
+    if (!canSave) return
     onSave({ ...form, logo: logoPreview || undefined, createdAt: new Date().toLocaleDateString('pt-BR') })
     onClose()
   }
@@ -87,41 +95,44 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
       <Sheet
         open={open}
         onClose={onClose}
-        title="Nova Organização"
-        description="Preencha os dados da Organização"
-        width="w-[768px]"
+        title="Nova organização"
+        description="Preencha os dados da organização"
+        width="w-[640px]"
         footer={
-          <div className="flex items-center justify-between w-full">
-            {/* Ação destrutiva — só aparece no modo edição */}
+          <>
             {onDelete ? (
-              <Button variant="destructive" onClick={onDelete}>
+              <Button variant="ghost" onClick={onDelete} className="mr-auto text-red-600 hover:bg-red-50">
                 Excluir organização
               </Button>
-            ) : <span />}
-            <div className="flex items-center gap-2">
-              <Button variant="secondary" onClick={onClose}>Cancelar</Button>
-              <Button onClick={handleSave}>Salvar</Button>
-            </div>
-          </div>
+            ) : null}
+            <Button variant="outline" onClick={onClose}>cancelar</Button>
+            <Button
+              onClick={handleSave}
+              disabled={!canSave}
+              className={!canSave ? 'opacity-50 cursor-not-allowed' : ''}
+            >
+              Criar Organização
+            </Button>
+          </>
         }
       >
         <div className="flex flex-col gap-10">
 
-          {/* Logotipo */}
+          {/* ── Logotipo ───────────────────────────────────── */}
           <div>
             <SectionTitle>Logotipo</SectionTitle>
-            <div className="flex items-start gap-7">
+            <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-full bg-[#f3f4f6] flex items-center justify-center shrink-0 overflow-hidden border border-[#e5e7eb]">
                 {logoPreview
                   ? <img src={logoPreview} alt="logo" className="w-full h-full object-cover" />
                   : <span className="text-[#9ca3af] text-xs">Logo</span>
                 }
               </div>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 flex-1 min-w-0">
                 <p className="text-sm text-[#6b7280] leading-5">
-                  Insira o logo da organização. Isso ajudará a identificar a organização de forma mais fácil e visual no sistema.
+                  Adicione o logotipo para facilitar a identificação da organização no sistema.
+                  Tamanho recomendado: 512 × 512 px.
                 </p>
-                {/* input oculto — acionado pelo botão abaixo */}
                 <input
                   ref={logoInputRef}
                   type="file"
@@ -132,7 +143,7 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
                 <button
                   type="button"
                   onClick={() => logoInputRef.current?.click()}
-                  className="flex items-center gap-2 border border-[#e5e7eb] rounded-md px-4 h-9 text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors self-start"
+                  className="inline-flex items-center gap-2 border border-[#e5e7eb] rounded-md px-4 h-9 text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors self-start"
                 >
                   <Upload className="w-4 h-4 text-[#6b7280]" />
                   Escolher imagem
@@ -143,13 +154,13 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
 
           <Divider />
 
-          {/* Informações básicas */}
+          {/* ── Informações básicas ────────────────────────── */}
           <div>
             <SectionTitle>Informações básicas</SectionTitle>
-            <div className="flex flex-col gap-7">
+            <div className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-4">
                 <Input label="Nome da organização" required placeholder="Digite o nome da organização" value={form.name} onChange={e => set('name', e.target.value)} />
-                <Input label="Razão Social" required placeholder="Qual a razão social?" value={form.razaoSocial} onChange={e => set('razaoSocial', e.target.value)} />
+                <Input label="Razão social" required placeholder="Qual a razão social?" value={form.razaoSocial} onChange={e => set('razaoSocial', e.target.value)} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <Select label="Tipo do documento" options={[{ value: 'CNPJ', label: 'CNPJ' }, { value: 'CPF', label: 'CPF' }]} value={form.docType} onChange={e => set('docType', e.target.value)} />
@@ -164,13 +175,13 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
 
           <Divider />
 
-          {/* Endereço */}
+          {/* ── Endereço ───────────────────────────────────── */}
           <div>
             <SectionTitle>Endereço</SectionTitle>
-            <div className="flex flex-col gap-7">
+            <div className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-4">
                 <Select label="País / Região" options={[{ value: 'Brasil', label: 'Brasil' }]} value={form.country} onChange={e => set('country', e.target.value)} />
-                <Input label="CEP" required placeholder="Código postal para identificar o endereço" value={form.zipCode} onChange={e => set('zipCode', e.target.value)} />
+                <Input label="CEP" required placeholder="Digite o CEP" value={form.zipCode} onChange={e => set('zipCode', e.target.value)} />
               </div>
               <Input label="Endereço postal" required placeholder="Digite o endereço completo, inclusive número" value={form.address} onChange={e => set('address', e.target.value)} />
               <Input label="Complemento" required placeholder="Complemento do local" value={form.complement} onChange={e => set('complement', e.target.value)} />
@@ -183,13 +194,13 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
 
           <Divider />
 
-          {/* Contatos */}
+          {/* ── Contatos ───────────────────────────────────── */}
           <div>
             <SectionTitle>Contatos</SectionTitle>
-            <div className="flex flex-col gap-7">
-              {contacts.length === 0 && (
-                <div>
-                  <p className="text-sm font-medium text-[#030712] leading-none mb-2">
+            <div className="flex flex-col gap-4">
+              {contacts.length === 0 && admins.length === 0 && (
+                <div className="mb-3">
+                  <p className="text-sm font-medium text-[#030712] leading-none mb-1">
                     Não há contatos adicionados
                   </p>
                   <p className="text-sm text-[#6b7280] leading-5">
@@ -226,30 +237,40 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
               )}
 
               <div className="flex flex-col gap-2">
-                {/* Contatos */}
-                <div className="flex items-center justify-between border border-[#e5e7eb] rounded-md px-4 py-3 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
-                  <span className="text-sm font-medium text-[#030712]">
-                    Contatos<span className="text-[#dc2626] ml-0.5">*</span>
-                  </span>
+                {/* Card: Contatos */}
+                <div className="flex items-center gap-2.5 border border-[#e5e7eb] rounded-md px-4 py-3">
+                  <div className="flex flex-col gap-1 flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[#030712] leading-4">
+                      Contatos<span className="text-[#dc2626] ml-0.5">*</span>
+                    </p>
+                    <p className="text-sm text-[#6b7280] leading-5">
+                      Adicione pessoas de referência para comunicação com a organização. Esses contatos não recebem acesso ao sistema automaticamente.
+                    </p>
+                  </div>
                   <button
                     type="button"
                     onClick={() => setContactDialogOpen(true)}
-                    className="flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                    className="flex items-center gap-1.5 text-sm font-medium text-[#030712] hover:text-blue-600 transition-colors shrink-0"
                   >
                     <Plus className="w-3.5 h-3.5" />
-                    Adicionar contatos
+                    Adicionar
                   </button>
                 </div>
 
-                {/* Usuário administrador */}
-                <div className="flex items-center justify-between border border-[#e5e7eb] rounded-md px-4 py-3 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
-                  <span className="text-sm font-medium text-[#030712]">
-                    Usuário administrador<span className="text-[#030712] ml-0.5">*</span>
-                  </span>
+                {/* Card: Usuário administrador */}
+                <div className="flex items-center gap-2.5 border border-[#e5e7eb] rounded-md px-4 py-3">
+                  <div className="flex flex-col gap-1 flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[#030712] leading-4">
+                      Usuário administrador<span className="text-[#030712] ml-0.5">*</span>
+                    </p>
+                    <p className="text-sm text-[#6b7280] leading-5">
+                      Defina quem terá acesso inicial para administrar a organização no sistema.
+                    </p>
+                  </div>
                   <button
                     type="button"
                     onClick={() => setAdminDialogOpen(true)}
-                    className="flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                    className="flex items-center gap-1.5 text-sm font-medium text-[#030712] hover:text-blue-600 transition-colors shrink-0"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     Adicionar
@@ -261,35 +282,31 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
 
           <Divider />
 
-          {/* Configuração PAS */}
+          {/* ── Configuração PAS ───────────────────────────── */}
           <div>
             <SectionTitle>Configuração PAS</SectionTitle>
-            <div className="flex flex-col gap-7">
+            <div className="flex flex-col gap-4">
               <Select
                 label="Arquiteto PAS responsável"
                 required
-                options={[
-                  { value: 'marcelo', label: 'Marcelo Gomes' },
-                  { value: 'ana', label: 'Ana Lima' },
-                ]}
+                options={ARQUITETOS}
                 placeholder="Escolha o arquiteto"
                 value={form.arquitetoPAS}
                 onChange={e => set('arquitetoPAS', e.target.value)}
               />
-              <div>
-                <label className="text-sm font-medium text-[#030712]">
-                  Subdomínio<span className="text-[#dc2626] ml-0.5">*</span>
-                </label>
-                <div className="mt-3 flex flex-col gap-2">
-                  <Input
-                    placeholder="Digite o subdomínio"
-                    value={form.domain}
-                    onChange={e => set('domain', e.target.value)}
-                  />
-                  <div className="flex items-center gap-2 bg-blue-100 p-2">
-                    <Info className="w-4 h-4 text-[#030712] shrink-0" />
-                    <span className="text-xs text-[#030712] leading-4">Escolha um nome único para o domínio. Este identificador não pode ser duplicado no sistema.</span>
-                  </div>
+              <div className="flex flex-col gap-2">
+                <Input
+                  label="Subdomínio"
+                  required
+                  placeholder="Digite o subdomínio (usar somente letras minúsculas)"
+                  value={form.domain}
+                  onChange={e => set('domain', e.target.value)}
+                />
+                <div className="flex items-center gap-2 bg-blue-100 px-2 py-4 rounded-sm">
+                  <Info className="w-4 h-4 text-[#030712] shrink-0" />
+                  <p className="text-sm text-[#030712] leading-5">
+                    Escolha um nome único para o domínio. Este identificador não pode ser duplicado no sistema.
+                  </p>
                 </div>
               </div>
             </div>
