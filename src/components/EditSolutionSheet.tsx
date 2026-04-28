@@ -164,21 +164,12 @@ export function EditSolutionSheet({
 }: Props) {
   const [form, setForm] = useState(() => buildForm(solution))
   const [plans, setPlans] = useState<Plan[]>(solution?.plans ?? [])
-  const [selectedComponenteIds, setSelectedComponenteIds] = useState<string[]>(solution?.componenteIds ?? [])
   const [planDialogOpen, setPlanDialogOpen] = useState(false)
   const [editingPlanIndex, setEditingPlanIndex] = useState<number | null>(null)
-  const [componenteSelecaoOpen, setComponenteSelecaoOpen] = useState(false)
 
-  const useInline = componentes.length <= THRESHOLD_INLINE
-
-  // Verifica se existe contrato ativo vinculado a esta solução
-  const hasActiveContract = !!(
-    solution &&
-    contracts?.some(
-      c => c.status === 'Ativo' &&
-        Array.isArray(c.objetos) &&
-        c.objetos.some((o: any) => o.solucao === solution.name)
-    )
+  // Componentes são sempre read-only — não podem ser alterados após a solução ser criada
+  const componentesVinculados = componentes.filter(c =>
+    (solution?.componenteIds ?? []).includes(c.id)
   )
 
   // Re-sync form when solution changes
@@ -187,7 +178,6 @@ export function EditSolutionSheet({
     setLastSolution(solution)
     setForm(buildForm(solution))
     setPlans(solution?.plans ?? [])
-    setSelectedComponenteIds(solution?.componenteIds ?? [])
   }
 
   function buildForm(s: Solution | null) {
