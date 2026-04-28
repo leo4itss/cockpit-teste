@@ -195,6 +195,7 @@ export function ComponentesPage() {
         open={sheetOpen}
         onClose={handleCloseSheet}
         onSave={handleSave}
+        onDelete={editingComponente ? handleDeleteComponente : undefined}
         initialComponente={editingComponente ?? undefined}
       />
     </div>
