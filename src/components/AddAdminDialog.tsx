@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import { Modal } from './ui/Modal'
 import { Button } from './ui/Button'
