@@ -211,7 +211,7 @@ function ContactCard({
         <button
           type="button"
           onClick={onAdd}
-          className="flex items-center gap-1.5 text-sm font-medium text-[#030712] hover:text-blue-600 transition-colors shrink-0 pt-0.5"
+          className="flex items-center gap-1.5 text-sm font-medium text-[#030712] border border-[#e5e7eb] rounded-md px-3 py-1.5 hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors shrink-0"
         >
           <Plus className="w-3.5 h-3.5" />
           Adicionar
