@@ -36,7 +36,7 @@ export const METADATA_MOCK_TIPOS = [
  *  - URL já configurada (leitura); tipos exibidos com checkboxes para ajuste fino
  *  - "Testar URL" desabilitado (metadados já foram consultados)
  */
-export function ComponenteSheet({ open, onClose, onSave, initialComponente }: Props) {
+export function ComponenteSheet({ open, onClose, onSave, onDelete, initialComponente }: Props) {
   const isEditing = !!initialComponente
 
   const [nome, setNome]                           = useState('')
