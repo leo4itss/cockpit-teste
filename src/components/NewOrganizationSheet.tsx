@@ -105,7 +105,7 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
                 Excluir organização
               </Button>
             ) : null}
-            <Button variant="outline" onClick={onClose}>cancelar</Button>
+            <Button variant="outline" onClick={onClose}>Cancelar</Button>
             <Button
               onClick={handleSave}
               disabled={!canSave}
