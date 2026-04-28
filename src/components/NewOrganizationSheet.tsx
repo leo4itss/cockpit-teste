@@ -56,6 +56,7 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
     state: '', city: '', arquitetoPAS: '', domain: '',
     activitySector: '', status: 'Ativo' as const, createdAt: '',
   })
+  const [outroSegmento, setOutroSegmento] = useState('')
   const [contacts, setContacts] = useState<Contato[]>([])
   const [contactDialogOpen, setContactDialogOpen] = useState(false)
   const [admins, setAdmins] = useState<AdminUser[]>([])
