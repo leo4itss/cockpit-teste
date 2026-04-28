@@ -242,7 +242,7 @@ function TelefoneRow({ telefone, isFirst, onChange, onAdd }: TelefoneRowProps) {
         <input
           type="tel"
           className="h-9 w-full rounded-md border border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#030712] placeholder:text-[#6b7280] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="62 9 9679-7176"
+          placeholder="Digite seu número"
           value={telefone.numero}
           onChange={e => onChange('numero', e.target.value)}
         />
