@@ -7,6 +7,7 @@ interface Props {
   open: boolean
   onClose: () => void
   onAdd: (contato: Contato) => void
+  initialContato?: Contato
 }
 
 export interface Contato {
