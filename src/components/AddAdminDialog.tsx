@@ -7,6 +7,7 @@ interface Props {
   open: boolean
   onClose: () => void
   onAdd: (admin: AdminUser) => void
+  initialAdmin?: AdminUser
 }
 
 export interface AdminUser {
