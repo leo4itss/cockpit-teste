@@ -74,7 +74,7 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
         open={open}
         onClose={onClose}
         title="Novo Contrato"
-        width="w-[768px]"
+        width="w-[80vw] max-w-[960px]"
         footer={
           <>
             <Button variant="secondary" onClick={onClose}>Cancelar</Button>
