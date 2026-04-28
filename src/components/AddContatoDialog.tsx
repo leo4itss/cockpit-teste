@@ -38,8 +38,12 @@ const EMPTY_FORM: Contato = {
   observacao: '',
 }
 
-export function AddContatoDialog({ open, onClose, onAdd }: Props) {
+export function AddContatoDialog({ open, onClose, onAdd, initialContato }: Props) {
   const [form, setForm] = useState<Contato>(EMPTY_FORM)
+
+  useEffect(() => {
+    if (open) setForm(initialContato ?? EMPTY_FORM)
+  }, [open, initialContato])
 
   function setField<K extends keyof Contato>(field: K, value: Contato[K]) {
     setForm(f => ({ ...f, [field]: value }))
