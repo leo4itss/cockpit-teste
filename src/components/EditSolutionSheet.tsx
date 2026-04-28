@@ -487,13 +487,6 @@ export function EditSolutionSheet({
         tiposLicenca={tiposDisponiveis}
       />
 
-      <ComponenteSelecaoSheet
-        open={componenteSelecaoOpen}
-        onClose={() => setComponenteSelecaoOpen(false)}
-        componentes={componentes}
-        value={selectedComponenteIds}
-        onChange={setSelectedComponenteIds}
-      />
     </>
   )
 }
