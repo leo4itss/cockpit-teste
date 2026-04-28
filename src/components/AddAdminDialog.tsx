@@ -103,8 +103,12 @@ function PasswordField({
 
 const EMPTY = { nome: '', sobrenome: '', email: '', usuario: '', senha: '', confirmar: '' }
 
-export function AddAdminDialog({ open, onClose, onAdd }: Props) {
+export function AddAdminDialog({ open, onClose, onAdd, initialAdmin }: Props) {
   const [form, setForm] = useState(EMPTY)
+
+  useEffect(() => {
+    if (open) setForm(initialAdmin ? { ...initialAdmin, confirmar: '' } : EMPTY)
+  }, [open, initialAdmin])
 
   function set(field: string, value: string) {
     setForm(f => ({ ...f, [field]: value }))
