@@ -245,7 +245,7 @@ export function EditSolutionSheet({
       description:       form.description,
       arquitetoPAS:      form.arquitetoPAS,
       plans,
-      componenteIds:     selectedComponenteIds,
+      componenteIds:     solution.componenteIds, // componentes nunca mudam na edição
       marketplace:       form.marketplace ? 'Ativo' : 'Inativo',
       link01:            form.link01,
       titleLink01:       form.titleLink01,
