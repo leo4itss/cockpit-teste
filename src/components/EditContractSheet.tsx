@@ -80,7 +80,7 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
         open={open}
         onClose={onClose}
         title="Editar Contrato"
-        width="w-[768px]"
+        width="w-[80vw] max-w-[960px]"
         footer={
           <>
             <Button variant="ghost" onClick={onDelete} className="mr-auto text-red-600 hover:bg-red-50">
