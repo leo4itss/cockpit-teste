@@ -78,6 +78,17 @@ export function ComponentesPage() {
     setEditingComponente(null)
   }
 
+  async function handleDeleteComponente() {
+    if (!editingComponente) return
+    try {
+      await api.deleteComponente(editingComponente.id)
+    } catch {
+      // silencioso — remove localmente mesmo sem backend
+    }
+    setComponentes(prev => prev.filter(c => c.id !== editingComponente.id))
+    handleCloseSheet()
+  }
+
   // Resolve nomes dos tipos a partir dos IDs (mock metadata ou fallback para ID)
   function tiposNomes(ids: string[]) {
     return ids
