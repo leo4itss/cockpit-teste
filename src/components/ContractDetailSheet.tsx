@@ -1,6 +1,7 @@
+import { Check } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
-import { Badge } from './ui/Badge'
 import { Button } from './ui/Button'
+import { ProvisioningDots } from './ProvisioningDots'
 import type { Contract } from '@/types'
 
 interface Props {
@@ -11,104 +12,144 @@ interface Props {
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <p className="text-base font-bold text-[#030712] leading-6 pb-3">{children}</p>
+  return <p className="text-base font-bold text-[#030712] leading-6">{children}</p>
 }
 
 function Divider() {
   return <div className="border-t border-[#e5e7eb]" />
 }
 
-function Field({ label, value }: { label: string; value?: string | number }) {
+function ReadonlyField({ label, value }: { label: string; value?: string | number }) {
   return (
-    <div className="flex flex-col gap-0.5">
-      <p className="text-xs font-medium text-[#030712]">{label}</p>
-      <p className="text-sm text-gray-500">{value ?? '—'}</p>
+    <div className="flex flex-col gap-2">
+      <label className="text-sm font-medium text-[#030712]">{label}</label>
+      <div className="h-9 px-3 flex items-center bg-[#f9fafb] border border-[#e5e7eb] rounded-md text-sm text-[#6b7280] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
+        {value ?? '—'}
+      </div>
     </div>
+  )
+}
+
+function CriadoBadge() {
+  return (
+    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#16a34a]">
+      <span className="w-4 h-4 rounded-full bg-[#16a34a] flex items-center justify-center shrink-0">
+        <Check className="w-3 h-3 text-white" strokeWidth={2.5} />
+      </span>
+      Criado
+    </span>
   )
 }
 
 export function ContractDetailSheet({ open, onClose, contract, onEdit }: Props) {
   if (!contract) return null
 
-  const statusVariant =
-    contract.status === 'Ativo' ? 'success'
-    : contract.status === 'Pendente' ? 'warning'
-    : 'default'
+  const shortId = contract.id.length > 8 ? `${contract.id.substring(0, 8)}…` : contract.id
 
   return (
-    <Sheet open={open} onClose={onClose} title="Detalhe do Contrato" width="w-[768px]">
+    <Sheet
+      open={open}
+      onClose={onClose}
+      title="Detalhe Contrato"
+      width="w-[80vw] max-w-[960px]"
+      headerAction={onEdit ? (
+        <Button variant="outline" size="sm" onClick={onEdit}>Editar</Button>
+      ) : undefined}
+    >
       <div className="flex flex-col gap-6">
 
-        {/* Contract header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-sm font-bold text-gray-500 shrink-0">
-              {contract.contratante.charAt(0)}
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-[#030712]">{contract.contratante}</p>
-              <Badge variant={statusVariant}>{contract.status}</Badge>
-            </div>
-          </div>
-          {onEdit && (
-            <Button variant="outline" size="sm" onClick={onEdit}>Editar</Button>
-          )}
+        {/* ── Identificação do contrato ─────────────────── */}
+        <div className="flex items-center gap-3">
+          <p className="text-sm font-semibold text-[#030712]">Contrato: {shortId}</p>
+          <CriadoBadge />
         </div>
 
         <Divider />
 
-        {/* ID do contrato */}
-        <Field label="ID do contrato" value={`${contract.id.substring(0, 8)}…`} />
+        {/* ── Dados do contrato ─────────────────────────── */}
+        <div className="flex flex-col gap-4">
+          <SectionTitle>Dados do contrato</SectionTitle>
+          <ReadonlyField
+            label="Conta contratante (onde as soluções desse contrato vão aparecer)"
+            value={contract.contratante}
+          />
+        </div>
 
         <Divider />
 
-        {/* Objetos do contrato */}
+        {/* ── Vigência ──────────────────────────────────── */}
+        <div className="flex flex-col gap-4">
+          <SectionTitle>Vigência</SectionTitle>
+          <div className="flex gap-6 items-start">
+            <div className="flex-1">
+              <ReadonlyField label="Data de início" value={contract.dataInicio} />
+            </div>
+            <div className="flex-1">
+              <ReadonlyField label="Data de término" value={contract.dataTermino} />
+            </div>
+          </div>
+        </div>
+
+        <Divider />
+
+        {/* ── Renovação ─────────────────────────────────── */}
+        <div className="flex flex-col gap-4">
+          <SectionTitle>Renovação</SectionTitle>
+          <ReadonlyField label="Tipo de renovação" value={contract.renovacao} />
+        </div>
+
+        <Divider />
+
+        {/* ── Objetos do contrato ───────────────────────── */}
         <div className="flex flex-col gap-4">
           <SectionTitle>Objetos do contrato</SectionTitle>
 
           {contract.objetos.length === 0 ? (
-            <p className="text-sm text-gray-400">Nenhum objeto adicionado.</p>
+            <p className="text-sm text-[#9ca3af]">Nenhum objeto adicionado.</p>
           ) : (
-            <div className="rounded-xl border border-[#e5e7eb] overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-[#e5e7eb]">
-                    {['Solução', 'Org. contratada', 'Plano', 'Licenciamento', 'Qtd'].map(col => (
-                      <th
-                        key={col}
-                        className="px-3 py-2.5 text-left text-xs font-medium text-[#030712] opacity-40 whitespace-nowrap"
-                      >
-                        {col}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {contract.objetos.map((obj, i) => (
-                    <tr key={i} className="border-b border-[#e5e7eb] last:border-0">
-                      <td className="px-3 py-3 text-sm text-[#030712]">{obj.solucao}</td>
-                      <td className="px-3 py-3 text-sm text-[#030712]">{obj.orgContratada}</td>
-                      <td className="px-3 py-3 text-sm text-[#030712]">{obj.plano}</td>
-                      <td className="px-3 py-3 text-sm text-[#030712] max-w-[200px] truncate">{obj.licenciamento}</td>
-                      <td className="px-3 py-3 text-sm text-[#030712]">{obj.qtdContratada}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="flex flex-col gap-3">
+              {contract.objetos.map((obj, i) => (
+                <div
+                  key={i}
+                  className="border border-[#e5e7eb] rounded-lg p-4 flex flex-col gap-4"
+                >
+                  {/* Linha superior: Solução + Plano */}
+                  <div className="flex gap-6">
+                    <div className="flex flex-col gap-1 flex-1 min-w-0">
+                      <p className="text-xs font-medium text-[#030712]">Solução</p>
+                      <p className="text-sm text-[#6b7280]">{obj.solucao || '—'}</p>
+                    </div>
+                    <div className="flex flex-col gap-1 flex-1 min-w-0">
+                      <p className="text-xs font-medium text-[#030712]">Plano</p>
+                      <p className="text-sm text-[#6b7280]">{obj.plano || '—'}</p>
+                    </div>
+                  </div>
+
+                  <Divider />
+
+                  {/* Linha inferior: Licença + Org contratada + Qtd + Status */}
+                  <div className="flex gap-6">
+                    <div className="flex flex-col gap-1 flex-[2] min-w-0">
+                      <p className="text-xs font-medium text-[#030712]">Licença</p>
+                      <p className="text-sm text-[#6b7280]">{obj.licenciamento || '—'}</p>
+                    </div>
+                    <div className="flex flex-col gap-1 flex-1 min-w-0">
+                      <p className="text-xs font-medium text-[#030712]">Org. contratada</p>
+                      <p className="text-sm text-[#6b7280]">{obj.orgContratada || '—'}</p>
+                    </div>
+                    <div className="flex flex-col gap-1 w-[90px] shrink-0">
+                      <p className="text-xs font-medium text-[#030712]">Qtd contratada</p>
+                      <p className="text-sm text-[#6b7280]">{obj.qtdContratada ?? '—'}</p>
+                    </div>
+                    <div className="flex flex-col gap-1 w-[140px] shrink-0">
+                      <p className="text-xs font-medium text-[#030712]">Status da publicação</p>
+                      <ProvisioningDots status="Provisionado" />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
-        </div>
-
-        <Divider />
-
-        {/* Vigência */}
-        <div className="flex flex-col gap-4">
-          <SectionTitle>Vigência</SectionTitle>
-          <div className="flex flex-col gap-6">
-            <Field label="Data de início" value={contract.dataInicio} />
-            <Field label="Data de término" value={contract.dataTermino} />
-            <Field label="Renovação" value={contract.renovacao} />
-          </div>
         </div>
 
       </div>
