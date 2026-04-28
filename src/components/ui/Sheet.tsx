@@ -16,7 +16,7 @@ interface SheetProps {
 
 const DURATION = 320
 
-export function Sheet({ open, onClose, title, description, children, footer, width = 'w-[768px]' }: SheetProps) {
+export function Sheet({ open, onClose, title, description, children, footer, width = 'w-[768px]', headerAction }: SheetProps) {
   const [mounted, setMounted] = useState(false)
   const [visible, setVisible] = useState(false)
 
