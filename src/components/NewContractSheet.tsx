@@ -28,9 +28,6 @@ function Divider() {
 const RENOVACAO_OPTIONS = [
   { value: 'Automática', label: 'Automática' },
   { value: 'Manual', label: 'Manual' },
-  { value: 'Mensal', label: 'Mensal' },
-  { value: 'Trimestral', label: 'Trimestral' },
-  { value: 'Semestral', label: 'Semestral' },
   { value: 'Anual', label: 'Anual' },
 ]
 
