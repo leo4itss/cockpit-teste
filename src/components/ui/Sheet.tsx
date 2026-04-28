@@ -66,18 +66,21 @@ export function Sheet({ open, onClose, title, description, children, footer, wid
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-6 border-b border-[#e5e7eb] shrink-0">
-          <div className="flex flex-col gap-2 min-w-0">
+          <div className="flex flex-col gap-2 min-w-0 flex-1">
             <h2 className="text-2xl font-semibold text-[#030712] leading-8">{title}</h2>
             {description && (
               <p className="text-sm text-[#6b7280] leading-5">{description}</p>
             )}
           </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors shrink-0 ml-4"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-2 ml-4 shrink-0">
+            {headerAction}
+            <button
+              onClick={onClose}
+              className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* Content */}
