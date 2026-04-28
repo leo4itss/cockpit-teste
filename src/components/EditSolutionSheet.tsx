@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { ChevronUp, ChevronDown, MoreVertical, CircleAlert, Pencil, Trash2, Plus } from 'lucide-react'
+import { ChevronUp, ChevronDown, MoreVertical, CircleAlert, Pencil, Trash2 } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Input } from './ui/Input'
 import { Select } from './ui/Select'
