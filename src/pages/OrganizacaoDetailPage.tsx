@@ -675,7 +675,7 @@ export function OrganizacaoDetailPage() {
               {contracts.length === 0 ? (
                 <EmptyState message="Nenhum contrato criado" description="Crie um contrato para esta organização." />
               ) : (
-                <div className="border border-[#e5e7eb] rounded-2xl p-4 overflow-hidden">
+                <div className="border border-[#e5e7eb] rounded-2xl overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-[#e5e7eb]">
