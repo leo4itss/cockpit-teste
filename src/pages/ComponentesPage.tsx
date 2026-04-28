@@ -1,30 +1,32 @@
 import { useState, useEffect } from 'react'
 import { Search, Plus, Cpu, BadgeCheck } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
-import { ComponenteSheet } from '@/components/ComponenteSheet'
+import { ComponenteSheet, METADATA_MOCK_TIPOS } from '@/components/ComponenteSheet'
+import { ComponenteDetailSheet } from '@/components/ComponenteDetailSheet'
 import { api } from '@/api/client'
-import { tiposLicenca as mockTiposLicenca, componentes as mockComponentes } from '@/data/mock'
-import type { TipoLicenca, Componente } from '@/types'
+import { componentes as mockComponentes } from '@/data/mock'
+import type { Componente } from '@/types'
 
 export function ComponentesPage() {
   const [componentes, setComponentes] = useState<Componente[]>([])
-  const [tiposLicenca, setTiposLicenca] = useState<TipoLicenca[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+
+  // Sheet de detalhe (leitura)
+  const [detailComponente, setDetailComponente] = useState<Componente | null>(null)
+
+  // Sheet de edição/criação
   const [sheetOpen, setSheetOpen] = useState(false)
   const [editingComponente, setEditingComponente] = useState<Componente | null>(null)
 
   useEffect(() => {
-    Promise.all([api.getComponentes(), api.getTiposLicenca()])
-      .then(([comps, tipos]) => {
+    api.getComponentes()
+      .then(comps => {
         setComponentes(comps)
-        setTiposLicenca(tipos)
         setLoading(false)
       })
       .catch(() => {
-        // Fallback para mock quando API indisponível (preview Vercel)
         setComponentes(mockComponentes)
-        setTiposLicenca(mockTiposLicenca)
         setLoading(false)
       })
   }, [])
@@ -54,7 +56,14 @@ export function ComponentesPage() {
     }
   }
 
+  // Abre o detalhe ao clicar na linha da tabela
+  function handleOpenDetail(c: Componente) {
+    setDetailComponente(c)
+  }
+
+  // Abre edição (vindo do detail sheet ou direto)
   function handleOpenEdit(c: Componente) {
+    setDetailComponente(null)   // fecha detalhe primeiro
     setEditingComponente(c)
     setSheetOpen(true)
   }
@@ -64,15 +73,15 @@ export function ComponentesPage() {
     setSheetOpen(true)
   }
 
-  function handleClose() {
+  function handleCloseSheet() {
     setSheetOpen(false)
     setEditingComponente(null)
   }
 
-  // Resolves nomes dos tipos de licença a partir dos IDs
+  // Resolve nomes dos tipos a partir dos IDs (mock metadata ou fallback para ID)
   function tiposNomes(ids: string[]) {
     return ids
-      .map(id => tiposLicenca.find(t => t.id === id)?.nome ?? id)
+      .map(id => METADATA_MOCK_TIPOS.find(t => t.id === id)?.nome ?? id)
       .join(', ')
   }
 
@@ -103,8 +112,6 @@ export function ComponentesPage() {
 
       {/* Content */}
       <div className="flex-1 overflow-auto p-8">
-
-        {/* Table */}
         {loading ? (
           <p className="text-sm text-[#6b7280]">Carregando...</p>
         ) : filtered.length === 0 ? (
@@ -126,7 +133,7 @@ export function ComponentesPage() {
                   <tr
                     key={c.id}
                     className="border-b border-[#e5e7eb] last:border-0 hover:bg-gray-50 cursor-pointer transition-colors"
-                    onClick={() => handleOpenEdit(c)}
+                    onClick={() => handleOpenDetail(c)}
                   >
                     <td className="px-2 py-2 h-[52px]">
                       <div className="flex items-center gap-2">
@@ -164,11 +171,19 @@ export function ComponentesPage() {
         )}
       </div>
 
+      {/* Sheet de detalhe (leitura) */}
+      <ComponenteDetailSheet
+        open={!!detailComponente}
+        onClose={() => setDetailComponente(null)}
+        componente={detailComponente}
+        onEdit={() => detailComponente && handleOpenEdit(detailComponente)}
+      />
+
+      {/* Sheet de criação/edição */}
       <ComponenteSheet
         open={sheetOpen}
-        onClose={handleClose}
+        onClose={handleCloseSheet}
         onSave={handleSave}
-        tiposLicenca={tiposLicenca}
         initialComponente={editingComponente ?? undefined}
       />
     </div>
@@ -187,7 +202,7 @@ function EmptyState({ search, onNew }: { search: string; onNew: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 gap-3">
       <div className="w-10 h-10 rounded-full bg-[#f3f4f6] flex items-center justify-center">
-        <Puzzle className="w-5 h-5 text-[#6b7280]" />
+        <Cpu className="w-5 h-5 text-[#6b7280]" />
       </div>
       <div className="flex flex-col items-center gap-1">
         <p className="text-sm font-medium text-[#030712]">Nenhum componente cadastrado</p>
