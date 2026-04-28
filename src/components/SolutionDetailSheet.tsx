@@ -103,22 +103,12 @@ function PlanItem({ plan, onRemove }: { plan: Plan; onRemove: () => void }) {
   )
 }
 
-export function SolutionDetailSheet({ open, onClose, solution, componentes = [], onEdit, onSave }: Props) {
-  const [localPlans, setLocalPlans] = useState(solution?.plans ?? [])
-
-  useEffect(() => {
-    setLocalPlans(solution?.plans ?? [])
-  }, [solution])
-
+export function SolutionDetailSheet({ open, onClose, solution, componentes = [], onEdit }: Props) {
   if (!solution) return null
 
   const componentesVinculados = componentes.filter(c =>
     (solution.componenteIds ?? []).includes(c.id)
   )
-
-  function handleSave() {
-    onSave?.({ ...solution!, plans: localPlans })
-  }
 
   return (
     <Sheet
