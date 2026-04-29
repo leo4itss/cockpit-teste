@@ -6,9 +6,11 @@ import { OrganizacaoDetailPage } from './pages/OrganizacaoDetailPage'
 import { AcessosPage } from './pages/AcessosPage'
 import { HomePage } from './pages/HomePage'
 import { ComponentesPage } from './pages/ComponentesPage'
+import { ComponentesProvider } from './context/ComponentesContext'
 
 export default function App() {
   return (
+    <ComponentesProvider>
     <BrowserRouter>
       <Routes>
         <Route path="/home" element={<HomePage />} />
