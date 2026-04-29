@@ -116,14 +116,12 @@ export function SolutionDetailSheet({ open, onClose, solution, componentes = [],
       <div className="flex flex-col gap-6">
 
         {/* Avatar + nome + status + botão editar */}
-        <div className="flex items-start gap-7">
-          <div className="w-12 h-12 rounded-full bg-[#f3f4f6] border border-[#e5e7eb] flex items-center justify-center text-sm font-bold text-[#6b7280] shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-[#f3f4f6] border border-[#e5e7eb] flex items-center justify-center text-sm font-bold text-[#6b7280] shrink-0 overflow-hidden">
             {solution.name.charAt(0)}
           </div>
-          <div className="flex flex-col flex-1 min-w-0 gap-3">
-            <p className="text-base font-bold text-[#030712] leading-6">
-              {solution.name}
-            </p>
+          <div className="flex-1 min-w-0">
+            <p className="text-base font-semibold text-[#030712] leading-6 truncate">{solution.name}</p>
             <StatusBadge status={solution.status} />
           </div>
           <Button variant="outline" size="sm" onClick={onEdit}>Editar</Button>
