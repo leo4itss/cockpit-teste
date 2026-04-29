@@ -122,7 +122,7 @@ export function NewSolutionSheet({
     form.link01.trim() !== '' && form.titleLink01.trim() !== '' &&
     form.link02.trim() !== '' && form.titleLink02.trim() !== ''
   )
-  const canSave = baseValid && marketplaceValid
+  const canSave = baseValid && marketplaceValid && selectedComponenteIds.length > 0
 
   function handleSave() {
     if (!canSave) return
