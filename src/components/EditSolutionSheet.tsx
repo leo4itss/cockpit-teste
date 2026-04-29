@@ -349,9 +349,12 @@ export function EditSolutionSheet({
           {/* ── Componentes (somente leitura) ───────────────── */}
           <div className="flex flex-col gap-4">
             <SectionTitle>Componentes</SectionTitle>
-            <p className="text-sm text-[#6b7280] -mt-2">
-              Os componentes não podem ser alterados após a criação da solução.
-            </p>
+            <div className="flex items-start gap-2 bg-blue-50 border border-blue-100 rounded-md px-3 py-3 -mt-2">
+              <CircleAlert className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+              <p className="text-xs text-[#030712] leading-5">
+                Os componentes de uma solução não podem ser alterados após a criação. Para uma composição diferente, crie uma nova solução.
+              </p>
+            </div>
 
             {componentesVinculados.length === 0 ? (
               <p className="text-sm text-[#9ca3af]">Nenhum componente vinculado.</p>
