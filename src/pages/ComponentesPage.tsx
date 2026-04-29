@@ -174,10 +174,9 @@ export function ComponentesPage() {
                         </span>
                       )}
                     </td>
-                    <td className="px-2 py-2 h-[52px] text-sm text-center text-[#030712]">—</td>
                     <td className="px-2 py-2 h-[52px] text-center">
-                      <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-sm bg-green-200 text-green-700">
-                        <BadgeCheck className="w-3 h-3" />
+                      <span className="inline-flex items-center gap-1 bg-[#dcfce7] text-[#16a34a] text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">
+                        <CircleCheck className="w-3 h-3" />
                         Ativo
                       </span>
                     </td>
