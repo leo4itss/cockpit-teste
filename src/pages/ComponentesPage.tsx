@@ -212,6 +212,7 @@ function EmptyState({ search, onNew }: { search: string; onNew: () => void }) {
   if (search) {
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-2">
+        <FolderOpen className="w-8 h-8 text-[#9ca3af]" />
         <p className="text-sm font-medium text-[#030712]">Nenhum componente encontrado</p>
         <p className="text-xs text-[#6b7280]">Tente buscar por outro termo.</p>
       </div>
@@ -219,14 +220,12 @@ function EmptyState({ search, onNew }: { search: string; onNew: () => void }) {
   }
   return (
     <div className="flex flex-col items-center justify-center py-16 gap-3">
-      <div className="w-10 h-10 rounded-full bg-[#f3f4f6] flex items-center justify-center">
-        <Cpu className="w-5 h-5 text-[#6b7280]" />
-      </div>
+      <FolderOpen className="w-8 h-8 text-[#9ca3af]" />
       <div className="flex flex-col items-center gap-1">
-        <p className="text-sm font-medium text-[#030712]">Nenhum componente cadastrado</p>
-        <p className="text-xs text-[#6b7280]">Crie o primeiro componente para começar.</p>
+        <p className="text-sm font-medium text-[#030712]">Nenhum componente encontrado</p>
+        <p className="text-xs text-[#6b7280]">Adicione o primeiro componente para começar.</p>
       </div>
-      <Button onClick={onNew} variant="outline">
+      <Button onClick={onNew}>
         <Plus className="w-4 h-4 mr-1.5" />
         Adicionar componente
       </Button>
