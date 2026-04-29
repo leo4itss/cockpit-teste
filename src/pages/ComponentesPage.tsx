@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Search, Plus, Cpu, BadgeCheck } from 'lucide-react'
+import { Search, Plus, FolderOpen, Cpu, CircleCheck, X } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { ComponenteSheet, METADATA_MOCK_TIPOS } from '@/components/ComponenteSheet'
 import { ComponenteDetailSheet } from '@/components/ComponenteDetailSheet'
