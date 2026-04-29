@@ -111,7 +111,7 @@ export function SolutionDetailSheet({ open, onClose, solution, componentes = [],
       open={open}
       onClose={onClose}
       title="Detalhe da solução"
-      width="w-[768px]"
+      width="w-[640px]"
     >
       <div className="flex flex-col gap-6">
 
