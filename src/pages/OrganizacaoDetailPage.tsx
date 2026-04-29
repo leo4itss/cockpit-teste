@@ -633,11 +633,16 @@ export function OrganizacaoDetailPage() {
                           <td className="px-2 py-2 h-[52px] w-[169px] max-w-[169px]">
                             <span className="text-sm text-[#030712] block truncate whitespace-nowrap overflow-hidden">{s.description || '—'}</span>
                           </td>
-                          {/* Componentes — count numérico */}
-                          <td className="px-2 py-2 h-[52px] w-[133px] text-sm text-[#030712]">
+                          {/* Componentes — nomes separados por " / " */}
+                          <td className="px-2 py-2 h-[52px] w-[133px] max-w-[133px]">
                             {(s.componenteIds ?? []).length > 0
-                              ? (s.componenteIds ?? []).length
-                              : <span className="text-[#9ca3af]">—</span>
+                              ? <span className="text-sm text-[#030712] block truncate">
+                                  {componentes
+                                    .filter(c => (s.componenteIds ?? []).includes(c.id))
+                                    .map(c => c.nome)
+                                    .join(' / ') || '—'}
+                                </span>
+                              : <span className="text-sm text-[#9ca3af]">—</span>
                             }
                           </td>
                           {/* Marketplace — badge */}
