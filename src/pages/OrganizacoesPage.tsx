@@ -56,15 +56,20 @@ export function OrganizacoesPage() {
   }
 
   async function handleCreate(data: Omit<Organization, 'id' | 'qtdContas' | 'qtdSolucoes' | 'qtdContratos' | 'contacts'>) {
-    const newOrg = await api.createOrganization({
+    const local: Organization = {
       ...data,
       id: crypto.randomUUID(),
       qtdContas: 0,
       qtdSolucoes: 0,
       qtdContratos: 0,
       contacts: [],
-    })
-    setOrgs(prev => [...prev, newOrg])
+    }
+    try {
+      const saved = await api.createOrganization(local)
+      setOrgs(prev => [...prev, saved])
+    } catch {
+      setOrgs(prev => [...prev, local])
+    }
   }
 
   return (
