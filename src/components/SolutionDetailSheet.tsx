@@ -64,9 +64,11 @@ function PlanItem({ plan }: { plan: Plan }) {
     const unidade = l.tipoLicencaUnidade ?? ''
     const min = l.valorMinimo?.trim()
     const max = l.valorMaximo?.trim()
+    const val = (l as any).valor?.trim?.()
     if (min && max) return `${min}–${max} ${unidade}`.trim()
     if (min) return `${min} ${unidade}`.trim()
     if (max) return `Até ${max} ${unidade}`.trim()
+    if (val) return `${val} ${unidade}`.trim()
     return l.tipoLicencaNome || l.tipoLicencaId
   })
 
