@@ -202,24 +202,20 @@ app.put('/api/solutions/:id', async (c) => {
   const existingPlans = JSON.stringify(existing.plans ?? [])
   const incomingPlans = JSON.stringify(body.plans ?? [])
   if (existingPlans !== incomingPlans) {
-    // Busca todos os contratos que referenciam esta solução pelo nome
-    const solucaoNome = existing.name
-    const allContracts = await db.select().from(contracts)
-    const afetados = allContracts.filter((ct: any) => {
-      const objetos = ct.objetos as Array<{ solucao: string }>
-      return objetos.some((obj) => obj.solucao === solucaoNome)
-    })
-
-    if (afetados.length > 0) {
+    try {
+      const solucaoNome = existing.name
+      const allContracts = await db.select().from(contracts)
+      const afetados = allContracts.filter((ct: any) => {
+        const objetos = ct.objetos as Array<{ solucao: string }>
+        return Array.isArray(objetos) && objetos.some((obj) => obj.solucao === solucaoNome)
+      })
       const now = new Date().toISOString()
       for (const ct of afetados) {
-        // Descobre o próximo número de versão
         const existingVersions = await db
           .select()
           .from(contractVersions)
           .where(eq(contractVersions.contratoId, ct.id))
         const nextVersao = existingVersions.length + 1
-
         await db.insert(contractVersions).values({
           id: crypto.randomUUID(),
           contratoId: ct.id,
@@ -230,6 +226,8 @@ app.put('/api/solutions/:id', async (c) => {
           motivo: `Planos da solução "${solucaoNome}" foram atualizados.`,
         })
       }
+    } catch (versionErr) {
+      console.error('[versioning error]', versionErr)
     }
   }
 
