@@ -62,6 +62,14 @@ export function AcessosPage() {
     setShowEditSheet(false)
   }
 
+  async function handleDeleteUser() {
+    if (!selectedUser) return
+    try { await api.deleteUser?.(selectedUser.id) } catch { /* silencioso */ }
+    setUsers(prev => prev.filter(u => u.id !== selectedUser.id))
+    setShowEditSheet(false)
+    setSelectedUser(null)
+  }
+
   return (
     <div>
       {/* Page Header */}
