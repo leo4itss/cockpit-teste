@@ -153,11 +153,12 @@ export function NewSolutionSheet({
       open={open}
       onClose={onClose}
       title="Nova Solução"
+      width="w-[640px]"
       footer={
         <>
           <Button variant="outline" onClick={onClose}>Cancelar</Button>
           <Button onClick={handleSave} disabled={!canSave} className={!canSave ? 'opacity-50 cursor-not-allowed' : ''}>
-            Salvar
+            Criar Solução
           </Button>
         </>
       }
