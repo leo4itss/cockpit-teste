@@ -17,7 +17,6 @@ interface Props {
   orgId: string
   onSave: (solution: Omit<Solution, 'id'>) => void
   tiposLicenca: TipoLicenca[]
-  componentes?: never  // componentes agora vêm do contexto global
 }
 
 /* ── sub-components ────────────────────────────────────── */
