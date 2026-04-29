@@ -84,7 +84,7 @@ export function OrganizacoesPage() {
             />
           </div>
           <Button onClick={() => setSheetOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" /> Criar
+            <Plus className="w-4 h-4 mr-1.5" /> Criar Organização
           </Button>
         </div>
       </div>
