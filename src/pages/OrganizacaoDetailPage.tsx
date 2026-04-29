@@ -71,7 +71,6 @@ export function OrganizacaoDetailPage() {
       setSolutions(mockSolutions.filter(s => s.orgId === id))
       setContracts(mockContracts.filter(c => c.orgId === id))
       setTiposLicenca(mockTiposLicenca)
-      setComponentes(mockComponentes)
       setLoading(false)
     })
   }, [id])
