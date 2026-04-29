@@ -114,6 +114,19 @@ export const contracts = pgTable('contracts', {
   status: text('status').notNull().default('Pendente'),
 })
 
+// ── Versões de Contrato ───────────────────────────────────────
+// Criada automaticamente quando os valores de um plano referenciado
+// por um contrato são alterados via PUT /api/solutions/:id.
+export const contractVersions = pgTable('contract_versions', {
+  id: text('id').primaryKey(),
+  contratoId: text('contrato_id').notNull().references(() => contracts.id, { onDelete: 'cascade' }),
+  versao: integer('versao').notNull(),
+  snapshotPlano: jsonb('snapshot_plano').notNull(),  // cópia do ObjetoContrato[] no momento da versão
+  alteradoPor: text('alterado_por').notNull().default('sistema'),
+  alteradoEm: text('alterado_em').notNull(),
+  motivo: text('motivo'),
+})
+
 export const users = pgTable('users', {
   id: text('id').primaryKey(),
   nomeCompleto: text('nome_completo').notNull(),
