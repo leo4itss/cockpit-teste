@@ -318,6 +318,16 @@ export function OrganizacaoDetailPage() {
     setEditingSolution(null)
   }
 
+  async function handleInactivateSolution(solution: Solution) {
+    try {
+      const updated = await api.updateSolution(solution.id, { ...solution, status: 'Inativo' })
+      setSolutions(prev => prev.map(s => s.id === updated.id ? updated : s))
+    } catch {
+      // silencioso
+    }
+    setEditingSolution(null)
+  }
+
   const tabs: { key: Tab; label: string }[] = [
     { key: 'conta', label: 'Conta' },
     { key: 'solucoes', label: 'Soluções e planos' },
