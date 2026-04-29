@@ -173,16 +173,19 @@ app.put('/solutions/:id', async (c) => {
   const existingPlans = JSON.stringify(existing.plans ?? [])
   const incomingPlans = JSON.stringify(body.plans ?? [])
   if (existingPlans !== incomingPlans) {
-    const solucaoNome = existing.name
-    const allContracts = await db.select().from(contracts)
-    const afetados = allContracts.filter((ct: any) => {
-      const objetos = ct.objetos as Array<{ solucao: string }>
-      return objetos.some((obj) => obj.solucao === solucaoNome)
-    })
-    if (afetados.length > 0) {
+    try {
+      const solucaoNome = existing.name
+      const allContracts = await db.select().from(contracts)
+      const afetados = allContracts.filter((ct: any) => {
+        const objetos = ct.objetos as Array<{ solucao: string }>
+        return Array.isArray(objetos) && objetos.some((obj) => obj.solucao === solucaoNome)
+      })
       const now = new Date().toISOString()
       for (const ct of afetados) {
-        const existingVersions = await db.select().from(contractVersions).where(eq(contractVersions.contratoId, ct.id))
+        const existingVersions = await db
+          .select()
+          .from(contractVersions)
+          .where(eq(contractVersions.contratoId, ct.id))
         const nextVersao = existingVersions.length + 1
         await db.insert(contractVersions).values({
           id: crypto.randomUUID(),
@@ -194,6 +197,9 @@ app.put('/solutions/:id', async (c) => {
           motivo: `Planos da solução "${solucaoNome}" foram atualizados.`,
         })
       }
+    } catch (versionErr) {
+      // Versioning failure is non-fatal — log but continue saving the solution
+      console.error('[versioning error]', versionErr)
     }
   }
 
