@@ -238,7 +238,23 @@ app.put('/api/solutions/:id', async (c) => {
 })
 
 app.delete('/api/solutions/:id', async (c) => {
-  await db.delete(solutions).where(eq(solutions.id, c.req.param('id')))
+  const id = c.req.param('id')
+  const [sol] = await db.select().from(solutions).where(eq(solutions.id, id))
+  if (!sol) return c.json({ error: 'Not found' }, 404)
+
+  // Verifica se há contratos vinculados pelo nome da solução
+  const allContracts = await db.select().from(contracts)
+  const linked = allContracts.some((ct: any) =>
+    (ct.objetos as Array<{ solucao: string }>).some(obj => obj.solucao === sol.name)
+  )
+  if (linked) {
+    return c.json({
+      error: 'linked_to_contracts',
+      message: 'Esta solução está vinculada a contratos e não pode ser excluída. Inative-a para desativá-la.',
+    }, 422)
+  }
+
+  await db.delete(solutions).where(eq(solutions.id, id))
   return c.json({ ok: true })
 })
 
