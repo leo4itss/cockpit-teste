@@ -166,6 +166,7 @@ export function EditSolutionSheet({
   const [plans, setPlans] = useState<Plan[]>(solution?.plans ?? [])
   const [planDialogOpen, setPlanDialogOpen] = useState(false)
   const [editingPlanIndex, setEditingPlanIndex] = useState<number | null>(null)
+  const [confirmVersionModal, setConfirmVersionModal] = useState(false)
 
   // Componentes são sempre read-only — não podem ser alterados após a solução ser criada
   const componentesVinculados = componentes.filter(c =>
