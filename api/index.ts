@@ -250,7 +250,34 @@ app.post('/contracts', async (c) => {
   return c.json(row, 201)
 })
 app.put('/contracts/:id', async (c) => {
-  const [row] = await db.update(contracts).set(await c.req.json()).where(eq(contracts.id, c.req.param('id'))).returning()
+  const id = c.req.param('id')
+  const body = await c.req.json()
+
+  // Busca o contrato atual para snapshot antes de sobrescrever
+  const [existing] = await db.select().from(contracts).where(eq(contracts.id, id))
+  if (!existing) return c.json({ error: 'Not found' }, 404)
+
+  // Versiona se os objetos mudaram
+  const existingObjetos = JSON.stringify(existing.objetos ?? [])
+  const incomingObjetos = JSON.stringify(body.objetos ?? [])
+  if (existingObjetos !== incomingObjetos) {
+    try {
+      const existingVersions = await db.select().from(contractVersions).where(eq(contractVersions.contratoId, id))
+      await db.insert(contractVersions).values({
+        id: crypto.randomUUID(),
+        contratoId: id,
+        versao: existingVersions.length + 1,
+        snapshotPlano: existing.objetos,
+        alteradoPor: 'sistema',
+        alteradoEm: new Date().toISOString(),
+        motivo: 'Contrato editado manualmente.',
+      })
+    } catch (err) {
+      console.error('[contract versioning error]', err)
+    }
+  }
+
+  const [row] = await db.update(contracts).set(body).where(eq(contracts.id, id)).returning()
   return row ? c.json(row) : c.json({ error: 'Not found' }, 404)
 })
 app.delete('/contracts/:id', async (c) => {
