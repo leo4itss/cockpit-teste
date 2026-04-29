@@ -6,20 +6,26 @@ interface Props {
   value: string[]                // IDs selecionados
   onChange: (ids: string[]) => void
   onCreateNew?: () => void       // Abre dialog de novo componente
+  single?: boolean               // Se true, permite selecionar apenas um componente
 }
 
 /**
- * Multi-select de Componentes para associar a uma Solução.
- * Exibe cada componente como um item clicável com checkbox.
- * O botão "Novo componente" é exibido apenas se onCreateNew for fornecido.
+ * Seletor de Componentes para associar a uma Solução.
+ * - single=false (padrão): multi-select com checkboxes
+ * - single=true: seleção única com radio behavior (substitui seleção anterior)
  */
-export function ComponenteSelector({ componentes, value, onChange, onCreateNew }: Props) {
+export function ComponenteSelector({ componentes, value, onChange, onCreateNew, single = false }: Props) {
   function toggle(id: string) {
-    onChange(
-      value.includes(id)
-        ? value.filter(i => i !== id)
-        : [...value, id]
-    )
+    if (single) {
+      // Seleciona apenas este; clicando no já selecionado, deseleciona
+      onChange(value.includes(id) ? [] : [id])
+    } else {
+      onChange(
+        value.includes(id)
+          ? value.filter(i => i !== id)
+          : [...value, id]
+      )
+    }
   }
 
   return (
@@ -40,10 +46,10 @@ export function ComponenteSelector({ componentes, value, onChange, onCreateNew }
                 }`}
               >
                 <input
-                  type="checkbox"
+                  type={single ? 'radio' : 'checkbox'}
                   checked={checked}
                   onChange={() => toggle(c.id)}
-                  className="mt-0.5 w-4 h-4 rounded border-[#e5e7eb] text-blue-600 shadow-sm cursor-pointer shrink-0"
+                  className="mt-0.5 w-4 h-4 border-[#e5e7eb] text-blue-600 shadow-sm cursor-pointer shrink-0 accent-[#2563eb]"
                 />
                 <div className="flex flex-col gap-0.5 min-w-0">
                   <p className="text-sm font-medium text-[#030712] leading-5">{c.nome}</p>
