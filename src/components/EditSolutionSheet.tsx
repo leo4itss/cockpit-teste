@@ -503,6 +503,32 @@ export function EditSolutionSheet({
         tiposLicenca={tiposDisponiveis}
       />
 
+      {/* ── Modal de confirmação de versionamento ──────────── */}
+      <Dialog
+        open={confirmVersionModal}
+        onClose={() => setConfirmVersionModal(false)}
+        title="Confirmar alteração de planos"
+        className="max-w-md"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setConfirmVersionModal(false)}>Cancelar</Button>
+            <Button onClick={doSave}>Confirmar e salvar</Button>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-4">
+          <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-md px-4 py-3">
+            <TriangleAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+            <p className="text-sm text-amber-800 leading-5">
+              Ao salvar, todos os contratos vinculados a esta solução serão versionados automaticamente. Uma cópia dos dados atuais será preservada no histórico de cada contrato.
+            </p>
+          </div>
+          <p className="text-sm text-[#6b7280]">
+            Esta ação não pode ser desfeita. Os contratos continuarão ativos com os novos valores dos planos.
+          </p>
+        </div>
+      </Dialog>
+
     </>
   )
 }
