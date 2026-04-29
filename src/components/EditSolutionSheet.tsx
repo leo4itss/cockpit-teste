@@ -265,7 +265,7 @@ export function EditSolutionSheet({
         open={open}
         onClose={onClose}
         title="Editar Solução"
-        width="w-[768px]"
+        width="w-[640px]"
         footer={
           <>
             <Button variant="ghost" onClick={onDelete} className="mr-auto text-red-600 hover:bg-red-50">
