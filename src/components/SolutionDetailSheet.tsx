@@ -64,7 +64,7 @@ function PlanItem({ plan }: { plan: Plan }) {
     const unidade = l.tipoLicencaUnidade ?? ''
     const min = l.valorMinimo?.trim()
     const max = l.valorMaximo?.trim()
-    const val = (l as any).valor?.trim?.()
+    const val = l.valor?.trim()
     if (min && max) return `${min}–${max} ${unidade}`.trim()
     if (min) return `${min} ${unidade}`.trim()
     if (max) return `Até ${max} ${unidade}`.trim()
