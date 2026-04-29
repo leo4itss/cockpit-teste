@@ -91,30 +91,33 @@ function VersionCard({ version }: { version: ContractVersion }) {
           {version.motivo && (
             <p className="text-xs text-[#6b7280] italic mb-1">{version.motivo}</p>
           )}
-          {version.snapshotPlano.map((obj, i) => (
-            <div key={i} className={`flex flex-col gap-1 text-xs text-[#030712] ${i > 0 ? 'pt-3 border-t border-[#e5e7eb]' : ''}`}>
-              <div className="flex justify-between gap-4">
-                <span className="text-[#6b7280]">Solução</span>
-                <span className="font-medium text-right">{obj.solucao || '—'}</span>
+          {version.snapshotPlano.map((obj, i) => {
+            const { tipo, valor } = parseLicenciamento(obj.licenciamento)
+            return (
+              <div key={i} className={`flex flex-col gap-1 text-xs text-[#030712] ${i > 0 ? 'pt-3 border-t border-[#e5e7eb]' : ''}`}>
+                <div className="flex justify-between gap-4">
+                  <span className="text-[#6b7280]">Solução</span>
+                  <span className="font-medium text-right">{obj.solucao || '—'}</span>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <span className="text-[#6b7280]">Plano</span>
+                  <span className="font-medium text-right">{obj.plano && obj.plano !== '—' ? obj.plano : '—'}</span>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <span className="text-[#6b7280]">Tipo de licença</span>
+                  <span className="font-medium text-right">{tipo}</span>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <span className="text-[#6b7280]">Valor do tipo de licença</span>
+                  <span className="font-medium text-right">{valor}</span>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <span className="text-[#6b7280]">Qtd contratada</span>
+                  <span className="font-medium text-right">{obj.qtdContratada ?? '—'}</span>
+                </div>
               </div>
-              <div className="flex justify-between gap-4">
-                <span className="text-[#6b7280]">Org. contratada</span>
-                <span className="font-medium text-right">{obj.orgContratada || '—'}</span>
-              </div>
-              <div className="flex justify-between gap-4">
-                <span className="text-[#6b7280]">Plano</span>
-                <span className="font-medium text-right">{obj.plano || '—'}</span>
-              </div>
-              <div className="flex justify-between gap-4">
-                <span className="text-[#6b7280]">Tipo de licença</span>
-                <span className="font-medium text-right">{obj.licenciamento && obj.licenciamento !== '—' ? obj.licenciamento : '—'}</span>
-              </div>
-              <div className="flex justify-between gap-4">
-                <span className="text-[#6b7280]">Qtd contratada</span>
-                <span className="font-medium text-right">{obj.qtdContratada ?? '—'}</span>
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>
