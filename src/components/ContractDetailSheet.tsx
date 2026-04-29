@@ -52,7 +52,57 @@ function ObjetoField({ label, value }: { label: string; value?: string | number 
   )
 }
 
+function VersionCard({ version }: { version: ContractVersion }) {
+  const [expanded, setExpanded] = useState(false)
+  const date = version.alteradoEm
+    ? new Date(version.alteradoEm).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
+    : '—'
+
+  return (
+    <div className="border border-[#e5e7eb] rounded-xl overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setExpanded(v => !v)}
+        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 transition-colors"
+      >
+        <div className="flex flex-col gap-0.5">
+          <p className="text-sm font-semibold text-[#030712]">Versão {version.versao}</p>
+          <p className="text-xs text-[#6b7280]">{date} · {version.alteradoPor}</p>
+        </div>
+        {expanded
+          ? <ChevronUp className="w-4 h-4 text-[#6b7280] shrink-0" />
+          : <ChevronDown className="w-4 h-4 text-[#6b7280] shrink-0" />
+        }
+      </button>
+      {expanded && (
+        <div className="px-4 pb-4 border-t border-[#e5e7eb] bg-[#fafafa] flex flex-col gap-2 pt-3">
+          {version.motivo && (
+            <p className="text-xs text-[#6b7280] italic">{version.motivo}</p>
+          )}
+          {version.snapshotPlano.map((obj, i) => (
+            <div key={i} className="flex flex-col gap-0.5 text-xs text-[#030712]">
+              <p><span className="font-medium">Solução:</span> {obj.solucao}</p>
+              <p><span className="font-medium">Plano:</span> {obj.plano}</p>
+              <p><span className="font-medium">Licença:</span> {obj.licenciamento}</p>
+              <p><span className="font-medium">Qtd:</span> {obj.qtdContratada}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function ContractDetailSheet({ open, onClose, contract, onEdit }: Props) {
+  const [versions, setVersions] = useState<ContractVersion[]>([])
+
+  useEffect(() => {
+    if (!open || !contract) return
+    api.getContractVersions(contract.id)
+      .then(data => setVersions(data))
+      .catch(() => setVersions([]))
+  }, [open, contract])
+
   if (!contract) return null
 
   const shortId = contract.id.length > 8 ? `${contract.id.substring(0, 8)}…` : contract.id
