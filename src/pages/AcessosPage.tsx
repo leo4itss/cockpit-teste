@@ -159,12 +159,6 @@ export function AcessosPage() {
                               <UserX className="w-4 h-4 shrink-0" />
                               Inativar usuário
                             </button>
-                            <button
-                              className="flex items-center gap-2 w-full px-3 py-2 text-sm font-medium text-[#030712] hover:bg-gray-100 rounded-md transition-colors text-left"
-                            >
-                              <FileText className="w-4 h-4 shrink-0" />
-                              Criar Contrato
-                            </button>
                           </div>
                         }
                       >
