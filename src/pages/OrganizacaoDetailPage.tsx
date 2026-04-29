@@ -37,7 +37,7 @@ export function OrganizacaoDetailPage() {
   const [solutions, setSolutions] = useState<Solution[]>([])
   const [contracts, setContracts] = useState<Contract[]>([])
   const [tiposLicenca, setTiposLicenca] = useState<TipoLicenca[]>([])
-  const [componentes, setComponentes] = useState<Componente[]>([])
+  const { componentes } = useComponentes()
   const [loading, setLoading] = useState(true)
   const [loadError] = useState<string | null>(null)
   const [showDeleted, setShowDeleted] = useState(false)
