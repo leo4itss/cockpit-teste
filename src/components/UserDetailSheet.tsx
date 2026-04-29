@@ -1,6 +1,6 @@
+import { Check } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Button } from './ui/Button'
-import { Check } from 'lucide-react'
 import type { User } from '@/types'
 
 interface Props {
@@ -10,32 +10,22 @@ interface Props {
   onEdit: (user: User) => void
 }
 
-function Separator() {
-  return <div className="border-t border-gray-200 w-full" />
+function Divider() {
+  return <div className="border-t border-[#e5e7eb] w-full" />
 }
 
-function FieldGroup({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex flex-col gap-7">
-      {children}
-    </div>
-  )
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return <p className="text-base font-bold text-[#030712] leading-6 pb-3">{children}</p>
 }
 
-function SectionLegend({ children }: { children: React.ReactNode }) {
+function Field({ label, value, required }: { label: string; value?: string; required?: boolean }) {
   return (
-    <div className="pb-3">
-      <p className="text-base font-bold text-[#030712] leading-6">{children}</p>
-    </div>
-  )
-}
-
-function Field({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex flex-col gap-1">
-      <label className="text-sm font-medium text-[#030712]">{label}</label>
-      <div className="bg-gray-50 rounded-md px-3 py-2 text-sm text-[#6b7280]">
-        {value || 'Não informado'}
+    <div className="flex flex-col gap-2">
+      <label className="text-sm font-medium text-[#030712]">
+        {label}{required && <span className="text-[#dc2626] ml-0.5">*</span>}
+      </label>
+      <div className="h-9 px-3 flex items-center bg-[#f9fafb] border border-[#e5e7eb] rounded-md text-sm text-[#6b7280] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] overflow-hidden">
+        <span className="truncate">{value || 'Não informado'}</span>
       </div>
     </div>
   )
@@ -49,70 +39,75 @@ export function UserDetailSheet({ open, onClose, user, onEdit }: Props) {
       open={open}
       onClose={onClose}
       title="Detalhes do Usuário"
-      width="w-[768px]"
+      width="w-[640px]"
+      headerAction={
+        <Button variant="outline" size="sm" onClick={() => onEdit(user)}>Editar</Button>
+      }
     >
-      <div className="flex flex-col gap-10">
+      <div className="flex flex-col gap-8">
 
-        {/* Header com avatar e status */}
-        <FieldGroup>
-          <div className="flex items-start gap-7">
-            <div className="w-12 h-12 rounded-full bg-gray-200 shrink-0 overflow-hidden">
-              {user.avatar
-                ? <img src={user.avatar} alt={user.nomeCompleto} className="w-full h-full object-cover" />
-                : <div className="w-full h-full bg-gray-200 rounded-full" />
-              }
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="pb-3">
-                <p className="text-base font-bold text-[#030712] leading-6">{user.nomeCompleto}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-[#16a34a] flex items-center justify-center shrink-0">
-                  <Check className="w-2.5 h-2.5 text-white stroke-[3]" />
-                </div>
-                <span className="text-xs font-medium text-[#16a34a]">Criado</span>
-              </div>
-            </div>
-            <div className="shrink-0">
-              <Button variant="outline" size="sm" onClick={() => onEdit(user)}>Editar</Button>
-            </div>
+        {/* ── Identificação ────────────────────────────── */}
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-[#e5e7eb] shrink-0 flex items-center justify-center text-sm font-semibold text-[#6b7280] overflow-hidden">
+            {user.avatar
+              ? <img src={user.avatar} alt={user.nomeCompleto} className="w-full h-full object-cover" />
+              : user.nomeCompleto.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase()
+            }
           </div>
-          <Separator />
-        </FieldGroup>
+          <div className="flex-1 min-w-0">
+            <p className="text-base font-bold text-[#030712] leading-6 truncate">{user.nomeCompleto}</p>
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#16a34a]">
+              <span className="w-4 h-4 rounded-full bg-[#16a34a] flex items-center justify-center shrink-0">
+                <Check className="w-3 h-3 text-white" strokeWidth={2.5} />
+              </span>
+              Criado
+            </span>
+          </div>
+        </div>
 
-        {/* Informações básicas */}
-        <FieldGroup>
-          <SectionLegend>Informações básicas</SectionLegend>
-          <Field label="Nome completo" value={user.nomeCompleto} />
-          <Field label="Usuário/Login" value={user.usuario} />
-          <Separator />
-        </FieldGroup>
+        <Divider />
 
-        {/* Contatos */}
-        <FieldGroup>
-          <SectionLegend>Contatos</SectionLegend>
-          <Field label="Telefone" value={user.telefone} />
-          <Field label="E-mail" value={user.email} />
-          <Separator />
-        </FieldGroup>
+        {/* ── Informações básicas ───────────────────────── */}
+        <div className="flex flex-col gap-4">
+          <SectionTitle>Informações básicas</SectionTitle>
+          <Field label="Nome completo" value={user.nomeCompleto} required />
+          <Field label="Usuário/login" value={user.usuario} required />
+          <Field label="E-mail" value={user.email} required />
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="País / Região" value={user.pais} required />
+            <Field label="Número" value={user.telefone} required />
+          </div>
+        </div>
 
-        {/* Informações Profissionais */}
-        <FieldGroup>
-          <SectionLegend>Informações Profissionais</SectionLegend>
-          <Field label="Área" value={user.area} />
-          <Field label="Cargo" value={user.cargo} />
-          <Field label="Papel" value={user.papel} />
-          <Field label="Etiquetas de classificação" value={user.etiquetas} />
-          <Separator />
-        </FieldGroup>
+        <Divider />
 
-        {/* Configurações regionais */}
-        <FieldGroup>
-          <SectionLegend>Configurações regionais</SectionLegend>
+        {/* ── Contatos ─────────────────────────────────── */}
+        <div className="flex flex-col gap-4">
+          <SectionTitle>Contatos</SectionTitle>
+          <Field label="Telefone" value={user.telefone} required />
+          <Field label="E-mail" value={user.email} required />
+        </div>
+
+        <Divider />
+
+        {/* ── Informações Profissionais ─────────────────── */}
+        <div className="flex flex-col gap-4">
+          <SectionTitle>Informações Profissionais</SectionTitle>
+          <Field label="Área" value={user.area} required />
+          <Field label="Cargo" value={user.cargo} required />
+          <Field label="Papel" value={user.papel} required />
+          <Field label="Etiquetas de classificação" value={user.etiquetas} required />
+        </div>
+
+        <Divider />
+
+        {/* ── Configurações regionais ───────────────────── */}
+        <div className="flex flex-col gap-4">
+          <SectionTitle>Configurações regionais</SectionTitle>
           <Field label="Formato de data" value={user.formatoData} />
           <Field label="Formato de hora (12/24)" value={user.formatoHora} />
           <Field label="Fuso horário pessoal" value={user.fusoHorario} />
-        </FieldGroup>
+        </div>
 
       </div>
     </Sheet>
