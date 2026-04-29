@@ -80,8 +80,8 @@ export function NewSolutionSheet({
   orgId,
   onSave,
   tiposLicenca,
-  componentes,
 }: Props) {
+  const { componentes } = useComponentes()
   const [form, setForm] = useState({
     name: '',
     description: '',
