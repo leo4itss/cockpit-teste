@@ -60,12 +60,8 @@ export function OrganizacaoDetailPage() {
       setContracts(conts)
 
       // Carrega auxiliares de forma independente — falha silenciosa
-      const [tipos, comps] = await Promise.all([
-        api.getTiposLicenca().catch(() => mockTiposLicenca),
-        api.getComponentes().catch(() => mockComponentes),
-      ])
+      const tipos = await api.getTiposLicenca().catch(() => mockTiposLicenca)
       setTiposLicenca(tipos)
-      setComponentes(comps)
       setLoading(false)
     }).catch(() => {
       // API indisponível — usa mock data como fallback
