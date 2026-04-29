@@ -8,7 +8,8 @@ import { PlanCard } from './PlanCard'
 import { NewPlanDialog } from './NewPlanDialog'
 import { ComponenteSelector } from './ComponenteSelector'
 import { ComponenteSelecaoSheet } from './ComponenteSelecaoSheet'
-import type { Solution, Plan, TipoLicenca, Componente } from '@/types'
+import { useComponentes } from '@/context/ComponentesContext'
+import type { Solution, Plan, TipoLicenca } from '@/types'
 
 interface Props {
   open: boolean
@@ -16,7 +17,7 @@ interface Props {
   orgId: string
   onSave: (solution: Omit<Solution, 'id'>) => void
   tiposLicenca: TipoLicenca[]
-  componentes: Componente[]
+  componentes?: never  // componentes agora vêm do contexto global
 }
 
 /* ── sub-components ────────────────────────────────────── */
