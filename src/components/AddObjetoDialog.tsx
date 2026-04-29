@@ -44,9 +44,17 @@ function buildRows(solutions: Solution[], orgName: string): Row[] {
       // Monta label de licenciamento a partir do novo formato (tipoLicencaNome + range)
       const licenciamento = plan.licensings.length > 0
         ? plan.licensings.map(l => {
-            const range = [l.valorMinimo, l.valorMaximo].filter(Boolean).join('–')
+            const unidade = l.tipoLicencaUnidade ?? ''
             const nome = l.tipoLicencaNome || l.tipoLicencaId
-            return range ? `${nome}: ${range} ${l.tipoLicencaUnidade ?? ''}`.trim() : nome
+            const min = l.valorMinimo?.trim?.()
+            const max = l.valorMaximo?.trim?.()
+            const val = (l as any).valor?.trim?.()
+            let range = ''
+            if (min && max) range = `${min}–${max} ${unidade}`.trim()
+            else if (min) range = `${min} ${unidade}`.trim()
+            else if (max) range = `Até ${max} ${unidade}`.trim()
+            else if (val) range = `${val} ${unidade}`.trim()
+            return range ? `${nome}: ${range}` : nome
           }).join(' · ') || '—'
         : '—'
 
