@@ -96,7 +96,7 @@ export function ComponenteSheet({ open, onClose, onSave, onDelete, initialCompon
     onClose()
   }
 
-  const canSave = nome.trim() !== '' && descricao.trim() !== ''
+  const canSave = nome.trim() !== '' && descricao.trim() !== '' && metadataTestado
 
   return (
     <Sheet
