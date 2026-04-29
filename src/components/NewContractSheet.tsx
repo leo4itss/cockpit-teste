@@ -70,15 +70,20 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
 
   return (
     <>
+      const canSave = !!contratante && objetos.length > 0 && !!form.dataInicio && !!form.dataTermino
+
+      return (
       <Sheet
         open={open}
         onClose={onClose}
         title="Novo Contrato"
-        width="w-[80vw] max-w-[960px]"
+        width="w-[640px]"
         footer={
           <>
-            <Button variant="secondary" onClick={onClose}>Cancelar</Button>
-            <Button onClick={handleSave}>Salvar</Button>
+            <Button variant="outline" onClick={onClose}>Cancelar</Button>
+            <Button onClick={handleSave} disabled={!canSave} className={!canSave ? 'opacity-50 cursor-not-allowed' : ''}>
+              Criar Contrato
+            </Button>
           </>
         }
       >
