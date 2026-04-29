@@ -98,7 +98,7 @@ export function AddObjetoDialog({ open, onClose, solutions, orgName, onSave }: P
       className="max-w-[960px]"
       footer={
         <>
-          <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
+          <Button variant="outline" onClick={handleClose}>Cancelar</Button>
           <Button onClick={handleSave}>Salvar</Button>
         </>
       }
