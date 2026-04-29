@@ -45,7 +45,7 @@ export function ComponenteDetailSheet({ open, onClose, componente, onEdit }: Pro
       open={open}
       onClose={onClose}
       title="Detalhe do componente"
-      width="w-[560px]"
+      width="w-[640px]"
       headerAction={
         <Button variant="outline" size="sm" onClick={onEdit}>
           Editar
