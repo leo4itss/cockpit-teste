@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, AlertCircle } from 'lucide-react'
+import { Plus, CircleAlert } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Select } from './ui/Select'
 import { Input } from './ui/Input'
@@ -31,18 +31,17 @@ const RENOVACAO_OPTIONS = [
   { value: 'Anual', label: 'Anual' },
 ]
 
+const COLS = ['Solução', 'Organização contratada', 'Plano', 'Licenciamento', 'Qtd contratada']
+
 export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solutions, onSave }: Props) {
-  // Contas ativas (sem deletedAt) disponíveis para ser a contratante
   const activeAccounts = accounts.filter(a => !a.deletedAt)
 
   const [contratante, setContratante] = useState('')
-  const [form, setForm] = useState({
-    dataInicio: '',
-    dataTermino: '',
-    renovacao: '',
-  })
+  const [form, setForm] = useState({ dataInicio: '', dataTermino: '', renovacao: '' })
   const [objetos, setObjetos] = useState<ObjetoContrato[]>([])
   const [dialogOpen, setDialogOpen] = useState(false)
+
+  const canSave = !!contratante && objetos.length > 0 && !!form.dataInicio && !!form.dataTermino
 
   function set(field: string, value: string) {
     setForm(f => ({ ...f, [field]: value }))
@@ -53,6 +52,7 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
   }
 
   function handleSave() {
+    if (!canSave) return
     onSave({
       orgId,
       contratante: contratante || activeAccounts[0]?.name || orgName,
@@ -70,9 +70,6 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
 
   return (
     <>
-      const canSave = !!contratante && objetos.length > 0 && !!form.dataInicio && !!form.dataTermino
-
-      return (
       <Sheet
         open={open}
         onClose={onClose}
@@ -81,7 +78,11 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
         footer={
           <>
             <Button variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button onClick={handleSave} disabled={!canSave} className={!canSave ? 'opacity-50 cursor-not-allowed' : ''}>
+            <Button
+              onClick={handleSave}
+              disabled={!canSave}
+              className={!canSave ? 'opacity-50 cursor-not-allowed' : ''}
+            >
               Criar Contrato
             </Button>
           </>
@@ -96,83 +97,61 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
             <Select
               label="Conta contratante (onde as soluções desse contrato vão aparecer)"
               options={activeAccounts.map(a => ({ value: a.name, label: a.name }))}
-              placeholder="Selecione uma conta"
+              placeholder="Selecione"
               value={contratante}
               onChange={e => setContratante(e.target.value)}
             />
 
-            {/* Card de soluções / planos / licenciamentos */}
-            <div className="border border-[#e5e7eb] rounded-md p-4 flex flex-col gap-[10px]">
-
-              {/* Header do card */}
+            {/* Card soluções / planos / licenciamentos */}
+            <div className="border border-[#e5e7eb] rounded-2xl p-4 flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-medium text-[#030712]">
-                  Soluções, planos e licenciamentos<span className="text-red-600">*</span>
+                  Soluções, planos e licenciamentos<span className="text-[#dc2626]">*</span>
                 </p>
-                <Button variant="outline" size="sm" onClick={() => setDialogOpen(true)}>
+                <button
+                  type="button"
+                  onClick={() => setDialogOpen(true)}
+                  className="inline-flex items-center gap-1.5 h-8 px-3 border border-[#e5e7eb] rounded-md text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors"
+                >
                   <Plus className="w-3.5 h-3.5" />
                   Adicionar
-                </Button>
+                </button>
               </div>
 
-              <Divider />
-
-              {/* Cabeçalho das colunas */}
-              <div className="flex gap-[15px] items-center">
-                {['Solução', 'Organização contratada', 'Plano', 'Licenciamento', 'Qtd contratada'].map(col => (
-                  <div key={col} className="flex-1 min-w-0">
-                    <div className="h-9 flex items-center px-3 rounded-md bg-white shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
-                      <span className="text-xs text-[#6b7280] truncate">{col}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Linhas de objetos selecionados */}
-              {objetos.length > 0 ? (
+              {objetos.length > 0 && (
                 <>
                   <Divider />
+                  {/* Cabeçalho */}
+                  <div className="grid grid-cols-5 gap-2">
+                    {COLS.map(col => (
+                      <p key={col} className="text-xs text-[#6b7280] leading-4">{col}</p>
+                    ))}
+                  </div>
+                  <Divider />
+                  {/* Linhas */}
                   {objetos.map((obj, i) => (
-                    <div key={i} className="flex gap-[15px] items-center">
-                      <div className="flex-1 min-w-0">
-                        <div className="h-9 flex items-center px-3 rounded-md bg-white shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
-                          <span className="text-sm text-[#030712] truncate">{obj.solucao}</span>
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="h-9 flex items-center px-3 rounded-md bg-white shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
-                          <span className="text-sm text-[#030712] truncate">{obj.orgContratada}</span>
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="h-9 flex items-center px-3 rounded-md bg-white shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
-                          <span className="text-sm text-[#030712] truncate">{obj.plano}</span>
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="h-9 flex items-center px-3 rounded-md bg-white shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
-                          <span className="text-sm text-[#030712] truncate">{obj.licenciamento}</span>
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <Input
-                          type="number"
-                          value={String(obj.qtdContratada)}
-                          onChange={e => setObjetos(prev =>
-                            prev.map((o, idx) => idx === i ? { ...o, qtdContratada: Number(e.target.value) } : o)
-                          )}
-                        />
-                      </div>
+                    <div key={i} className="grid grid-cols-5 gap-2 items-center">
+                      <p className="text-sm text-[#030712] truncate">{obj.solucao}</p>
+                      <p className="text-sm text-[#030712] truncate">{obj.orgContratada}</p>
+                      <p className="text-sm text-[#030712] truncate">{obj.plano}</p>
+                      <p className="text-sm text-[#030712] truncate">{obj.licenciamento}</p>
+                      <Input
+                        type="number"
+                        value={String(obj.qtdContratada)}
+                        onChange={e => setObjetos(prev =>
+                          prev.map((o, idx) => idx === i ? { ...o, qtdContratada: Number(e.target.value) } : o)
+                        )}
+                      />
                     </div>
                   ))}
                 </>
-              ) : null}
+              )}
             </div>
 
-            {/* Banner informativo */}
-            <div className="flex items-center gap-2 bg-[#f3f4f6] p-2">
-              <AlertCircle className="w-4 h-4 text-[#030712] shrink-0" />
-              <p className="text-xs text-[#030712] leading-4">
+            {/* Info box */}
+            <div className="flex items-start gap-2 bg-blue-50 rounded-md px-3 py-3">
+              <CircleAlert className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+              <p className="text-xs text-[#030712] leading-5">
                 Objetos do contrato reúnem soluções, planos e licenciamentos, definindo as condições e limites para atender às necessidades do cliente.
               </p>
             </div>
@@ -183,35 +162,28 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
           {/* ── Vigência ─────────────────────────────────────── */}
           <div className="flex flex-col gap-7">
             <SectionTitle>Vigência</SectionTitle>
-
-            <div className="flex gap-7 items-start">
-              <div className="w-[234px]">
-                <Input
-                  label="Data de início"
-                  required
-                  type="date"
-                  value={form.dataInicio}
-                  onChange={e => set('dataInicio', e.target.value)}
-                />
-              </div>
-              <div className="w-[234px]">
-                <Input
-                  label="Data de término"
-                  required
-                  type="date"
-                  value={form.dataTermino}
-                  onChange={e => set('dataTermino', e.target.value)}
-                />
-              </div>
+            <div className="grid grid-cols-2 gap-7">
+              <Input
+                label="Data de início"
+                required
+                type="date"
+                value={form.dataInicio}
+                onChange={e => set('dataInicio', e.target.value)}
+              />
+              <Input
+                label="Data de término"
+                required
+                type="date"
+                value={form.dataTermino}
+                onChange={e => set('dataTermino', e.target.value)}
+              />
             </div>
-
             <Divider />
           </div>
 
           {/* ── Renovação ─────────────────────────────────────── */}
           <div className="flex flex-col gap-7">
             <SectionTitle>Renovação</SectionTitle>
-
             <Select
               label="Tipo de renovação"
               options={RENOVACAO_OPTIONS}
