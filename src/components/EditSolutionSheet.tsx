@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
-import { ChevronUp, ChevronDown, MoreVertical, CircleAlert, Pencil, Trash2 } from 'lucide-react'
+import { ChevronUp, ChevronDown, MoreVertical, CircleAlert, Pencil, Trash2, TriangleAlert } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Input } from './ui/Input'
 import { Select } from './ui/Select'
 import { Button } from './ui/Button'
 import { NewPlanDialog } from './NewPlanDialog'
+import { Dialog } from './ui/Dialog'
 import type { Solution, Plan, TipoLicenca, Componente, Contract } from '@/types'
 
 interface Props {
