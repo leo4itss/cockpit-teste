@@ -208,6 +208,7 @@ export function AcessosPage() {
         onClose={() => setShowEditSheet(false)}
         user={selectedUser}
         onSave={handleSaveEditUser}
+        onDelete={handleDeleteUser}
       />
     </div>
   )
