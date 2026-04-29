@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BadgeCheck } from 'lucide-react'
+import { CircleCheck } from 'lucide-react'
 import { Dialog } from './ui/Dialog'
 import { Button } from './ui/Button'
 import type { Solution, ObjetoContrato } from '@/types'
