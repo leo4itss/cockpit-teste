@@ -238,7 +238,7 @@ export function EditSolutionSheet({
     setEditingPlanIndex(null)
   }
 
-  function handleSave() {
+  function doSave() {
     if (!solution) return
     onSave({
       ...solution,
@@ -254,7 +254,22 @@ export function EditSolutionSheet({
       titleLink02:       form.titleLink02,
       marketplaceStatus: form.marketplaceStatus,
     })
+    setConfirmVersionModal(false)
     onClose()
+  }
+
+  function handleSave() {
+    if (!solution) return
+    // Verifica se os planos foram alterados
+    const plansChanged = JSON.stringify(plans) !== JSON.stringify(solution.plans ?? [])
+    if (plansChanged && (contracts ?? []).some(ct =>
+      (ct.objetos as Array<{ solucao: string }>).some(obj => obj.solucao === solution.name)
+    )) {
+      // Há contratos vinculados — exibe modal de confirmação
+      setConfirmVersionModal(true)
+      return
+    }
+    doSave()
   }
 
   if (!solution) return null
