@@ -111,65 +111,67 @@ export function OrganizacoesPage() {
         </div>
       ) : (
         <div className="px-8 pt-6 pb-8">
-        <div className="border border-gray-200 rounded-lg overflow-x-auto">
+        <div className="border border-[#e5e7eb] rounded-2xl overflow-x-auto">
           <table className="w-full text-sm whitespace-nowrap">
             <thead>
-              <tr className="border-b border-gray-200 bg-white">
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">Nome</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">Doc tipo</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">Doc número</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">Domínio</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">Setor atividade</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-gray-500">Qtd contas</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-gray-500">Qtd solução</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-gray-500">Qtd contratos</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">País</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">Estado</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">Cidade</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">Arquiteto PAS</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">Status</th>
-                <th className="px-4 py-3 w-10" />
+              <tr className="border-b border-[#e5e7eb] bg-white">
+                <th className="text-left px-4 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Nome</th>
+                <th className="text-left px-4 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Doc tipo</th>
+                <th className="text-left px-4 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Doc número</th>
+                <th className="text-left px-4 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Domínio</th>
+                <th className="text-left px-4 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Setor atividade</th>
+                <th className="text-left px-4 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">País</th>
+                <th className="text-left px-4 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Estado</th>
+                <th className="text-left px-4 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Cidade</th>
+                <th className="text-left px-4 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Arquiteto PAS</th>
+                <th className="text-left px-4 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Status</th>
+                <th className="px-4 py-2.5 w-10" />
               </tr>
             </thead>
             <tbody>
               {filtered.map((org) => (
                 <tr
                   key={org.id}
-                  className="group/row border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors bg-white"
+                  className="group/row border-b border-[#e5e7eb] last:border-0 hover:bg-gray-50 cursor-pointer transition-colors bg-white"
                   onClick={() => navigate(`/organizacoes/${org.id}`)}
                 >
-                  <td className="px-4 py-3 font-medium text-gray-900">
+                  <td className="px-4 py-3 h-[52px]">
                     <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-xs shrink-0">
-                        {org.name.charAt(0)}
+                      <div className="w-8 h-8 rounded-full bg-[#f3f4f6] border border-[#e5e7eb] flex items-center justify-center text-xs font-semibold text-[#6b7280] shrink-0">
+                        {org.name.charAt(0).toUpperCase()}
                       </div>
-                      {org.name}
+                      <span className="text-sm font-medium text-[#030712]">{org.name}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{org.docType}</td>
-                  <td className="px-4 py-3 text-gray-600">{org.docNumber}</td>
-                  <td className="px-4 py-3 text-gray-600">{org.domain}</td>
-                  <td className="px-4 py-3 text-gray-600">{org.activitySector}</td>
-                  <td className="px-4 py-3 text-right text-gray-600">{org.qtdContas}</td>
-                  <td className="px-4 py-3 text-right text-gray-600">{org.qtdSolucoes}</td>
-                  <td className="px-4 py-3 text-right text-gray-600">{org.qtdContratos}</td>
-                  <td className="px-4 py-3 text-gray-600">{org.country}</td>
-                  <td className="px-4 py-3 text-gray-600">{org.state}</td>
-                  <td className="px-4 py-3 text-gray-600">{org.city}</td>
-                  <td className="px-4 py-3 text-gray-600">{org.arquitetoPAS.split(' ')[0]}...</td>
+                  <td className="px-4 py-3 text-sm text-[#030712]">{org.docType}</td>
+                  <td className="px-4 py-3 text-sm text-[#030712]">{org.docNumber}</td>
+                  <td className="px-4 py-3 text-sm text-[#030712]">{org.domain}</td>
+                  <td className="px-4 py-3 text-sm text-[#030712]">{org.activitySector}</td>
+                  <td className="px-4 py-3 text-sm text-[#030712]">{org.country}</td>
+                  <td className="px-4 py-3 text-sm text-[#030712]">{org.state}</td>
+                  <td className="px-4 py-3 text-sm text-[#030712]">{org.city}</td>
+                  <td className="px-4 py-3 text-sm text-[#030712]">{org.arquitetoPAS}</td>
                   <td className="px-4 py-3">
-                    <Badge variant={org.status === 'Ativo' ? 'success' : 'default'}>{org.status}</Badge>
+                    {org.status === 'Ativo' ? (
+                      <span className="inline-flex items-center gap-1 bg-[#dcfce7] text-[#16a34a] text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">
+                        <CircleCheck className="w-3 h-3" />
+                        Ativo
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-500 text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">
+                        <Circle className="w-3 h-3" />
+                        {org.status}
+                      </span>
+                    )}
                   </td>
                   <td className="px-2 py-3 w-10" onClick={e => e.stopPropagation()}>
-                    <div className="relative group">
-                      <button
-                        onClick={() => { setDeleteTarget(org); setDeleteModal('org') }}
-                        className="p-1.5 rounded hover:bg-red-50 text-[#9ca3af] hover:text-red-600 transition-colors opacity-0 group-hover/row:opacity-100"
-                        title="Excluir organização"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => { setDeleteTarget(org); setDeleteModal('org') }}
+                      className="p-1.5 rounded hover:bg-red-50 text-[#9ca3af] hover:text-red-600 transition-colors opacity-0 group-hover/row:opacity-100"
+                      title="Excluir organização"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </td>
                 </tr>
               ))}
