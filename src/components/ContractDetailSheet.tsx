@@ -75,16 +75,32 @@ function VersionCard({ version }: { version: ContractVersion }) {
         }
       </button>
       {expanded && (
-        <div className="px-4 pb-4 border-t border-[#e5e7eb] bg-[#fafafa] flex flex-col gap-2 pt-3">
+        <div className="px-4 pb-4 border-t border-[#e5e7eb] bg-[#fafafa] flex flex-col gap-3 pt-3">
           {version.motivo && (
-            <p className="text-xs text-[#6b7280] italic">{version.motivo}</p>
+            <p className="text-xs text-[#6b7280] italic mb-1">{version.motivo}</p>
           )}
           {version.snapshotPlano.map((obj, i) => (
-            <div key={i} className="flex flex-col gap-0.5 text-xs text-[#030712]">
-              <p><span className="font-medium">Solução:</span> {obj.solucao}</p>
-              <p><span className="font-medium">Plano:</span> {obj.plano}</p>
-              <p><span className="font-medium">Licença:</span> {obj.licenciamento}</p>
-              <p><span className="font-medium">Qtd:</span> {obj.qtdContratada}</p>
+            <div key={i} className={`flex flex-col gap-1 text-xs text-[#030712] ${i > 0 ? 'pt-3 border-t border-[#e5e7eb]' : ''}`}>
+              <div className="flex justify-between gap-4">
+                <span className="text-[#6b7280]">Solução</span>
+                <span className="font-medium text-right">{obj.solucao || '—'}</span>
+              </div>
+              <div className="flex justify-between gap-4">
+                <span className="text-[#6b7280]">Org. contratada</span>
+                <span className="font-medium text-right">{obj.orgContratada || '—'}</span>
+              </div>
+              <div className="flex justify-between gap-4">
+                <span className="text-[#6b7280]">Plano</span>
+                <span className="font-medium text-right">{obj.plano || '—'}</span>
+              </div>
+              <div className="flex justify-between gap-4">
+                <span className="text-[#6b7280]">Tipo de licença</span>
+                <span className="font-medium text-right">{obj.licenciamento && obj.licenciamento !== '—' ? obj.licenciamento : '—'}</span>
+              </div>
+              <div className="flex justify-between gap-4">
+                <span className="text-[#6b7280]">Qtd contratada</span>
+                <span className="font-medium text-right">{obj.qtdContratada ?? '—'}</span>
+              </div>
             </div>
           ))}
         </div>
