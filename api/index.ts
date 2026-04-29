@@ -11,7 +11,16 @@ export const config = { runtime: 'edge' }
 const sql = neon(process.env.DATABASE_URL!)
 const db = drizzle(sql, { schema })
 
-const { organizations, accounts, solutions, contracts, users } = schema
+const {
+  organizations,
+  accounts,
+  solutions,
+  contracts,
+  contractVersions,
+  users,
+  tiposLicenca,
+  componentes,
+} = schema
 
 const app = new Hono().basePath('/api')
 
@@ -40,11 +49,7 @@ app.get('/organizations/:id', async (c) => {
 })
 app.post('/organizations', async (c) => {
   const body = await c.req.json()
-
-  // neon-http não suporta transactions. Usamos compensação manual:
-  // cria org → tenta criar conta default → se falhar, apaga org.
   const [org] = await db.insert(organizations).values(body).returning()
-
   try {
     await db.insert(accounts).values({
       id: crypto.randomUUID(),
@@ -61,7 +66,6 @@ app.post('/organizations', async (c) => {
     await db.delete(organizations).where(eq(organizations.id, org.id))
     throw err
   }
-
   return c.json(org, 201)
 })
 app.put('/organizations/:id', async (c) => {
@@ -70,24 +74,15 @@ app.put('/organizations/:id', async (c) => {
 })
 app.delete('/organizations/:id', async (c) => {
   const id = c.req.param('id')
-
-  // Verificar dependências bloqueantes
   const [orgAccounts, orgContracts] = await Promise.all([
     db.select().from(accounts).where(eq(accounts.orgId, id)),
     db.select().from(contracts).where(eq(contracts.orgId, id)),
   ])
   const activeAccounts = orgAccounts.filter((a: any) => a.status !== 'Excluído')
   const activeContracts = orgContracts.filter((ct: any) => ct.status === 'Ativo')
-
   if (activeAccounts.length > 0 || activeContracts.length > 0) {
-    return c.json({
-      error: 'dependencies',
-      activeAccounts: activeAccounts.length,
-      activeContracts: activeContracts.length,
-    }, 422)
+    return c.json({ error: 'dependencies', activeAccounts: activeAccounts.length, activeContracts: activeContracts.length }, 422)
   }
-
-  // Cascata: excluir contas (já inativas/excluídas) e contratos
   await db.delete(accounts).where(eq(accounts.orgId, id))
   await db.delete(contracts).where(eq(contracts.orgId, id))
   await db.delete(solutions).where(eq(solutions.orgId, id))
@@ -99,7 +94,6 @@ app.delete('/organizations/:id', async (c) => {
 app.get('/accounts', async (c) => {
   const orgId = c.req.query('orgId')
   const includeDeleted = c.req.query('include_deleted') === 'true'
-
   let rows
   if (orgId) {
     rows = includeDeleted
@@ -125,7 +119,6 @@ app.put('/accounts/:id', async (c) => {
   return row ? c.json(row) : c.json({ error: 'Not found' }, 404)
 })
 app.delete('/accounts/:id', async (c) => {
-  // Soft delete: marca deletedAt, não remove fisicamente
   const [row] = await db
     .update(accounts)
     .set({ deletedAt: new Date().toISOString() })
@@ -134,7 +127,6 @@ app.delete('/accounts/:id', async (c) => {
   if (!row) return c.json({ error: 'Not found' }, 404)
   return c.json({ ok: true })
 })
-// Restaura conta em quarentena (cancela exclusão)
 app.patch('/accounts/:id/restaurar', async (c) => {
   const [row] = await db
     .update(accounts)
@@ -165,35 +157,67 @@ app.put('/solutions/:id', async (c) => {
   const id = c.req.param('id')
   const body = await c.req.json()
 
-  // Se componenteIds está sendo alterado, verificar se há contratos ativos
-  if (body.componenteIds !== undefined) {
-    const [current] = await db.select().from(solutions).where(eq(solutions.id, id))
-    if (!current) return c.json({ error: 'Not found' }, 404)
+  const [existing] = await db.select().from(solutions).where(eq(solutions.id, id))
+  if (!existing) return c.json({ error: 'Not found' }, 404)
 
-    const sortedCurrent = JSON.stringify([...(current.componenteIds ?? [])].sort())
-    const sortedNew = JSON.stringify([...(body.componenteIds ?? [])].sort())
+  // ENTREGA 1: componentes são imutáveis após a criação
+  const sortedExisting = [...((existing.componenteIds as string[]) ?? [])].sort().join(',')
+  const sortedIncoming = [...((body.componenteIds as string[]) ?? [])].sort().join(',')
+  if (sortedExisting !== sortedIncoming) {
+    return c.json({
+      error: 'Os componentes de uma solução não podem ser alterados após a criação. Para uma composição diferente, crie uma nova solução.',
+    }, 422)
+  }
 
-    if (sortedCurrent !== sortedNew) {
-      const activeContracts = await db.select().from(contracts)
-        .where(and(eq(contracts.orgId, current.orgId), eq(contracts.status, 'Ativo')))
-
-      const hasActive = activeContracts.some(ct =>
-        Array.isArray(ct.objetos) && (ct.objetos as any[]).some(o => o.solucao === current.name)
-      )
-
-      if (hasActive) {
-        return c.json({
-          error: 'Esta solução possui contratos ativos. Os componentes não podem ser alterados. Para incluir novos componentes, crie uma nova solução.',
-        }, 422)
+  // ENTREGA 2: versionar contratos afetados por mudança de planos
+  const existingPlans = JSON.stringify(existing.plans ?? [])
+  const incomingPlans = JSON.stringify(body.plans ?? [])
+  if (existingPlans !== incomingPlans) {
+    const solucaoNome = existing.name
+    const allContracts = await db.select().from(contracts)
+    const afetados = allContracts.filter((ct: any) => {
+      const objetos = ct.objetos as Array<{ solucao: string }>
+      return objetos.some((obj) => obj.solucao === solucaoNome)
+    })
+    if (afetados.length > 0) {
+      const now = new Date().toISOString()
+      for (const ct of afetados) {
+        const existingVersions = await db.select().from(contractVersions).where(eq(contractVersions.contratoId, ct.id))
+        const nextVersao = existingVersions.length + 1
+        await db.insert(contractVersions).values({
+          id: crypto.randomUUID(),
+          contratoId: ct.id,
+          versao: nextVersao,
+          snapshotPlano: ct.objetos,
+          alteradoPor: 'sistema',
+          alteradoEm: now,
+          motivo: `Planos da solução "${solucaoNome}" foram atualizados.`,
+        })
       }
     }
   }
 
   const [row] = await db.update(solutions).set(body).where(eq(solutions.id, id)).returning()
-  return row ? c.json(row) : c.json({ error: 'Not found' }, 404)
+  return c.json(row)
 })
 app.delete('/solutions/:id', async (c) => {
-  await db.delete(solutions).where(eq(solutions.id, c.req.param('id')))
+  const id = c.req.param('id')
+  const [sol] = await db.select().from(solutions).where(eq(solutions.id, id))
+  if (!sol) return c.json({ error: 'Not found' }, 404)
+
+  // Verifica se há contratos vinculados pelo nome da solução
+  const allContracts = await db.select().from(contracts)
+  const linked = allContracts.some((ct: any) =>
+    (ct.objetos as Array<{ solucao: string }>).some(obj => obj.solucao === sol.name)
+  )
+  if (linked) {
+    return c.json({
+      error: 'linked_to_contracts',
+      message: 'Esta solução está vinculada a contratos e não pode ser excluída. Inative-a para desativá-la.',
+    }, 422)
+  }
+
+  await db.delete(solutions).where(eq(solutions.id, id))
   return c.json({ ok: true })
 })
 
@@ -221,6 +245,12 @@ app.delete('/contracts/:id', async (c) => {
   await db.delete(contracts).where(eq(contracts.id, c.req.param('id')))
   return c.json({ ok: true })
 })
+// Histórico de versões de um contrato
+app.get('/contracts/:id/versoes', async (c) => {
+  const rows = await db.select().from(contractVersions).where(eq(contractVersions.contratoId, c.req.param('id')))
+  rows.sort((a: any, b: any) => b.versao - a.versao)
+  return c.json(rows)
+})
 
 // ── Users ─────────────────────────────────────────────────────
 app.get('/users', async (c) => c.json(await db.select().from(users)))
@@ -239,6 +269,65 @@ app.put('/users/:id', async (c) => {
 app.delete('/users/:id', async (c) => {
   await db.delete(users).where(eq(users.id, c.req.param('id')))
   return c.json({ ok: true })
+})
+
+// ── Tipos de Licença ──────────────────────────────────────────
+app.get('/tipos-licenca', async (c) => c.json(await db.select().from(tiposLicenca)))
+app.get('/tipos-licenca/:id', async (c) => {
+  const [row] = await db.select().from(tiposLicenca).where(eq(tiposLicenca.id, c.req.param('id')))
+  return row ? c.json(row) : c.json({ error: 'Not found' }, 404)
+})
+app.post('/tipos-licenca', async (c) => {
+  const [row] = await db.insert(tiposLicenca).values(await c.req.json()).returning()
+  return c.json(row, 201)
+})
+app.put('/tipos-licenca/:id', async (c) => {
+  const [row] = await db.update(tiposLicenca).set(await c.req.json()).where(eq(tiposLicenca.id, c.req.param('id'))).returning()
+  return row ? c.json(row) : c.json({ error: 'Not found' }, 404)
+})
+app.delete('/tipos-licenca/:id', async (c) => {
+  await db.delete(tiposLicenca).where(eq(tiposLicenca.id, c.req.param('id')))
+  return c.json({ ok: true })
+})
+
+// ── Componentes ───────────────────────────────────────────────
+app.get('/componentes', async (c) => c.json(await db.select().from(componentes)))
+app.get('/componentes/:id', async (c) => {
+  const [row] = await db.select().from(componentes).where(eq(componentes.id, c.req.param('id')))
+  return row ? c.json(row) : c.json({ error: 'Not found' }, 404)
+})
+app.post('/componentes', async (c) => {
+  const [row] = await db.insert(componentes).values(await c.req.json()).returning()
+  return c.json(row, 201)
+})
+app.put('/componentes/:id', async (c) => {
+  const [row] = await db.update(componentes).set(await c.req.json()).where(eq(componentes.id, c.req.param('id'))).returning()
+  return row ? c.json(row) : c.json({ error: 'Not found' }, 404)
+})
+app.delete('/componentes/:id', async (c) => {
+  await db.delete(componentes).where(eq(componentes.id, c.req.param('id')))
+  return c.json({ ok: true })
+})
+app.post('/componentes/validate-metadata', async (c) => {
+  const { url } = await c.req.json() as { url: string }
+  if (!url || typeof url !== 'string') return c.json({ ok: false, error: 'URL inválida' }, 400)
+  try {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 3000)
+    const res = await fetch(url, { signal: controller.signal })
+    clearTimeout(timeout)
+    if (!res.ok) return c.json({ ok: false, error: `Servidor retornou status ${res.status}` })
+    const data = await res.json() as Record<string, unknown>
+    if (!Array.isArray(data.tiposLicenca) || data.tiposLicenca.length === 0) {
+      return c.json({ ok: false, error: 'Resposta não contém "tiposLicenca" como array não-vazio' })
+    }
+    return c.json({ ok: true, data })
+  } catch (err: unknown) {
+    const msg = err instanceof Error && err.name === 'AbortError'
+      ? 'Timeout — URL demorou mais de 3 segundos para responder'
+      : 'URL inacessível'
+    return c.json({ ok: false, error: msg })
+  }
 })
 
 export default handle(app)
