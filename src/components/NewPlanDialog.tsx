@@ -105,7 +105,7 @@ export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca
             disabled={!canSave}
             className={!canSave ? 'opacity-50 cursor-not-allowed' : ''}
           >
-            Salvar
+            Adicionar
           </Button>
         </>
       }
