@@ -10,13 +10,14 @@ interface Props {
   componentes: Componente[]
   value: string[]              // IDs selecionados
   onChange: (ids: string[]) => void
+  single?: boolean             // Se true, permite selecionar apenas um componente
 }
 
 /**
  * Sheet de seleção de componentes — usado quando há > 5 componentes disponíveis.
  * Exibe lista pesquisável com checkboxes. A confirmação aplica a seleção e fecha.
  */
-export function ComponenteSelecaoSheet({ open, onClose, componentes, value, onChange }: Props) {
+export function ComponenteSelecaoSheet({ open, onClose, componentes, value, onChange, single = false }: Props) {
   const [search, setSearch] = useState('')
   // cópia local da seleção enquanto o sheet está aberto
   const [localSelected, setLocalSelected] = useState<string[]>(value)
