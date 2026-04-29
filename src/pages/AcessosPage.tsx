@@ -18,10 +18,9 @@ export function AcessosPage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
 
   useEffect(() => {
-    api.getUsers().then(data => {
-      setUsers(data)
-      setLoading(false)
-    })
+    api.getUsers()
+      .then(data => { setUsers(data); setLoading(false) })
+      .catch(() => setLoading(false))
   }, [])
 
   const filteredUsers = useMemo(() => {
@@ -34,8 +33,13 @@ export function AcessosPage() {
   }, [users, searchQuery])
 
   async function handleCreateUser(newUser: Omit<User, 'id'>) {
-    const user = await api.createUser({ ...newUser, id: crypto.randomUUID() })
-    setUsers(prev => [...prev, user])
+    const local: User = { ...newUser, id: crypto.randomUUID() } as User
+    try {
+      const saved = await api.createUser(local)
+      setUsers(prev => [...prev, saved])
+    } catch {
+      setUsers(prev => [...prev, local])
+    }
     setShowNewUserSheet(false)
   }
 
@@ -57,14 +61,30 @@ export function AcessosPage() {
   }, [])
 
   async function handleSaveEditUser(updatedUser: User) {
-    const saved = await api.updateUser(updatedUser.id, updatedUser)
-    setUsers(prev => prev.map(u => u.id === saved.id ? saved : u))
+    try {
+      const saved = await api.updateUser(updatedUser.id, updatedUser)
+      setUsers(prev => prev.map(u => u.id === saved.id ? saved : u))
+      setSelectedUser(saved)
+    } catch {
+      setUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u))
+      setSelectedUser(updatedUser)
+    }
     setShowEditSheet(false)
+  }
+
+  async function handleInactivateUser(user: User) {
+    const inativado: User = { ...user, status: 'Inativo' }
+    try {
+      const saved = await api.updateUser(user.id, inativado)
+      setUsers(prev => prev.map(u => u.id === saved.id ? saved : u))
+    } catch {
+      setUsers(prev => prev.map(u => u.id === user.id ? inativado : u))
+    }
   }
 
   async function handleDeleteUser() {
     if (!selectedUser) return
-    try { await api.deleteUser?.(selectedUser.id) } catch { /* silencioso */ }
+    try { await api.deleteUser(selectedUser.id) } catch { /* silencioso */ }
     setUsers(prev => prev.filter(u => u.id !== selectedUser.id))
     setShowEditSheet(false)
     setSelectedUser(null)
