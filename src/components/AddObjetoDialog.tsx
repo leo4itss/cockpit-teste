@@ -27,6 +27,19 @@ interface Props {
 function buildRows(solutions: Solution[], orgName: string): Row[] {
   const rows: Row[] = []
   solutions.forEach(sol => {
+    if (sol.plans.length === 0) {
+      // Solução sem planos: exibe mesmo assim com valores vazios
+      rows.push({
+        id: sol.id,
+        solucao: sol.name,
+        orgContratada: orgName,
+        plano: '—',
+        licenciamento: '—',
+        status: sol.status,
+      })
+      return
+    }
+
     sol.plans.forEach(plan => {
       // Monta label de licenciamento a partir do novo formato (tipoLicencaNome + range)
       const licenciamento = plan.licensings.length > 0
