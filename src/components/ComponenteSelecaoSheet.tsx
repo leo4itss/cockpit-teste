@@ -34,9 +34,13 @@ export function ComponenteSelecaoSheet({ open, onClose, componentes, value, onCh
   )
 
   function toggle(id: string) {
-    setLocalSelected(prev =>
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-    )
+    if (single) {
+      setLocalSelected(prev => prev.includes(id) ? [] : [id])
+    } else {
+      setLocalSelected(prev =>
+        prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+      )
+    }
   }
 
   function handleConfirm() {
