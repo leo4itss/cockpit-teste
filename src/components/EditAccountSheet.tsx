@@ -434,7 +434,7 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
                     </div>
                     {phones.map((t, pi) => (
                       <div key={pi} className="flex items-center gap-3 mt-2 border border-[#e5e7eb] rounded-xl px-4 py-3">
-                        {t.meio === 'chat'
+                        {t.meio === 'telefone'
                           ? <MessageCircle className="w-4 h-4 text-[#030712] shrink-0" />
                           : <MessageCircle className="w-4 h-4 text-[#030712] shrink-0" />
                         }
