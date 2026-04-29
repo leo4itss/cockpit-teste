@@ -210,11 +210,9 @@ export function NewSolutionSheet({
 
         {/* ── Componentes ────────────────────────────── */}
         <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <SectionTitle>Selecione os componentes que compõem essa solução</SectionTitle>
-          </div>
+          <SectionTitle>Componentes</SectionTitle>
           <p className="text-sm text-[#6b7280] -mt-2">
-            Os tipos de licença disponíveis para os planos serão derivados automaticamente dos componentes selecionados.
+            Selecione os módulos que compõem esta solução. Os tipos de licença disponíveis para os planos serão derivados dos componentes selecionados.
           </p>
 
           {useInline ? (
