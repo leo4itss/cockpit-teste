@@ -119,7 +119,9 @@ export function AcessosPage() {
                   >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gray-200 shrink-0" />
+                        <div className="w-8 h-8 rounded-full bg-[#e5e7eb] shrink-0 flex items-center justify-center text-xs font-semibold text-[#6b7280]">
+                          {user.nomeCompleto.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase()}
+                        </div>
                         <span className="text-sm font-medium text-[#030712] truncate">{user.nomeCompleto}</span>
                       </div>
                     </td>
