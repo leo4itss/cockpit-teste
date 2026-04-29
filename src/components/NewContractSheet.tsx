@@ -36,12 +36,22 @@ const COLS = ['Solução', 'Organização contratada', 'Plano', 'Licenciamento',
 export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solutions, onSave }: Props) {
   const activeAccounts = accounts.filter(a => !a.deletedAt)
 
-  const [contratante, setContratante] = useState('')
+  const [contratante, setContratante] = useState(() => activeAccounts[0]?.name ?? '')
   const [form, setForm] = useState({ dataInicio: '', dataTermino: '', renovacao: '' })
   const [objetos, setObjetos] = useState<ObjetoContrato[]>([])
   const [dialogOpen, setDialogOpen] = useState(false)
 
-  const canSave = !!contratante && objetos.length > 0 && !!form.dataInicio && !!form.dataTermino
+  // Sincroniza contratante quando accounts carrega depois do mount
+  const [lastAccounts, setLastAccounts] = useState(accounts)
+  if (accounts !== lastAccounts) {
+    setLastAccounts(accounts)
+    if (!contratante && activeAccounts.length > 0) {
+      setContratante(activeAccounts[0].name)
+    }
+  }
+
+  // contratante é opcional: se não houver contas, usa orgName como fallback no save
+  const canSave = objetos.length > 0 && !!form.dataInicio && !!form.dataTermino
 
   function set(field: string, value: string) {
     setForm(f => ({ ...f, [field]: value }))
