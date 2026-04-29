@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, AlertCircle, Trash2 } from 'lucide-react'
+import { Plus, CircleAlert, Trash2 } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Input } from './ui/Input'
 import { Select } from './ui/Select'
