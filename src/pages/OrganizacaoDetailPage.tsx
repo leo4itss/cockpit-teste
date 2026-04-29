@@ -16,15 +16,15 @@ import { EditSolutionSheet } from '@/components/EditSolutionSheet'
 import { ContractDetailSheet } from '@/components/ContractDetailSheet'
 import { EditContractSheet } from '@/components/EditContractSheet'
 import { api } from '@/api/client'
+import { useComponentes } from '@/context/ComponentesContext'
 import {
   organizations as mockOrgs,
   accounts as mockAccounts,
   solutions as mockSolutions,
   contracts as mockContracts,
   tiposLicenca as mockTiposLicenca,
-  componentes as mockComponentes,
 } from '@/data/mock'
-import type { Account, Solution, Contract, Organization, Contact, TipoLicenca, Componente } from '@/types'
+import type { Account, Solution, Contract, Organization, Contact, TipoLicenca } from '@/types'
 
 type Tab = 'conta' | 'solucoes' | 'contrato' | 'marketplace'
 
