@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
-import { Upload, MessageCircleMore, Mail, MoreVertical, Plus, Pencil, Trash2 } from 'lucide-react'
+import { Upload, MessageCircle, Mail, MoreVertical, Plus, Pencil, Trash2, Copy } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Input } from './ui/Input'
 import { Select } from './ui/Select'
 import { Button } from './ui/Button'
-import { NewContactDialog, type ContactData } from './NewContactDialog'
+import { AddContatoDialog, type Contato } from './AddContatoDialog'
 import { AddAdminDialog, type AdminUser } from './AddAdminDialog'
 import type { Account, Organization, Contact } from '@/types'
 
@@ -18,27 +18,117 @@ interface Props {
   onDelete?: () => void
 }
 
-/* ── sub-components ────────────────────────────────────── */
+/* ── helpers ─────────────────────────────────────────────── */
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
+function contatoFromContact(c: Contact): Contato {
+  return {
+    nome: c.name,
+    cargo: c.role,
+    telefones: [{ pais: 'Brasil (+55)', numero: c.phone, meio: '' }],
+    emails: [c.email],
+    observacao: '',
+  }
+}
+
+function contactFromContato(c: Contato): Contact {
+  return {
+    name: c.nome,
+    role: c.cargo,
+    phone: c.telefones.find(t => t.numero.trim())?.numero ?? '',
+    email: c.emails.find(e => e.trim()) ?? '',
+  }
+}
+
+/* ── EllipsisMenu ────────────────────────────────────────── */
+
+function EllipsisMenu({
+  onEdit,
+  onRemove,
+  editLabel,
+  removeLabel,
+}: {
+  onEdit: () => void
+  onRemove: () => void
+  editLabel: string
+  removeLabel: string
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!open) return
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [open])
   return (
-    <p className="text-base font-bold text-[#030712] leading-6">{children}</p>
+    <div className="relative shrink-0" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        className="w-8 h-8 flex items-center justify-center rounded-md text-[#6b7280] hover:bg-[#f3f4f6] transition-colors"
+      >
+        <MoreVertical className="w-4 h-4" />
+      </button>
+      {open && (
+        <div className="absolute right-0 top-9 z-50 w-52 bg-white border border-[#e5e7eb] rounded-md shadow-md py-1">
+          <button
+            type="button"
+            onClick={() => { setOpen(false); onEdit() }}
+            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[#030712] hover:bg-[#f3f4f6] transition-colors"
+          >
+            <Pencil className="w-4 h-4 text-[#6b7280] shrink-0" />
+            {editLabel}
+          </button>
+          <button
+            type="button"
+            onClick={() => { setOpen(false); onRemove() }}
+            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[#dc2626] hover:bg-red-50 transition-colors"
+          >
+            <Trash2 className="w-4 h-4 shrink-0" />
+            {removeLabel}
+          </button>
+        </div>
+      )}
+    </div>
   )
 }
 
-function Divider() {
-  return <div className="border-t border-gray-100 w-full" />
-}
+/* ── ImageUploadRow ──────────────────────────────────────── */
 
-function ImageRow({ description }: { description: string }) {
+function ImageUploadRow({
+  description,
+  preview,
+  onFileSelect,
+}: {
+  description: string
+  preview: string
+  onFileSelect: (dataUrl: string) => void
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = ev => onFileSelect(ev.target?.result as string)
+    reader.readAsDataURL(file)
+  }
   return (
-    <div className="flex gap-7 items-start">
-      <div className="w-12 h-12 rounded-full border border-gray-200 bg-gray-100 shrink-0 overflow-hidden" />
+    <div className="flex items-start gap-7">
+      <div className="w-12 h-12 rounded-full bg-gray-100 shrink-0 overflow-hidden border border-[#e5e7eb]">
+        {preview
+          ? <img src={preview} alt="" className="w-full h-full object-cover" />
+          : <div className="w-full h-full bg-gray-200 rounded-full" />
+        }
+      </div>
       <div className="flex flex-col gap-2 flex-1 min-w-0">
-        <p className="text-sm font-normal text-[#6b7280] leading-5">{description}</p>
+        <p className="text-sm text-[#6b7280] leading-5">{description}</p>
+        <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleChange} />
         <button
           type="button"
-          className="inline-flex items-center gap-2 h-9 px-4 border border-gray-200 rounded-md text-sm font-medium text-[#030712] bg-white hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors w-fit"
+          onClick={() => inputRef.current?.click()}
+          className="flex items-center gap-2 border border-[#e5e7eb] rounded-md px-4 h-9 text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors self-start"
         >
           <Upload className="w-4 h-4 text-[#6b7280]" />
           Escolher imagem
@@ -90,67 +180,91 @@ const ESTADOS = [
 /* ── main ─────────────────────────────────────────────────── */
 
 export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdateContacts, onDelete }: Props) {
+  const [logo, setLogo] = useState(account.logo ?? '')
+  const [favicon, setFavicon] = useState('')
+  const [banner, setBanner] = useState('')
+
   const [form, setForm] = useState({
-    name:           account.name,
-    razaoSocial:    account.razaoSocial    ?? org.razaoSocial    ?? '',
-    tipoDocumento:  account.tipoDocumento  ?? org.docType        ?? 'CNPJ',
-    numeroDocumento:account.numeroDocumento?? org.docNumber      ?? '',
-    segmentoNegocio:account.segmentoNegocio?? org.businessSegment?? '',
-    siteOficial:    account.siteOficial    ?? org.officialSite   ?? '',
-    pais:           account.pais           ?? org.country        ?? 'brasil',
-    cep:            account.cep            ?? org.zipCode        ?? '',
-    endereco:       account.endereco       ?? org.address        ?? '',
-    complemento:    account.complemento    ?? org.complement     ?? '',
-    estado:         account.estado         ?? org.state          ?? '',
-    cidade:         account.cidade         ?? org.city           ?? '',
-    arquitetoPAS:   account.arquitetoPAS,
-    descricao:      account.descricao      ?? '',
+    name:            account.name,
+    razaoSocial:     account.razaoSocial    ?? org.razaoSocial    ?? '',
+    tipoDocumento:   account.tipoDocumento  ?? org.docType        ?? 'CNPJ',
+    numeroDocumento: account.numeroDocumento ?? org.docNumber     ?? '',
+    segmentoNegocio: account.segmentoNegocio ?? org.businessSegment ?? '',
+    siteOficial:     account.siteOficial    ?? org.officialSite   ?? '',
+    pais:            account.pais           ?? org.country        ?? 'brasil',
+    cep:             account.cep            ?? org.zipCode        ?? '',
+    endereco:        account.endereco       ?? org.address        ?? '',
+    complemento:     account.complemento    ?? org.complement     ?? '',
+    estado:          account.estado         ?? org.state          ?? '',
+    cidade:          account.cidade         ?? org.city           ?? '',
+    arquitetoPAS:    account.arquitetoPAS,
+    descricao:       account.descricao      ?? '',
   })
 
-  const [localContacts, setLocalContacts] = useState<Contact[]>(org.contacts)
-  const [contactDialogOpen, setContactDialogOpen] = useState(false)
-  const [editingContact, setEditingContact] = useState<{ idx: number; data: ContactData } | null>(null)
-  const [openMenuIdx, setOpenMenuIdx] = useState<number | null>(null)
-  const menuRef = useRef<HTMLDivElement>(null)
+  const [contatos, setContatos] = useState<Contato[]>(() => org.contacts.map(contatoFromContact))
+  const [showContatoDialog, setShowContatoDialog] = useState(false)
+  const [editingContatoIdx, setEditingContatoIdx] = useState<number | null>(null)
+
   const [admins, setAdmins] = useState<AdminUser[]>([])
-  const [adminDialogOpen, setAdminDialogOpen] = useState(false)
+  const [showAdminDialog, setShowAdminDialog] = useState(false)
+  const [editingAdminIdx, setEditingAdminIdx] = useState<number | null>(null)
 
   useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setOpenMenuIdx(null)
-      }
+    if (open) {
+      setForm({
+        name:            account.name,
+        razaoSocial:     account.razaoSocial    ?? org.razaoSocial    ?? '',
+        tipoDocumento:   account.tipoDocumento  ?? org.docType        ?? 'CNPJ',
+        numeroDocumento: account.numeroDocumento ?? org.docNumber     ?? '',
+        segmentoNegocio: account.segmentoNegocio ?? org.businessSegment ?? '',
+        siteOficial:     account.siteOficial    ?? org.officialSite   ?? '',
+        pais:            account.pais           ?? org.country        ?? 'brasil',
+        cep:             account.cep            ?? org.zipCode        ?? '',
+        endereco:        account.endereco       ?? org.address        ?? '',
+        complemento:     account.complemento    ?? org.complement     ?? '',
+        estado:          account.estado         ?? org.state          ?? '',
+        cidade:          account.cidade         ?? org.city           ?? '',
+        arquitetoPAS:    account.arquitetoPAS,
+        descricao:       account.descricao      ?? '',
+      })
+      setContatos(org.contacts.map(contatoFromContact))
+      setLogo(account.logo ?? '')
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+  }, [open, account, org])
 
   function set(field: string, value: string) {
     setForm(f => ({ ...f, [field]: value }))
   }
 
-  function handleContactAdd(data: ContactData) {
-    const contact: Contact = { name: data.name, role: data.role, phone: data.phone, email: data.email }
-    const updated = editingContact !== null
-      ? localContacts.map((c, i) => i === editingContact.idx ? contact : c)
-      : [...localContacts, contact]
-    setLocalContacts(updated)
-    onUpdateContacts?.(updated)
-    setEditingContact(null)
+  function openEditContato(idx: number) {
+    setEditingContatoIdx(idx)
+    setShowContatoDialog(true)
   }
 
-  function handleDeleteContact(idx: number) {
-    const updated = localContacts.filter((_, i) => i !== idx)
-    setLocalContacts(updated)
-    onUpdateContacts?.(updated)
-    setOpenMenuIdx(null)
+  function openEditAdmin(idx: number) {
+    setEditingAdminIdx(idx)
+    setShowAdminDialog(true)
   }
 
-  function handleEditContact(idx: number) {
-    const c = localContacts[idx]
-    setEditingContact({ idx, data: { name: c.name, role: c.role, country: 'Brasil (+55)', phone: c.phone, contactMethod: '', email: c.email, notes: '' } })
-    setOpenMenuIdx(null)
-    setContactDialogOpen(true)
+  function handleContatoAdd(contato: Contato) {
+    let updated: Contato[]
+    if (editingContatoIdx !== null) {
+      updated = contatos.map((c, i) => i === editingContatoIdx ? contato : c)
+    } else {
+      updated = [...contatos, contato]
+    }
+    setContatos(updated)
+    onUpdateContacts?.(updated.map(contactFromContato))
+    setEditingContatoIdx(null)
+  }
+
+  function handleAdminAdd(admin: AdminUser) {
+    if (editingAdminIdx !== null) {
+      setAdmins(prev => prev.map((a, i) => i === editingAdminIdx ? admin : a))
+    } else {
+      setAdmins(prev => [...prev, admin])
+    }
+    setEditingAdminIdx(null)
   }
 
   function handleSave() {
@@ -170,320 +284,233 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
       cidade:          form.cidade,
       arquitetoPAS:    form.arquitetoPAS,
       descricao:       form.descricao,
+      logo:            logo || undefined,
     })
     onClose()
   }
 
   return (
     <>
-    <Sheet
-      open={open}
-      onClose={onClose}
-      title="Editar Conta"
-      width="w-[768px]"
-      footer={
-        <>
-          {onDelete && (
-            <Button variant="ghost" onClick={onDelete} className="mr-auto text-red-600 hover:bg-red-50">
-              Excluir conta
-            </Button>
-          )}
-          <Button variant="secondary" onClick={onClose}>Cancelar</Button>
-          <Button onClick={handleSave}>Salvar</Button>
-        </>
-      }
-    >
-      <div className="flex flex-col gap-10">
-
-        {/* ── Imagens ──────────────────────────────────────── */}
-        <div className="flex flex-col gap-7">
-          <ImageRow description="Insira o logo da organização. Isso ajudará a identificar a organização de forma mais fácil e visual no sistema." />
-          <ImageRow description="Insira o favicon da conta. Isso será exibido na aba do navegador. Formato: 64×64 pixels." />
-          <ImageRow description="Insira o banner da conta. Isso será exibido na tela de login. Formato: 180×180 pixels." />
-          <Divider />
-        </div>
-
-        {/* ── Informações básicas ───────────────────────────── */}
-        <div className="flex flex-col gap-7">
-          <SectionTitle>Informações básicas</SectionTitle>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              label="Nome da conta"
-              required
-              placeholder="Nome da conta"
-              value={form.name}
-              onChange={e => set('name', e.target.value)}
-            />
-            <Input
-              label="Razão Social"
-              required
-              placeholder="Razão Social"
-              value={form.razaoSocial}
-              onChange={e => set('razaoSocial', e.target.value)}
-            />
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <label className="text-sm font-medium text-[#030712]">Descrição</label>
-            <textarea
-              placeholder="Digite uma descrição para a conta"
-              value={form.descricao}
-              onChange={e => set('descricao', e.target.value)}
-              rows={3}
-              className="h-16 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-[#030712] placeholder:text-[#6b7280] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Select
-              label="Tipo do documento"
-              options={DOC_TYPES}
-              value={form.tipoDocumento}
-              onChange={e => set('tipoDocumento', e.target.value)}
-            />
-            <Input
-              label="Número do documento"
-              required
-              placeholder="00.000.000/0000-00"
-              value={form.numeroDocumento}
-              onChange={e => set('numeroDocumento', e.target.value)}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Select
-              label="Segmento de negócio"
-              placeholder="Selecione"
-              options={SEGMENTOS}
-              value={form.segmentoNegocio}
-              onChange={e => set('segmentoNegocio', e.target.value)}
-            />
-            <Input
-              label="Site oficial"
-              required
-              placeholder="https://"
-              value={form.siteOficial}
-              onChange={e => set('siteOficial', e.target.value)}
-            />
-          </div>
-
-          <Divider />
-        </div>
-
-        {/* ── Endereço ─────────────────────────────────────── */}
-        <div className="flex flex-col gap-7">
-          <SectionTitle>Endereço</SectionTitle>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Select
-              label="País / Região"
-              options={PAISES}
-              value={form.pais}
-              onChange={e => set('pais', e.target.value)}
-            />
-            <Input
-              label="CEP"
-              required
-              placeholder="00000-000"
-              value={form.cep}
-              onChange={e => set('cep', e.target.value)}
-            />
-          </div>
-
-          <Input
-            label="Endereço postal"
-            required
-            placeholder="Rua, Avenida..."
-            value={form.endereco}
-            onChange={e => set('endereco', e.target.value)}
-          />
-
-          <Input
-            label="Complemento"
-            required
-            placeholder="Número, apartamento..."
-            value={form.complemento}
-            onChange={e => set('complemento', e.target.value)}
-          />
-
-          <div className="grid grid-cols-2 gap-4">
-            <Select
-              label="Estado"
-              placeholder="Selecione"
-              options={ESTADOS}
-              value={form.estado}
-              onChange={e => set('estado', e.target.value)}
-            />
-            <Input
-              label="Cidade"
-              required
-              placeholder="Cidade"
-              value={form.cidade}
-              onChange={e => set('cidade', e.target.value)}
-            />
-          </div>
-
-          <Divider />
-        </div>
-
-        {/* ── Configuração PAS ─────────────────────────────── */}
-        <div className="flex flex-col gap-7">
-          <SectionTitle>Configuração PAS</SectionTitle>
-
-          <Select
-            label="Arquiteto PAS responsável"
-            required
-            placeholder="Selecione"
-            options={ARQUITETOS}
-            value={form.arquitetoPAS}
-            onChange={e => set('arquitetoPAS', e.target.value)}
-          />
-
-          <Divider />
-        </div>
-
-        {/* ── Contatos ─────────────────────────────────────── */}
-        <div className="flex flex-col gap-7">
-          <div className="border border-gray-200 rounded-md bg-white px-5 pt-2 pb-4 flex flex-col">
-
-            {/* Header */}
-            <div className="flex items-center justify-between py-4">
-              <p className="text-sm font-medium text-[#030712]">
-                Contato<span className="text-red-600">*</span>
-              </p>
-              <Button variant="outline" size="sm" onClick={() => { setEditingContact(null); setContactDialogOpen(true) }}>
-                <Plus className="w-3.5 h-3.5" />
-                Adicionar
+      <Sheet
+        open={open}
+        onClose={onClose}
+        title="Editar Conta"
+        width="w-[640px]"
+        footer={
+          <>
+            {onDelete && (
+              <Button variant="ghost" onClick={onDelete} className="mr-auto text-[#dc2626] hover:bg-red-50">
+                Excluir conta
               </Button>
+            )}
+            <Button variant="outline" onClick={onClose}>Cancelar</Button>
+            <Button onClick={handleSave}>Salvar</Button>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-10">
+
+          {/* Imagens */}
+          <div className="flex flex-col gap-7">
+            <ImageUploadRow
+              description="Insira o logo da conta. Isso ajudará a identificar a conta de forma mais fácil e visual no sistema."
+              preview={logo}
+              onFileSelect={setLogo}
+            />
+            <ImageUploadRow
+              description="Insira o favicon da conta. Isso será exibido na aba do navegador. Formato: 64×64 pixels."
+              preview={favicon}
+              onFileSelect={setFavicon}
+            />
+            <ImageUploadRow
+              description="Insira o banner da conta. Isso será exibido na tela de login. Formato: 180×180 pixels."
+              preview={banner}
+              onFileSelect={setBanner}
+            />
+            <div className="border-t border-gray-200" />
+          </div>
+
+          {/* Informações básicas */}
+          <div className="flex flex-col gap-7">
+            <p className="text-base font-bold text-[#030712] leading-6">Informações básicas</p>
+
+            <div className="grid grid-cols-2 gap-4">
+              <Input label="Nome da conta" required placeholder="Nome da conta" value={form.name} onChange={e => set('name', e.target.value)} />
+              <Input label="Razão Social" required placeholder="Razão Social" value={form.razaoSocial} onChange={e => set('razaoSocial', e.target.value)} />
             </div>
 
-            <div className="border-t border-gray-100" />
+            <div className="flex flex-col gap-3">
+              <label className="text-sm font-medium text-[#030712]">Descrição</label>
+              <textarea
+                placeholder="Digite uma descrição para a conta"
+                value={form.descricao}
+                onChange={e => set('descricao', e.target.value)}
+                rows={3}
+                className="w-full min-h-[64px] rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-[#030712] placeholder:text-[#6b7280] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              />
+            </div>
 
-            {localContacts.length === 0 ? (
-              <p className="text-sm text-[#6b7280] py-4">Nenhum contato cadastrado.</p>
-            ) : (
-              localContacts.map((contact, i) => (
-                <div key={i}>
-                  {/* Contact name/role */}
-                  <div className="flex items-start gap-4 py-4">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-[#030712] leading-4">{contact.name}</p>
-                      <p className="text-sm font-normal text-[#6b7280] leading-5 mt-1">{contact.role}</p>
+            <div className="grid grid-cols-2 gap-4">
+              <Select label="Tipo do documento" options={DOC_TYPES} value={form.tipoDocumento} onChange={e => set('tipoDocumento', e.target.value)} />
+              <Input label="Número do documento" required placeholder="00.000.000/0000-00" value={form.numeroDocumento} onChange={e => set('numeroDocumento', e.target.value)} />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <Select label="Segmento de negócio" placeholder="Selecione" options={SEGMENTOS} value={form.segmentoNegocio} onChange={e => set('segmentoNegocio', e.target.value)} />
+              <Input label="Site oficial" required placeholder="https://" value={form.siteOficial} onChange={e => set('siteOficial', e.target.value)} />
+            </div>
+
+            <div className="border-t border-gray-200" />
+          </div>
+
+          {/* Endereço */}
+          <div className="flex flex-col gap-7">
+            <p className="text-base font-bold text-[#030712] leading-6">Endereço</p>
+
+            <div className="grid grid-cols-2 gap-4">
+              <Select label="País / Região" options={PAISES} value={form.pais} onChange={e => set('pais', e.target.value)} />
+              <Input label="CEP" required placeholder="00000-000" value={form.cep} onChange={e => set('cep', e.target.value)} />
+            </div>
+            <Input label="Endereço postal" required placeholder="Rua, Avenida..." value={form.endereco} onChange={e => set('endereco', e.target.value)} />
+            <Input label="Complemento" required placeholder="Número, apartamento..." value={form.complemento} onChange={e => set('complemento', e.target.value)} />
+            <div className="grid grid-cols-2 gap-4">
+              <Select label="Estado" placeholder="Selecione" options={ESTADOS} value={form.estado} onChange={e => set('estado', e.target.value)} />
+              <Input label="Cidade" required placeholder="Cidade" value={form.cidade} onChange={e => set('cidade', e.target.value)} />
+            </div>
+
+            <div className="border-t border-gray-200" />
+          </div>
+
+          {/* Configuração PAS */}
+          <div className="flex flex-col gap-7">
+            <p className="text-base font-bold text-[#030712] leading-6">Configuração PAS</p>
+
+            <Select label="Arquiteto PAS responsável" required placeholder="Selecione" options={ARQUITETOS} value={form.arquitetoPAS} onChange={e => set('arquitetoPAS', e.target.value)} />
+
+            <div className="border-t border-gray-200" />
+          </div>
+
+          {/* Contatos */}
+          <div className="flex flex-col gap-4">
+
+            {/* Contatos card */}
+            <div className="border border-[#e5e7eb] rounded-md">
+              <div className="flex items-start gap-3 px-4 py-3">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-[#030712]">
+                    Contatos<span className="text-[#dc2626]">*</span>
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => { setEditingContatoIdx(null); setShowContatoDialog(true) }}
+                  className="flex items-center gap-1.5 text-sm font-medium text-[#030712] border border-[#e5e7eb] rounded-md px-3 py-1.5 hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors shrink-0"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Adicionar
+                </button>
+              </div>
+
+              {contatos.map((c, i) => {
+                const phones = c.telefones.filter(t => t.numero.trim())
+                const emails = c.emails.filter(e => e.trim())
+                return (
+                  <div key={i} className="border-t border-[#e5e7eb] px-4 py-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-base font-semibold text-[#030712] leading-6">{c.nome}</p>
+                        {c.cargo && <p className="text-sm text-[#6b7280] leading-5">{c.cargo}</p>}
+                      </div>
+                      <EllipsisMenu
+                        onEdit={() => openEditContato(i)}
+                        onRemove={() => {
+                          const updated = contatos.filter((_, idx) => idx !== i)
+                          setContatos(updated)
+                          onUpdateContacts?.(updated.map(contactFromContato))
+                        }}
+                        editLabel="Editar contato"
+                        removeLabel="Remover contato"
+                      />
                     </div>
-                    <div className="relative shrink-0" ref={openMenuIdx === i ? menuRef : undefined}>
-                      <button
-                        type="button"
-                        onClick={() => setOpenMenuIdx(openMenuIdx === i ? null : i)}
-                        className="w-9 h-9 flex items-center justify-center rounded-md hover:bg-gray-100 text-[#030712] transition-colors"
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
-                      {openMenuIdx === i && (
-                        <div className="absolute right-0 top-10 z-50 bg-white border border-gray-200 rounded-md shadow-md py-1 min-w-[128px]">
-                          <button
-                            type="button"
-                            onClick={() => handleEditContact(i)}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#030712] hover:bg-gray-50 transition-colors"
-                          >
-                            <Pencil className="w-3.5 h-3.5 text-[#6b7280]" />
-                            Editar
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteContact(i)}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                            Excluir
-                          </button>
-                        </div>
-                      )}
-                    </div>
+                    {phones.map((t, pi) => (
+                      <div key={pi} className="flex items-center gap-3 mt-2 border border-[#e5e7eb] rounded-xl px-4 py-3">
+                        {t.meio === 'chat'
+                          ? <MessageCircle className="w-4 h-4 text-[#030712] shrink-0" />
+                          : <MessageCircle className="w-4 h-4 text-[#030712] shrink-0" />
+                        }
+                        <span className="flex-1 text-sm text-[#030712] truncate">{t.numero}</span>
+                        <button type="button" onClick={() => navigator.clipboard.writeText(t.numero)} className="text-[#6b7280] hover:text-[#030712] transition-colors shrink-0">
+                          <Copy className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                    {emails.map((email, ei) => (
+                      <div key={ei} className="flex items-center gap-3 mt-2 border border-[#e5e7eb] rounded-xl px-4 py-3">
+                        <Mail className="w-4 h-4 text-[#030712] shrink-0" />
+                        <span className="flex-1 text-sm text-[#030712] truncate">{email}</span>
+                        <button type="button" onClick={() => navigator.clipboard.writeText(email)} className="text-[#6b7280] hover:text-[#030712] transition-colors shrink-0">
+                          <Copy className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
                   </div>
+                )
+              })}
+            </div>
 
-                  {/* Phone / email items */}
-                  <div className="flex flex-col gap-2 pb-2">
-                    <div className="border border-gray-200 rounded-md flex items-center gap-4 px-4 py-2">
-                      <MessageCircleMore className="w-5 h-5 text-[#030712] shrink-0" />
-                      <span className="flex-1 text-sm font-medium text-[#030712]">{contact.phone}</span>
-                      <button
-                        type="button"
-                        className="w-9 h-9 flex items-center justify-center rounded-md hover:bg-gray-100 text-[#030712] transition-colors shrink-0"
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
+            {/* Usuário administrador card */}
+            <div className="border border-[#e5e7eb] rounded-md">
+              <div className="flex items-start gap-3 px-4 py-3">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-[#030712]">
+                    Usuário administrador<span className="text-[#dc2626]">*</span>
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => { setEditingAdminIdx(null); setShowAdminDialog(true) }}
+                  className="flex items-center gap-1.5 text-sm font-medium text-[#030712] border border-[#e5e7eb] rounded-md px-3 py-1.5 hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors shrink-0"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Adicionar
+                </button>
+              </div>
+
+              {admins.map((a, i) => (
+                <div key={i} className="border-t border-[#e5e7eb] px-4 py-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-base font-semibold text-[#030712] leading-6">{a.nome} {a.sobrenome}</p>
+                      <p className="text-sm text-[#6b7280] leading-5">{a.email}</p>
                     </div>
-                    <div className="border border-gray-200 rounded-md flex items-center gap-4 px-4 py-2">
-                      <Mail className="w-5 h-5 text-[#030712] shrink-0" />
-                      <span className="flex-1 text-sm font-medium text-[#030712]">{contact.email}</span>
-                      <button
-                        type="button"
-                        className="w-9 h-9 flex items-center justify-center rounded-md hover:bg-gray-100 text-[#030712] transition-colors shrink-0"
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
-                    </div>
+                    <EllipsisMenu
+                      onEdit={() => openEditAdmin(i)}
+                      onRemove={() => setAdmins(prev => prev.filter((_, idx) => idx !== i))}
+                      editLabel="Editar usuário"
+                      removeLabel="Remover usuário"
+                    />
                   </div>
                 </div>
-              ))
-            )}
+              ))}
+            </div>
+
           </div>
 
-          <Divider />
         </div>
+      </Sheet>
 
-        {/* ── Usuário administrador ─────────────────────────── */}
-        <div className="border border-gray-200 rounded-md bg-white px-5 pt-2 pb-4 flex flex-col">
-          <div className="flex items-center justify-between py-4">
-            <p className="text-sm font-medium text-[#030712]">
-              Usuário administrador<span className="text-red-600">*</span>
-            </p>
-            <Button variant="outline" size="sm" onClick={() => setAdminDialogOpen(true)}>
-              <Plus className="w-3.5 h-3.5" />
-              Adicionar
-            </Button>
-          </div>
-
-          {admins.length > 0 && (
-            <>
-              <div className="border-t border-gray-100" />
-              <div className="flex flex-col gap-3 pt-4">
-                {admins.map((admin, i) => (
-                  <div key={i} className="flex items-center justify-between gap-3 bg-gray-50 border border-gray-200 rounded-md px-4 py-2.5">
-                    <div className="flex flex-col min-w-0">
-                      <p className="text-sm font-medium text-[#030712]">{admin.nome} {admin.sobrenome}</p>
-                      <p className="text-xs text-[#6b7280]">{admin.email}</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setAdmins(prev => prev.filter((_, idx) => idx !== i))}
-                      className="w-7 h-7 flex items-center justify-center rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors shrink-0"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
-
-      </div>
-    </Sheet>
-
-    <NewContactDialog
-      open={contactDialogOpen}
-      onClose={() => { setContactDialogOpen(false); setEditingContact(null) }}
-      onAdd={handleContactAdd}
-      initialData={editingContact?.data}
-    />
-
-    <AddAdminDialog
-      open={adminDialogOpen}
-      onClose={() => setAdminDialogOpen(false)}
-      onAdd={admin => setAdmins(prev => [...prev, admin])}
-    />
+      <AddContatoDialog
+        open={showContatoDialog}
+        onClose={() => { setShowContatoDialog(false); setEditingContatoIdx(null) }}
+        onAdd={handleContatoAdd}
+        initialContato={editingContatoIdx !== null ? contatos[editingContatoIdx] : undefined}
+      />
+      <AddAdminDialog
+        open={showAdminDialog}
+        onClose={() => { setShowAdminDialog(false); setEditingAdminIdx(null) }}
+        onAdd={handleAdminAdd}
+        initialAdmin={editingAdminIdx !== null ? admins[editingAdminIdx] : undefined}
+      />
     </>
   )
 }
