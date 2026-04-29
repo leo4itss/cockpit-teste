@@ -195,9 +195,9 @@ export function SolutionDetailSheet({ open, onClose, solution, componentes = [],
             {/* Exibe campos de link sempre que houver dados, independente do status */}
             {(solution.link01 || solution.link02 || solution.marketplaceStatus) && (
               <>
-                <Field label="Link 01" value={solution.link01} isLink />
+                <Field label="Link 01" value={solution.link01} />
                 <Field label="Título do Link 01" value={solution.titleLink01} />
-                <Field label="Link 02" value={solution.link02} isLink />
+                <Field label="Link 02" value={solution.link02} />
                 <Field label="Título do Link 02" value={solution.titleLink02} />
                 <Field label="Status" value={solution.marketplaceStatus} />
               </>
