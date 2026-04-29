@@ -182,6 +182,28 @@ export function ContractDetailSheet({ open, onClose, contract, onEdit }: Props) 
           )}
         </div>
 
+        <Divider />
+
+        {/* ── Histórico de versões ──────────────────────── */}
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-2">
+            <History className="w-4 h-4 text-[#6b7280]" />
+            <SectionTitle>Histórico de versões</SectionTitle>
+          </div>
+
+          {versions.length === 0 ? (
+            <p className="text-sm text-[#9ca3af]">
+              Nenhuma versão registrada. O histórico é criado automaticamente quando os planos de uma solução vinculada a este contrato são alterados.
+            </p>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {versions.map(v => (
+                <VersionCard key={v.id} version={v} />
+              ))}
+            </div>
+          )}
+        </div>
+
       </div>
     </Sheet>
   )
