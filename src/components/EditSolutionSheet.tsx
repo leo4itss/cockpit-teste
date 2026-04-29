@@ -50,10 +50,12 @@ function PlanCard({
     const unidade = l.tipoLicencaUnidade ?? ''
     const min = l.valorMinimo?.trim()
     const max = l.valorMaximo?.trim()
+    const val = (l as any).valor?.trim?.()
     let range = ''
     if (min && max) range = `${min}–${max} ${unidade}`.trim()
     else if (min) range = `${min} ${unidade}`.trim()
     else if (max) range = `Até ${max} ${unidade}`.trim()
+    else if (val) range = `${val} ${unidade}`.trim()
     return range ? `${nome}: ${range}` : nome
   })
 
