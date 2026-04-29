@@ -104,7 +104,7 @@ export function ComponenteSheet({ open, onClose, onSave, onDelete, initialCompon
       onClose={handleClose}
       title={isEditing ? 'Editar componente' : 'Adicionar componente'}
       description="Configure o componente que poderá ser selecionado ao criar soluções."
-      width="w-[560px]"
+      width="w-[640px]"
       footer={
         <>
           {isEditing && onDelete && (
