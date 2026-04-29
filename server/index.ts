@@ -182,9 +182,58 @@ app.post('/api/solutions', async (c) => {
 })
 
 app.put('/api/solutions/:id', async (c) => {
+  const id = c.req.param('id')
   const body = await c.req.json()
-  const [row] = await db.update(solutions).set(body).where(eq(solutions.id, c.req.param('id'))).returning()
-  if (!row) return c.json({ error: 'Not found' }, 404)
+
+  // Busca a solução existente
+  const [existing] = await db.select().from(solutions).where(eq(solutions.id, id))
+  if (!existing) return c.json({ error: 'Not found' }, 404)
+
+  // ── ENTREGA 1: componentes são imutáveis ──────────────────────
+  const sortedExisting = [...((existing.componenteIds as string[]) ?? [])].sort().join(',')
+  const sortedIncoming = [...((body.componenteIds as string[]) ?? [])].sort().join(',')
+  if (sortedExisting !== sortedIncoming) {
+    return c.json({
+      error: 'Os componentes de uma solução não podem ser alterados após a criação. Para uma composição diferente, crie uma nova solução.',
+    }, 422)
+  }
+
+  // ── ENTREGA 2: versionar contratos afetados por mudança de planos ─
+  const existingPlans = JSON.stringify(existing.plans ?? [])
+  const incomingPlans = JSON.stringify(body.plans ?? [])
+  if (existingPlans !== incomingPlans) {
+    // Busca todos os contratos que referenciam esta solução pelo nome
+    const solucaoNome = existing.name
+    const allContracts = await db.select().from(contracts)
+    const afetados = allContracts.filter((ct: any) => {
+      const objetos = ct.objetos as Array<{ solucao: string }>
+      return objetos.some((obj) => obj.solucao === solucaoNome)
+    })
+
+    if (afetados.length > 0) {
+      const now = new Date().toISOString()
+      for (const ct of afetados) {
+        // Descobre o próximo número de versão
+        const existingVersions = await db
+          .select()
+          .from(contractVersions)
+          .where(eq(contractVersions.contratoId, ct.id))
+        const nextVersao = existingVersions.length + 1
+
+        await db.insert(contractVersions).values({
+          id: crypto.randomUUID(),
+          contratoId: ct.id,
+          versao: nextVersao,
+          snapshotPlano: ct.objetos,
+          alteradoPor: 'sistema',
+          alteradoEm: now,
+          motivo: `Planos da solução "${solucaoNome}" foram atualizados.`,
+        })
+      }
+    }
+  }
+
+  const [row] = await db.update(solutions).set(body).where(eq(solutions.id, id)).returning()
   return c.json(row)
 })
 
