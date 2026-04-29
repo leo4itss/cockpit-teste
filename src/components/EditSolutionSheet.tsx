@@ -279,6 +279,11 @@ export function EditSolutionSheet({
 
   const editingPlan = editingPlanIndex !== null ? plans[editingPlanIndex] : undefined
 
+  // Verifica se a solução está vinculada a algum contrato
+  const isLinkedToContracts = (contracts ?? []).some(ct =>
+    (ct.objetos as Array<{ solucao: string }>).some(obj => obj.solucao === solution.name)
+  )
+
   return (
     <>
       <Sheet
@@ -288,9 +293,19 @@ export function EditSolutionSheet({
         width="w-[640px]"
         footer={
           <>
-            <Button variant="ghost" onClick={onDelete} className="mr-auto text-red-600 hover:bg-red-50">
-              Excluir solução
-            </Button>
+            {isLinkedToContracts ? (
+              <Button
+                variant="ghost"
+                onClick={onInactivate}
+                className="mr-auto text-amber-600 hover:bg-amber-50"
+              >
+                Inativar solução
+              </Button>
+            ) : (
+              <Button variant="ghost" onClick={onDelete} className="mr-auto text-red-600 hover:bg-red-50">
+                Excluir solução
+              </Button>
+            )}
             <Button variant="outline" onClick={onClose}>Cancelar</Button>
             <Button onClick={handleSave}>Salvar</Button>
           </>
