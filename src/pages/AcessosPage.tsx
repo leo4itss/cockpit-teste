@@ -84,8 +84,8 @@ export function AcessosPage() {
             )}
           </div>
           <Button onClick={() => setShowNewUserSheet(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Novo usuário
+            <Plus className="w-4 h-4 mr-1.5" />
+            Criar Usuário
           </Button>
         </div>
       </div>
