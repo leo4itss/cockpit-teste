@@ -300,17 +300,6 @@ app.delete('/api/contracts/:id', async (c) => {
   return c.json({ ok: true })
 })
 
-// Histórico de versões de um contrato
-app.get('/api/contracts/:id/versoes', async (c) => {
-  const rows = await db
-    .select()
-    .from(contractVersions)
-    .where(eq(contractVersions.contratoId, c.req.param('id')))
-  // Ordena por versão decrescente (mais recente primeiro)
-  rows.sort((a: any, b: any) => b.versao - a.versao)
-  return c.json(rows)
-})
-
 // ── Users ─────────────────────────────────────────────────────
 
 app.get('/api/users', async (c) => {
