@@ -12,11 +12,15 @@ interface Props {
   onEdit?: () => void
 }
 
-function Field({ label, value, isLink }: { label: string; value?: string; isLink?: boolean }) {
+function Field({ label, value, required }: { label: string; value?: string; required?: boolean }) {
   return (
-    <div className="flex flex-col gap-1">
-      <p className="text-sm font-medium text-[#030712]">{label}</p>
-      <p className={`text-sm ${isLink ? 'text-[#030712]' : 'text-[#6b7280]'}`}>{value || '—'}</p>
+    <div className="flex flex-col gap-3">
+      <label className="text-sm font-medium text-[#030712]">
+        {label}{required && <span className="text-[#dc2626] ml-0.5">*</span>}
+      </label>
+      <div className="h-9 w-full rounded-md border border-[#e5e7eb] bg-[#f9fafb] px-3 flex items-center shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
+        <span className="text-sm text-[#030712] truncate">{value || '—'}</span>
+      </div>
     </div>
   )
 }
