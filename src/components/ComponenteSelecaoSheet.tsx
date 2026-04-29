@@ -65,8 +65,11 @@ export function ComponenteSelecaoSheet({ open, onClose, componentes, value, onCh
     <Sheet
       open={open}
       onClose={handleClose}
-      title="Selecionar componentes"
-      description="Escolha os componentes que compõem esta solução. Os tipos de licença serão derivados automaticamente."
+      title={single ? 'Selecionar componente' : 'Selecionar componentes'}
+      description={single
+        ? 'Escolha o componente que compõe esta solução. Os tipos de licença serão derivados automaticamente.'
+        : 'Escolha os componentes que compõem esta solução. Os tipos de licença serão derivados automaticamente.'
+      }
       width="w-[520px]"
       footer={
         <>
