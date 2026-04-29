@@ -116,13 +116,13 @@ export function ComponenteSheet({ open, onClose, onSave, onDelete, initialCompon
               Excluir componente
             </Button>
           )}
-          <Button variant="outline" onClick={handleClose}>cancelar</Button>
+          <Button variant="outline" onClick={handleClose}>Cancelar</Button>
           <Button
             onClick={handleSave}
             disabled={!canSave || saving}
             className={!canSave ? 'opacity-50 cursor-not-allowed' : ''}
           >
-            {saving ? 'Salvando...' : 'Salvar'}
+            {saving ? 'Salvando...' : 'Adicionar componente'}
           </Button>
         </>
       }
