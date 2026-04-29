@@ -57,22 +57,28 @@ function StatusBadge({ status }: { status: Solution['status'] }) {
 }
 
 function PlanItem({ plan }: { plan: Plan }) {
-  const [expanded, setExpanded] = useState(false)
+  const [expanded, setExpanded] = useState(true)
 
-  const licensingText = plan.licensings.length > 0
-    ? plan.licensings.map(l => {
-        const range = [l.valorMinimo, l.valorMaximo].filter(Boolean).join('–')
-        const nome = l.tipoLicencaNome || l.tipoLicencaId
-        return range ? `${nome}: ${range} ${l.tipoLicencaUnidade ?? ''}`.trim() : nome
-      }).join(' · ')
-    : null
+  // Formata cada licença como "valor unidade" ou "Até valor unidade" ou "min–max unidade"
+  const licensingParts = plan.licensings.map(l => {
+    const unidade = l.tipoLicencaUnidade ?? ''
+    const min = l.valorMinimo?.trim()
+    const max = l.valorMaximo?.trim()
+    if (min && max) return `${min}–${max} ${unidade}`.trim()
+    if (min) return `${min} ${unidade}`.trim()
+    if (max) return `Até ${max} ${unidade}`.trim()
+    return l.tipoLicencaNome || l.tipoLicencaId
+  })
+
+  const licensingLine = licensingParts.length > 0 ? licensingParts.join(' | ') : null
 
   return (
-    <div className="bg-white border border-[#e5e7eb] rounded-md flex flex-col gap-2 pt-2 pb-4 px-5">
-      <div className="flex items-center gap-4 py-2">
+    <div className="bg-white border border-[#e5e7eb] rounded-xl overflow-hidden">
+      {/* Header do plano */}
+      <div className="flex items-start gap-3 px-5 py-4">
         <button
           onClick={() => setExpanded(v => !v)}
-          className="text-[#6b7280] shrink-0"
+          className="text-[#6b7280] shrink-0 mt-0.5"
         >
           {expanded
             ? <ChevronUp className="w-4 h-4" />
@@ -80,20 +86,19 @@ function PlanItem({ plan }: { plan: Plan }) {
           }
         </button>
         <div className="flex flex-col flex-1 min-w-0">
-          <p className="text-sm font-semibold text-[#030712]">{plan.name}</p>
+          <p className="text-sm font-bold text-[#030712]">{plan.name}</p>
           {plan.description && (
-            <p className="text-xs text-[#6b7280]">{plan.description}</p>
+            <p className="text-sm text-[#6b7280] leading-5 mt-0.5">{plan.description}</p>
           )}
         </div>
       </div>
 
-      {expanded && licensingText && (
-        <>
-          <Divider />
-          <div className="px-1 py-2">
-            <Field label="Tipos de licença" value={licensingText} />
-          </div>
-        </>
+      {/* Modelo de licenciamento expandido */}
+      {expanded && licensingLine && (
+        <div className="border-t border-[#e5e7eb] px-5 py-4 flex flex-col gap-1">
+          <p className="text-sm font-bold text-[#030712]">Modelo de licenciamento</p>
+          <p className="text-sm text-[#6b7280]">{licensingLine}</p>
+        </div>
       )}
     </div>
   )
