@@ -122,7 +122,8 @@ export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca
 
         <Input
           label="Descrição"
-          placeholder="Escreva aqui"
+          required
+          placeholder="Descreva aqui o seu plano"
           value={description}
           onChange={e => setDescription(e.target.value)}
         />
