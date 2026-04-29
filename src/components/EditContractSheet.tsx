@@ -104,70 +104,48 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
               onChange={() => {}}
             />
 
-            {/* Card de objetos do contrato */}
-            <div className="border border-[#e5e7eb] rounded-md p-4 flex flex-col gap-[10px]">
+            {/* Card soluções / planos / licenciamentos */}
+            <div className="border border-[#e5e7eb] rounded-2xl p-4 flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-medium text-[#030712]">
-                  Soluções, planos e licenciamentos<span className="text-red-600">*</span>
+                  Soluções, planos e licenciamentos<span className="text-[#dc2626]">*</span>
                 </p>
-                <Button variant="outline" size="sm" onClick={() => setDialogOpen(true)}>
+                <button
+                  type="button"
+                  onClick={() => setDialogOpen(true)}
+                  className="inline-flex items-center gap-1.5 h-8 px-3 border border-[#e5e7eb] rounded-md text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors"
+                >
                   <Plus className="w-3.5 h-3.5" />
                   Adicionar
-                </Button>
+                </button>
               </div>
 
-              <Divider />
-
-              {/* Cabeçalho das colunas */}
-              <div className="flex gap-[10px] items-center">
-                {['Solução', 'Org. contratada', 'Plano', 'Licenciamento', 'Qtd'].map(col => (
-                  <div key={col} className="flex-1 min-w-0">
-                    <span className="text-xs text-[#6b7280]">{col}</span>
-                  </div>
-                ))}
-                <div className="w-8 shrink-0" />
-              </div>
-
-              {objetos.length === 0 ? (
-                <p className="text-sm text-[#6b7280] py-2">Nenhum objeto adicionado.</p>
-              ) : (
+              {objetos.length > 0 && (
                 <>
                   <Divider />
+                  <div className="grid grid-cols-[1fr_1fr_1fr_1fr_80px_32px] gap-2">
+                    {['Solução', 'Org. contratada', 'Plano', 'Licenciamento', 'Qtd', ''].map(col => (
+                      <p key={col} className="text-xs text-[#6b7280] leading-4">{col}</p>
+                    ))}
+                  </div>
+                  <Divider />
                   {objetos.map((obj, i) => (
-                    <div key={i} className="flex gap-[10px] items-center">
-                      <div className="flex-1 min-w-0">
-                        <div className="h-9 flex items-center px-3 rounded-md bg-white border border-[#e5e7eb]">
-                          <span className="text-sm text-[#030712] truncate">{obj.solucao}</span>
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="h-9 flex items-center px-3 rounded-md bg-white border border-[#e5e7eb]">
-                          <span className="text-sm text-[#030712] truncate">{obj.orgContratada}</span>
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="h-9 flex items-center px-3 rounded-md bg-white border border-[#e5e7eb]">
-                          <span className="text-sm text-[#030712] truncate">{obj.plano}</span>
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="h-9 flex items-center px-3 rounded-md bg-white border border-[#e5e7eb]">
-                          <span className="text-sm text-[#030712] truncate">{obj.licenciamento}</span>
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <Input
-                          type="number"
-                          value={String(obj.qtdContratada)}
-                          onChange={e => setObjetos(prev =>
-                            prev.map((o, idx) => idx === i ? { ...o, qtdContratada: Number(e.target.value) } : o)
-                          )}
-                        />
-                      </div>
+                    <div key={i} className="grid grid-cols-[1fr_1fr_1fr_1fr_80px_32px] gap-2 items-center">
+                      <p className="text-sm text-[#030712] truncate">{obj.solucao}</p>
+                      <p className="text-sm text-[#030712] truncate">{obj.orgContratada}</p>
+                      <p className="text-sm text-[#030712] truncate">{obj.plano}</p>
+                      <p className="text-sm text-[#030712] truncate">{obj.licenciamento}</p>
+                      <Input
+                        type="number"
+                        value={String(obj.qtdContratada)}
+                        onChange={e => setObjetos(prev =>
+                          prev.map((o, idx) => idx === i ? { ...o, qtdContratada: Number(e.target.value) } : o)
+                        )}
+                      />
                       <button
                         type="button"
                         onClick={() => handleRemoveObjeto(i)}
-                        className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors shrink-0"
+                        className="w-8 h-8 flex items-center justify-center text-[#6b7280] hover:text-[#dc2626] transition-colors shrink-0"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -177,9 +155,9 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
               )}
             </div>
 
-            <div className="flex items-center gap-2 bg-[#f3f4f6] p-2 rounded-md">
-              <AlertCircle className="w-4 h-4 text-[#030712] shrink-0" />
-              <p className="text-xs text-[#030712] leading-4">
+            <div className="flex items-start gap-2 bg-blue-50 rounded-md px-3 py-3">
+              <CircleAlert className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+              <p className="text-xs text-[#030712] leading-5">
                 Objetos do contrato reúnem soluções, planos e licenciamentos, definindo as condições e limites para atender às necessidades do cliente.
               </p>
             </div>
