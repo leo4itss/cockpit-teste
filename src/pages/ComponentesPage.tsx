@@ -1,15 +1,13 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Search, Plus, FolderOpen, Cpu, CircleCheck, X } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { ComponenteSheet, METADATA_MOCK_TIPOS } from '@/components/ComponenteSheet'
 import { ComponenteDetailSheet } from '@/components/ComponenteDetailSheet'
-import { api } from '@/api/client'
-import { componentes as mockComponentes } from '@/data/mock'
+import { useComponentes } from '@/context/ComponentesContext'
 import type { Componente } from '@/types'
 
 export function ComponentesPage() {
-  const [componentes, setComponentes] = useState<Componente[]>([])
-  const [loading, setLoading] = useState(true)
+  const { componentes, loading, addComponente, updateComponente, deleteComponente } = useComponentes()
   const [search, setSearch] = useState('')
 
   // Sheet de detalhe (leitura)
@@ -19,18 +17,6 @@ export function ComponentesPage() {
   const [sheetOpen, setSheetOpen] = useState(false)
   const [editingComponente, setEditingComponente] = useState<Componente | null>(null)
 
-  useEffect(() => {
-    api.getComponentes()
-      .then(comps => {
-        setComponentes(comps)
-        setLoading(false)
-      })
-      .catch(() => {
-        setComponentes(mockComponentes)
-        setLoading(false)
-      })
-  }, [])
-
   const filtered = componentes.filter(c =>
     c.nome.toLowerCase().includes(search.toLowerCase()) ||
     (c.descricao ?? '').toLowerCase().includes(search.toLowerCase())
@@ -38,21 +24,9 @@ export function ComponentesPage() {
 
   async function handleSave(data: Omit<Componente, 'id' | 'createdAt'>) {
     if (editingComponente) {
-      const updated = { ...editingComponente, ...data }
-      try {
-        const saved = await api.updateComponente(editingComponente.id, updated)
-        setComponentes(prev => prev.map(c => c.id === saved.id ? saved : c))
-      } catch {
-        setComponentes(prev => prev.map(c => c.id === updated.id ? updated : c))
-      }
+      await updateComponente(editingComponente.id, data)
     } else {
-      const local: Componente = { ...data, id: crypto.randomUUID(), createdAt: new Date().toISOString() }
-      try {
-        const saved = await api.createComponente(local)
-        setComponentes(prev => [...prev, saved])
-      } catch {
-        setComponentes(prev => [...prev, local])
-      }
+      await addComponente(data)
     }
   }
 
@@ -80,12 +54,7 @@ export function ComponentesPage() {
 
   async function handleDeleteComponente() {
     if (!editingComponente) return
-    try {
-      await api.deleteComponente(editingComponente.id)
-    } catch {
-      // silencioso — remove localmente mesmo sem backend
-    }
-    setComponentes(prev => prev.filter(c => c.id !== editingComponente.id))
+    await deleteComponente(editingComponente.id)
     handleCloseSheet()
   }
 
