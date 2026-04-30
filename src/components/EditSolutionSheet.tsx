@@ -94,36 +94,38 @@ function PlanCard({
           )}
         </div>
 
-        {/* Dropdown menu */}
-        <div className="relative shrink-0" ref={menuRef}>
-          <button
-            type="button"
-            onClick={() => setMenuOpen(v => !v)}
-            className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-100 text-[#6b7280] transition-colors"
-          >
-            <MoreVertical className="w-4 h-4" />
-          </button>
-          {menuOpen && (
-            <div className="absolute right-0 top-9 z-50 bg-white border border-[#e5e7eb] rounded-md shadow-lg py-1 min-w-[148px]">
-              <button
-                type="button"
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#030712] hover:bg-gray-50 transition-colors"
-                onClick={() => { setMenuOpen(false); onEdit() }}
-              >
-                <Pencil className="w-4 h-4 text-[#6b7280]" />
-                Editar
-              </button>
-              <button
-                type="button"
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                onClick={() => { setMenuOpen(false); onRemove() }}
-              >
-                <Trash2 className="w-4 h-4" />
-                Excluir
-              </button>
-            </div>
-          )}
-        </div>
+        {/* Dropdown menu — oculto quando inativa */}
+        {!disabled && (
+          <div className="relative shrink-0" ref={menuRef}>
+            <button
+              type="button"
+              onClick={() => setMenuOpen(v => !v)}
+              className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-100 text-[#6b7280] transition-colors"
+            >
+              <MoreVertical className="w-4 h-4" />
+            </button>
+            {menuOpen && (
+              <div className="absolute right-0 top-9 z-50 bg-white border border-[#e5e7eb] rounded-md shadow-lg py-1 min-w-[148px]">
+                <button
+                  type="button"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#030712] hover:bg-gray-50 transition-colors"
+                  onClick={() => { setMenuOpen(false); onEdit() }}
+                >
+                  <Pencil className="w-4 h-4 text-[#6b7280]" />
+                  Editar
+                </button>
+                <button
+                  type="button"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  onClick={() => { setMenuOpen(false); onRemove() }}
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Excluir
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Licensings expandidos */}
