@@ -231,6 +231,87 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
     )
   }
 
+  // --- INATIVAR-SOLUCAO ---
+  if (variant === 'inativar-solucao') {
+    return (
+      <Modal
+        open={open}
+        onClose={handleClose}
+        title="Inativar solução"
+        maxWidth="max-w-[480px]"
+        footer={
+          <>
+            <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
+            <Button
+              onClick={handleConfirm}
+              className="bg-amber-500 hover:bg-amber-600 text-white"
+            >
+              Inativar
+            </Button>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-4 text-sm text-[#030712]">
+          <p>
+            Tem certeza que deseja inativar a solução <strong>"{name}"</strong>?
+          </p>
+          <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+            <div className="flex flex-col gap-1 text-xs text-amber-800">
+              <p>
+                Ao inativar esta solução, <strong>todos os contratos vinculados</strong> serão
+                automaticamente inativados.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+            <p className="text-xs text-blue-800">
+              Esta ação <strong>pode ser desfeita</strong>. Para reativar a solução,
+              acesse o menu de edição e clique em <strong>"Ativar solução"</strong>.
+            </p>
+          </div>
+        </div>
+      </Modal>
+    )
+  }
+
+  // --- INATIVAR-CONTRATO ---
+  if (variant === 'inativar-contrato') {
+    return (
+      <Modal
+        open={open}
+        onClose={handleClose}
+        title="Inativar contrato"
+        maxWidth="max-w-[480px]"
+        footer={
+          <>
+            <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
+            <Button
+              onClick={handleConfirm}
+              className="bg-amber-500 hover:bg-amber-600 text-white"
+            >
+              Inativar
+            </Button>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-4 text-sm text-[#030712]">
+          <p>
+            Tem certeza que deseja inativar o contrato de <strong>"{name}"</strong>?
+          </p>
+          <div className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+            <p className="text-xs text-blue-800">
+              Esta ação <strong>pode ser desfeita</strong>. Para reativar o contrato,
+              acesse o menu de edição e clique em <strong>"Ativar contrato"</strong>.
+            </p>
+          </div>
+        </div>
+      </Modal>
+    )
+  }
+
   // --- ORG ---
   const canConfirm = typed === name
 
