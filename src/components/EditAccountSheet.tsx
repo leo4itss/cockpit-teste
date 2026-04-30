@@ -353,8 +353,8 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
             <p className="text-base font-bold text-[#030712] leading-6">Informações básicas</p>
 
             <div className="grid grid-cols-2 gap-4">
-              <Input label="Nome da conta" required placeholder="Nome da conta" value={form.name} onChange={e => set('name', e.target.value)} />
-              <Input label="Razão Social" required placeholder="Razão Social" value={form.razaoSocial} onChange={e => set('razaoSocial', e.target.value)} />
+              <Input label="Nome da conta" required placeholder="Nome da conta" value={form.name} onChange={e => set('name', e.target.value)} disabled={isInactive} />
+              <Input label="Razão Social" required placeholder="Razão Social" value={form.razaoSocial} onChange={e => set('razaoSocial', e.target.value)} disabled={isInactive} />
             </div>
 
             <div className="flex flex-col gap-3">
@@ -364,18 +364,19 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
                 value={form.descricao}
                 onChange={e => set('descricao', e.target.value)}
                 rows={3}
-                className="w-full min-h-[64px] rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-[#030712] placeholder:text-[#6b7280] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                disabled={isInactive}
+                className="w-full min-h-[64px] rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-[#030712] placeholder:text-[#6b7280] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none disabled:bg-[#f9fafb] disabled:text-[#9ca3af] disabled:cursor-not-allowed"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <Select label="Tipo do documento" options={DOC_TYPES} value={form.tipoDocumento} onChange={e => set('tipoDocumento', e.target.value)} />
-              <Input label="Número do documento" required placeholder="00.000.000/0000-00" value={form.numeroDocumento} onChange={e => set('numeroDocumento', e.target.value)} />
+              <Select label="Tipo do documento" options={DOC_TYPES} value={form.tipoDocumento} onChange={e => set('tipoDocumento', e.target.value)} disabled={isInactive} />
+              <Input label="Número do documento" required placeholder="00.000.000/0000-00" value={form.numeroDocumento} onChange={e => set('numeroDocumento', e.target.value)} disabled={isInactive} />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <Select label="Segmento de negócio" placeholder="Selecione" options={SEGMENTOS} value={form.segmentoNegocio} onChange={e => set('segmentoNegocio', e.target.value)} />
-              <Input label="Site oficial" required placeholder="https://" value={form.siteOficial} onChange={e => set('siteOficial', e.target.value)} />
+              <Select label="Segmento de negócio" placeholder="Selecione" options={SEGMENTOS} value={form.segmentoNegocio} onChange={e => set('segmentoNegocio', e.target.value)} disabled={isInactive} />
+              <Input label="Site oficial" required placeholder="https://" value={form.siteOficial} onChange={e => set('siteOficial', e.target.value)} disabled={isInactive} />
             </div>
 
             <div className="border-t border-gray-200" />
