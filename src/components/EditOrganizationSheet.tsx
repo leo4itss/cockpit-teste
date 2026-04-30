@@ -13,6 +13,7 @@ interface Props {
   org: Organization
   onSave: (org: Organization) => void
   onDelete?: () => void
+  onActivate?: () => void
 }
 
 /* ── helpers ─────────────────────────────────────────────── */
