@@ -279,7 +279,7 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
               <Input label="Endereço postal" required placeholder="Digite o endereço completo, inclusive número" value={form.address} onChange={e => setField('address', e.target.value)} />
               <Input label="Complemento" required placeholder="Complemento do local" value={form.complement} onChange={e => setField('complement', e.target.value)} />
               <div className="grid grid-cols-2 gap-4">
-                <Select label="Estado" options={STATES} placeholder="Selecione" value={form.state} onChange={e => setField('state', e.target.value)} />
+                <Select label="Estado" required options={STATES} placeholder="Selecione" value={form.state} onChange={e => setField('state', e.target.value)} />
                 <Input label="Cidade" required placeholder="Digite a cidade" value={form.city} onChange={e => setField('city', e.target.value)} />
               </div>
             </div>
