@@ -220,6 +220,8 @@ export function OrganizacaoDetailPage() {
       const saved = await api.updateSolution(updated.id, updated)
       setSolutions(prev => prev.map(s => s.id === saved.id ? saved : s))
       setSelectedSolution(saved)
+      // Recarrega contratos pois o backend pode ter sincronizado os objetos
+      api.getContracts(id).then(setContracts).catch(() => {})
     } catch {
       setSolutions(prev => prev.map(s => s.id === updated.id ? updated : s))
       setSelectedSolution(updated)
