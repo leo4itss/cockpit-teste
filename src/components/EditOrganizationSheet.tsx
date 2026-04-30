@@ -233,11 +233,12 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete, on
                   Adicione o logotipo para facilitar a identificação da organização no sistema.
                   Tamanho recomendado: 512 × 512 px.
                 </p>
-                <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoChange} />
+                <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoChange} disabled={isInactive} />
                 <button
                   type="button"
-                  onClick={() => logoInputRef.current?.click()}
-                  className="inline-flex items-center gap-2 h-9 px-4 border border-[#e5e7eb] rounded-md text-sm font-medium text-[#030712] bg-white hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors self-start"
+                  onClick={() => !isInactive && logoInputRef.current?.click()}
+                  disabled={isInactive}
+                  className="inline-flex items-center gap-2 h-9 px-4 border border-[#e5e7eb] rounded-md text-sm font-medium text-[#030712] bg-white hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors self-start disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Upload className="w-4 h-4 text-[#6b7280]" />
                   Escolher imagem
