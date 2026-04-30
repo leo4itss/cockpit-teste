@@ -861,6 +861,7 @@ export function OrganizacaoDetailPage() {
         org={org}
         onSave={updated => handleEditOrg(updated)}
         onDelete={() => { setSheetEditOrg(false); setOrgDeleteModal('inativar') }}
+        onActivate={handleActivateOrg}
       />
 
       {/* Detail sheets */}
