@@ -956,6 +956,12 @@ export function OrganizacaoDetailPage() {
           org={org}
           onSave={handleSaveAccount}
           onUpdateContacts={handleUpdateContacts}
+          canDelete={accountCanDelete(editingAccount)}
+          onDelete={() => {
+            setAccountExcluirTarget(editingAccount)
+            setAccountExcluirModal(true)
+            setEditingAccount(null)
+          }}
           onInativar={() => {
             setAccountInativarTarget(editingAccount)
             setAccountInativarModal(true)
