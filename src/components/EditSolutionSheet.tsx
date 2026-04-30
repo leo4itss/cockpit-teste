@@ -369,6 +369,7 @@ export function EditSolutionSheet({
               placeholder="Nome da instância da solução"
               value={form.name}
               onChange={e => set('name', e.target.value)}
+              disabled={isInactive}
             />
 
             <Input
@@ -376,6 +377,7 @@ export function EditSolutionSheet({
               placeholder="Descrição"
               value={form.description}
               onChange={e => set('description', e.target.value)}
+              disabled={isInactive}
             />
 
             {/* Info box */}
