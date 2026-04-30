@@ -188,6 +188,8 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete, on
     onClose()
   }
 
+  const isInactive = org.status === 'Inativo'
+
   return (
     <>
       <Sheet
@@ -197,7 +199,7 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete, on
         width="w-[640px]"
         footer={
           <>
-            {org.status === 'Inativo' ? (
+            {isInactive ? (
               onActivate && (
                 <Button variant="ghost" onClick={onActivate} className="mr-auto text-green-700 hover:bg-green-50">
                   Ativar organização
@@ -211,7 +213,7 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete, on
               )
             )}
             <Button variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button onClick={handleSave}>Salvar</Button>
+            {!isInactive && <Button onClick={handleSave}>Salvar</Button>}
           </>
         }
       >
