@@ -844,7 +844,8 @@ export function OrganizacaoDetailPage() {
                     </tbody>
                   </table>
                 </div>
-              )}
+              )
+              })()}
             </>
           )}
 
