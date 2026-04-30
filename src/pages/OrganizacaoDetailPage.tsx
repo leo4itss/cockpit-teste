@@ -86,10 +86,10 @@ export function OrganizacaoDetailPage() {
   // Delete org modal
   const [orgDeleteModal, setOrgDeleteModal] = useState<'inativar' | null>(null)
 
-  // Delete account modal
-  const [accountDeleteTarget, setAccountDeleteTarget] = useState<Account | null>(null)
-  const [accountDeleteModal, setAccountDeleteModal] = useState<'confirm' | 'blocked' | null>(null)
-  const [accountBlockedContracts, setAccountBlockedContracts] = useState(0)
+  // Inativar account modal
+  const [accountInativarTarget, setAccountInativarTarget] = useState<Account | null>(null)
+  const [accountInativarModal, setAccountInativarModal] = useState(false)
+  const [showInativosAccount, setShowInativosAccount] = useState(false)
 
   // Inativar contract modal
   const [contractInativarTarget, setContractInativarTarget] = useState<Contract | null>(null)
