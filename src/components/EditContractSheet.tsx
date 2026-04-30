@@ -226,6 +226,7 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
               placeholder="Selecione"
               value={form.renovacao}
               onChange={e => set('renovacao', e.target.value)}
+              disabled={isInactive}
             />
           </div>
 
