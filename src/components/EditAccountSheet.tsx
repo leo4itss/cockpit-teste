@@ -103,10 +103,12 @@ function ImageUploadRow({
   description,
   preview,
   onFileSelect,
+  disabled,
 }: {
   description: string
   preview: string
   onFileSelect: (dataUrl: string) => void
+  disabled?: boolean
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -126,15 +128,17 @@ function ImageUploadRow({
       </div>
       <div className="flex flex-col gap-2 flex-1 min-w-0">
         <p className="text-sm text-[#6b7280] leading-5">{description}</p>
-        <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleChange} />
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          className="flex items-center gap-2 border border-[#e5e7eb] rounded-md px-4 h-9 text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors self-start"
-        >
-          <Upload className="w-4 h-4 text-[#6b7280]" />
-          Escolher imagem
-        </button>
+        <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleChange} disabled={disabled} />
+        {!disabled && (
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            className="flex items-center gap-2 border border-[#e5e7eb] rounded-md px-4 h-9 text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors self-start"
+          >
+            <Upload className="w-4 h-4 text-[#6b7280]" />
+            Escolher imagem
+          </button>
+        )}
       </div>
     </div>
   )
