@@ -164,6 +164,7 @@ export function EditSolutionSheet({
   onSave,
   onDelete,
   onInactivate,
+  onActivate,
   tiposLicenca,
   componentes,
   contracts,
