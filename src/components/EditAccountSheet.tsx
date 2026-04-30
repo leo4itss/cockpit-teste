@@ -185,7 +185,7 @@ const ESTADOS = [
 
 /* ── main ─────────────────────────────────────────────────── */
 
-export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdateContacts, onDelete, onInativar, onActivate }: Props) {
+export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdateContacts, onInativar, onActivate }: Props) {
   const isInactive = account.status === 'Inativo'
   const [logo, setLogo] = useState(account.logo ?? '')
   const [favicon, setFavicon] = useState('')
