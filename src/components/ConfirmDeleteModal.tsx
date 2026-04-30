@@ -1,7 +1,10 @@
-// Modal de confirmação de exclusão — 3 variantes:
+// Modal de confirmação de exclusão — variantes:
 // - 'org': exige digitação do nome, lista impactos
 // - 'account': apenas confirmação por botão
 // - 'blocked': informativo, lista dependências que bloqueiam
+// - 'inativar-org': inativação reversível de org
+// - 'inativar-solucao': inativação de solução (avisa sobre contratos)
+// - 'inativar-contrato': inativação simples de contrato
 
 import { useState } from 'react'
 import { Modal } from './ui/Modal'
