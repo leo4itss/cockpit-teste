@@ -482,8 +482,9 @@ export function EditSolutionSheet({
             {/* Toggle */}
             <button
               type="button"
-              onClick={() => set('marketplace', !form.marketplace)}
-              className="flex items-start gap-3 w-fit"
+              onClick={isInactive ? undefined : () => set('marketplace', !form.marketplace)}
+              disabled={isInactive}
+              className="flex items-start gap-3 w-fit disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <div className={`relative w-9 h-5 rounded-full transition-colors shrink-0 mt-0.5 ${form.marketplace ? 'bg-[#2563eb]' : 'bg-[#d1d5db]'}`}>
                 <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-4px_rgba(0,0,0,0.1)] transition-transform ${form.marketplace ? 'translate-x-[18px]' : 'translate-x-0.5'}`} />
