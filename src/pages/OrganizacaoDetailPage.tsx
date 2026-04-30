@@ -271,37 +271,49 @@ export function OrganizacaoDetailPage() {
     setSheetEditOrg(false)
   }
 
-  // Verifica dependências e abre o modal correto (confirm ou blocked)
-  function requestDeleteAccount(account: Account) {
-    const activeContracts = contracts.filter(
-      c => c.contratante === account.name && c.status === 'Ativo'
-    ).length
-    setAccountDeleteTarget(account)
-    if (activeContracts > 0) {
-      setAccountBlockedContracts(activeContracts)
-      setAccountDeleteModal('blocked')
-    } else {
-      setAccountDeleteModal('confirm')
-    }
-  }
-
-  function closeAccountDeleteModal() {
-    setAccountDeleteModal(null)
-    setAccountDeleteTarget(null)
-  }
-
-  async function handleDeleteAccount(account: Account) {
+  async function handleInativarAccount(account: Account) {
     try {
-      await api.deleteAccount(account.id)
-      if (showDeleted) {
-        setAccounts(prev => prev.map(a => a.id === account.id ? { ...a, deletedAt: new Date().toISOString() } : a))
-      } else {
-        setAccounts(prev => prev.filter(a => a.id !== account.id))
-      }
+      const updated = await api.updateAccount(account.id, { ...account, status: 'Inativo' })
+      setAccounts(prev => prev.map(a => a.id === updated.id ? updated : a))
     } catch {
-      // silencioso
+      setAccounts(prev => prev.map(a => a.id === account.id ? { ...account, status: 'Inativo' } : a))
     }
-    closeAccountDeleteModal()
+    // Cascata: inativa contratos vinculados
+    const linkedContracts = contracts.filter(c => c.contratante === account.name && c.status !== 'Inativo')
+    await Promise.allSettled(
+      linkedContracts.map(c => api.updateContract(c.id, { ...c, status: 'Inativo' }))
+    )
+    if (linkedContracts.length > 0) {
+      setContracts(prev => prev.map(c =>
+        linkedContracts.some(lc => lc.id === c.id) ? { ...c, status: 'Inativo' } : c
+      ))
+    }
+    // Cascata: inativa soluções vinculadas via contratos dessa conta
+    const linkedSolutionNames = new Set(
+      linkedContracts.flatMap(c => c.objetos.map(o => o.solucao))
+    )
+    const linkedSolutions = solutions.filter(s => linkedSolutionNames.has(s.name) && s.status !== 'Inativo')
+    await Promise.allSettled(
+      linkedSolutions.map(s => api.updateSolution(s.id, { ...s, status: 'Inativo' }))
+    )
+    if (linkedSolutions.length > 0) {
+      setSolutions(prev => prev.map(s =>
+        linkedSolutions.some(ls => ls.id === s.id) ? { ...s, status: 'Inativo' } : s
+      ))
+    }
+    setAccountInativarModal(false)
+    setAccountInativarTarget(null)
+    setEditingAccount(null)
+  }
+
+  async function handleActivateAccount(account: Account) {
+    try {
+      const updated = await api.updateAccount(account.id, { ...account, status: 'Ativo' })
+      setAccounts(prev => prev.map(a => a.id === updated.id ? updated : a))
+    } catch {
+      setAccounts(prev => prev.map(a => a.id === account.id ? { ...account, status: 'Ativo' } : a))
+    }
+    setEditingAccount(null)
   }
 
   async function handleRestoreAccount(account: Account) {
