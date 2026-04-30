@@ -966,7 +966,7 @@ export function OrganizacaoDetailPage() {
             setSolutionDeleteTarget(editingSolution)
             setEditingSolution(null)
           }}
-          onInactivate={() => handleInactivateSolution(editingSolution)}
+          onInactivate={() => requestInactivateSolution(editingSolution)}
           onActivate={() => handleActivateSolution(editingSolution)}
           tiposLicenca={tiposLicenca}
           componentes={componentes}
