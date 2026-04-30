@@ -158,14 +158,18 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
                         onChange={e => setObjetos(prev =>
                           prev.map((o, idx) => idx === i ? { ...o, qtdContratada: Number(e.target.value) } : o)
                         )}
+                        disabled={isInactive}
                       />
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveObjeto(i)}
-                        className="w-8 h-8 flex items-center justify-center text-[#6b7280] hover:text-[#dc2626] transition-colors shrink-0"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                      {!isInactive && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveObjeto(i)}
+                          className="w-8 h-8 flex items-center justify-center text-[#6b7280] hover:text-[#dc2626] transition-colors shrink-0"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                      {isInactive && <div className="w-8 h-8 shrink-0" />}
                     </div>
                   ))}
                 </>
