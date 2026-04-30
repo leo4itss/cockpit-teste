@@ -218,12 +218,17 @@ app.put('/solutions/:id', async (c) => {
 
       const allContracts = await db.select().from(contracts)
       const afetados = allContracts.filter((ct: any) => {
-        const objetos = ct.objetos as Array<{ solucao: string }>
-        return Array.isArray(objetos) && objetos.some((obj) => obj.solucao === solucaoNome)
+        // Defensivo: JSONB pode retornar como string em alguns contextos
+        try {
+          const raw = ct.objetos
+          const objetos: Array<{ solucao: string }> = Array.isArray(raw) ? raw
+            : (typeof raw === 'string' ? JSON.parse(raw) : [])
+          return objetos.some((obj) => obj.solucao === solucaoNome)
+        } catch { return false }
       })
       const now = new Date().toISOString()
       for (const ct of afetados) {
-        const enriched = enrichObjetos(ct.objetos as any[])
+        const enriched = enrichObjetos(ct.objetos)
         // 1. Registra versão com snapshot enriquecido
         const existingVersions = await db
           .select()
@@ -239,8 +244,8 @@ app.put('/solutions/:id', async (c) => {
           alteradoEm: now,
           motivo: `Planos da solução "${solucaoNome}" foram atualizados.`,
         })
-        // 2. Sincroniza objetos do contrato com os dados atuais dos planos
-        await db.update(contracts).set({ objetos: enriched }).where(eq(contracts.id, ct.id))
+        // 2. Sincroniza objetos do contrato via SQL raw (garante cast JSONB correto)
+        await sql`UPDATE contracts SET objetos = ${JSON.stringify(enriched)}::jsonb WHERE id = ${ct.id}`
       }
     } catch (versionErr) {
       // Versioning failure is non-fatal — log but continue saving the solution
