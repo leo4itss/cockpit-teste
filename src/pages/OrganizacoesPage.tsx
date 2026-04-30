@@ -13,7 +13,6 @@ export function OrganizacoesPage() {
   const [orgs, setOrgs] = useState<Organization[]>([])
   const [loading, setLoading] = useState(true)
   const [error] = useState<string | null>(null)
-  const [search, setSearch] = useState('')
   const [showInativas, setShowInativas] = useState(false)
   const [sheetOpen, setSheetOpen] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<Organization | null>(null)
