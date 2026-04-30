@@ -543,26 +543,21 @@ export function OrganizacaoDetailPage() {
               </p>
             </div>
             <div className="flex items-center gap-8 shrink-0">
-              {tab === 'conta' && (
-                <label className="flex items-start gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={showDeleted}
-                    onChange={async e => {
-                      const val = e.target.checked
-                      setShowDeleted(val)
-                      if (id) {
-                        try {
-                          const accs = await api.getAccounts(id, val)
-                          setAccounts(accs)
-                        } catch {}
-                      }
-                    }}
-                    className="w-4 h-4 mt-[1px] rounded border border-[#e5e7eb] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] shrink-0 accent-[#2563eb] cursor-pointer"
-                  />
-                  <span className="text-sm font-medium text-[#030712] leading-none">Exibir contas deletadas</span>
-                </label>
-              )}
+              {tab === 'conta' && (() => {
+                const hasInativas = accounts.some(a => a.status === 'Inativo')
+                return (
+                  <label className={`flex items-start gap-2 ${hasInativas ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'}`}>
+                    <input
+                      type="checkbox"
+                      checked={showInativosAccount && hasInativas}
+                      onChange={e => hasInativas && setShowInativosAccount(e.target.checked)}
+                      disabled={!hasInativas}
+                      className="w-4 h-4 mt-[1px] rounded border border-[#e5e7eb] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] shrink-0 accent-[#2563eb] cursor-pointer"
+                    />
+                    <span className="text-sm font-medium text-[#030712] leading-none">Exibir contas inativadas</span>
+                  </label>
+                )
+              })()}
               {tab === 'solucoes' && (() => {
                 const hasInativas = solutions.some(s => s.status === 'Inativo')
                 return (
