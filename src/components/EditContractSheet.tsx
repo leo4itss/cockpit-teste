@@ -40,7 +40,7 @@ function buildForm(c: Contract) {
   }
 }
 
-export function EditContractSheet({ open, onClose, contract, solutions, onSave, onDelete, onInativar, onActivate }: Props) {
+export function EditContractSheet({ open, onClose, contract, solutions, onSave, onInativar, onActivate }: Props) {
   const [form, setForm] = useState(() => buildForm(contract))
   const [objetos, setObjetos] = useState<ObjetoContrato[]>(contract.objetos ?? [])
   const [dialogOpen, setDialogOpen] = useState(false)
