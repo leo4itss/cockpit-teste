@@ -400,7 +400,7 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
             <Input label="Endereço postal" required placeholder="Rua, Avenida..." value={form.endereco} onChange={e => set('endereco', e.target.value)} disabled={isInactive} />
             <Input label="Complemento" required placeholder="Número, apartamento..." value={form.complemento} onChange={e => set('complemento', e.target.value)} disabled={isInactive} />
             <div className="grid grid-cols-2 gap-4">
-              <Select label="Estado" placeholder="Selecione" options={ESTADOS} value={form.estado} onChange={e => set('estado', e.target.value)} disabled={isInactive} />
+              <Select label="Estado" required placeholder="Selecione" options={ESTADOS} value={form.estado} onChange={e => set('estado', e.target.value)} disabled={isInactive} />
               <Input label="Cidade" required placeholder="Cidade" value={form.cidade} onChange={e => set('cidade', e.target.value)} disabled={isInactive} />
             </div>
 
