@@ -198,6 +198,7 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
                   type="date"
                   value={form.dataInicio}
                   onChange={e => set('dataInicio', e.target.value)}
+                  disabled={isInactive}
                 />
               </div>
               <div className="w-[234px]">
@@ -207,6 +208,7 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
                   type="date"
                   value={form.dataTermino}
                   onChange={e => set('dataTermino', e.target.value)}
+                  disabled={isInactive}
                 />
               </div>
             </div>
