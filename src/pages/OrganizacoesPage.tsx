@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, Plus, FolderOpen, Trash2, CircleCheck, Circle } from 'lucide-react'
+import { Plus, FolderOpen, Trash2, CircleCheck, Circle } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { NewOrganizationSheet } from '@/components/NewOrganizationSheet'
 import { ConfirmDeleteModal } from '@/components/ConfirmDeleteModal'
