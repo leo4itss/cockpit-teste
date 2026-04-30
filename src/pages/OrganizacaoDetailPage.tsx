@@ -566,6 +566,21 @@ export function OrganizacaoDetailPage() {
                   </label>
                 )
               })()}
+              {tab === 'contrato' && (() => {
+                const hasInativos = contracts.some(c => c.status === 'Inativo')
+                return (
+                  <label className={`flex items-start gap-2 ${hasInativos ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'}`}>
+                    <input
+                      type="checkbox"
+                      checked={showInativosContract && hasInativos}
+                      onChange={e => hasInativos && setShowInativosContract(e.target.checked)}
+                      disabled={!hasInativos}
+                      className="w-4 h-4 mt-[1px] rounded border border-[#e5e7eb] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] shrink-0 accent-[#2563eb] cursor-pointer"
+                    />
+                    <span className="text-sm font-medium text-[#030712] leading-none">Exibir contratos inativados</span>
+                  </label>
+                )
+              })()}
               {tab !== 'marketplace' && (
                 <Button onClick={() => {
                   if (tab === 'conta') setSheetAccount(true)
