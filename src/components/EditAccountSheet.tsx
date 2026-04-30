@@ -16,6 +16,8 @@ interface Props {
   onSave: (account: Account) => void
   onUpdateContacts?: (contacts: Contact[]) => void
   onDelete?: () => void
+  onInativar?: () => void
+  onActivate?: () => void
 }
 
 /* ── helpers ─────────────────────────────────────────────── */
