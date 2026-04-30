@@ -275,14 +275,14 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete, on
             <SectionTitle>Endereço</SectionTitle>
             <div className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-4">
-                <Select label="País / Região" options={PAISES} value={form.country} onChange={e => set('country', e.target.value)} />
-                <Input label="CEP" required placeholder="00000-000" value={form.zipCode} onChange={e => set('zipCode', e.target.value)} />
+                <Select label="País / Região" options={PAISES} value={form.country} onChange={e => set('country', e.target.value)} disabled={isInactive} />
+                <Input label="CEP" required placeholder="00000-000" value={form.zipCode} onChange={e => set('zipCode', e.target.value)} disabled={isInactive} />
               </div>
-              <Input label="Endereço postal" placeholder="Rua, Avenida..." value={form.address} onChange={e => set('address', e.target.value)} />
-              <Input label="Complemento" placeholder="Número, apartamento..." value={form.complement} onChange={e => set('complement', e.target.value)} />
+              <Input label="Endereço postal" placeholder="Rua, Avenida..." value={form.address} onChange={e => set('address', e.target.value)} disabled={isInactive} />
+              <Input label="Complemento" placeholder="Número, apartamento..." value={form.complement} onChange={e => set('complement', e.target.value)} disabled={isInactive} />
               <div className="grid grid-cols-2 gap-4">
-                <Select label="Estado" placeholder="Selecione" options={STATES} value={form.state} onChange={e => set('state', e.target.value)} />
-                <Input label="Cidade" required placeholder="Cidade" value={form.city} onChange={e => set('city', e.target.value)} />
+                <Select label="Estado" placeholder="Selecione" options={STATES} value={form.state} onChange={e => set('state', e.target.value)} disabled={isInactive} />
+                <Input label="Cidade" required placeholder="Cidade" value={form.city} onChange={e => set('city', e.target.value)} disabled={isInactive} />
               </div>
             </div>
           </div>
