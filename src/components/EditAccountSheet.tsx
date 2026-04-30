@@ -18,6 +18,7 @@ interface Props {
   onDelete?: () => void
   onInativar?: () => void
   onActivate?: () => void
+  canDelete?: boolean  // true quando não há contratos/soluções vinculados
 }
 
 /* ── helpers ─────────────────────────────────────────────── */
