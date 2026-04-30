@@ -37,10 +37,12 @@ function PlanCard({
   plan,
   onEdit,
   onRemove,
+  disabled = false,
 }: {
   plan: Plan
   onEdit: () => void
   onRemove: () => void
+  disabled?: boolean
 }) {
   const [expanded, setExpanded] = useState(true)
   const [menuOpen, setMenuOpen] = useState(false)
