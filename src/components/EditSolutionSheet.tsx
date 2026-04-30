@@ -426,13 +426,15 @@ export function EditSolutionSheet({
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between pb-3">
               <SectionTitle>Planos</SectionTitle>
-              <button
-                type="button"
-                onClick={handleOpenNewPlan}
-                className="inline-flex items-center h-8 px-3 border border-[#e5e7eb] rounded-md text-xs font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors"
-              >
-                Adicionar
-              </button>
+              {!isInactive && (
+                <button
+                  type="button"
+                  onClick={handleOpenNewPlan}
+                  className="inline-flex items-center h-8 px-3 border border-[#e5e7eb] rounded-md text-xs font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors"
+                >
+                  Adicionar
+                </button>
+              )}
             </div>
 
             {plans.length === 0 ? (
