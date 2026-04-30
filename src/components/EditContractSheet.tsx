@@ -14,6 +14,8 @@ interface Props {
   solutions: Solution[]
   onSave: (contract: Contract) => void
   onDelete?: () => void
+  onInativar?: () => void
+  onActivate?: () => void
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
