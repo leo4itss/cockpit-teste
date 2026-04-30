@@ -204,6 +204,44 @@ app.put('/api/solutions/:id', async (c) => {
   if (existingPlans !== incomingPlans) {
     try {
       const solucaoNome = existing.name
+      const newPlans: any[] = body.plans ?? []
+
+      // Monta string de licenciamento a partir dos dados de um plano
+      function buildLicStr(plan: any): string {
+        if (!plan.licensings?.length) return '—'
+        const parts = plan.licensings.map((l: any) => {
+          const unidade = l.tipoLicencaUnidade ?? ''
+          const nome = l.tipoLicencaNome || l.tipoLicencaId || ''
+          const min = l.valorMinimo?.trim?.()
+          const max = l.valorMaximo?.trim?.()
+          const val = l.valor?.trim?.()
+          let range = ''
+          if (min && max) range = `${min}–${max} ${unidade}`.trim()
+          else if (min) range = `${min} ${unidade}`.trim()
+          else if (max) range = `Até ${max} ${unidade}`.trim()
+          else if (val) range = `${val} ${unidade}`.trim()
+          return range ? `${nome}: ${range}` : nome
+        })
+        return parts.join(' · ') || '—'
+      }
+
+      // Enriquece os objetos do contrato com dados atuais dos planos da solução
+      function enrichObjetos(objetos: any[]): any[] {
+        return objetos.map((obj: any) => {
+          if (obj.solucao !== solucaoNome) return obj
+          // Tenta encontrar o plano pelo nome; se não houver match (ex: foi renomeado
+          // ou era '—'), usa o único plano disponível como fallback
+          const match = newPlans.find((p: any) => p.name === obj.plano)
+            ?? (newPlans.length === 1 ? newPlans[0] : null)
+          if (!match) return obj
+          return {
+            ...obj,
+            plano: match.name,
+            licenciamento: buildLicStr(match),
+          }
+        })
+      }
+
       const allContracts = await db.select().from(contracts)
       const afetados = allContracts.filter((ct: any) => {
         const objetos = ct.objetos as Array<{ solucao: string }>
@@ -220,7 +258,7 @@ app.put('/api/solutions/:id', async (c) => {
           id: crypto.randomUUID(),
           contratoId: ct.id,
           versao: nextVersao,
-          snapshotPlano: ct.objetos,
+          snapshotPlano: enrichObjetos(ct.objetos as any[]),
           alteradoPor: 'sistema',
           alteradoEm: now,
           motivo: `Planos da solução "${solucaoNome}" foram atualizados.`,
