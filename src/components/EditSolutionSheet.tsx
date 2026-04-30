@@ -267,9 +267,16 @@ export function EditSolutionSheet({
     if (!solution) return
     // Verifica se os planos foram alterados
     const plansChanged = JSON.stringify(plans) !== JSON.stringify(solution.plans ?? [])
-    if (plansChanged && (contracts ?? []).some(ct =>
-      (ct.objetos as Array<{ solucao: string }>).some(obj => obj.solucao === solution.name)
-    )) {
+    // Verifica contratos vinculados de forma defensiva (objetos pode vir como string do JSONB)
+    const hasLinkedContract = (contracts ?? []).some(ct => {
+      try {
+        const objs: Array<{ solucao: string }> = Array.isArray(ct.objetos)
+          ? ct.objetos
+          : (typeof ct.objetos === 'string' ? JSON.parse(ct.objetos) : [])
+        return objs.some(obj => obj.solucao === solution.name)
+      } catch { return false }
+    })
+    if (plansChanged && hasLinkedContract) {
       // Há contratos vinculados — exibe modal de confirmação
       setConfirmVersionModal(true)
       return
