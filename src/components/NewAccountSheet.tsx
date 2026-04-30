@@ -176,7 +176,23 @@ export function NewAccountSheet({ open, onClose, orgId, onSave }: Props) {
     setForm(f => ({ ...f, [field]: value }))
   }
 
-  const canSave = !!form.name && !!form.razaoSocial && !!form.numeroDocumento
+  const canSave =
+    form.name.trim() !== '' &&
+    form.razaoSocial.trim() !== '' &&
+    form.tipoDocumento !== '' &&
+    form.numeroDocumento.trim() !== '' &&
+    form.segmento !== '' &&
+    form.siteOficial.trim() !== '' &&
+    form.pais !== '' &&
+    form.cep.trim() !== '' &&
+    form.enderecoPostal.trim() !== '' &&
+    form.complemento.trim() !== '' &&
+    form.estado !== '' &&
+    form.cidade.trim() !== '' &&
+    form.arquitetoPAS !== '' &&
+    form.subdomain.trim() !== '' &&
+    contatos.length > 0 &&
+    admins.length > 0
 
   function openEditContato(idx: number) {
     setEditingContatoIdx(idx)
