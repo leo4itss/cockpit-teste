@@ -220,6 +220,8 @@ app.put('/solutions/:id', async (c) => {
       })
       const now = new Date().toISOString()
       for (const ct of afetados) {
+        const enriched = enrichObjetos(ct.objetos as any[])
+        // 1. Registra versão com snapshot enriquecido
         const existingVersions = await db
           .select()
           .from(contractVersions)
@@ -229,11 +231,13 @@ app.put('/solutions/:id', async (c) => {
           id: crypto.randomUUID(),
           contratoId: ct.id,
           versao: nextVersao,
-          snapshotPlano: enrichObjetos(ct.objetos as any[]),
+          snapshotPlano: enriched,
           alteradoPor: 'sistema',
           alteradoEm: now,
           motivo: `Planos da solução "${solucaoNome}" foram atualizados.`,
         })
+        // 2. Sincroniza objetos do contrato com os dados atuais dos planos
+        await db.update(contracts).set({ objetos: enriched }).where(eq(contracts.id, ct.id))
       }
     } catch (versionErr) {
       // Versioning failure is non-fatal — log but continue saving the solution
