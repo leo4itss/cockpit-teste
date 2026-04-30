@@ -324,8 +324,8 @@ export function EditSolutionSheet({
               >
                 Ativar solução
               </Button>
-            ) : isLinkedToContracts ? (
-              /* Vinculada a contrato: só inativar (sem excluir) */
+            ) : (
+              /* Solução ativa: permite inativar */
               <Button
                 variant="ghost"
                 onClick={onInactivate}
@@ -333,7 +333,7 @@ export function EditSolutionSheet({
               >
                 Inativar solução
               </Button>
-            ) : null}
+            )}
             <Button variant="outline" onClick={onClose}>Cancelar</Button>
             {!isInactive && <Button onClick={handleSave}>Salvar</Button>}
           </>
