@@ -888,6 +888,13 @@ export function OrganizacaoDetailPage() {
         name={accountInativarTarget?.name ?? ''}
         onConfirm={() => accountInativarTarget && handleInativarAccount(accountInativarTarget)}
       />
+      <ConfirmDeleteModal
+        open={accountExcluirModal}
+        onClose={() => { setAccountExcluirModal(false); setAccountExcluirTarget(null) }}
+        variant="excluir-conta"
+        name={accountExcluirTarget?.name ?? ''}
+        onConfirm={() => accountExcluirTarget && handleDeleteAccount(accountExcluirTarget)}
+      />
 
       <ConfirmDeleteModal
         open={contractInativarModal}
