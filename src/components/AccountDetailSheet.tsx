@@ -1,7 +1,6 @@
-import { Copy, MessageCircle, Mail, ExternalLink } from 'lucide-react'
+import { Check, Copy, MessageCircle, Mail, ExternalLink } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Button } from './ui/Button'
-import { ProvisioningDots } from './ProvisioningDots'
 import type { Account, Organization } from '@/types'
 
 interface Props {
@@ -49,8 +48,17 @@ function CopyButton({ text }: { text: string }) {
 }
 
 function StatusBadge({ status }: { status: Account['status'] }) {
+  if (status === 'Criado') {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#16a34a]">
+        <span className="w-4 h-4 rounded-full bg-[#16a34a] flex items-center justify-center shrink-0">
+          <Check className="w-3 h-3 text-white" strokeWidth={2.5} />
+        </span>
+        Criado
+      </span>
+    )
+  }
   const styles: Record<string, string> = {
-    Criado:  'bg-[#dcfce7] text-[#16a34a]',
     Ativo:   'bg-[#dbeafe] text-[#2563eb]',
     Inativo: 'bg-[#f3f4f6] text-[#6b7280]',
   }
@@ -69,38 +77,57 @@ export function AccountDetailSheet({ open, onClose, account, org, onEdit }: Prop
 
   const accessUrl = `http://${account.subdomain}.hml.pas.app.br/assistant`
 
+  const enderecoPartes = [
+    account.endereco || org.address,
+    [account.cidade || org.city, account.estado || org.state].filter(Boolean).join(' - '),
+  ].filter(Boolean)
+  const enderecoFormatado = enderecoPartes.join(' | ')
+
   return (
-    <Sheet open={open} onClose={onClose} title="Detalhes da Conta" width="w-[640px]">
+    <Sheet
+      open={open}
+      onClose={onClose}
+      title="Detalhes da Conta"
+      width="w-[640px]"
+      headerAction={onEdit ? (
+        <Button variant="outline" size="sm" onClick={onEdit}>Editar</Button>
+      ) : undefined}
+    >
       <div className="flex flex-col gap-7">
 
-        {/* Cabeçalho: logo + nome + status + Editar */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gray-100 border border-[#e5e7eb] flex items-center justify-center text-sm font-bold text-gray-500 shrink-0 overflow-hidden">
+        {/* Cabeçalho: logo + nome + status */}
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-gray-100 border border-[#e5e7eb] flex items-center justify-center text-base font-bold text-gray-500 shrink-0 overflow-hidden">
             {account.logo
               ? <img src={account.logo} alt="" className="w-full h-full object-cover" />
               : <span>{account.name.charAt(0)}</span>
             }
           </div>
-          <div className="flex-1 min-w-0">
+          <div className="flex flex-col gap-1 min-w-0">
             <p className="text-base font-semibold text-[#030712] leading-6 truncate">{account.name}</p>
             <StatusBadge status={account.status} />
           </div>
-          <Button variant="outline" size="sm" onClick={onEdit}>Editar</Button>
         </div>
 
         {/* Favicon + Banner */}
-        <div className="flex items-center gap-4">
-          <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-            <p className="text-xs font-medium text-[#6b7280]">Favicon</p>
-            <div className="w-10 h-10 rounded-md bg-[#f3f4f6] border border-[#e5e7eb] flex items-center justify-center overflow-hidden">
-              <span className="text-xs text-[#9ca3af]">—</span>
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-md bg-[#f3f4f6] border border-[#e5e7eb] flex items-center justify-center overflow-hidden shrink-0">
+              {account.logo
+                ? <img src={account.logo} alt="favicon" className="w-full h-full object-cover" />
+                : <span className="text-xs text-[#9ca3af]">—</span>
+              }
             </div>
+            <span className="text-sm font-medium text-[#030712]">Favicon</span>
           </div>
-          <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-            <p className="text-xs font-medium text-[#6b7280]">Banner</p>
-            <div className="h-10 rounded-md bg-[#f3f4f6] border border-[#e5e7eb] flex items-center justify-center overflow-hidden">
-              <span className="text-xs text-[#9ca3af]">—</span>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-md bg-[#f3f4f6] border border-[#e5e7eb] flex items-center justify-center overflow-hidden shrink-0">
+              {account.logo
+                ? <img src={account.logo} alt="banner" className="w-full h-full object-cover" />
+                : <span className="text-xs text-[#9ca3af]">—</span>
+              }
             </div>
+            <span className="text-sm font-medium text-[#030712]">Banner</span>
           </div>
         </div>
 
@@ -110,7 +137,7 @@ export function AccountDetailSheet({ open, onClose, account, org, onEdit }: Prop
         <div className="flex flex-col gap-5">
           <SectionTitle>Informações básicas</SectionTitle>
 
-          <ReadonlyField label="Nome da conta" value={account.name} required />
+          <ReadonlyField label="Nome" value={account.name} required />
 
           {/* URL de acesso */}
           <div className="flex flex-col gap-3">
@@ -132,33 +159,23 @@ export function AccountDetailSheet({ open, onClose, account, org, onEdit }: Prop
             </div>
           </div>
 
-          <ReadonlyField label="Razão Social" value={org.razaoSocial} required />
-          <ReadonlyField label={org.docType || 'Documento'} value={org.docNumber} />
-          <ReadonlyField label="Segmento de negócio" value={org.businessSegment} />
+          <ReadonlyField label="Razão social" value={account.razaoSocial || org.razaoSocial} required />
+          <ReadonlyField label="Descrição" value={account.descricao} />
+          <ReadonlyField label={account.tipoDocumento || org.docType || 'CNPJ'} value={account.numeroDocumento || org.docNumber} />
+          <ReadonlyField label="Segmento de negócio" value={account.segmentoNegocio || org.businessSegment} />
           <ReadonlyField label="Data de cadastro" value={account.createdAt} />
-          <ReadonlyField label="Site oficial" value={org.officialSite} required />
-        </div>
-
-        <Divider />
-
-        {/* Provisionamento */}
-        <div className="flex flex-col gap-4">
-          <SectionTitle>Provisionamento</SectionTitle>
-          <div className="flex flex-col gap-3">
-            <label className="text-sm font-medium text-[#030712]">Status</label>
-            <ProvisioningDots status={account.provisioningStatus} />
-          </div>
+          <ReadonlyField label="Site oficial" value={account.siteOficial || org.officialSite} required />
         </div>
 
         <Divider />
 
         {/* Endereço */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
           <SectionTitle>Endereço</SectionTitle>
-          <ReadonlyField
-            label="Endereço postal"
-            value={[org.address, org.city, org.state].filter(Boolean).join(', ')}
-          />
+          <div className="flex flex-col gap-0.5">
+            <p className="text-sm font-medium text-[#030712]">Endereço postal</p>
+            <p className="text-sm text-[#6b7280]">{enderecoFormatado || '—'}</p>
+          </div>
         </div>
 
         <Divider />
