@@ -505,12 +505,14 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
                       <p className="text-base font-semibold text-[#030712] leading-6">{a.nome} {a.sobrenome}</p>
                       <p className="text-sm text-[#6b7280] leading-5">{a.email}</p>
                     </div>
-                    <EllipsisMenu
-                      onEdit={() => openEditAdmin(i)}
-                      onRemove={() => setAdmins(prev => prev.filter((_, idx) => idx !== i))}
-                      editLabel="Editar usuário"
-                      removeLabel="Remover usuário"
-                    />
+                    {!isInactive && (
+                      <EllipsisMenu
+                        onEdit={() => openEditAdmin(i)}
+                        onRemove={() => setAdmins(prev => prev.filter((_, idx) => idx !== i))}
+                        editLabel="Editar usuário"
+                        removeLabel="Remover usuário"
+                      />
+                    )}
                   </div>
                 </div>
               ))}
