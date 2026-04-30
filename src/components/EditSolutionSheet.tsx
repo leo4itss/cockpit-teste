@@ -505,6 +505,7 @@ export function EditSolutionSheet({
                     placeholder="https://"
                     value={form.link01}
                     onChange={e => set('link01', e.target.value)}
+                    disabled={isInactive}
                   />
                   <Input
                     label="Título do Link 01"
@@ -512,6 +513,7 @@ export function EditSolutionSheet({
                     placeholder="ex: Adquirir"
                     value={form.titleLink01}
                     onChange={e => set('titleLink01', e.target.value)}
+                    disabled={isInactive}
                   />
                 </div>
 
@@ -522,6 +524,7 @@ export function EditSolutionSheet({
                     placeholder="https://"
                     value={form.link02}
                     onChange={e => set('link02', e.target.value)}
+                    disabled={isInactive}
                   />
                   <Input
                     label="Título do Link 02"
@@ -529,6 +532,7 @@ export function EditSolutionSheet({
                     placeholder="ex: Saiba mais"
                     value={form.titleLink02}
                     onChange={e => set('titleLink02', e.target.value)}
+                    disabled={isInactive}
                   />
                 </div>
 
