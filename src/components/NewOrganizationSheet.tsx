@@ -251,7 +251,7 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
                 <Input label="Razão social" required placeholder="Qual a razão social?" value={form.razaoSocial} onChange={e => setField('razaoSocial', e.target.value)} />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <Select label="Tipo do documento" options={[{ value: 'CNPJ', label: 'CNPJ' }, { value: 'CPF', label: 'CPF' }]} value={form.docType} onChange={e => setField('docType', e.target.value)} />
+                <Select label="Tipo do documento" required options={[{ value: 'CNPJ', label: 'CNPJ' }, { value: 'CPF', label: 'CPF' }]} value={form.docType} onChange={e => setField('docType', e.target.value)} />
                 <Input label="Número do documento" required placeholder="00-000-000/0000-00" value={form.docNumber} onChange={e => setField('docNumber', e.target.value)} />
               </div>
               <div className="grid grid-cols-2 gap-4">
