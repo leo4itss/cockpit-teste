@@ -170,91 +170,93 @@ app.put('/solutions/:id', async (c) => {
   }
 
   // ENTREGA 2: versionar contratos afetados por mudança de planos
-  const existingPlans = JSON.stringify(existing.plans ?? [])
-  const incomingPlans = JSON.stringify(body.plans ?? [])
-  if (existingPlans !== incomingPlans) {
-    try {
-      const solucaoNome = existing.name
-      const newPlans: any[] = body.plans ?? []
+  const existingPlansStr = JSON.stringify(existing.plans ?? [])
+  const incomingPlansStr = JSON.stringify(body.plans ?? [])
+  const plansChanged = existingPlansStr !== incomingPlansStr
+  const versionLog: string[] = [`plansChanged=${plansChanged}`]
 
-      // Monta string de licenciamento a partir dos dados de um plano
-      const buildLicStr = (plan: any): string => {
-        if (!plan?.licensings?.length) return '—'
-        const parts = plan.licensings.map((l: any) => {
-          const unidade = l.tipoLicencaUnidade ?? ''
-          const nome = l.tipoLicencaNome || l.tipoLicencaId || ''
-          const min = l.valorMinimo?.trim?.()
-          const max = l.valorMaximo?.trim?.()
-          const val = l.valor?.trim?.()
-          let range = ''
-          if (min && max) range = `${min}–${max} ${unidade}`.trim()
-          else if (min) range = `${min} ${unidade}`.trim()
-          else if (max) range = `Até ${max} ${unidade}`.trim()
-          else if (val) range = `${val} ${unidade}`.trim()
-          return range ? `${nome}: ${range}` : nome
-        })
-        return parts.join(' · ') || '—'
-      }
+  if (plansChanged) {
+    const solucaoNome = existing.name
+    const newPlans: any[] = body.plans ?? []
 
-      // Enriquece os objetos do contrato com dados atuais dos planos da solução
-      const enrichObjetos = (raw: any): any[] => {
-        // Garante que objetos seja sempre um array (JSONB pode vir como string)
-        const objetos: any[] = Array.isArray(raw) ? raw
-          : (typeof raw === 'string' ? JSON.parse(raw) : [])
-        return objetos.map((obj: any) => {
-          if (obj.solucao !== solucaoNome) return obj
-          // Tenta encontrar o plano pelo nome; se não houver match (ex: foi renomeado
-          // ou era '—'), usa o único plano disponível como fallback
-          const match = newPlans.find((p: any) => p.name === obj.plano)
-            ?? (newPlans.length === 1 ? newPlans[0] : null)
-          if (!match) return obj
-          return {
-            ...obj,
-            plano: match.name,
-            licenciamento: buildLicStr(match),
-          }
-        })
-      }
+    const buildLicStr = (plan: any): string => {
+      if (!plan?.licensings?.length) return '—'
+      return plan.licensings.map((l: any) => {
+        const unidade = l.tipoLicencaUnidade ?? ''
+        const nome = l.tipoLicencaNome || l.tipoLicencaId || ''
+        const min = l.valorMinimo?.trim?.()
+        const max = l.valorMaximo?.trim?.()
+        const val = l.valor?.trim?.()
+        let range = ''
+        if (min && max) range = `${min}–${max} ${unidade}`.trim()
+        else if (min) range = `${min} ${unidade}`.trim()
+        else if (max) range = `Até ${max} ${unidade}`.trim()
+        else if (val) range = `${val} ${unidade}`.trim()
+        return range ? `${nome}: ${range}` : nome
+      }).join(' · ') || '—'
+    }
 
-      const allContracts = await db.select().from(contracts)
-      const afetados = allContracts.filter((ct: any) => {
-        // Defensivo: JSONB pode retornar como string em alguns contextos
-        try {
-          const raw = ct.objetos
-          const objetos: Array<{ solucao: string }> = Array.isArray(raw) ? raw
-            : (typeof raw === 'string' ? JSON.parse(raw) : [])
-          return objetos.some((obj) => obj.solucao === solucaoNome)
-        } catch { return false }
+    const toArr = (raw: any): any[] => {
+      if (Array.isArray(raw)) return raw
+      if (typeof raw === 'string') { try { return JSON.parse(raw) } catch { return [] } }
+      return []
+    }
+
+    const enrichObjetos = (raw: any): any[] =>
+      toArr(raw).map((obj: any) => {
+        if (obj.solucao !== solucaoNome) return obj
+        const match = newPlans.find((p: any) => p.name === obj.plano)
+          ?? (newPlans.length === 1 ? newPlans[0] : null)
+        if (!match) return obj
+        return { ...obj, plano: match.name, licenciamento: buildLicStr(match) }
       })
-      const now = new Date().toISOString()
-      for (const ct of afetados) {
-        const enriched = enrichObjetos(ct.objetos)
-        // 1. Registra versão com snapshot enriquecido
-        const existingVersions = await db
-          .select()
-          .from(contractVersions)
-          .where(eq(contractVersions.contratoId, ct.id))
-        const nextVersao = existingVersions.length + 1
+
+    // Passo 1: buscar contratos afetados
+    let afetados: any[] = []
+    try {
+      const all = await db.select().from(contracts)
+      afetados = all.filter((ct: any) => toArr(ct.objetos).some((o: any) => o.solucao === solucaoNome))
+      versionLog.push(`afetados=${afetados.length}`)
+    } catch (e: any) {
+      versionLog.push(`ERR fetch contracts: ${e.message}`)
+    }
+
+    // Passo 2: para cada contrato, criar versão e sincronizar objetos
+    for (const ct of afetados) {
+      const enriched = enrichObjetos(ct.objetos)
+      const enrichedJson = JSON.stringify(enriched)
+
+      // 2a. Versão
+      try {
+        const vers = await db.select().from(contractVersions).where(eq(contractVersions.contratoId, ct.id))
         await db.insert(contractVersions).values({
           id: crypto.randomUUID(),
           contratoId: ct.id,
-          versao: nextVersao,
-          snapshotPlano: enriched,
+          versao: vers.length + 1,
+          snapshotPlano: JSON.parse(enrichedJson),
           alteradoPor: 'sistema',
-          alteradoEm: now,
+          alteradoEm: new Date().toISOString(),
           motivo: `Planos da solução "${solucaoNome}" foram atualizados.`,
         })
-        // 2. Sincroniza objetos do contrato via SQL raw (garante cast JSONB correto)
-        await sql`UPDATE contracts SET objetos = ${JSON.stringify(enriched)}::jsonb WHERE id = ${ct.id}`
+        versionLog.push(`version ok [${ct.id}]`)
+      } catch (e: any) {
+        versionLog.push(`ERR version insert [${ct.id}]: ${e.message}`)
       }
-    } catch (versionErr) {
-      // Versioning failure is non-fatal — log but continue saving the solution
-      console.error('[versioning error]', versionErr)
+
+      // 2b. Sincronizar objetos do contrato (raw SQL com cast JSONB explícito)
+      try {
+        await sql`UPDATE contracts SET objetos = ${enrichedJson}::jsonb WHERE id = ${ct.id}`
+        versionLog.push(`sync ok [${ct.id}]`)
+      } catch (e: any) {
+        versionLog.push(`ERR sync [${ct.id}]: ${e.message}`)
+      }
     }
+
+    console.log('[versioning]', versionLog.join(' | '))
   }
 
   const [row] = await db.update(solutions).set(body).where(eq(solutions.id, id)).returning()
-  return c.json(row)
+  return c.json({ ...row, _v: versionLog })
 })
 app.delete('/solutions/:id', async (c) => {
   const id = c.req.param('id')
