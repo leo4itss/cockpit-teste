@@ -15,6 +15,7 @@ interface Props {
   onSave: (solution: Solution) => void
   onDelete?: () => void
   onInactivate?: () => void
+  onActivate?: () => void
   tiposLicenca: TipoLicenca[]
   componentes: Componente[]
   contracts?: Contract[]
