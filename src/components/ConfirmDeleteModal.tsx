@@ -231,6 +231,46 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
     )
   }
 
+  // --- INATIVAR-CONTA ---
+  if (variant === 'inativar-conta') {
+    return (
+      <Modal
+        open={open}
+        onClose={handleClose}
+        title="Inativar conta"
+        maxWidth="max-w-[480px]"
+        footer={
+          <>
+            <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
+            <Button
+              onClick={handleConfirm}
+              className="bg-amber-500 hover:bg-amber-600 text-white"
+            >
+              Inativar
+            </Button>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-4 text-sm text-[#030712]">
+          <p>
+            Ao inativar a conta <strong>"{name}"</strong>, os seguintes itens serão <strong>automaticamente inativados</strong>:
+          </p>
+          <ul className="flex flex-col gap-1.5 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-xs list-disc list-outside pl-6">
+            <li>Todos os contratos vinculados a esta conta</li>
+            <li>Todas as soluções vinculadas a esta conta</li>
+          </ul>
+          <div className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+            <p className="text-xs text-blue-800">
+              Esta ação <strong>pode ser desfeita</strong>. Para reativar a conta,
+              acesse o menu de edição e clique em <strong>"Ativar conta"</strong>.
+            </p>
+          </div>
+        </div>
+      </Modal>
+    )
+  }
+
   // --- INATIVAR-SOLUCAO ---
   if (variant === 'inativar-solucao') {
     return (
