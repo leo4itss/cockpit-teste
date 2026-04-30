@@ -231,6 +231,34 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
     )
   }
 
+  // --- EXCLUIR-CONTA ---
+  if (variant === 'excluir-conta') {
+    return (
+      <Modal
+        open={open}
+        onClose={handleClose}
+        title="Excluir conta"
+        maxWidth="max-w-[480px]"
+        footer={
+          <>
+            <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
+            <Button variant="destructive" onClick={handleConfirm}>Excluir</Button>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-4 text-sm text-[#030712]">
+          <p>Tem certeza que deseja excluir a conta <strong>"{name}"</strong>?</p>
+          <div className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+            <p className="text-xs text-red-800">
+              Esta ação é <strong>irreversível</strong>. A conta e todos os seus dados serão removidos permanentemente.
+            </p>
+          </div>
+        </div>
+      </Modal>
+    )
+  }
+
   // --- INATIVAR-CONTA ---
   if (variant === 'inativar-conta') {
     return (
