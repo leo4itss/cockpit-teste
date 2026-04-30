@@ -254,6 +254,17 @@ export function OrganizacaoDetailPage() {
     navigate('/organizacoes')
   }
 
+  async function handleActivateOrg() {
+    if (!org) return
+    try {
+      const updated = await api.updateOrganization(org.id, { ...org, status: 'Ativo' })
+      setOrg(updated)
+    } catch {
+      setOrg(prev => prev ? { ...prev, status: 'Ativo' } : prev)
+    }
+    setSheetEditOrg(false)
+  }
+
   // Verifica dependências e abre o modal correto (confirm ou blocked)
   function requestDeleteAccount(account: Account) {
     const activeContracts = contracts.filter(
