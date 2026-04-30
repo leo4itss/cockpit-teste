@@ -19,7 +19,7 @@ interface BlockedInfo {
 interface Props {
   open: boolean
   onClose: () => void
-  variant: 'org' | 'account' | 'contract' | 'solution' | 'blocked' | 'inativar-org'
+  variant: 'org' | 'account' | 'contract' | 'solution' | 'blocked' | 'inativar-org' | 'inativar-solucao' | 'inativar-contrato'
   name: string            // nome da org, conta, contrato ou solução
   onConfirm?: () => void  // não usado em 'blocked'
   blocked?: BlockedInfo   // usado em 'blocked'
