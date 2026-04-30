@@ -87,11 +87,21 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
         width="w-[640px]"
         footer={
           <>
-            <Button variant="ghost" onClick={onDelete} className="mr-auto text-[#dc2626] hover:bg-red-50">
-              Excluir contrato
-            </Button>
+            {isInactive ? (
+              onActivate && (
+                <Button variant="ghost" onClick={onActivate} className="mr-auto text-green-700 hover:bg-green-50">
+                  Ativar contrato
+                </Button>
+              )
+            ) : (
+              onInativar && (
+                <Button variant="ghost" onClick={onInativar} className="mr-auto text-amber-600 hover:bg-amber-50">
+                  Inativar contrato
+                </Button>
+              )
+            )}
             <Button variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button onClick={handleSave}>Salvar</Button>
+            {!isInactive && <Button onClick={handleSave}>Salvar</Button>}
           </>
         }
       >
