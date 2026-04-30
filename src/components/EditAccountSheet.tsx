@@ -404,7 +404,7 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
           <div className="flex flex-col gap-7">
             <p className="text-base font-bold text-[#030712] leading-6">Configuração PAS</p>
 
-            <Select label="Arquiteto PAS responsável" required placeholder="Selecione" options={ARQUITETOS} value={form.arquitetoPAS} onChange={e => set('arquitetoPAS', e.target.value)} />
+            <Select label="Arquiteto PAS responsável" required placeholder="Selecione" options={ARQUITETOS} value={form.arquitetoPAS} onChange={e => set('arquitetoPAS', e.target.value)} disabled={isInactive} />
 
             <div className="border-t border-gray-200" />
           </div>
