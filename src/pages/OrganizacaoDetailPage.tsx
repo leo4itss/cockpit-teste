@@ -91,11 +91,16 @@ export function OrganizacaoDetailPage() {
   const [accountDeleteModal, setAccountDeleteModal] = useState<'confirm' | 'blocked' | null>(null)
   const [accountBlockedContracts, setAccountBlockedContracts] = useState(0)
 
-  // Delete contract modal
-  const [contractDeleteTarget, setContractDeleteTarget] = useState<Contract | null>(null)
+  // Inativar contract modal
+  const [contractInativarTarget, setContractInativarTarget] = useState<Contract | null>(null)
+  const [contractInativarModal, setContractInativarModal] = useState(false)
 
   // Delete solution modal
   const [solutionDeleteTarget, setSolutionDeleteTarget] = useState<Solution | null>(null)
+
+  // Inativar solution modal
+  const [solutionInativarTarget, setSolutionInativarTarget] = useState<Solution | null>(null)
+  const [solutionInativarModal, setSolutionInativarModal] = useState(false)
 
   // Detail sheets
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null)
