@@ -316,15 +316,6 @@ export function OrganizacaoDetailPage() {
     setEditingAccount(null)
   }
 
-  async function handleRestoreAccount(account: Account) {
-    try {
-      await api.restoreAccount(account.id)
-      setAccounts(prev => prev.map(a => a.id === account.id ? { ...a, deletedAt: undefined } : a))
-    } catch {
-      // silencioso
-    }
-  }
-
   async function handleInativarContract(contract: Contract) {
     try {
       const updated = await api.updateContract(contract.id, { ...contract, status: 'Inativo' })
