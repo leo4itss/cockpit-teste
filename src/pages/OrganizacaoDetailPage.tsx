@@ -870,19 +870,11 @@ export function OrganizacaoDetailPage() {
         onConfirm={handleDeleteOrg}
       />
       <ConfirmDeleteModal
-        open={accountDeleteModal === 'confirm'}
-        onClose={closeAccountDeleteModal}
-        variant="account"
-        name={accountDeleteTarget?.name ?? ''}
-        onConfirm={() => accountDeleteTarget && handleDeleteAccount(accountDeleteTarget)}
-      />
-      <ConfirmDeleteModal
-        open={accountDeleteModal === 'blocked'}
-        onClose={closeAccountDeleteModal}
-        variant="blocked"
-        name={accountDeleteTarget?.name ?? ''}
-        blocked={{ activeAccounts: 0, activeContracts: accountBlockedContracts }}
-        blockedTitle="Não é possível excluir esta conta"
+        open={accountInativarModal}
+        onClose={() => { setAccountInativarModal(false); setAccountInativarTarget(null) }}
+        variant="inativar-conta"
+        name={accountInativarTarget?.name ?? ''}
+        onConfirm={() => accountInativarTarget && handleInativarAccount(accountInativarTarget)}
       />
 
       <ConfirmDeleteModal
