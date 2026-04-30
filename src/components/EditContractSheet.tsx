@@ -40,10 +40,12 @@ function buildForm(c: Contract) {
   }
 }
 
-export function EditContractSheet({ open, onClose, contract, solutions, onSave, onDelete }: Props) {
+export function EditContractSheet({ open, onClose, contract, solutions, onSave, onDelete, onInativar, onActivate }: Props) {
   const [form, setForm] = useState(() => buildForm(contract))
   const [objetos, setObjetos] = useState<ObjetoContrato[]>(contract.objetos ?? [])
   const [dialogOpen, setDialogOpen] = useState(false)
+
+  const isInactive = contract.status === 'Inativo'
 
   // Re-sync quando o contrato muda
   const [lastContract, setLastContract] = useState(contract)
