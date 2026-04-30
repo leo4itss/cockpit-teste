@@ -288,10 +288,15 @@ export function EditSolutionSheet({
 
   const editingPlan = editingPlanIndex !== null ? plans[editingPlanIndex] : undefined
 
-  // Verifica se a solução está vinculada a algum contrato
-  const isLinkedToContracts = (contracts ?? []).some(ct =>
-    (ct.objetos as Array<{ solucao: string }>).some(obj => obj.solucao === solution.name)
-  )
+  // Verifica se a solução está vinculada a algum contrato (defensivo contra objetos não-array)
+  const isLinkedToContracts = (contracts ?? []).some(ct => {
+    try {
+      const objs: Array<{ solucao: string }> = Array.isArray(ct.objetos)
+        ? ct.objetos
+        : (typeof ct.objetos === 'string' ? JSON.parse(ct.objetos) : [])
+      return objs.some(obj => obj.solucao === solution.name)
+    } catch { return false }
+  })
 
   return (
     <>
