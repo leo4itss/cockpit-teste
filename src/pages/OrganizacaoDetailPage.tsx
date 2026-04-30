@@ -40,7 +40,6 @@ export function OrganizacaoDetailPage() {
   const { componentes } = useComponentes()
   const [loading, setLoading] = useState(true)
   const [loadError] = useState<string | null>(null)
-  const [showDeleted, setShowDeleted] = useState(false)
   const [showInativas, setShowInativas] = useState(false)
   const [showInativosContract, setShowInativosContract] = useState(false)
 
