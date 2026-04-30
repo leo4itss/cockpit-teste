@@ -987,10 +987,12 @@ export function OrganizacaoDetailPage() {
           contract={editingContract}
           solutions={solutions}
           onSave={handleSaveContract}
-          onDelete={() => {
-            setContractDeleteTarget(editingContract)
+          onInativar={() => {
+            setContractInativarTarget(editingContract)
+            setContractInativarModal(true)
             setEditingContract(null)
           }}
+          onActivate={() => handleActivateContract(editingContract)}
         />
       )}
     </div>
