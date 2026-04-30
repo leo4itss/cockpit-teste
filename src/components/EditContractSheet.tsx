@@ -116,6 +116,7 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
               options={[{ value: contract.contratante, label: contract.contratante }]}
               value={contract.contratante}
               onChange={() => {}}
+              disabled={isInactive}
             />
 
             {/* Card soluções / planos / licenciamentos */}
