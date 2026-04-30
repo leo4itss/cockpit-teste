@@ -125,10 +125,7 @@ export function SolutionDetailSheet({ open, onClose, solution, componentes = [],
         {/* Avatar + nome + status */}
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-full bg-[#f3f4f6] border border-[#e5e7eb] flex items-center justify-center text-base font-bold text-[#6b7280] shrink-0 overflow-hidden">
-            {solution.iconUrl
-              ? <img src={solution.iconUrl} alt="" className="w-full h-full object-cover" />
-              : <span>{solution.name.charAt(0)}</span>
-            }
+            <span>{solution.name.charAt(0)}</span>
           </div>
           <div className="flex flex-col gap-1 min-w-0">
             <p className="text-base font-semibold text-[#030712] leading-6 truncate">{solution.name}</p>
