@@ -290,6 +290,9 @@ export function EditSolutionSheet({
 
   const editingPlan = editingPlanIndex !== null ? plans[editingPlanIndex] : undefined
 
+  // Solução inativa: somente leitura
+  const isInactive = solution.status === 'Inativo'
+
   // Verifica se a solução está vinculada a algum contrato (defensivo contra objetos não-array)
   const isLinkedToContracts = (contracts ?? []).some(ct => {
     try {
@@ -309,7 +312,17 @@ export function EditSolutionSheet({
         width="w-[640px]"
         footer={
           <>
-            {isLinkedToContracts ? (
+            {isInactive ? (
+              /* Solução inativa: só permite ativar */
+              <Button
+                variant="ghost"
+                onClick={onActivate}
+                className="mr-auto text-green-700 hover:bg-green-50"
+              >
+                Ativar solução
+              </Button>
+            ) : isLinkedToContracts ? (
+              /* Vinculada a contrato: só inativar (sem excluir) */
               <Button
                 variant="ghost"
                 onClick={onInactivate}
@@ -317,13 +330,9 @@ export function EditSolutionSheet({
               >
                 Inativar solução
               </Button>
-            ) : (
-              <Button variant="ghost" onClick={onDelete} className="mr-auto text-red-600 hover:bg-red-50">
-                Excluir solução
-              </Button>
-            )}
+            ) : null}
             <Button variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button onClick={handleSave}>Salvar</Button>
+            {!isInactive && <Button onClick={handleSave}>Salvar</Button>}
           </>
         }
       >
