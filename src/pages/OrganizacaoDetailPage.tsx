@@ -330,7 +330,17 @@ export function OrganizacaoDetailPage() {
       const updated = await api.updateSolution(solution.id, { ...solution, status: 'Inativo' })
       setSolutions(prev => prev.map(s => s.id === updated.id ? updated : s))
     } catch {
-      // silencioso
+      setSolutions(prev => prev.map(s => s.id === solution.id ? { ...solution, status: 'Inativo' } : s))
+    }
+    setEditingSolution(null)
+  }
+
+  async function handleActivateSolution(solution: Solution) {
+    try {
+      const updated = await api.updateSolution(solution.id, { ...solution, status: 'Ativo' })
+      setSolutions(prev => prev.map(s => s.id === updated.id ? updated : s))
+    } catch {
+      setSolutions(prev => prev.map(s => s.id === solution.id ? { ...solution, status: 'Ativo' } : s))
     }
     setEditingSolution(null)
   }
