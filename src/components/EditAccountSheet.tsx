@@ -442,16 +442,18 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
                         <p className="text-base font-semibold text-[#030712] leading-6">{c.nome}</p>
                         {c.cargo && <p className="text-sm text-[#6b7280] leading-5">{c.cargo}</p>}
                       </div>
-                      <EllipsisMenu
-                        onEdit={() => openEditContato(i)}
-                        onRemove={() => {
-                          const updated = contatos.filter((_, idx) => idx !== i)
-                          setContatos(updated)
-                          onUpdateContacts?.(updated.map(contactFromContato))
-                        }}
-                        editLabel="Editar contato"
-                        removeLabel="Remover contato"
-                      />
+                      {!isInactive && (
+                        <EllipsisMenu
+                          onEdit={() => openEditContato(i)}
+                          onRemove={() => {
+                            const updated = contatos.filter((_, idx) => idx !== i)
+                            setContatos(updated)
+                            onUpdateContacts?.(updated.map(contactFromContato))
+                          }}
+                          editLabel="Editar contato"
+                          removeLabel="Remover contato"
+                        />
+                      )}
                     </div>
                     {phones.map((t, pi) => (
                       <div key={pi} className="flex items-center gap-3 mt-2 border border-[#e5e7eb] rounded-xl px-4 py-3">
