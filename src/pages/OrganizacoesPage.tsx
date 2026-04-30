@@ -89,6 +89,21 @@ export function OrganizacoesPage() {
               className="text-sm bg-transparent outline-none text-[#030712] placeholder:text-[#6b7280] w-40"
             />
           </div>
+          {(() => {
+            const hasInativas = orgs.some(o => o.status === 'Inativo')
+            return (
+              <label className={`flex items-center gap-2 ${hasInativas ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'}`}>
+                <input
+                  type="checkbox"
+                  checked={showInativas && hasInativas}
+                  onChange={e => hasInativas && setShowInativas(e.target.checked)}
+                  disabled={!hasInativas}
+                  className="w-4 h-4 rounded border border-[#e5e7eb] accent-[#2563eb] cursor-pointer"
+                />
+                <span className="text-sm font-medium text-[#030712] whitespace-nowrap">Exibir organizações inativadas</span>
+              </label>
+            )
+          })()}
           <Button onClick={() => setSheetOpen(true)}>
             <Plus className="w-4 h-4 mr-1.5" /> Criar Organização
           </Button>
