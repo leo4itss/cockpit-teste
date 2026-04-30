@@ -882,11 +882,11 @@ export function OrganizacaoDetailPage() {
       />
 
       <ConfirmDeleteModal
-        open={!!contractDeleteTarget}
-        onClose={() => setContractDeleteTarget(null)}
-        variant="contract"
-        name={contractDeleteTarget?.contratante ?? ''}
-        onConfirm={handleDeleteContract}
+        open={contractInativarModal}
+        onClose={() => { setContractInativarModal(false); setContractInativarTarget(null) }}
+        variant="inativar-contrato"
+        name={contractInativarTarget?.contratante ?? ''}
+        onConfirm={() => contractInativarTarget && handleInativarContract(contractInativarTarget)}
       />
 
       <ConfirmDeleteModal
@@ -895,6 +895,14 @@ export function OrganizacaoDetailPage() {
         variant="solution"
         name={solutionDeleteTarget?.name ?? ''}
         onConfirm={handleDeleteSolution}
+      />
+
+      <ConfirmDeleteModal
+        open={solutionInativarModal}
+        onClose={() => { setSolutionInativarModal(false); setSolutionInativarTarget(null) }}
+        variant="inativar-solucao"
+        name={solutionInativarTarget?.name ?? ''}
+        onConfirm={() => solutionInativarTarget && handleInactivateSolution(solutionInativarTarget)}
       />
 
       {/* Create sheets */}
