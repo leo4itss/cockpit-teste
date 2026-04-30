@@ -609,74 +609,71 @@ export function OrganizacaoDetailPage() {
           {/* CONTA TAB */}
           {tab === 'conta' && (
             <>
-              {accounts.length === 0 ? (
-                <EmptyState message="Nenhuma conta criada" description="Crie uma conta para provisionar o sistema." />
-              ) : (
-                <div className="border border-[#e5e7eb] rounded-2xl p-4 overflow-hidden">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-[#e5e7eb]">
-                        <th className="text-left px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10 w-[184px]">Nome</th>
-                        <th className="text-left px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10 w-[169px] leading-snug">Provisionamento / Remoção</th>
-                        <th className="text-left px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10">Subdomínio</th>
-                        <th className="text-center px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10 w-[120px]">Arquiteto PAS</th>
-                        <th className="text-center px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10 w-[131px]">Status</th>
-                        <th className="w-10" />
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {accounts.map(a => {
-                        const isDeleted = !!a.deletedAt
-                        const exclusaoPermanente = isDeleted
-                          ? new Date(new Date(a.deletedAt!).getTime() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR')
-                          : null
-                        return (
-                          <tr
-                            key={a.id}
-                            className={`group border-b border-[#e5e7eb] transition-colors ${isDeleted ? 'bg-red-50/40' : 'hover:bg-gray-50 cursor-pointer'}`}
-                            onClick={() => !isDeleted && setSelectedAccount(a)}
-                          >
-                            <td className="px-2 py-2 h-[52px]">
-                              <div className="flex items-center gap-2">
-                                <div className={`w-8 h-8 rounded-full bg-[#f3f4f6] border border-[#e5e7eb] flex items-center justify-center text-sm font-medium text-[#6b7280] shrink-0 ${isDeleted ? 'opacity-40' : ''}`}>{a.name.charAt(0)}</div>
-                                <div className="flex flex-col min-w-0">
-                                  <span className={`text-sm font-medium ${isDeleted ? 'text-[#9ca3af] line-through' : 'text-[#030712]'}`}>{a.name}</span>
-                                  {isDeleted && exclusaoPermanente && (
-                                    <span className="text-xs text-red-500 leading-none mt-0.5">Exclusão em {exclusaoPermanente}</span>
-                                  )}
+              {(() => {
+                const visibleAccounts = accounts.filter(a => showInativosAccount || a.status !== 'Inativo')
+                return visibleAccounts.length === 0 ? (
+                  <EmptyState message="Nenhuma conta criada" description="Crie uma conta para provisionar o sistema." />
+                ) : (
+                  <div className="border border-[#e5e7eb] rounded-2xl p-4 overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-[#e5e7eb]">
+                          <th className="text-left px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10 w-[184px]">Nome</th>
+                          <th className="text-left px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10 w-[169px] leading-snug">Provisionamento</th>
+                          <th className="text-left px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10">Subdomínio</th>
+                          <th className="text-center px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10 w-[120px]">Arquiteto PAS</th>
+                          <th className="text-center px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10 w-[131px]">Status</th>
+                          <th className="w-10" />
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {visibleAccounts.map(a => {
+                          const isInativo = a.status === 'Inativo'
+                          return (
+                            <tr
+                              key={a.id}
+                              className="group/row border-b border-[#e5e7eb] last:border-0 hover:bg-gray-50 cursor-pointer transition-colors"
+                              onClick={() => setSelectedAccount(a)}
+                            >
+                              <td className="px-2 py-2 h-[52px]">
+                                <div className="flex items-center gap-2">
+                                  <div className={`w-8 h-8 rounded-full bg-[#f3f4f6] border border-[#e5e7eb] flex items-center justify-center text-sm font-medium text-[#6b7280] shrink-0 ${isInativo ? 'opacity-40' : ''}`}>{a.name.charAt(0)}</div>
+                                  <span className={`text-sm font-medium ${isInativo ? 'text-[#9ca3af]' : 'text-[#030712]'}`}>{a.name}</span>
                                 </div>
-                              </div>
-                            </td>
-                            <td className="px-2 py-2 h-[52px]">
-                              {isDeleted ? <span className="text-xs text-[#9ca3af]">—</span> : <ProvisioningDots status={a.provisioningStatus} />}
-                            </td>
-                            <td className={`px-2 py-2 h-[52px] text-sm ${isDeleted ? 'text-[#9ca3af]' : 'text-[#030712]'}`}>{a.subdomain}</td>
-                            <td className={`px-2 py-2 h-[52px] text-sm text-center ${isDeleted ? 'text-[#9ca3af]' : 'text-[#030712]'}`}>{a.arquitetoPAS}</td>
-                            <td className="px-2 py-2 h-[52px] text-center">
-                              {isDeleted
-                                ? <Badge variant="error">Em exclusão</Badge>
-                                : <Badge variant="success" showIcon>{a.status}</Badge>
-                              }
-                            </td>
-                            <td className="px-2 py-2 h-[52px] text-center">
-                              {isDeleted && (
-                                <button
-                                  type="button"
-                                  title="Restaurar conta"
-                                  onClick={e => { e.stopPropagation(); handleRestoreAccount(a) }}
-                                  className="w-8 h-8 flex items-center justify-center mx-auto rounded-md text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                              </td>
+                              <td className="px-2 py-2 h-[52px]">
+                                {isInativo ? <span className="text-xs text-[#9ca3af]">—</span> : <ProvisioningDots status={a.provisioningStatus} />}
+                              </td>
+                              <td className={`px-2 py-2 h-[52px] text-sm ${isInativo ? 'text-[#9ca3af]' : 'text-[#030712]'}`}>{a.subdomain}</td>
+                              <td className={`px-2 py-2 h-[52px] text-sm text-center ${isInativo ? 'text-[#9ca3af]' : 'text-[#030712]'}`}>{a.arquitetoPAS}</td>
+                              <td className="px-2 py-2 h-[52px] text-center">
+                                <Badge
+                                  variant={a.status === 'Ativo' ? 'success' : a.status === 'Criado' ? 'warning' : 'default'}
+                                  showIcon={a.status === 'Ativo'}
                                 >
-                                  <RotateCcw className="w-4 h-4" />
-                                </button>
-                              )}
-                            </td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                                  {a.status}
+                                </Badge>
+                              </td>
+                              <td className="px-2 py-2 h-[52px] text-center" onClick={e => e.stopPropagation()}>
+                                {isInativo ? (
+                                  <button
+                                    type="button"
+                                    title="Ativar conta"
+                                    onClick={() => handleActivateAccount(a)}
+                                    className="w-8 h-8 flex items-center justify-center mx-auto rounded-md text-gray-400 hover:text-green-600 hover:bg-green-50 transition-colors opacity-0 group-hover/row:opacity-100"
+                                  >
+                                    <RotateCcw className="w-4 h-4" />
+                                  </button>
+                                ) : null}
+                              </td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )
+              })()}
             </>
           )}
 
