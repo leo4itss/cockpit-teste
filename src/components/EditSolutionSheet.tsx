@@ -469,6 +469,7 @@ export function EditSolutionSheet({
               options={ARQUITETOS}
               value={form.arquitetoPAS}
               onChange={e => set('arquitetoPAS', e.target.value)}
+              disabled={isInactive}
             />
 
             <Divider />
