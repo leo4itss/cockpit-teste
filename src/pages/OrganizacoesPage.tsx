@@ -186,13 +186,23 @@ export function OrganizacoesPage() {
                     )}
                   </td>
                   <td className="px-2 py-3 w-10" onClick={e => e.stopPropagation()}>
-                    <button
-                      onClick={() => { setDeleteTarget(org); setDeleteModal('inativar') }}
-                      className="p-1.5 rounded hover:bg-amber-50 text-[#9ca3af] hover:text-amber-600 transition-colors opacity-0 group-hover/row:opacity-100"
-                      title="Inativar organização"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    {org.status === 'Inativo' ? (
+                      <button
+                        onClick={() => handleActivateOrg(org)}
+                        className="p-1.5 rounded hover:bg-green-50 text-[#9ca3af] hover:text-green-600 transition-colors opacity-0 group-hover/row:opacity-100"
+                        title="Ativar organização"
+                      >
+                        <Circle className="w-4 h-4" />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => { setDeleteTarget(org); setDeleteModal('inativar') }}
+                        className="p-1.5 rounded hover:bg-amber-50 text-[#9ca3af] hover:text-amber-600 transition-colors opacity-0 group-hover/row:opacity-100"
+                        title="Inativar organização"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
