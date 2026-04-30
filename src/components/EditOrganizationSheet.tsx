@@ -303,14 +303,16 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete, on
                     Adicione pessoas de referência para comunicação com a organização. Esses contatos não recebem acesso ao sistema automaticamente.
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => { setEditingContact(null); setContactDialogOpen(true) }}
-                  className="flex items-center gap-1.5 text-sm font-medium text-[#030712] border border-[#e5e7eb] rounded-md px-3 py-1.5 hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors shrink-0"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  Adicionar
-                </button>
+                {!isInactive && (
+                  <button
+                    type="button"
+                    onClick={() => { setEditingContact(null); setContactDialogOpen(true) }}
+                    className="flex items-center gap-1.5 text-sm font-medium text-[#030712] border border-[#e5e7eb] rounded-md px-3 py-1.5 hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors shrink-0"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    Adicionar
+                  </button>
+                )}
               </div>
 
               {/* lista de contatos */}
