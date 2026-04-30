@@ -447,8 +447,8 @@ export function EditSolutionSheet({
                   <PlanCard
                     key={i}
                     plan={plan}
-                    onEdit={isInactive ? undefined : () => handleEditPlan(i)}
-                    onRemove={isInactive ? undefined : () => handleRemovePlan(i)}
+                    onEdit={isInactive ? () => {} : () => handleEditPlan(i)}
+                    onRemove={isInactive ? () => {} : () => handleRemovePlan(i)}
                   />
                 ))}
               </div>
