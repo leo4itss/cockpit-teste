@@ -511,6 +511,17 @@ export function OrganizacaoDetailPage() {
                   <span className="text-sm font-medium text-[#030712] leading-none">Exibir contas deletadas</span>
                 </label>
               )}
+              {tab === 'solucoes' && (
+                <label className="flex items-start gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={showInativas}
+                    onChange={e => setShowInativas(e.target.checked)}
+                    className="w-4 h-4 mt-[1px] rounded border border-[#e5e7eb] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] shrink-0 accent-[#2563eb] cursor-pointer"
+                  />
+                  <span className="text-sm font-medium text-[#030712] leading-none">Exibir soluções inativadas</span>
+                </label>
+              )}
               {tab !== 'marketplace' && (
                 <Button onClick={() => {
                   if (tab === 'conta') setSheetAccount(true)
