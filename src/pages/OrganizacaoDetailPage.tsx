@@ -772,7 +772,9 @@ export function OrganizacaoDetailPage() {
           {/* CONTRATO TAB */}
           {tab === 'contrato' && (
             <>
-              {contracts.length === 0 ? (
+              {(() => {
+                const visibleContracts = contracts.filter(c => showInativosContract || c.status !== 'Inativo')
+                return visibleContracts.length === 0 ? (
                 <EmptyState message="Nenhum contrato criado" description="Crie um contrato para esta organização." />
               ) : (
                 <div className="border border-[#e5e7eb] rounded-2xl overflow-x-auto">
@@ -791,7 +793,7 @@ export function OrganizacaoDetailPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {contracts.map(c => (
+                      {visibleContracts.map(c => (
                         <tr
                           key={c.id}
                           className="border-b border-[#e5e7eb] hover:bg-gray-50 cursor-pointer transition-colors"
