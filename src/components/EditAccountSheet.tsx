@@ -312,6 +312,12 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
                   Ativar conta
                 </Button>
               )
+            ) : canDelete ? (
+              onDelete && (
+                <Button variant="ghost" onClick={onDelete} className="mr-auto text-[#dc2626] hover:bg-red-50">
+                  Excluir conta
+                </Button>
+              )
             ) : (
               onInativar && (
                 <Button variant="ghost" onClick={onInativar} className="mr-auto text-amber-600 hover:bg-amber-50">
