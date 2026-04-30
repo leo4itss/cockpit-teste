@@ -486,14 +486,16 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
                     Usuário administrador<span className="text-[#dc2626]">*</span>
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => { setEditingAdminIdx(null); setShowAdminDialog(true) }}
-                  className="flex items-center gap-1.5 text-sm font-medium text-[#030712] border border-[#e5e7eb] rounded-md px-3 py-1.5 hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors shrink-0"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  Adicionar
-                </button>
+                {!isInactive && (
+                  <button
+                    type="button"
+                    onClick={() => { setEditingAdminIdx(null); setShowAdminDialog(true) }}
+                    className="flex items-center gap-1.5 text-sm font-medium text-[#030712] border border-[#e5e7eb] rounded-md px-3 py-1.5 hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors shrink-0"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    Adicionar
+                  </button>
+                )}
               </div>
 
               {admins.map((a, i) => (
