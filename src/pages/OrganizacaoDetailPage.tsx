@@ -903,6 +903,7 @@ export function OrganizacaoDetailPage() {
             setEditingSolution(null)
           }}
           onInactivate={() => handleInactivateSolution(editingSolution)}
+          onActivate={() => handleActivateSolution(editingSolution)}
           tiposLicenca={tiposLicenca}
           componentes={componentes}
           contracts={contracts}
