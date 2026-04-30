@@ -317,6 +317,26 @@ export function OrganizacaoDetailPage() {
     setEditingAccount(null)
   }
 
+  async function handleDeleteAccount(account: Account) {
+    try {
+      await api.deleteAccount(account.id)
+    } catch {
+      // silencioso
+    }
+    setAccounts(prev => prev.filter(a => a.id !== account.id))
+    setAccountExcluirModal(false)
+    setAccountExcluirTarget(null)
+    setEditingAccount(null)
+  }
+
+  function accountCanDelete(account: Account) {
+    const hasContracts = contracts.some(c => c.contratante === account.name)
+    const hasLinkedSolutions = solutions.some(s =>
+      contracts.some(c => c.contratante === account.name && c.objetos.some(o => o.solucao === s.name))
+    )
+    return !hasContracts && !hasLinkedSolutions
+  }
+
   async function handleInativarContract(contract: Contract) {
     try {
       const updated = await api.updateContract(contract.id, { ...contract, status: 'Inativo' })
