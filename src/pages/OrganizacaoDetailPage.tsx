@@ -617,7 +617,9 @@ export function OrganizacaoDetailPage() {
           {/* SOLUÇÕES TAB */}
           {tab === 'solucoes' && (
             <>
-              {solutions.length === 0 ? (
+              {(() => {
+                const visibleSolutions = solutions.filter(s => showInativas || s.status !== 'Inativo')
+                return visibleSolutions.length === 0 ? (
                 <EmptyState message="Nenhuma solução criada" description="Crie uma solução e associe planos a ela." />
               ) : (
                 <div className="border border-[#e5e7eb] rounded-2xl overflow-x-auto p-4">
@@ -641,7 +643,7 @@ export function OrganizacaoDetailPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {solutions.map(s => (
+                      {visibleSolutions.map(s => (
                         <tr
                           key={s.id}
                           className="border-b border-[#e5e7eb] last:border-b-0 hover:bg-gray-50 cursor-pointer transition-colors"
