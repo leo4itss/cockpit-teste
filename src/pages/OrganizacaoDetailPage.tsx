@@ -351,9 +351,27 @@ export function OrganizacaoDetailPage() {
     try {
       const updated = await api.updateSolution(solution.id, { ...solution, status: 'Inativo' })
       setSolutions(prev => prev.map(s => s.id === updated.id ? updated : s))
+      // Inativa contratos vinculados
+      const linkedContracts = contracts.filter(c =>
+        c.objetos.some(o => o.solucao === solution.name) && c.status !== 'Inativo'
+      )
+      await Promise.allSettled(
+        linkedContracts.map(c => api.updateContract(c.id, { ...c, status: 'Inativo' }))
+      )
+      setContracts(prev => prev.map(c =>
+        linkedContracts.some(lc => lc.id === c.id) ? { ...c, status: 'Inativo' } : c
+      ))
     } catch {
       setSolutions(prev => prev.map(s => s.id === solution.id ? { ...solution, status: 'Inativo' } : s))
     }
+    setSolutionInativarModal(false)
+    setSolutionInativarTarget(null)
+    setEditingSolution(null)
+  }
+
+  function requestInactivateSolution(solution: Solution) {
+    setSolutionInativarTarget(solution)
+    setSolutionInativarModal(true)
     setEditingSolution(null)
   }
 
