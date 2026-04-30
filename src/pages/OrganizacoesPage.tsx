@@ -79,16 +79,6 @@ export function OrganizacoesPage() {
       <div className="flex items-center justify-between px-8 py-4">
         <h1 className="text-2xl font-bold leading-8 text-[#030712]">Organização</h1>
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2 border border-gray-200 rounded-md px-3 py-2 bg-white shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
-            <Search className="w-4 h-4 text-gray-400 opacity-50" />
-            <input
-              type="text"
-              placeholder="Buscar"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="text-sm bg-transparent outline-none text-[#030712] placeholder:text-[#6b7280] w-40"
-            />
-          </div>
           {(() => {
             const hasInativas = orgs.some(o => o.status === 'Inativo')
             return (
