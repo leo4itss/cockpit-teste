@@ -125,7 +125,21 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
   const [logoPreview, setLogoPreview] = useState<string>('')
   const logoInputRef = useRef<HTMLInputElement>(null)
 
-  const canSave = form.name.trim() !== '' && form.razaoSocial.trim() !== '' && form.docNumber.trim() !== ''
+  const canSave =
+    form.name.trim() !== '' &&
+    form.razaoSocial.trim() !== '' &&
+    form.docType !== '' &&
+    form.docNumber.trim() !== '' &&
+    form.businessSegment !== '' &&
+    form.officialSite.trim() !== '' &&
+    form.country !== '' &&
+    form.zipCode.trim() !== '' &&
+    form.address.trim() !== '' &&
+    form.complement.trim() !== '' &&
+    form.state !== '' &&
+    form.city.trim() !== '' &&
+    form.arquitetoPAS !== '' &&
+    form.domain.trim() !== ''
 
   function setField(field: string, value: string) {
     setForm(f => ({ ...f, [field]: value }))
