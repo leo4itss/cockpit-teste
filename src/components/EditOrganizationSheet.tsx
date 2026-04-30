@@ -384,6 +384,7 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete, on
               options={ARQUITETOS}
               value={form.arquitetoPAS}
               onChange={e => set('arquitetoPAS', e.target.value)}
+              disabled={isInactive}
             />
           </div>
 
