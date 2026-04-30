@@ -29,10 +29,12 @@ export function OrganizacoesPage() {
       })
   }, [])
 
-  const filtered = orgs.filter(o =>
-    o.name.toLowerCase().includes(search.toLowerCase()) ||
-    o.domain.toLowerCase().includes(search.toLowerCase())
-  )
+  const filtered = orgs.filter(o => {
+    const matchSearch = o.name.toLowerCase().includes(search.toLowerCase()) ||
+      o.domain.toLowerCase().includes(search.toLowerCase())
+    const matchStatus = showInativas || o.status !== 'Inativo'
+    return matchSearch && matchStatus
+  })
 
   async function handleDeleteOrg(org: Organization) {
     try {
@@ -43,6 +45,15 @@ export function OrganizacoesPage() {
     }
     setDeleteModal(null)
     setDeleteTarget(null)
+  }
+
+  async function handleActivateOrg(org: Organization) {
+    try {
+      await api.updateOrganization(org.id, { ...org, status: 'Ativo' })
+      setOrgs(prev => prev.map(o => o.id === org.id ? { ...o, status: 'Ativo' } : o))
+    } catch {
+      setOrgs(prev => prev.map(o => o.id === org.id ? { ...o, status: 'Ativo' } : o))
+    }
   }
 
   async function handleCreate(data: Omit<Organization, 'id' | 'qtdContas' | 'qtdSolucoes' | 'qtdContratos' | 'contacts'>) {
