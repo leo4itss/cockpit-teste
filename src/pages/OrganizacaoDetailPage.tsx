@@ -937,11 +937,12 @@ export function OrganizacaoDetailPage() {
           org={org}
           onSave={handleSaveAccount}
           onUpdateContacts={handleUpdateContacts}
-          onDelete={() => {
-            const acc = editingAccount
+          onInativar={() => {
+            setAccountInativarTarget(editingAccount)
+            setAccountInativarModal(true)
             setEditingAccount(null)
-            setTimeout(() => requestDeleteAccount(acc), 340)
           }}
+          onActivate={() => handleActivateAccount(editingAccount)}
         />
       )}
       <SolutionDetailSheet
