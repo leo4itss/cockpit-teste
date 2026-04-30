@@ -313,15 +313,25 @@ export function OrganizacaoDetailPage() {
     }
   }
 
-  async function handleDeleteContract() {
-    if (!contractDeleteTarget) return
+  async function handleInativarContract(contract: Contract) {
     try {
-      await api.deleteContract(contractDeleteTarget.id)
-      setContracts(prev => prev.filter(c => c.id !== contractDeleteTarget.id))
+      const updated = await api.updateContract(contract.id, { ...contract, status: 'Inativo' })
+      setContracts(prev => prev.map(c => c.id === updated.id ? updated : c))
     } catch {
-      // silencioso
+      setContracts(prev => prev.map(c => c.id === contract.id ? { ...contract, status: 'Inativo' } : c))
     }
-    setContractDeleteTarget(null)
+    setContractInativarModal(false)
+    setContractInativarTarget(null)
+    setEditingContract(null)
+  }
+
+  async function handleActivateContract(contract: Contract) {
+    try {
+      const updated = await api.updateContract(contract.id, { ...contract, status: 'Ativo' })
+      setContracts(prev => prev.map(c => c.id === updated.id ? updated : c))
+    } catch {
+      setContracts(prev => prev.map(c => c.id === contract.id ? { ...contract, status: 'Ativo' } : c))
+    }
     setEditingContract(null)
   }
 
