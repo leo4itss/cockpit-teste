@@ -258,7 +258,7 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete, on
                 <Input label="Razão social" required placeholder="Razão social" value={form.razaoSocial} onChange={e => set('razaoSocial', e.target.value)} disabled={isInactive} />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <Select label="Tipo do documento" options={DOC_TYPES} value={form.docType} onChange={e => set('docType', e.target.value)} disabled={isInactive} />
+                <Select label="Tipo do documento" required options={DOC_TYPES} value={form.docType} onChange={e => set('docType', e.target.value)} disabled={isInactive} />
                 <Input label="Número do documento" required placeholder="00.000.000/0000-00" value={form.docNumber} onChange={e => set('docNumber', e.target.value)} disabled={isInactive} />
               </div>
               <div className="grid grid-cols-2 gap-4">
