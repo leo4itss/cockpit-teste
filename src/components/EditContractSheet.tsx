@@ -125,14 +125,16 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
                 <p className="text-sm font-medium text-[#030712]">
                   Soluções, planos e licenciamentos<span className="text-[#dc2626]">*</span>
                 </p>
-                <button
-                  type="button"
-                  onClick={() => setDialogOpen(true)}
-                  className="inline-flex items-center gap-1.5 h-8 px-3 border border-[#e5e7eb] rounded-md text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  Adicionar
-                </button>
+                {!isInactive && (
+                  <button
+                    type="button"
+                    onClick={() => setDialogOpen(true)}
+                    className="inline-flex items-center gap-1.5 h-8 px-3 border border-[#e5e7eb] rounded-md text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    Adicionar
+                  </button>
+                )}
               </div>
 
               {objetos.length > 0 && (
