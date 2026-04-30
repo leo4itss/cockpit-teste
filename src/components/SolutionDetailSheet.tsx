@@ -59,7 +59,6 @@ function StatusBadge({ status }: { status: Solution['status'] }) {
 function PlanItem({ plan }: { plan: Plan }) {
   const [expanded, setExpanded] = useState(true)
 
-  // Formata cada licença como "valor unidade" ou "Até valor unidade" ou "min–max unidade"
   const licensingParts = plan.licensings.map(l => {
     const unidade = l.tipoLicencaUnidade ?? ''
     const min = l.valorMinimo?.trim()
@@ -76,7 +75,6 @@ function PlanItem({ plan }: { plan: Plan }) {
 
   return (
     <div className="bg-white border border-[#e5e7eb] rounded-xl overflow-hidden">
-      {/* Header do plano */}
       <div className="flex items-start gap-3 px-5 py-4">
         <button
           onClick={() => setExpanded(v => !v)}
@@ -95,7 +93,6 @@ function PlanItem({ plan }: { plan: Plan }) {
         </div>
       </div>
 
-      {/* Modelo de licenciamento expandido */}
       {expanded && licensingLine && (
         <div className="border-t border-[#e5e7eb] px-5 py-4 flex flex-col gap-1">
           <p className="text-sm font-bold text-[#030712]">Modelo de licenciamento</p>
@@ -119,25 +116,30 @@ export function SolutionDetailSheet({ open, onClose, solution, componentes = [],
       onClose={onClose}
       title="Detalhe da solução"
       width="w-[640px]"
+      headerAction={onEdit ? (
+        <Button variant="outline" size="sm" onClick={onEdit}>Editar</Button>
+      ) : undefined}
     >
       <div className="flex flex-col gap-6">
 
-        {/* Avatar + nome + status + botão editar */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-[#f3f4f6] border border-[#e5e7eb] flex items-center justify-center text-sm font-bold text-[#6b7280] shrink-0 overflow-hidden">
-            {solution.name.charAt(0)}
+        {/* Avatar + nome + status */}
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-[#f3f4f6] border border-[#e5e7eb] flex items-center justify-center text-base font-bold text-[#6b7280] shrink-0 overflow-hidden">
+            {solution.iconUrl
+              ? <img src={solution.iconUrl} alt="" className="w-full h-full object-cover" />
+              : <span>{solution.name.charAt(0)}</span>
+            }
           </div>
-          <div className="flex-1 min-w-0">
+          <div className="flex flex-col gap-1 min-w-0">
             <p className="text-base font-semibold text-[#030712] leading-6 truncate">{solution.name}</p>
             <StatusBadge status={solution.status} />
           </div>
-          <Button variant="outline" size="sm" onClick={onEdit}>Editar</Button>
         </div>
 
         <Divider />
 
         {/* Informações básicas */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-5">
           <SectionTitle>Informações básicas</SectionTitle>
           <div className="flex flex-col gap-4">
             <Field label="Nome da instância da solução" value={solution.name} required />
@@ -153,7 +155,7 @@ export function SolutionDetailSheet({ open, onClose, solution, componentes = [],
         <div className="flex flex-col gap-4">
           <SectionTitle>Componentes</SectionTitle>
           {componentesVinculados.length === 0 ? (
-            <p className="text-sm text-[#6b7280] text-center py-2">
+            <p className="text-sm text-[#6b7280] py-2">
               Nenhum componente vinculado a esta solução.
             </p>
           ) : (
@@ -163,7 +165,7 @@ export function SolutionDetailSheet({ open, onClose, solution, componentes = [],
                   key={c.id}
                   className="flex flex-col gap-0.5 px-4 py-3 border border-[#e5e7eb] rounded-lg"
                 >
-                  <p className="text-sm font-medium text-[#030712]">{c.nome}</p>
+                  <p className="text-sm font-semibold text-[#030712]">{c.nome}</p>
                   {c.descricao && (
                     <p className="text-sm text-[#6b7280]">{c.descricao}</p>
                   )}
@@ -183,10 +185,7 @@ export function SolutionDetailSheet({ open, onClose, solution, componentes = [],
           ) : (
             <div className="flex flex-col gap-2">
               {solution.plans.map((plan, i) => (
-                <PlanItem
-                  key={i}
-                  plan={plan}
-                />
+                <PlanItem key={i} plan={plan} />
               ))}
             </div>
           )}
@@ -199,14 +198,13 @@ export function SolutionDetailSheet({ open, onClose, solution, componentes = [],
           <SectionTitle>Marketplace</SectionTitle>
           <div className="flex flex-col gap-4">
             <Field label="Marketplace" value={solution.marketplace} />
-            {/* Exibe campos de link sempre que houver dados, independente do status */}
-            {(solution.link01 || solution.link02 || solution.marketplaceStatus) && (
+            {solution.marketplace === 'Ativo' && (
               <>
-                <Field label="Link 01" value={solution.link01} />
-                <Field label="Título do Link 01" value={solution.titleLink01} />
-                <Field label="Link 02" value={solution.link02} />
-                <Field label="Título do Link 02" value={solution.titleLink02} />
-                <Field label="Status" value={solution.marketplaceStatus} />
+                {solution.link01 && <Field label="Link 01" value={solution.link01} />}
+                {solution.titleLink01 && <Field label="Título do Link 01" value={solution.titleLink01} />}
+                {solution.link02 && <Field label="Link 02" value={solution.link02} />}
+                {solution.titleLink02 && <Field label="Título do Link 02" value={solution.titleLink02} />}
+                {solution.marketplaceStatus && <Field label="Status" value={solution.marketplaceStatus} />}
               </>
             )}
           </div>
