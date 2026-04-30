@@ -178,8 +178,8 @@ app.put('/solutions/:id', async (c) => {
       const newPlans: any[] = body.plans ?? []
 
       // Monta string de licenciamento a partir dos dados de um plano
-      function buildLicStr(plan: any): string {
-        if (!plan.licensings?.length) return '—'
+      const buildLicStr = (plan: any): string => {
+        if (!plan?.licensings?.length) return '—'
         const parts = plan.licensings.map((l: any) => {
           const unidade = l.tipoLicencaUnidade ?? ''
           const nome = l.tipoLicencaNome || l.tipoLicencaId || ''
@@ -197,7 +197,10 @@ app.put('/solutions/:id', async (c) => {
       }
 
       // Enriquece os objetos do contrato com dados atuais dos planos da solução
-      function enrichObjetos(objetos: any[]): any[] {
+      const enrichObjetos = (raw: any): any[] => {
+        // Garante que objetos seja sempre um array (JSONB pode vir como string)
+        const objetos: any[] = Array.isArray(raw) ? raw
+          : (typeof raw === 'string' ? JSON.parse(raw) : [])
         return objetos.map((obj: any) => {
           if (obj.solucao !== solucaoNome) return obj
           // Tenta encontrar o plano pelo nome; se não houver match (ex: foi renomeado
