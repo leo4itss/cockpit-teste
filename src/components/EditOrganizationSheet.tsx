@@ -329,10 +329,12 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete, on
                         <p className="text-base font-semibold text-[#030712] leading-6">{contact.name}</p>
                         {contact.role && <p className="text-sm text-[#6b7280] leading-5">{contact.role}</p>}
                       </div>
-                      <EllipsisMenu
-                        onEdit={() => openEditContact(i)}
-                        onRemove={() => setContacts(prev => prev.filter((_, j) => j !== i))}
-                      />
+                      {!isInactive && (
+                        <EllipsisMenu
+                          onEdit={() => openEditContact(i)}
+                          onRemove={() => setContacts(prev => prev.filter((_, j) => j !== i))}
+                        />
+                      )}
                     </div>
 
                     {/* telefone */}
