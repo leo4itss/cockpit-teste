@@ -28,12 +28,7 @@ export function OrganizacoesPage() {
       })
   }, [])
 
-  const filtered = orgs.filter(o => {
-    const matchSearch = o.name.toLowerCase().includes(search.toLowerCase()) ||
-      o.domain.toLowerCase().includes(search.toLowerCase())
-    const matchStatus = showInativas || o.status !== 'Inativo'
-    return matchSearch && matchStatus
-  })
+  const filtered = orgs.filter(o => showInativas || o.status !== 'Inativo')
 
   async function handleDeleteOrg(org: Organization) {
     try {
