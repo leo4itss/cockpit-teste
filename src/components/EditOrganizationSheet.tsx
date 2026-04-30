@@ -254,16 +254,16 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete, on
             <SectionTitle>Informações básicas</SectionTitle>
             <div className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-4">
-                <Input label="Nome da organização" required placeholder="Nome da organização" value={form.name} onChange={e => set('name', e.target.value)} />
-                <Input label="Razão social" required placeholder="Razão social" value={form.razaoSocial} onChange={e => set('razaoSocial', e.target.value)} />
+                <Input label="Nome da organização" required placeholder="Nome da organização" value={form.name} onChange={e => set('name', e.target.value)} disabled={isInactive} />
+                <Input label="Razão social" required placeholder="Razão social" value={form.razaoSocial} onChange={e => set('razaoSocial', e.target.value)} disabled={isInactive} />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <Select label="Tipo do documento" options={DOC_TYPES} value={form.docType} onChange={e => set('docType', e.target.value)} />
-                <Input label="Número do documento" required placeholder="00.000.000/0000-00" value={form.docNumber} onChange={e => set('docNumber', e.target.value)} />
+                <Select label="Tipo do documento" options={DOC_TYPES} value={form.docType} onChange={e => set('docType', e.target.value)} disabled={isInactive} />
+                <Input label="Número do documento" required placeholder="00.000.000/0000-00" value={form.docNumber} onChange={e => set('docNumber', e.target.value)} disabled={isInactive} />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <Select label="Segmento de negócio" placeholder="Selecione" options={SEGMENTS} value={form.businessSegment} onChange={e => set('businessSegment', e.target.value)} />
-                <Input label="Site oficial" required placeholder="https://" value={form.officialSite} onChange={e => set('officialSite', e.target.value)} />
+                <Select label="Segmento de negócio" placeholder="Selecione" options={SEGMENTS} value={form.businessSegment} onChange={e => set('businessSegment', e.target.value)} disabled={isInactive} />
+                <Input label="Site oficial" required placeholder="https://" value={form.officialSite} onChange={e => set('officialSite', e.target.value)} disabled={isInactive} />
               </div>
             </div>
           </div>
