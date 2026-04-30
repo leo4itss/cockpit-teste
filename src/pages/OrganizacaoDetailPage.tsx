@@ -83,8 +83,7 @@ export function OrganizacaoDetailPage() {
   const [sheetEditOrg, setSheetEditOrg] = useState(false)
 
   // Delete org modal
-  const [orgDeleteModal, setOrgDeleteModal] = useState<'org' | 'blocked' | null>(null)
-  const [orgBlockedInfo, setOrgBlockedInfo] = useState<{ activeAccounts: number; activeContracts: number } | null>(null)
+  const [orgDeleteModal, setOrgDeleteModal] = useState<'inativar' | null>(null)
 
   // Delete account modal
   const [accountDeleteTarget, setAccountDeleteTarget] = useState<Account | null>(null)
@@ -247,16 +246,12 @@ export function OrganizacaoDetailPage() {
 
   async function handleDeleteOrg() {
     try {
-      await api.deleteOrganization(org!.id)
-      navigate('/organizacoes')
+      await api.updateOrganization(org!.id, { ...org, status: 'Inativo' })
     } catch {
-      const res = await fetch(`/api/organizations/${org!.id}`, { method: 'DELETE' })
-      if (res.status === 422) {
-        const body = await res.json()
-        setOrgBlockedInfo({ activeAccounts: body.activeAccounts, activeContracts: body.activeContracts })
-        setOrgDeleteModal('blocked')
-      }
+      // fallback silencioso
     }
+    setOrgDeleteModal(null)
+    navigate('/organizacoes')
   }
 
   // Verifica dependências e abre o modal correto (confirm ou blocked)
@@ -801,18 +796,11 @@ export function OrganizacaoDetailPage() {
 
       {/* Delete modals */}
       <ConfirmDeleteModal
-        open={orgDeleteModal === 'org'}
+        open={orgDeleteModal === 'inativar'}
         onClose={() => setOrgDeleteModal(null)}
-        variant="org"
+        variant="inativar-org"
         name={org?.name ?? ''}
         onConfirm={handleDeleteOrg}
-      />
-      <ConfirmDeleteModal
-        open={orgDeleteModal === 'blocked'}
-        onClose={() => setOrgDeleteModal(null)}
-        variant="blocked"
-        name={org?.name ?? ''}
-        blocked={orgBlockedInfo ?? undefined}
       />
       <ConfirmDeleteModal
         open={accountDeleteModal === 'confirm'}
@@ -861,7 +849,7 @@ export function OrganizacaoDetailPage() {
         onClose={() => setSheetEditOrg(false)}
         org={org}
         onSave={updated => handleEditOrg(updated)}
-        onDelete={() => { setSheetEditOrg(false); setOrgDeleteModal('org') }}
+        onDelete={() => { setSheetEditOrg(false); setOrgDeleteModal('inativar') }}
       />
 
       {/* Detail sheets */}

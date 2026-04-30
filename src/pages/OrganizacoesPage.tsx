@@ -16,8 +16,7 @@ export function OrganizacoesPage() {
   const [search, setSearch] = useState('')
   const [sheetOpen, setSheetOpen] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<Organization | null>(null)
-  const [deleteModal, setDeleteModal] = useState<'org' | 'blocked' | null>(null)
-  const [blockedInfo, setBlockedInfo] = useState<{ activeAccounts: number; activeContracts: number } | null>(null)
+  const [deleteModal, setDeleteModal] = useState<'inativar' | null>(null)
 
   useEffect(() => {
     api.getOrganizations()
@@ -36,23 +35,13 @@ export function OrganizacoesPage() {
 
   async function handleDeleteOrg(org: Organization) {
     try {
-      await api.deleteOrganization(org.id)
-      setOrgs(prev => prev.filter(o => o.id !== org.id))
-      setDeleteModal(null)
-      setDeleteTarget(null)
-    } catch (_err: any) {
-      // Tenta parsear erro 422 com dependências
-      try {
-        const res = await fetch(`/api/organizations/${org.id}`, { method: 'DELETE' })
-        if (res.status === 422) {
-          const body = await res.json()
-          setBlockedInfo({ activeAccounts: body.activeAccounts, activeContracts: body.activeContracts })
-          setDeleteModal('blocked')
-        }
-      } catch {
-        // fallback silencioso
-      }
+      await api.updateOrganization(org.id, { ...org, status: 'Inativo' })
+      setOrgs(prev => prev.map(o => o.id === org.id ? { ...o, status: 'Inativo' } : o))
+    } catch {
+      setOrgs(prev => prev.map(o => o.id === org.id ? { ...o, status: 'Inativo' } : o))
     }
+    setDeleteModal(null)
+    setDeleteTarget(null)
   }
 
   async function handleCreate(data: Omit<Organization, 'id' | 'qtdContas' | 'qtdSolucoes' | 'qtdContratos' | 'contacts'>) {
@@ -171,9 +160,9 @@ export function OrganizacoesPage() {
                   </td>
                   <td className="px-2 py-3 w-10" onClick={e => e.stopPropagation()}>
                     <button
-                      onClick={() => { setDeleteTarget(org); setDeleteModal('org') }}
-                      className="p-1.5 rounded hover:bg-red-50 text-[#9ca3af] hover:text-red-600 transition-colors opacity-0 group-hover/row:opacity-100"
-                      title="Excluir organização"
+                      onClick={() => { setDeleteTarget(org); setDeleteModal('inativar') }}
+                      className="p-1.5 rounded hover:bg-amber-50 text-[#9ca3af] hover:text-amber-600 transition-colors opacity-0 group-hover/row:opacity-100"
+                      title="Inativar organização"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -187,18 +176,11 @@ export function OrganizacoesPage() {
       )}
 
       <ConfirmDeleteModal
-        open={deleteModal === 'org' && !!deleteTarget}
+        open={deleteModal === 'inativar' && !!deleteTarget}
         onClose={() => { setDeleteModal(null); setDeleteTarget(null) }}
-        variant="org"
+        variant="inativar-org"
         name={deleteTarget?.name ?? ''}
         onConfirm={() => deleteTarget && handleDeleteOrg(deleteTarget)}
-      />
-      <ConfirmDeleteModal
-        open={deleteModal === 'blocked'}
-        onClose={() => { setDeleteModal(null); setDeleteTarget(null) }}
-        variant="blocked"
-        name={deleteTarget?.name ?? ''}
-        blocked={blockedInfo ?? undefined}
       />
       <NewOrganizationSheet
         open={sheetOpen}

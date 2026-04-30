@@ -16,7 +16,7 @@ interface BlockedInfo {
 interface Props {
   open: boolean
   onClose: () => void
-  variant: 'org' | 'account' | 'contract' | 'solution' | 'blocked'
+  variant: 'org' | 'account' | 'contract' | 'solution' | 'blocked' | 'inativar-org'
   name: string            // nome da org, conta, contrato ou solução
   onConfirm?: () => void  // não usado em 'blocked'
   blocked?: BlockedInfo   // usado em 'blocked'
@@ -165,6 +165,63 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
                 Exclusão permanente prevista para: {exclusaoFormatada}
               </p>
             </div>
+          </div>
+        </div>
+      </Modal>
+    )
+  }
+
+  // --- INATIVAR-ORG ---
+  if (variant === 'inativar-org') {
+    const canConfirm = typed === name
+    return (
+      <Modal
+        open={open}
+        onClose={handleClose}
+        title="Inativar organização"
+        maxWidth="max-w-[480px]"
+        footer={
+          <>
+            <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
+            <Button
+              onClick={handleConfirm}
+              disabled={!canConfirm}
+              className={`bg-amber-500 hover:bg-amber-600 text-white ${!canConfirm ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              Inativar
+            </Button>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-4 text-sm text-[#030712]">
+          <p>
+            Ao inativar esta organização, os seguintes itens serão <strong>automaticamente inativados</strong>:
+          </p>
+          <ul className="flex flex-col gap-1.5 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-xs list-disc list-outside pl-6">
+            <li>Todas as contas vinculadas</li>
+            <li>Todos os contratos</li>
+            <li>Todas as soluções</li>
+          </ul>
+
+          <div className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+            <p className="text-xs text-blue-800">
+              Esta ação <strong>pode ser desfeita</strong>. Para reativar a organização e seus vínculos,
+              acesse o menu de ações da organização e selecione <strong>"Reativar organização"</strong>.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-[#030712]">
+              Digite <strong>"{name}"</strong> para confirmar:
+            </label>
+            <input
+              type="text"
+              value={typed}
+              onChange={e => setTyped(e.target.value)}
+              placeholder={name}
+              className="w-full rounded-md border border-[#e5e7eb] px-3 py-2 text-sm text-[#030712] placeholder:text-[#9ca3af] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-amber-500"
+            />
           </div>
         </div>
       </Modal>

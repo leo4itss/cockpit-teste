@@ -197,8 +197,8 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete }: 
         footer={
           <>
             {onDelete && (
-              <Button variant="ghost" onClick={onDelete} className="mr-auto text-red-600 hover:bg-red-50">
-                Excluir organização
+              <Button variant="ghost" onClick={onDelete} className="mr-auto text-amber-600 hover:bg-amber-50">
+                Inativar organização
               </Button>
             )}
             <Button variant="outline" onClick={onClose}>Cancelar</Button>
