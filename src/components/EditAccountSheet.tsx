@@ -331,16 +331,19 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
               description="Insira o logo da conta. Isso ajudará a identificar a conta de forma mais fácil e visual no sistema."
               preview={logo}
               onFileSelect={setLogo}
+              disabled={isInactive}
             />
             <ImageUploadRow
               description="Insira o favicon da conta. Isso será exibido na aba do navegador. Formato: 64×64 pixels."
               preview={favicon}
               onFileSelect={setFavicon}
+              disabled={isInactive}
             />
             <ImageUploadRow
               description="Insira o banner da conta. Isso será exibido na tela de login. Formato: 180×180 pixels."
               preview={banner}
               onFileSelect={setBanner}
+              disabled={isInactive}
             />
             <div className="border-t border-gray-200" />
           </div>
