@@ -358,7 +358,6 @@ export function NewSolutionSheet({
         componentes={componentes}
         value={selectedComponenteIds}
         onChange={setSelectedComponenteIds}
-        single
       />
     </Sheet>
   )
