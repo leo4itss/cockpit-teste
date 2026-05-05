@@ -88,7 +88,14 @@ function PlanCard({
           }
         </button>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-[#030712] leading-5">{plan.name}</p>
+          <div className="flex items-center gap-1.5">
+            <p className="text-sm font-semibold text-[#030712] leading-5">{plan.name}</p>
+            {plan.versao && (
+              <span className="text-xs font-normal text-[#6b7280] bg-[#f3f4f6] border border-[#e5e7eb] px-1.5 py-0.5 rounded">
+                v{plan.versao}
+              </span>
+            )}
+          </div>
           {plan.description && (
             <p className="text-xs text-[#6b7280] leading-4 mt-0.5">{plan.description}</p>
           )}
