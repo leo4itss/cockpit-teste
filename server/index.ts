@@ -189,7 +189,7 @@ app.put('/api/solutions/:id', async (c) => {
   const [existing] = await db.select().from(solutions).where(eq(solutions.id, id))
   if (!existing) return c.json({ error: 'Not found' }, 404)
 
-  // ── ENTREGA 1: componentes são imutáveis ──────────────────────
+  // ── Componentes são imutáveis após a criação ──────────────
   const sortedExisting = [...((existing.componenteIds as string[]) ?? [])].sort().join(',')
   const sortedIncoming = [...((body.componenteIds as string[]) ?? [])].sort().join(',')
   if (sortedExisting !== sortedIncoming) {
@@ -198,86 +198,118 @@ app.put('/api/solutions/:id', async (c) => {
     }, 422)
   }
 
-  // ── ENTREGA 2: versionar contratos afetados por mudança de planos ─
-  const existingPlansStr = JSON.stringify(existing.plans ?? [])
-  const incomingPlansStr = JSON.stringify(body.plans ?? [])
-  const plansChanged = existingPlansStr !== incomingPlansStr
+  // ── Versionamento de planos ───────────────────────────────
+  // O frontend envia apenas os planos ATIVOS (o que o usuário vê/edita).
+  // O backend faz o merge: marca versões alteradas como 'inativo' e cria
+  // novas versões 'ativo'. Versões inativas anteriores são preservadas
+  // como histórico.
+  const existingPlansArr: any[] = (existing.plans as any[]) ?? []
+  const incomingPlansArr: any[] = body.plans ?? []
+
+  // Separa histórico (inativo) dos planos vigentes (ativos)
+  const existingInactive = existingPlansArr.filter((p: any) => p.statusVersao === 'inativo')
+  const existingActive   = existingPlansArr.filter((p: any) => !p.statusVersao || p.statusVersao === 'ativo')
+
+  // Remove campos de meta-versão para comparar apenas conteúdo
+  function stripMeta({ versao: _v, statusVersao: _s, criadoEm: _c, ...rest }: any) {
+    return rest
+  }
+
+  // Detecta se algum plano EXISTENTE (não novo) teve seu conteúdo alterado
+  const plansChanged = incomingPlansArr.some(incoming => {
+    const active = existingActive.find((p: any) => p.name === incoming.name)
+    if (!active) return false // plano novo → não é "mudança de versão"
+    return JSON.stringify(stripMeta(active)) !== JSON.stringify(stripMeta(incoming))
+  })
+
   const versionLog: string[] = [`plansChanged=${plansChanged}`]
 
+  // Constrói array final com versionamento
+  const resultPlans: any[] = [...existingInactive] // preserva histórico sempre
+
+  for (const incoming of incomingPlansArr) {
+    const currentActive = existingActive.find((p: any) => p.name === incoming.name)
+
+    if (!currentActive) {
+      // Plano novo: versão 1
+      resultPlans.push({
+        ...incoming,
+        versao: 1,
+        statusVersao: 'ativo',
+        criadoEm: new Date().toISOString(),
+      })
+    } else {
+      const contentChanged = JSON.stringify(stripMeta(currentActive)) !== JSON.stringify(stripMeta(incoming))
+      if (contentChanged) {
+        // Marca versão atual como inativa e cria nova versão
+        resultPlans.push({ ...currentActive, statusVersao: 'inativo' })
+        resultPlans.push({
+          ...incoming,
+          versao: (currentActive.versao ?? 1) + 1,
+          statusVersao: 'ativo',
+          criadoEm: new Date().toISOString(),
+        })
+        versionLog.push(`plan v${(currentActive.versao ?? 1) + 1}: ${incoming.name}`)
+      } else {
+        // Sem mudança: mantém exatamente como estava (com meta-campos)
+        resultPlans.push(currentActive)
+      }
+    }
+  }
+
+  // Planos ativos que o usuário removeu → marcar como inativo (não excluir)
+  for (const active of existingActive) {
+    if (!incomingPlansArr.find((p: any) => p.name === active.name)) {
+      resultPlans.push({ ...active, statusVersao: 'inativo' })
+      versionLog.push(`plan removed → inativo: ${active.name}`)
+    }
+  }
+
+  body.plans = resultPlans
+
+  // ── Snapshot de contratos afetados (ENTREGA 3) ────────────
+  // Quando um plano muda de versão, registra um snapshot dos valores
+  // ATUAIS do contrato como histórico — mas NÃO altera o contrato.
+  // Contratos são imutáveis após a assinatura; apenas qtdContratada
+  // pode ser editada via PUT /api/contracts/:id.
   if (plansChanged) {
     const solucaoNome = existing.name
-    const newPlans: any[] = body.plans ?? []
-
-    const buildLicStr = (plan: any): string => {
-      if (!plan?.licensings?.length) return '—'
-      return plan.licensings.map((l: any) => {
-        const unidade = l.tipoLicencaUnidade ?? ''
-        const nome = l.tipoLicencaNome || l.tipoLicencaId || ''
-        const min = l.valorMinimo?.trim?.()
-        const max = l.valorMaximo?.trim?.()
-        const val = l.valor?.trim?.()
-        let range = ''
-        if (min && max) range = `${min}–${max} ${unidade}`.trim()
-        else if (min) range = `${min} ${unidade}`.trim()
-        else if (max) range = `Até ${max} ${unidade}`.trim()
-        else if (val) range = `${val} ${unidade}`.trim()
-        return range ? `${nome}: ${range}` : nome
-      }).join(' · ') || '—'
-    }
-
     const toArr = (raw: any): any[] => {
       if (Array.isArray(raw)) return raw
       if (typeof raw === 'string') { try { return JSON.parse(raw) } catch { return [] } }
       return []
     }
 
-    const enrichObjetos = (raw: any): any[] =>
-      toArr(raw).map((obj: any) => {
-        if (obj.solucao !== solucaoNome) return obj
-        const match = newPlans.find((p: any) => p.name === obj.plano)
-          ?? (newPlans.length === 1 ? newPlans[0] : null)
-        if (!match) return obj
-        return { ...obj, plano: match.name, licenciamento: buildLicStr(match) }
-      })
-
     let afetados: any[] = []
     try {
       const all = await db.select().from(contracts)
       afetados = all.filter((ct: any) => toArr(ct.objetos).some((o: any) => o.solucao === solucaoNome))
-      versionLog.push(`afetados=${afetados.length}`)
+      versionLog.push(`contracts afetados=${afetados.length}`)
     } catch (e: any) {
       versionLog.push(`ERR fetch contracts: ${e.message}`)
     }
 
     for (const ct of afetados) {
-      const enriched = enrichObjetos(ct.objetos)
-      const enrichedJson = JSON.stringify(enriched)
-
       try {
         const vers = await db.select().from(contractVersions).where(eq(contractVersions.contratoId, ct.id))
+        const oldObjetos = Array.isArray(ct.objetos) ? ct.objetos : JSON.parse(ct.objetos as string)
         await db.insert(contractVersions).values({
           id: crypto.randomUUID(),
           contratoId: ct.id,
           versao: vers.length + 1,
-          snapshotPlano: JSON.parse(enrichedJson),
+          snapshotPlano: oldObjetos,   // snapshot dos valores DO contrato (estáticos)
           alteradoPor: 'sistema',
           alteradoEm: new Date().toISOString(),
-          motivo: `Planos da solução "${solucaoNome}" foram atualizados.`,
+          motivo: `Nova versão criada para planos da solução "${solucaoNome}". Contrato preservado com valores originais da assinatura.`,
         })
-        versionLog.push(`version ok [${ct.id}]`)
+        versionLog.push(`snapshot ok [${ct.id}]`)
       } catch (e: any) {
-        versionLog.push(`ERR version insert [${ct.id}]: ${e.message}`)
+        versionLog.push(`ERR snapshot [${ct.id}]: ${e.message}`)
       }
-
-      try {
-        await sqlClient`UPDATE contracts SET objetos = ${enrichedJson}::jsonb WHERE id = ${ct.id}`
-        versionLog.push(`sync ok [${ct.id}]`)
-      } catch (e: any) {
-        versionLog.push(`ERR sync [${ct.id}]: ${e.message}`)
-      }
+      // ✅ NÃO atualiza contracts.objetos — valores são estáticos desde a assinatura
     }
 
-    console.log('[versioning]', versionLog.join(' | '))
+    console.log('[plan-versioning]', versionLog.join(' | '))
   }
 
   const [row] = await db.update(solutions).set(body).where(eq(solutions.id, id)).returning()
