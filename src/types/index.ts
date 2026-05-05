@@ -99,6 +99,9 @@ export interface Plan {
   name: string
   description: string
   licensings: Licensing[]
+  versao?: number                       // número incremental: 1, 2, 3…
+  statusVersao?: 'ativo' | 'inativo'   // undefined ou 'ativo' = vigente
+  criadoEm?: string                     // ISO timestamp da criação desta versão
 }
 
 // ── Objeto do Contrato ────────────────────────────────────────
