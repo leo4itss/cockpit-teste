@@ -12,6 +12,7 @@ interface Row {
   solucao: string
   orgContratada: string
   plano: string
+  planoVersao: number
   licenciamento: string
   status: string
 }
