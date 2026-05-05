@@ -82,8 +82,9 @@ export function OrganizacaoDetailPage() {
   const [sheetContract, setSheetContract] = useState(false)
   const [sheetEditOrg, setSheetEditOrg] = useState(false)
 
-  // Delete org modal
+  // Delete / inativar org modals
   const [orgDeleteModal, setOrgDeleteModal] = useState<'inativar' | null>(null)
+  const [orgExcluirModal, setOrgExcluirModal] = useState(false)
 
   // Inativar / excluir account modal
   const [accountInativarTarget, setAccountInativarTarget] = useState<Account | null>(null)
