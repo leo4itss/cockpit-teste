@@ -234,6 +234,7 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
         estado:          account.estado         ?? org.state          ?? '',
         cidade:          account.cidade         ?? org.city           ?? '',
         arquitetoPAS:    account.arquitetoPAS,
+        subdomain:       account.subdomain      ?? '',
         descricao:       account.descricao      ?? '',
       })
       setContatos(org.contacts.map(contatoFromContact))
