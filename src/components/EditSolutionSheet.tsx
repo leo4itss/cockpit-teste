@@ -641,29 +641,29 @@ export function EditSolutionSheet({
         tiposLicenca={tiposDisponiveis}
       />
 
-      {/* ── Modal de confirmação de versionamento ──────────── */}
+      {/* ── Modal de confirmação de nova versão do plano ───── */}
       <Dialog
         open={confirmVersionModal}
         onClose={() => setConfirmVersionModal(false)}
-        title="Confirmar alteração de planos"
+        title="Criar nova versão do plano"
         className="max-w-md"
         footer={
           <>
             <Button variant="outline" onClick={() => setConfirmVersionModal(false)}>Cancelar</Button>
-            <Button onClick={doSave}>Confirmar e salvar</Button>
+            <Button onClick={doSave}>Confirmar</Button>
           </>
         }
       >
         <div className="flex flex-col gap-4">
-          <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-md px-4 py-3">
-            <TriangleAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-            <p className="text-sm text-amber-800 leading-5">
-              Ao salvar, todos os contratos vinculados a esta solução serão versionados automaticamente. Uma cópia dos dados atuais será preservada no histórico de cada contrato.
+          <p className="text-sm text-[#030712] leading-5">
+            Uma nova versão deste plano será criada com os valores atualizados. A versão anterior será mantida como histórico. Contratos existentes não serão afetados.
+          </p>
+          <div className="flex items-start gap-3 bg-blue-50 border border-blue-100 rounded-md px-4 py-3">
+            <TriangleAlert className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+            <p className="text-sm text-blue-800 leading-5">
+              Novos contratos criados após a confirmação usarão a versão atualizada do plano.
             </p>
           </div>
-          <p className="text-sm text-[#6b7280]">
-            Esta ação não pode ser desfeita. Os contratos continuarão ativos com os novos valores dos planos.
-          </p>
         </div>
       </Dialog>
 
