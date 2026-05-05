@@ -12,8 +12,10 @@ interface Props {
   onClose: () => void
   org: Organization
   onSave: (org: Organization) => void
-  onDelete?: () => void
+  onDelete?: () => void      // exclusão permanente (quando canDelete=true)
+  onInativar?: () => void    // inativação reversível (quando canDelete=false)
   onActivate?: () => void
+  canDelete?: boolean        // true = sem soluções/contratos → mostrar Excluir
 }
 
 /* ── helpers ─────────────────────────────────────────────── */
