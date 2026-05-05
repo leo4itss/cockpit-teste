@@ -285,19 +285,18 @@ export function EditSolutionSheet({
 
   function handleSave() {
     if (!solution) return
-    // Verifica se os planos foram alterados
-    const plansChanged = JSON.stringify(plans) !== JSON.stringify(solution.plans ?? [])
-    // Verifica contratos vinculados de forma defensiva (objetos pode vir como string do JSONB)
-    const hasLinkedContract = (contracts ?? []).some(ct => {
-      try {
-        const objs: Array<{ solucao: string }> = Array.isArray(ct.objetos)
-          ? ct.objetos
-          : (typeof ct.objetos === 'string' ? JSON.parse(ct.objetos) : [])
-        return objs.some(obj => obj.solucao === solution.name)
-      } catch { return false }
+
+    // Detecta se algum plano EXISTENTE teve conteúdo alterado (não planos novos)
+    const stripMeta = ({ versao: _v, statusVersao: _s, criadoEm: _c, ...rest }: Plan) => rest
+    const existingActive = activePlans(solution)
+    const hasModifiedExistingPlan = plans.some(p => {
+      const existing = existingActive.find(ep => ep.name === p.name)
+      if (!existing) return false // plano novo — sem versão anterior
+      return JSON.stringify(stripMeta(existing)) !== JSON.stringify(stripMeta(p))
     })
-    if (plansChanged && hasLinkedContract) {
-      // Há contratos vinculados — exibe modal de confirmação
+
+    if (hasModifiedExistingPlan) {
+      // Exibe modal de confirmação de nova versão
       setConfirmVersionModal(true)
       return
     }
