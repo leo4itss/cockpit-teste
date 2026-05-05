@@ -954,7 +954,9 @@ export function OrganizacaoDetailPage() {
         onClose={() => setSheetEditOrg(false)}
         org={org}
         onSave={updated => handleEditOrg(updated)}
-        onDelete={() => { setSheetEditOrg(false); setOrgDeleteModal('inativar') }}
+        canDelete={orgCanDelete()}
+        onDelete={() => { setSheetEditOrg(false); setOrgExcluirModal(true) }}
+        onInativar={() => { setSheetEditOrg(false); setOrgDeleteModal('inativar') }}
         onActivate={handleActivateOrg}
       />
 
