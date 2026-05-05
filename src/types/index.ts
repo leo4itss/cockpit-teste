@@ -113,6 +113,7 @@ export interface ObjetoContrato {
   plano: string
   licenciamento: string
   qtdContratada: number
+  planoVersao?: number   // versão do plano vigente no momento da assinatura
 }
 
 export interface Solution {
