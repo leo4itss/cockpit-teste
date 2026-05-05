@@ -205,13 +205,44 @@ export function SolutionDetailSheet({ open, onClose, solution, componentes = [],
         {/* Planos */}
         <div className="flex flex-col gap-4">
           <SectionTitle>Planos</SectionTitle>
-          {solution.plans.length === 0 ? (
-            <p className="text-sm text-[#6b7280]">Nenhum plano cadastrado.</p>
+
+          {/* Planos ativos (versões vigentes) */}
+          {activePlans.length === 0 ? (
+            <p className="text-sm text-[#6b7280]">Nenhum plano ativo.</p>
           ) : (
             <div className="flex flex-col gap-2">
-              {solution.plans.map((plan, i) => (
+              {activePlans.map((plan, i) => (
                 <PlanItem key={i} plan={plan} />
               ))}
+            </div>
+          )}
+
+          {/* Histórico de versões (colapsável) */}
+          {inactivePlans.length > 0 && (
+            <div className="flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={() => setHistoryOpen(v => !v)}
+                className="flex items-center gap-2 text-sm text-[#6b7280] hover:text-[#030712] transition-colors w-fit"
+              >
+                <History className="w-3.5 h-3.5" />
+                Histórico de versões
+                <span className="bg-[#f3f4f6] text-[#6b7280] text-xs px-1.5 py-0.5 rounded-full border border-[#e5e7eb]">
+                  {inactivePlans.length}
+                </span>
+                {historyOpen
+                  ? <ChevronUp className="w-3.5 h-3.5" />
+                  : <ChevronDown className="w-3.5 h-3.5" />
+                }
+              </button>
+
+              {historyOpen && (
+                <div className="flex flex-col gap-2 pl-2 border-l-2 border-[#e5e7eb]">
+                  {inactivePlans.map((plan, i) => (
+                    <PlanItem key={i} plan={plan} inactive />
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
