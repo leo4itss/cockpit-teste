@@ -485,6 +485,57 @@ export function EditSolutionSheet({
               </div>
             )}
 
+            {/* ── Histórico de versões (colapsável) ─────────── */}
+            {inactivePlans.length > 0 && (
+              <div className="flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={() => setHistoryOpen(v => !v)}
+                  className="flex items-center gap-2 text-sm text-[#6b7280] hover:text-[#030712] transition-colors w-fit"
+                >
+                  <History className="w-3.5 h-3.5" />
+                  Histórico de versões
+                  <span className="bg-[#f3f4f6] text-[#6b7280] text-xs px-1.5 py-0.5 rounded-full border border-[#e5e7eb]">
+                    {inactivePlans.length}
+                  </span>
+                  {historyOpen
+                    ? <ChevronUp className="w-3.5 h-3.5" />
+                    : <ChevronDown className="w-3.5 h-3.5" />
+                  }
+                </button>
+
+                {historyOpen && (
+                  <div className="flex flex-col gap-2 pl-2 border-l-2 border-[#e5e7eb]">
+                    {[...inactivePlans].reverse().map((plan, i) => (
+                      <div
+                        key={i}
+                        className="flex items-start gap-2.5 px-3 py-2.5 border border-[#e5e7eb] rounded-lg bg-[#fafafa] opacity-70"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <p className="text-sm font-medium text-[#6b7280]">{plan.name}</p>
+                            {plan.versao && (
+                              <span className="text-xs text-[#9ca3af] bg-white border border-[#e5e7eb] px-1.5 py-0.5 rounded">
+                                v{plan.versao}
+                              </span>
+                            )}
+                            <span className="text-xs text-[#9ca3af] bg-white border border-[#e5e7eb] px-1.5 py-0.5 rounded">
+                              Inativo
+                            </span>
+                          </div>
+                          {plan.criadoEm && (
+                            <p className="text-xs text-[#9ca3af] mt-0.5">
+                              {new Date(plan.criadoEm).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             <Divider />
           </div>
 
