@@ -296,6 +296,15 @@ export function EditSolutionSheet({
   // Solução inativa: somente leitura
   const isInactive = solution.status === 'Inativo'
 
+  // Sem contratos vinculados → pode excluir direto
+  const hasLinkedContracts = (contracts ?? []).some(ct => {
+    try {
+      const objs: Array<{ solucao: string }> = Array.isArray(ct.objetos)
+        ? ct.objetos
+        : (typeof ct.objetos === 'string' ? JSON.parse(ct.objetos) : [])
+      return objs.some(obj => obj.solucao === solution.name)
+    } catch { return false }
+  })
 
   return (
     <>
@@ -315,14 +324,23 @@ export function EditSolutionSheet({
               >
                 Ativar solução
               </Button>
-            ) : (
-              /* Solução ativa: permite inativar */
+            ) : hasLinkedContracts ? (
+              /* Tem contratos vinculados: só inativa */
               <Button
                 variant="ghost"
                 onClick={onInactivate}
                 className="mr-auto text-amber-600 hover:bg-amber-50"
               >
                 Inativar solução
+              </Button>
+            ) : (
+              /* Sem contratos: pode excluir permanentemente */
+              <Button
+                variant="ghost"
+                onClick={onDelete}
+                className="mr-auto text-[#dc2626] hover:bg-red-50"
+              >
+                Excluir solução
               </Button>
             )}
             <Button variant="outline" onClick={onClose}>Cancelar</Button>
