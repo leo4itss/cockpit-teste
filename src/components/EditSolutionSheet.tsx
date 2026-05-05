@@ -180,11 +180,17 @@ export function EditSolutionSheet({
   componentes,
   contracts,
 }: Props) {
+  // Planos ativos = o que o usuário vê e edita; inativas ficam no histórico
+  function activePlans(s: Solution | null): Plan[] {
+    return (s?.plans ?? []).filter(p => !p.statusVersao || p.statusVersao === 'ativo')
+  }
+
   const [form, setForm] = useState(() => buildForm(solution))
-  const [plans, setPlans] = useState<Plan[]>(solution?.plans ?? [])
+  const [plans, setPlans] = useState<Plan[]>(() => activePlans(solution))
   const [planDialogOpen, setPlanDialogOpen] = useState(false)
   const [editingPlanIndex, setEditingPlanIndex] = useState<number | null>(null)
   const [confirmVersionModal, setConfirmVersionModal] = useState(false)
+  const [historyOpen, setHistoryOpen] = useState(false)
 
   // Componentes são sempre read-only — não podem ser alterados após a solução ser criada
   const componentesVinculados = componentes.filter(c =>
@@ -196,7 +202,8 @@ export function EditSolutionSheet({
   if (solution !== lastSolution) {
     setLastSolution(solution)
     setForm(buildForm(solution))
-    setPlans(solution?.plans ?? [])
+    setPlans(activePlans(solution))
+    setHistoryOpen(false)
   }
 
   function buildForm(s: Solution | null) {
