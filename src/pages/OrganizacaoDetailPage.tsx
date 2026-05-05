@@ -901,6 +901,13 @@ export function OrganizacaoDetailPage() {
         onConfirm={handleDeleteOrg}
       />
       <ConfirmDeleteModal
+        open={orgExcluirModal}
+        onClose={() => setOrgExcluirModal(false)}
+        variant="excluir-org"
+        name={org?.name ?? ''}
+        onConfirm={handleExcluirOrg}
+      />
+      <ConfirmDeleteModal
         open={accountInativarModal}
         onClose={() => { setAccountInativarModal(false); setAccountInativarTarget(null) }}
         variant="inativar-conta"
