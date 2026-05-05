@@ -310,6 +310,9 @@ export function EditSolutionSheet({
   // Solução inativa: somente leitura
   const isInactive = solution.status === 'Inativo'
 
+  // Planos inativados = histórico de versões anteriores
+  const inactivePlans = (solution.plans ?? []).filter(p => p.statusVersao === 'inativo')
+
   // Sem contratos vinculados → pode excluir direto
   const hasLinkedContracts = (contracts ?? []).some(ct => {
     try {
