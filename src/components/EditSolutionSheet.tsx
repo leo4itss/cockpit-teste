@@ -166,6 +166,7 @@ export function EditSolutionSheet({
   onClose,
   solution,
   onSave,
+  onDelete,
   onInactivate,
   onActivate,
   tiposLicenca,
