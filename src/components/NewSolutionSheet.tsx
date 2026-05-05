@@ -216,12 +216,11 @@ export function NewSolutionSheet({
           </p>
 
           {useInline ? (
-            /* ≤ 5 componentes: seletor inline — seleção única */
+            /* ≤ 5 componentes: seletor inline — multi-select */
             <ComponenteSelector
               componentes={componentes}
               value={selectedComponenteIds}
               onChange={setSelectedComponenteIds}
-              single
             />
           ) : (
             /* > 5 componentes: botão que abre sheet de seleção */
@@ -232,10 +231,10 @@ export function NewSolutionSheet({
                 className="inline-flex items-center gap-1.5 h-9 px-4 border border-[#e5e7eb] rounded-md text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors w-fit"
               >
                 <Plus className="w-4 h-4" />
-                Selecionar componente
+                Selecionar componentes
                 {selectedComponenteIds.length > 0 && (
                   <span className="ml-1 bg-blue-100 text-blue-700 text-xs font-semibold px-1.5 py-0.5 rounded-full">
-                    1
+                    {selectedComponenteIds.length}
                   </span>
                 )}
               </button>
