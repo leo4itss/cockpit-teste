@@ -126,11 +126,17 @@ function PlanItem({ plan, inactive = false }: { plan: Plan; inactive?: boolean }
 }
 
 export function SolutionDetailSheet({ open, onClose, solution, componentes = [], onEdit }: Props) {
+  const [historyOpen, setHistoryOpen] = useState(false)
+
   if (!solution) return null
 
   const componentesVinculados = componentes.filter(c =>
     (solution.componenteIds ?? []).includes(c.id)
   )
+
+  // Separa planos ativos (visíveis) dos inativados (histórico)
+  const activePlans = solution.plans.filter(p => !p.statusVersao || p.statusVersao === 'ativo')
+  const inactivePlans = [...solution.plans.filter(p => p.statusVersao === 'inativo')].reverse()
 
   return (
     <Sheet
