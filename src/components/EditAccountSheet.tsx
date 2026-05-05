@@ -292,6 +292,7 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
       estado:          form.estado,
       cidade:          form.cidade,
       arquitetoPAS:    form.arquitetoPAS,
+      subdomain:       form.subdomain,
       descricao:       form.descricao,
       logo:            logo || undefined,
     })
