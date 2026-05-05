@@ -187,7 +187,16 @@ export function AddObjetoDialog({ open, onClose, solutions, orgName, onSave }: P
                       </div>
                     </td>
                     <td className="px-2 py-3 text-sm text-[#030712] whitespace-nowrap">{row.orgContratada}</td>
-                    <td className="px-2 py-3 text-sm text-[#030712] whitespace-nowrap">{row.plano}</td>
+                    <td className="px-2 py-3 text-sm text-[#030712] whitespace-nowrap">
+                      <span className="flex items-center gap-1.5">
+                        {row.plano}
+                        {row.planoVersao > 1 && (
+                          <span className="text-xs text-[#6b7280] bg-[#f3f4f6] border border-[#e5e7eb] px-1 py-0.5 rounded">
+                            v{row.planoVersao}
+                          </span>
+                        )}
+                      </span>
+                    </td>
                     <td className="px-2 py-3 text-sm text-[#030712] max-w-[260px] truncate">{row.licenciamento}</td>
                     <td className="px-2 py-3">
                       <span className="inline-flex items-center gap-1 bg-[#dcfce7] text-[#16a34a] text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">
