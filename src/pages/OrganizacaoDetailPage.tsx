@@ -252,6 +252,7 @@ export function OrganizacaoDetailPage() {
     setEditingContract(null)
   }
 
+  // Inativa org (reversível)
   async function handleDeleteOrg() {
     try {
       await api.updateOrganization(org!.id, { ...org, status: 'Inativo' })
@@ -260,6 +261,23 @@ export function OrganizacaoDetailPage() {
     }
     setOrgDeleteModal(null)
     navigate('/organizacoes')
+  }
+
+  // Exclui org permanentemente (só quando sem soluções e sem contratos)
+  async function handleExcluirOrg() {
+    if (!org) return
+    try {
+      await api.deleteOrganization(org.id)
+    } catch {
+      // fallback silencioso
+    }
+    setOrgExcluirModal(false)
+    navigate('/organizacoes')
+  }
+
+  // Org pode ser excluída permanentemente quando não tem soluções nem contratos
+  function orgCanDelete() {
+    return solutions.length === 0 && contracts.length === 0
   }
 
   async function handleActivateOrg() {
