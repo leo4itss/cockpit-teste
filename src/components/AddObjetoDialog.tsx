@@ -28,20 +28,24 @@ interface Props {
 function buildRows(solutions: Solution[], orgName: string): Row[] {
   const rows: Row[] = []
   solutions.forEach(sol => {
-    if (sol.plans.length === 0) {
-      // Solução sem planos: exibe mesmo assim com valores vazios
+    // Apenas planos ativos (versão vigente) estão disponíveis para novos contratos
+    const activePlans = sol.plans.filter(p => !p.statusVersao || p.statusVersao === 'ativo')
+
+    if (activePlans.length === 0) {
+      // Solução sem planos ativos: exibe mesmo assim com valores vazios
       rows.push({
         id: sol.id,
         solucao: sol.name,
         orgContratada: orgName,
         plano: '—',
+        planoVersao: 1,
         licenciamento: '—',
         status: sol.status,
       })
       return
     }
 
-    sol.plans.forEach(plan => {
+    activePlans.forEach(plan => {
       // Monta label de licenciamento a partir do novo formato (tipoLicencaNome + range)
       const licenciamento = plan.licensings.length > 0
         ? plan.licensings.map(l => {
@@ -64,6 +68,7 @@ function buildRows(solutions: Solution[], orgName: string): Row[] {
         solucao: sol.name,
         orgContratada: orgName,
         plano: plan.name,
+        planoVersao: plan.versao ?? 1,
         licenciamento,
         status: sol.status,
       })
