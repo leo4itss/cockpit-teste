@@ -413,6 +413,7 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
             <p className="text-base font-bold text-[#030712] leading-6">Configuração PAS</p>
 
             <Select label="Arquiteto PAS responsável" required placeholder="Selecione" options={ARQUITETOS} value={form.arquitetoPAS} onChange={e => set('arquitetoPAS', e.target.value)} disabled={isInactive} />
+            <Input label="Subdomínio" required placeholder="Nome do domínio" value={form.subdomain} onChange={e => set('subdomain', e.target.value)} disabled={isInactive} />
 
             <div className="border-t border-gray-200" />
           </div>
