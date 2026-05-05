@@ -56,8 +56,8 @@ function StatusBadge({ status }: { status: Solution['status'] }) {
   )
 }
 
-function PlanItem({ plan }: { plan: Plan }) {
-  const [expanded, setExpanded] = useState(true)
+function PlanItem({ plan, inactive = false }: { plan: Plan; inactive?: boolean }) {
+  const [expanded, setExpanded] = useState(!inactive)
 
   const licensingParts = plan.licensings.map(l => {
     const unidade = l.tipoLicencaUnidade ?? ''
@@ -74,7 +74,7 @@ function PlanItem({ plan }: { plan: Plan }) {
   const licensingLine = licensingParts.length > 0 ? licensingParts.join(' | ') : null
 
   return (
-    <div className="bg-white border border-[#e5e7eb] rounded-xl overflow-hidden">
+    <div className={`bg-white border rounded-xl overflow-hidden ${inactive ? 'border-[#e5e7eb] opacity-60' : 'border-[#e5e7eb]'}`}>
       <div className="flex items-start gap-3 px-5 py-4">
         <button
           onClick={() => setExpanded(v => !v)}
@@ -85,10 +85,32 @@ function PlanItem({ plan }: { plan: Plan }) {
             : <ChevronDown className="w-4 h-4" />
           }
         </button>
-        <div className="flex flex-col flex-1 min-w-0">
-          <p className="text-sm font-bold text-[#030712]">{plan.name}</p>
+        <div className="flex flex-col flex-1 min-w-0 gap-1">
+          {/* Nome + badges de versão e status */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="text-sm font-bold text-[#030712]">{plan.name}</p>
+            {plan.versao && (
+              <span className="text-xs font-medium text-[#6b7280] bg-[#f3f4f6] border border-[#e5e7eb] px-1.5 py-0.5 rounded">
+                v{plan.versao}
+              </span>
+            )}
+            {inactive ? (
+              <span className="text-xs font-medium text-[#9ca3af] bg-[#f9fafb] border border-[#e5e7eb] px-1.5 py-0.5 rounded">
+                Inativo
+              </span>
+            ) : (
+              <span className="text-xs font-semibold text-[#16a34a] bg-[#dcfce7] px-1.5 py-0.5 rounded-full">
+                Ativa
+              </span>
+            )}
+          </div>
           {plan.description && (
-            <p className="text-sm text-[#6b7280] leading-5 mt-0.5">{plan.description}</p>
+            <p className="text-sm text-[#6b7280] leading-5">{plan.description}</p>
+          )}
+          {inactive && plan.criadoEm && (
+            <p className="text-xs text-[#9ca3af]">
+              Criado em {new Date(plan.criadoEm).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
+            </p>
           )}
         </div>
       </div>
