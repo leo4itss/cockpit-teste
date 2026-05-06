@@ -34,14 +34,7 @@ function ReadonlyField({ label, value, half }: { label: string; value?: string |
 }
 
 function CriadoBadge() {
-  return (
-    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#16a34a]">
-      <span className="w-4 h-4 rounded-full bg-[#16a34a] flex items-center justify-center shrink-0">
-        <Check className="w-3 h-3 text-white" strokeWidth={2.5} />
-      </span>
-      Criado
-    </span>
-  )
+  return <Badge variant="success" showIcon>Criado</Badge>
 }
 
 function ObjetoField({ label, value }: { label: string; value?: string | number }) {
