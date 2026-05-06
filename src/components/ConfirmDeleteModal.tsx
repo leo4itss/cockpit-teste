@@ -331,9 +331,9 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
               </p>
             </div>
           </div>
-          <div className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-            <p className="text-xs text-blue-800">
+          <div className="flex items-start gap-4 bg-blue-50 border border-blue-300 rounded-md p-4">
+            <CircleAlert className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
+            <p className="text-sm font-medium text-blue-700 leading-5">
               Esta ação <strong>pode ser desfeita</strong>. Para reativar a solução,
               acesse o menu de edição e clique em <strong>"Ativar solução"</strong>.
             </p>
