@@ -491,46 +491,60 @@ export function EditSolutionSheet({
                 <button
                   type="button"
                   onClick={() => setHistoryOpen(v => !v)}
-                  className="flex items-center gap-2 text-sm text-[#6b7280] hover:text-[#030712] transition-colors w-fit"
+                  className="flex items-center gap-2 w-full px-3 py-2 rounded-lg bg-[#f9fafb] hover:bg-[#f3f4f6] border border-[#e5e7eb] text-sm text-[#6b7280] hover:text-[#030712] transition-colors"
                 >
-                  <History className="w-3.5 h-3.5" />
-                  Histórico de versões
-                  <span className="bg-[#f3f4f6] text-[#6b7280] text-xs px-1.5 py-0.5 rounded-full border border-[#e5e7eb]">
+                  <History className="w-3.5 h-3.5 shrink-0" />
+                  <span className="flex-1 text-left">Histórico de versões</span>
+                  <span className="bg-white text-[#6b7280] text-xs px-1.5 py-0.5 rounded-full border border-[#e5e7eb]">
                     {inactivePlans.length}
                   </span>
                   {historyOpen
-                    ? <ChevronUp className="w-3.5 h-3.5" />
-                    : <ChevronDown className="w-3.5 h-3.5" />
+                    ? <ChevronUp className="w-3.5 h-3.5 shrink-0" />
+                    : <ChevronDown className="w-3.5 h-3.5 shrink-0" />
                   }
                 </button>
 
                 {historyOpen && (
-                  <div className="flex flex-col gap-2 pl-2 border-l-2 border-[#e5e7eb]">
-                    {[...inactivePlans].reverse().map((plan, i) => (
-                      <div
-                        key={i}
-                        className="flex items-start gap-2.5 px-3 py-2.5 border border-[#e5e7eb] rounded-lg bg-[#fafafa] opacity-70"
-                      >
-                        <div className="flex-1 min-w-0">
+                  <div className="flex flex-col gap-1.5 pl-3 border-l-2 border-[#e5e7eb] ml-1">
+                    {[...inactivePlans].reverse().map((plan, i) => {
+                      const licParts = plan.licensings.map(l => {
+                        const nome = l.tipoLicencaNome || l.tipoLicencaId
+                        const unidade = l.tipoLicencaUnidade ?? ''
+                        const min = l.valorMinimo?.trim(); const max = l.valorMaximo?.trim(); const val = l.valor?.trim()
+                        let range = ''
+                        if (min && max) range = `${min}–${max} ${unidade}`.trim()
+                        else if (min) range = `${min} ${unidade}`.trim()
+                        else if (max) range = `Até ${max} ${unidade}`.trim()
+                        else if (val) range = `${val} ${unidade}`.trim()
+                        return range ? `${nome}: ${range}` : nome
+                      })
+                      return (
+                        <div
+                          key={i}
+                          className="px-3 py-2.5 border border-[#e5e7eb] rounded-lg bg-white opacity-70 flex flex-col gap-1"
+                        >
                           <div className="flex items-center gap-1.5">
-                            <p className="text-sm font-medium text-[#6b7280]">{plan.name}</p>
+                            <p className="text-sm font-medium text-[#374151]">{plan.name}</p>
                             {plan.versao && (
-                              <span className="text-xs text-[#9ca3af] bg-white border border-[#e5e7eb] px-1.5 py-0.5 rounded">
+                              <span className="text-[11px] font-medium text-[#9ca3af] bg-[#f9fafb] border border-[#e5e7eb] px-1.5 py-0.5 rounded leading-none">
                                 v{plan.versao}
                               </span>
                             )}
-                            <span className="text-xs text-[#9ca3af] bg-white border border-[#e5e7eb] px-1.5 py-0.5 rounded">
+                            <span className="text-[11px] font-medium text-[#9ca3af] bg-[#f9fafb] border border-[#e5e7eb] px-1.5 py-0.5 rounded leading-none">
                               Inativo
                             </span>
                           </div>
+                          {licParts.length > 0 && (
+                            <p className="text-xs text-[#9ca3af] leading-4">{licParts.join(' · ')}</p>
+                          )}
                           {plan.criadoEm && (
-                            <p className="text-xs text-[#9ca3af] mt-0.5">
-                              {new Date(plan.criadoEm).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                            <p className="text-[11px] text-[#d1d5db]">
+                              Vigente de {new Date(plan.criadoEm).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
                             </p>
                           )}
                         </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 )}
               </div>
