@@ -498,13 +498,12 @@ export function EditSolutionSheet({
             {useInline ? (
               <ComponenteSelector
                 componentes={componentes}
-                value={selectedComponenteIds}
-                onChange={ids => {
+                value={isInactive ? selectedComponenteIds : selectedComponenteIds}
+                onChange={isInactive ? () => {} : ids => {
                   setSelectedComponenteIds(ids)
                   setComponenteError(false)
                   setOrphanWarning(null)
                 }}
-                disabled={isInactive}
               />
             ) : (
               <div className="flex flex-col gap-3">
