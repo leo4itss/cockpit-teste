@@ -72,7 +72,7 @@ export function OrganizacoesPage() {
     <div>
       {/* Page header */}
       <div className="flex items-center justify-between px-8 py-4">
-        <h1 className="text-2xl font-bold leading-8 text-[#030712]">Organização</h1>
+        <h1 className="text-2xl font-bold leading-8 text-[#030712]">Organizações</h1>
         <div className="flex items-center gap-2">
           {(() => {
             const hasInativas = orgs.some(o => o.status === 'Inativo')
