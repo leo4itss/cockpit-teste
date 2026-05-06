@@ -338,6 +338,12 @@ export function EditSolutionSheet({
   function handleSave() {
     if (!solution) return
 
+    // Valida mínimo de componentes antes de qualquer outra coisa
+    if (selectedComponenteIds.length === 0) {
+      setComponenteError(true)
+      return
+    }
+
     // Detecta se algum plano EXISTENTE teve conteúdo alterado (não planos novos)
     const stripMeta = ({ versao: _v, statusVersao: _s, criadoEm: _c, ...rest }: Plan) => rest
     const existingActive = activePlans(solution)
