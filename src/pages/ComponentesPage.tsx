@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Search, Plus, FolderOpen, Cpu, CircleCheck, X } from 'lucide-react'
+import { Search, Plus, FolderOpen, Cpu, X } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import { Badge } from '@/components/ui/Badge'
 import { ComponenteSheet, METADATA_MOCK_TIPOS } from '@/components/ComponenteSheet'
 import { ComponenteDetailSheet } from '@/components/ComponenteDetailSheet'
 import { useComponentes } from '@/context/ComponentesContext'
