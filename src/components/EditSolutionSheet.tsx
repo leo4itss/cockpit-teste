@@ -478,31 +478,80 @@ export function EditSolutionSheet({
             <Divider />
           </div>
 
-          {/* ── Componentes (somente leitura) ───────────────── */}
+          {/* ── Componentes (editável) ──────────────────────── */}
           <div className="flex flex-col gap-4">
             <SectionTitle>Componentes</SectionTitle>
-            <div className="flex items-start gap-2 bg-blue-50 border border-blue-100 rounded-md px-3 py-3 -mt-2">
-              <CircleAlert className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
-              <p className="text-xs text-[#030712] leading-5">
-                Os componentes de uma solução não podem ser alterados após a criação. Para uma composição diferente, crie uma nova solução.
-              </p>
-            </div>
 
-            {componentesVinculados.length === 0 ? (
-              <p className="text-sm text-[#9ca3af]">Nenhum componente vinculado.</p>
+            {orphanWarning && (
+              <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-md px-3 py-3 -mt-2">
+                <CircleAlert className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                <p className="text-xs text-[#030712] leading-5">{orphanWarning}</p>
+              </div>
+            )}
+
+            {componenteError && (
+              <p className="text-xs text-red-600 -mt-2">
+                Adicione ao menos um componente para salvar a solução.
+              </p>
+            )}
+
+            {useInline ? (
+              <ComponenteSelector
+                componentes={componentes}
+                value={selectedComponenteIds}
+                onChange={ids => {
+                  setSelectedComponenteIds(ids)
+                  setComponenteError(false)
+                  setOrphanWarning(null)
+                }}
+                disabled={isInactive}
+              />
             ) : (
-              <div className="flex flex-col gap-2">
-                {componentesVinculados.map(c => (
-                  <div
-                    key={c.id}
-                    className="flex flex-col gap-0.5 px-4 py-3 border border-[#e5e7eb] rounded-lg bg-[#f9fafb]"
+              <div className="flex flex-col gap-3">
+                {!isInactive && (
+                  <button
+                    type="button"
+                    onClick={() => setComponenteSelecaoOpen(true)}
+                    className="inline-flex items-center gap-1.5 h-9 px-4 border border-[#e5e7eb] rounded-md text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors w-fit"
                   >
-                    <p className="text-sm font-medium text-[#030712]">{c.nome}</p>
-                    {c.descricao && (
-                      <p className="text-sm text-[#6b7280]">{c.descricao}</p>
+                    <Plus className="w-4 h-4" />
+                    Selecionar componentes
+                    {selectedComponenteIds.length > 0 && (
+                      <span className="ml-1 bg-blue-100 text-blue-700 text-xs font-semibold px-1.5 py-0.5 rounded-full">
+                        {selectedComponenteIds.length}
+                      </span>
                     )}
+                  </button>
+                )}
+
+                {componentesVinculados.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {componentesVinculados.map(c => {
+                      const isLast = selectedComponenteIds.length === 1
+                      return (
+                        <span
+                          key={c.id}
+                          className="inline-flex items-center gap-1.5 h-7 pl-2.5 pr-1.5 border border-[#2563eb] bg-blue-50 rounded-md text-xs font-medium text-[#2563eb]"
+                        >
+                          <Puzzle className="w-3 h-3" />
+                          {c.nome}
+                          {!isInactive && (
+                            <button
+                              type="button"
+                              onClick={() => !isLast && handleRemoveComponente(c.id)}
+                              disabled={isLast}
+                              title={isLast ? 'A solução deve ter ao menos um componente.' : `Remover ${c.nome}`}
+                              className="ml-0.5 hover:text-blue-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                              aria-label={`Remover ${c.nome}`}
+                            >
+                              ×
+                            </button>
+                          )}
+                        </span>
+                      )
+                    })}
                   </div>
-                ))}
+                )}
               </div>
             )}
 
