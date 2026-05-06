@@ -764,7 +764,6 @@ export function EditSolutionSheet({
           setComponenteError(false)
           setOrphanWarning(null)
         }}
-        minSelected={1}
       />
 
       <NewPlanDialog
