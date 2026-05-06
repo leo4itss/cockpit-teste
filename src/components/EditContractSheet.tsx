@@ -176,9 +176,9 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
               )}
             </div>
 
-            <div className="flex items-start gap-2 bg-blue-50 rounded-md px-3 py-3">
-              <CircleAlert className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
-              <p className="text-xs text-[#030712] leading-5">
+            <div className="flex items-center gap-4 bg-blue-50 border border-blue-300 rounded-md p-4">
+              <CircleAlert className="w-5 h-5 text-blue-700 shrink-0" />
+              <p className="text-sm font-medium text-blue-700 leading-5">
                 Objetos do contrato reúnem soluções, planos e licenciamentos, definindo as condições e limites para atender às necessidades do cliente.
               </p>
             </div>
