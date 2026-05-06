@@ -159,15 +159,9 @@ export function OrganizacoesPage() {
                   <td className="px-4 py-3 text-sm text-[#030712]">{org.arquitetoPAS}</td>
                   <td className="px-4 py-3">
                     {org.status === 'Ativo' ? (
-                      <span className="inline-flex items-center gap-1 bg-[#dcfce7] text-[#16a34a] text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">
-                        <CircleCheck className="w-3 h-3" />
-                        Ativo
-                      </span>
+                      <Badge variant="success" showIcon>Ativo</Badge>
                     ) : (
-                      <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-500 text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">
-                        <Circle className="w-3 h-3" />
-                        {org.status}
-                      </span>
+                      <Badge variant="secondary">{org.status}</Badge>
                     )}
                   </td>
                   <td className="px-2 py-3 w-10" onClick={e => e.stopPropagation()}>
