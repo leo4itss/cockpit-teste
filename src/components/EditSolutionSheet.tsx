@@ -754,6 +754,19 @@ export function EditSolutionSheet({
         </div>
       </Sheet>
 
+      <ComponenteSelecaoSheet
+        open={componenteSelecaoOpen}
+        onClose={() => setComponenteSelecaoOpen(false)}
+        componentes={componentes}
+        value={selectedComponenteIds}
+        onChange={ids => {
+          setSelectedComponenteIds(ids)
+          setComponenteError(false)
+          setOrphanWarning(null)
+        }}
+        minSelected={1}
+      />
+
       <NewPlanDialog
         open={planDialogOpen}
         onClose={handlePlanDialogClose}
