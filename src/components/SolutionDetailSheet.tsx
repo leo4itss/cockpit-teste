@@ -57,7 +57,7 @@ function StatusBadge({ status }: { status: Solution['status'] }) {
 }
 
 function PlanItem({ plan, inactive = false }: { plan: Plan; inactive?: boolean }) {
-  const [expanded, setExpanded] = useState(!inactive)
+  const [expanded, setExpanded] = useState(true)
 
   const licensingParts = plan.licensings.map(l => {
     const unidade = l.tipoLicencaUnidade ?? ''
@@ -73,52 +73,66 @@ function PlanItem({ plan, inactive = false }: { plan: Plan; inactive?: boolean }
 
   const licensingLine = licensingParts.length > 0 ? licensingParts.join(' | ') : null
 
+  /* ── card inativo (histórico) ──────────────────────── */
+  if (inactive) {
+    return (
+      <div className="bg-white border border-[#e5e7eb] rounded-lg px-4 py-3 flex flex-col gap-1 opacity-70">
+        <div className="flex items-center gap-2 flex-wrap">
+          <p className="text-sm font-medium text-[#374151]">{plan.name}</p>
+          {plan.versao && (
+            <span className="text-[11px] font-medium text-[#9ca3af] bg-white border border-[#e5e7eb] px-1.5 py-0.5 rounded leading-none">
+              v{plan.versao}
+            </span>
+          )}
+          <span className="text-[11px] font-medium text-[#9ca3af] bg-white border border-[#e5e7eb] px-1.5 py-0.5 rounded leading-none">
+            Inativo
+          </span>
+        </div>
+        {licensingLine && (
+          <p className="text-xs text-[#9ca3af] leading-5">{licensingLine}</p>
+        )}
+        {plan.criadoEm && (
+          <p className="text-[11px] text-[#d1d5db] mt-0.5">
+            Vigente de {new Date(plan.criadoEm).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
+          </p>
+        )}
+      </div>
+    )
+  }
+
+  /* ── card ativo (versão vigente) ───────────────────── */
   return (
-    <div className={`bg-white border rounded-xl overflow-hidden ${inactive ? 'border-[#e5e7eb] opacity-60' : 'border-[#e5e7eb]'}`}>
-      <div className="flex items-start gap-3 px-5 py-4">
+    <div className="bg-white border border-[#e5e7eb] rounded-xl overflow-hidden">
+      <div className="flex items-center gap-3 px-5 py-4">
         <button
           onClick={() => setExpanded(v => !v)}
-          className="text-[#6b7280] shrink-0 mt-0.5"
+          className="text-[#6b7280] hover:text-[#030712] transition-colors shrink-0"
         >
           {expanded
             ? <ChevronUp className="w-4 h-4" />
             : <ChevronDown className="w-4 h-4" />
           }
         </button>
-        <div className="flex flex-col flex-1 min-w-0 gap-1">
-          {/* Nome + badges de versão e status */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <p className="text-sm font-bold text-[#030712]">{plan.name}</p>
-            {plan.versao && (
-              <span className="text-xs font-medium text-[#6b7280] bg-[#f3f4f6] border border-[#e5e7eb] px-1.5 py-0.5 rounded">
-                v{plan.versao}
-              </span>
-            )}
-            {inactive ? (
-              <span className="text-xs font-medium text-[#9ca3af] bg-[#f9fafb] border border-[#e5e7eb] px-1.5 py-0.5 rounded">
-                Inativo
-              </span>
-            ) : (
-              <span className="text-xs font-semibold text-[#16a34a] bg-[#dcfce7] px-1.5 py-0.5 rounded-full">
-                Ativa
-              </span>
-            )}
-          </div>
-          {plan.description && (
-            <p className="text-sm text-[#6b7280] leading-5">{plan.description}</p>
+        <div className="flex items-center gap-2 flex-1 min-w-0 flex-wrap">
+          <p className="text-sm font-bold text-[#030712]">{plan.name}</p>
+          {plan.versao && (
+            <span className="text-[11px] font-medium text-[#6b7280] bg-[#f3f4f6] border border-[#e5e7eb] px-1.5 py-0.5 rounded leading-none">
+              v{plan.versao}
+            </span>
           )}
-          {inactive && plan.criadoEm && (
-            <p className="text-xs text-[#9ca3af]">
-              Criado em {new Date(plan.criadoEm).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
-            </p>
+          <span className="text-[11px] font-semibold text-[#15803d] bg-[#dcfce7] px-2 py-0.5 rounded-full leading-none">
+            Ativa
+          </span>
+          {plan.description && (
+            <p className="w-full text-xs text-[#6b7280] leading-4 mt-0.5">{plan.description}</p>
           )}
         </div>
       </div>
 
       {expanded && licensingLine && (
-        <div className="border-t border-[#e5e7eb] px-5 py-4 flex flex-col gap-1">
-          <p className="text-sm font-bold text-[#030712]">Modelo de licenciamento</p>
-          <p className="text-sm text-[#6b7280]">{licensingLine}</p>
+        <div className="border-t border-[#e5e7eb] bg-[#fafafa] px-5 py-3 flex flex-col gap-1">
+          <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">Modelo de licenciamento</p>
+          <p className="text-sm text-[#030712]">{licensingLine}</p>
         </div>
       )}
     </div>
