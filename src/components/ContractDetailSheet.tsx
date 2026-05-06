@@ -56,75 +56,7 @@ function parseLicenciamento(lic: string): { tipo: string; valor: string } {
   return { tipo: tipos || '—', valor: valores || '—' }
 }
 
-function VersionCard({ version }: { version: ContractVersion }) {
-  const [expanded, setExpanded] = useState(false)
-  const date = version.alteradoEm
-    ? new Date(version.alteradoEm).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
-    : '—'
-
-  return (
-    <div className="border border-[#e5e7eb] rounded-xl overflow-hidden">
-      <button
-        type="button"
-        onClick={() => setExpanded(v => !v)}
-        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 transition-colors"
-      >
-        <div className="flex flex-col gap-0.5">
-          <p className="text-sm font-semibold text-[#030712]">Versão {version.versao}</p>
-          <p className="text-xs text-[#6b7280]">{date} · {version.alteradoPor}</p>
-        </div>
-        {expanded
-          ? <ChevronUp className="w-4 h-4 text-[#6b7280] shrink-0" />
-          : <ChevronDown className="w-4 h-4 text-[#6b7280] shrink-0" />
-        }
-      </button>
-      {expanded && (
-        <div className="px-4 pb-4 border-t border-[#e5e7eb] bg-[#fafafa] flex flex-col gap-3 pt-3">
-          {version.motivo && (
-            <p className="text-xs text-[#6b7280] italic mb-1">{version.motivo}</p>
-          )}
-          {version.snapshotPlano.map((obj, i) => {
-            const { tipo, valor } = parseLicenciamento(obj.licenciamento)
-            return (
-              <div key={i} className={`flex flex-col gap-1 text-xs text-[#030712] ${i > 0 ? 'pt-3 border-t border-[#e5e7eb]' : ''}`}>
-                <div className="flex justify-between gap-4">
-                  <span className="text-[#6b7280]">Solução</span>
-                  <span className="font-medium text-right">{obj.solucao || '—'}</span>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <span className="text-[#6b7280]">Plano</span>
-                  <span className="font-medium text-right">{obj.plano && obj.plano !== '—' ? obj.plano : '—'}</span>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <span className="text-[#6b7280]">Tipo de licença</span>
-                  <span className="font-medium text-right">{tipo}</span>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <span className="text-[#6b7280]">Valor do tipo de licença</span>
-                  <span className="font-medium text-right">{valor}</span>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <span className="text-[#6b7280]">Qtd contratada</span>
-                  <span className="font-medium text-right">{obj.qtdContratada ?? '—'}</span>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      )}
-    </div>
-  )
-}
-
 export function ContractDetailSheet({ open, onClose, contract, onEdit }: Props) {
-  const [versions, setVersions] = useState<ContractVersion[]>([])
-
-  useEffect(() => {
-    if (!open || !contract) return
-    api.getContractVersions(contract.id)
-      .then(data => setVersions(data))
-      .catch(() => setVersions([]))
-  }, [open, contract])
 
   if (!contract) return null
 
