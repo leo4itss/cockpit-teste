@@ -42,7 +42,6 @@ export const api = {
   createContract: (data: any) => request<any>('/api/contracts', { method: 'POST', body: JSON.stringify(data) }),
   updateContract: (id: string, data: any) => request<any>(`/api/contracts/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteContract: (id: string) => request<any>(`/api/contracts/${id}`, { method: 'DELETE' }),
-  getContractVersions: (id: string) => request<any[]>(`/api/contracts/${id}/versoes`),
 
   // Users
   getUsers: () => request<any[]>('/api/users'),
