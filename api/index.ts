@@ -16,7 +16,6 @@ const {
   accounts,
   solutions,
   contracts,
-  contractVersions,
   users,
   tiposLicenca,
   componentes,
