@@ -305,16 +305,6 @@ app.get('/api/contracts', async (c) => {
   return c.json(rows)
 })
 
-// IMPORTANTE: rota específica /versoes deve vir ANTES de /:id
-app.get('/api/contracts/:id/versoes', async (c) => {
-  const rows = await db
-    .select()
-    .from(contractVersions)
-    .where(eq(contractVersions.contratoId, c.req.param('id')))
-  rows.sort((a: any, b: any) => b.versao - a.versao)
-  return c.json(rows)
-})
-
 app.get('/api/contracts/:id', async (c) => {
   const [row] = await db.select().from(contracts).where(eq(contracts.id, c.req.param('id')))
   if (!row) return c.json({ error: 'Not found' }, 404)
