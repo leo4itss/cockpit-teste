@@ -24,7 +24,7 @@ function Field({ label, value, required }: { label: string; value?: string; requ
       <label className="text-sm font-medium text-[#030712]">
         {label}{required && <span className="text-[#dc2626] ml-0.5">*</span>}
       </label>
-      <div className="h-9 px-3 flex items-center bg-[#f9fafb] border border-[#e5e7eb] rounded-md text-sm text-[#6b7280] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] overflow-hidden">
+      <div className="h-9 px-3 flex items-center bg-[#f3f4f6] rounded-md text-sm text-[#6b7280] overflow-hidden">
         <span className="truncate">{value || 'Não informado'}</span>
       </div>
     </div>
