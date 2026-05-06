@@ -495,33 +495,46 @@ export function EditSolutionSheet({
               </p>
             )}
 
-            {useInline ? (
+            {isInactive ? (
+              /* Solução inativa: componentes somente leitura */
+              <div className="flex flex-col gap-2">
+                {componentesVinculados.map(c => (
+                  <div key={c.id} className="flex flex-col gap-0.5 px-4 py-3 border border-[#e5e7eb] rounded-lg bg-[#f9fafb]">
+                    <p className="text-sm font-medium text-[#030712]">{c.nome}</p>
+                    {c.descricao && <p className="text-sm text-[#6b7280]">{c.descricao}</p>}
+                  </div>
+                ))}
+              </div>
+            ) : useInline ? (
+              /* ≤ 5 componentes: seletor inline */
               <ComponenteSelector
                 componentes={componentes}
-                value={isInactive ? selectedComponenteIds : selectedComponenteIds}
-                onChange={isInactive ? () => {} : ids => {
+                value={selectedComponenteIds}
+                onChange={ids => {
+                  // Aviso de órfãos ao remover
+                  const removed = selectedComponenteIds.find(id => !ids.includes(id))
+                  if (removed) setOrphanWarning(calcOrphanWarning(removed))
+                  else setOrphanWarning(null)
                   setSelectedComponenteIds(ids)
                   setComponenteError(false)
-                  setOrphanWarning(null)
                 }}
               />
             ) : (
+              /* > 5 componentes: botão + chips */
               <div className="flex flex-col gap-3">
-                {!isInactive && (
-                  <button
-                    type="button"
-                    onClick={() => setComponenteSelecaoOpen(true)}
-                    className="inline-flex items-center gap-1.5 h-9 px-4 border border-[#e5e7eb] rounded-md text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors w-fit"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Selecionar componentes
-                    {selectedComponenteIds.length > 0 && (
-                      <span className="ml-1 bg-blue-100 text-blue-700 text-xs font-semibold px-1.5 py-0.5 rounded-full">
-                        {selectedComponenteIds.length}
-                      </span>
-                    )}
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => setComponenteSelecaoOpen(true)}
+                  className="inline-flex items-center gap-1.5 h-9 px-4 border border-[#e5e7eb] rounded-md text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors w-fit"
+                >
+                  <Plus className="w-4 h-4" />
+                  Selecionar componentes
+                  {selectedComponenteIds.length > 0 && (
+                    <span className="ml-1 bg-blue-100 text-blue-700 text-xs font-semibold px-1.5 py-0.5 rounded-full">
+                      {selectedComponenteIds.length}
+                    </span>
+                  )}
+                </button>
 
                 {componentesVinculados.length > 0 && (
                   <div className="flex flex-wrap gap-2">
@@ -534,18 +547,16 @@ export function EditSolutionSheet({
                         >
                           <Puzzle className="w-3 h-3" />
                           {c.nome}
-                          {!isInactive && (
-                            <button
-                              type="button"
-                              onClick={() => !isLast && handleRemoveComponente(c.id)}
-                              disabled={isLast}
-                              title={isLast ? 'A solução deve ter ao menos um componente.' : `Remover ${c.nome}`}
-                              className="ml-0.5 hover:text-blue-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                              aria-label={`Remover ${c.nome}`}
-                            >
-                              ×
-                            </button>
-                          )}
+                          <button
+                            type="button"
+                            onClick={() => !isLast && handleRemoveComponente(c.id)}
+                            disabled={isLast}
+                            title={isLast ? 'A solução deve ter ao menos um componente.' : `Remover ${c.nome}`}
+                            className="ml-0.5 hover:text-blue-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                            aria-label={`Remover ${c.nome}`}
+                          >
+                            ×
+                          </button>
                         </span>
                       )
                     })}
