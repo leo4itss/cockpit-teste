@@ -237,21 +237,21 @@ export function SolutionDetailSheet({ open, onClose, solution, componentes = [],
               <button
                 type="button"
                 onClick={() => setHistoryOpen(v => !v)}
-                className="flex items-center gap-2 text-sm text-[#6b7280] hover:text-[#030712] transition-colors w-fit"
+                className="flex items-center gap-2 w-full px-3 py-2 rounded-lg bg-[#f9fafb] hover:bg-[#f3f4f6] border border-[#e5e7eb] text-sm text-[#6b7280] hover:text-[#030712] transition-colors"
               >
-                <History className="w-3.5 h-3.5" />
-                Histórico de versões
-                <span className="bg-[#f3f4f6] text-[#6b7280] text-xs px-1.5 py-0.5 rounded-full border border-[#e5e7eb]">
+                <History className="w-3.5 h-3.5 shrink-0" />
+                <span className="flex-1 text-left">Histórico de versões</span>
+                <span className="bg-white text-[#6b7280] text-xs px-1.5 py-0.5 rounded-full border border-[#e5e7eb]">
                   {inactivePlans.length}
                 </span>
                 {historyOpen
-                  ? <ChevronUp className="w-3.5 h-3.5" />
-                  : <ChevronDown className="w-3.5 h-3.5" />
+                  ? <ChevronUp className="w-3.5 h-3.5 shrink-0" />
+                  : <ChevronDown className="w-3.5 h-3.5 shrink-0" />
                 }
               </button>
 
               {historyOpen && (
-                <div className="flex flex-col gap-2 pl-2 border-l-2 border-[#e5e7eb]">
+                <div className="flex flex-col gap-1.5 pl-3 border-l-2 border-[#e5e7eb] ml-1">
                   {inactivePlans.map((plan, i) => (
                     <PlanItem key={i} plan={plan} inactive />
                   ))}
