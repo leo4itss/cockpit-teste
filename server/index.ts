@@ -8,7 +8,6 @@ import {
   accounts,
   solutions,
   contracts,
-  contractVersions,
   users,
   tiposLicenca,
   componentes,
