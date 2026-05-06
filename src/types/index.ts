@@ -135,19 +135,6 @@ export interface Solution {
   marketplaceStatus?: string
 }
 
-// ── Versão de Contrato ────────────────────────────────────────
-// Criada automaticamente quando os planos de uma solução referenciada
-// pelo contrato são alterados.
-export interface ContractVersion {
-  id: string
-  contratoId: string
-  versao: number
-  snapshotPlano: ObjetoContrato[]
-  alteradoPor: string
-  alteradoEm: string
-  motivo?: string
-}
-
 export interface Contract {
   id: string
   orgId: string
