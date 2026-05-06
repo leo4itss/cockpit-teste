@@ -79,7 +79,7 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
                 collapsed && 'justify-center px-2',
                 isActive
                   ? 'bg-[#111827] text-[#f9fafb] font-medium'
-                  : 'text-[#030712] hover:bg-[#f3f4f6] font-normal'
+                  : 'text-[#030712] hover:bg-[#e5e7eb] hover:text-[#111827] font-normal'
               )
             }
           >
@@ -95,7 +95,7 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
                 collapsed && 'justify-center px-2',
                 isActive
                   ? 'bg-[#111827] text-[#f9fafb] font-medium'
-                  : 'text-[#030712] hover:bg-[#f3f4f6] font-normal'
+                  : 'text-[#030712] hover:bg-[#e5e7eb] hover:text-[#111827] font-normal'
               )
             }
           >
@@ -111,7 +111,7 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
                 collapsed && 'justify-center px-2',
                 isActive
                   ? 'bg-[#111827] text-[#f9fafb] font-medium'
-                  : 'text-[#030712] hover:bg-[#f3f4f6] font-normal'
+                  : 'text-[#030712] hover:bg-[#e5e7eb] hover:text-[#111827] font-normal'
               )
             }
           >
