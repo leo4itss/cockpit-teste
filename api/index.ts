@@ -226,47 +226,7 @@ app.put('/solutions/:id', async (c) => {
 
   body.plans = resultPlans
 
-  // ── Snapshot de contratos afetados (E3 — contrato estático) ──
-  // Quando um plano muda de versão, registra um snapshot dos valores
-  // ATUAIS do contrato como histórico — mas NÃO altera o contrato.
-  // Contratos são imutáveis após a assinatura.
   if (plansChanged) {
-    const solucaoNome = existing.name
-    const toArr = (raw: any): any[] => {
-      if (Array.isArray(raw)) return raw
-      if (typeof raw === 'string') { try { return JSON.parse(raw) } catch { return [] } }
-      return []
-    }
-
-    let afetados: any[] = []
-    try {
-      const all = await db.select().from(contracts)
-      afetados = all.filter((ct: any) => toArr(ct.objetos).some((o: any) => o.solucao === solucaoNome))
-      versionLog.push(`contracts afetados=${afetados.length}`)
-    } catch (e: any) {
-      versionLog.push(`ERR fetch contracts: ${e.message}`)
-    }
-
-    for (const ct of afetados) {
-      try {
-        const vers = await db.select().from(contractVersions).where(eq(contractVersions.contratoId, ct.id))
-        const oldObjetos = Array.isArray(ct.objetos) ? ct.objetos : JSON.parse(ct.objetos as string)
-        await db.insert(contractVersions).values({
-          id: crypto.randomUUID(),
-          contratoId: ct.id,
-          versao: vers.length + 1,
-          snapshotPlano: oldObjetos,   // valores originais do contrato (estáticos)
-          alteradoPor: 'sistema',
-          alteradoEm: new Date().toISOString(),
-          motivo: `Nova versão criada para planos da solução "${solucaoNome}". Contrato preservado com valores originais da assinatura.`,
-        })
-        versionLog.push(`snapshot ok [${ct.id}]`)
-      } catch (e: any) {
-        versionLog.push(`ERR snapshot [${ct.id}]: ${e.message}`)
-      }
-      // ✅ NÃO atualiza contracts.objetos — valores são estáticos desde a assinatura
-    }
-
     console.log('[plan-versioning]', versionLog.join(' | '))
   }
 
