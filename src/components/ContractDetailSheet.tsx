@@ -1,4 +1,4 @@
-import { Check, History, ChevronDown, ChevronUp } from 'lucide-react'
+import { History, ChevronDown, ChevronUp } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { Sheet } from './ui/Sheet'
 import { Button } from './ui/Button'
