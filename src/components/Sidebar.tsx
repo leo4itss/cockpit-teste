@@ -28,12 +28,12 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'min-h-screen bg-white border-r border-gray-200 flex flex-col shrink-0 transition-[width] duration-300 ease-in-out overflow-hidden',
+        'min-h-screen bg-[#f9fafb] border-r border-[#e5e7eb] flex flex-col shrink-0 transition-[width] duration-300 ease-in-out overflow-hidden',
         collapsed ? 'w-[52px]' : 'w-64'
       )}
     >
       {/* Header */}
-      <div className="p-2 shrink-0">
+      <div className="bg-white p-2 shrink-0">
         <div
           className={cn(
             'flex items-center gap-2 p-2 rounded-md',
@@ -43,7 +43,7 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
           {/* Logo */}
           <div
             onClick={() => navigate('/home')}
-            className="bg-gray-50 rounded-lg shrink-0 flex items-center justify-center w-8 h-8 cursor-pointer hover:bg-gray-100 transition-colors"
+            className="bg-[#f9fafb] rounded-lg shrink-0 flex items-center justify-center w-8 h-8 cursor-pointer hover:bg-gray-100 transition-colors"
           >
             <ITSSIcon />
           </div>
@@ -70,65 +70,54 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
 
       {/* Nav */}
       <div className="flex flex-col flex-1 min-h-0">
-        {/* Group: Assistentes */}
-        <div className="p-2 flex flex-col shrink-0">
-          {!collapsed && (
-            <div className="h-8 flex items-center px-2 opacity-70">
-              <span className="text-xs font-medium text-[#030712] leading-none">
-                Assistentes
-              </span>
-            </div>
-          )}
+        <div className="p-2 flex flex-col gap-1 shrink-0">
+          <NavLink
+            to="/organizacoes"
+            className={({ isActive }) =>
+              cn(
+                'flex items-center gap-2 h-8 px-2 rounded-md text-sm transition-colors',
+                collapsed && 'justify-center px-2',
+                isActive
+                  ? 'bg-[#f3f4f6] text-[#111827] font-medium'
+                  : 'text-[#030712] hover:bg-[#f3f4f6] font-normal'
+              )
+            }
+          >
+            <Building2 className="w-4 h-4 shrink-0" />
+            {!collapsed && <span className="whitespace-nowrap">Organizações</span>}
+          </NavLink>
 
-          <div className="flex flex-col gap-1">
-            <NavLink
-              to="/organizacoes"
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-2 h-8 px-2 rounded-md text-sm transition-colors',
-                  collapsed && 'justify-center px-2',
-                  isActive
-                    ? 'bg-gray-100 text-[#111827] font-medium'
-                    : 'text-[#030712] hover:bg-gray-100 font-normal'
-                )
-              }
-            >
-              <Building2 className="w-4 h-4 shrink-0" />
-              {!collapsed && <span className="whitespace-nowrap">Organizações</span>}
-            </NavLink>
+          <NavLink
+            to="/acessos"
+            className={({ isActive }) =>
+              cn(
+                'flex items-center gap-2 h-8 px-2 rounded-md text-sm transition-colors',
+                collapsed && 'justify-center px-2',
+                isActive
+                  ? 'bg-[#f3f4f6] text-[#111827] font-medium'
+                  : 'text-[#030712] hover:bg-[#f3f4f6] font-normal'
+              )
+            }
+          >
+            <Users className="w-4 h-4 shrink-0" />
+            {!collapsed && <span className="whitespace-nowrap">Acessos</span>}
+          </NavLink>
 
-            <NavLink
-              to="/acessos"
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-2 h-8 px-2 rounded-md text-sm transition-colors',
-                  collapsed && 'justify-center px-2',
-                  isActive
-                    ? 'bg-gray-100 text-[#111827] font-medium'
-                    : 'text-[#030712] hover:bg-gray-100 font-normal'
-                )
-              }
-            >
-              <Users className="w-4 h-4 shrink-0" />
-              {!collapsed && <span className="whitespace-nowrap">Acessos</span>}
-            </NavLink>
-
-            <NavLink
-              to="/componentes"
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-2 h-8 px-2 rounded-md text-sm transition-colors',
-                  collapsed && 'justify-center px-2',
-                  isActive
-                    ? 'bg-gray-100 text-[#111827] font-medium'
-                    : 'text-[#030712] hover:bg-gray-100 font-normal'
-                )
-              }
-            >
-              <Puzzle className="w-4 h-4 shrink-0" />
-              {!collapsed && <span className="whitespace-nowrap">Componentes</span>}
-            </NavLink>
-          </div>
+          <NavLink
+            to="/componentes"
+            className={({ isActive }) =>
+              cn(
+                'flex items-center gap-2 h-8 px-2 rounded-md text-sm transition-colors',
+                collapsed && 'justify-center px-2',
+                isActive
+                  ? 'bg-[#f3f4f6] text-[#111827] font-medium'
+                  : 'text-[#030712] hover:bg-[#f3f4f6] font-normal'
+              )
+            }
+          >
+            <Puzzle className="w-4 h-4 shrink-0" />
+            {!collapsed && <span className="whitespace-nowrap">Componentes</span>}
+          </NavLink>
         </div>
       </div>
     </aside>
