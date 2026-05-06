@@ -140,8 +140,8 @@ function PlanCard({
 
       {/* Licensings expandidos */}
       {expanded && licensings.length > 0 && (
-        <div className="px-4 pb-4 pt-1 border-t border-[#e5e7eb] bg-[#fafafa]">
-          <p className="text-xs font-semibold text-[#030712] mb-2">Modelo de licenciamento</p>
+        <div className="px-4 pb-4 pt-3 border-t border-[#e5e7eb] bg-[#fafafa]">
+          <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide mb-2">Modelo de licenciamento</p>
           <ul className="flex flex-col gap-1">
             {licensings.map((text, i) => (
               <li key={i} className="flex items-start gap-1.5 text-xs text-[#6b7280]">
