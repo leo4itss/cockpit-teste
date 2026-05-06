@@ -239,13 +239,47 @@ export function EditSolutionSheet({
     setForm(f => ({ ...f, [field]: value }))
   }
 
-  // Tipos disponíveis = union dos tipos dos componentes vinculados à solução
+  // Tipos disponíveis = union dos tipos dos componentes selecionados (reativo ao estado editável)
   const tiposDisponiveis: TipoLicenca[] = componentesVinculados.length === 0
     ? tiposLicenca
     : (() => {
         const ids = new Set(componentesVinculados.flatMap(c => c.tiposLicenca))
         return tiposLicenca.filter(t => ids.has(t.id))
       })()
+
+  // Calcula aviso de tipos de licença órfãos ao remover um componente
+  function calcOrphanWarning(removedId: string): string | null {
+    const removedComp = componentes.find(c => c.id === removedId)
+    if (!removedComp) return null
+
+    // IDs que restam após a remoção
+    const remainingIds = selectedComponenteIds.filter(id => id !== removedId)
+    const remainingTipos = new Set(
+      componentes.filter(c => remainingIds.includes(c.id)).flatMap(c => c.tiposLicenca)
+    )
+
+    // Tipos fornecidos pelo componente removido que não estão nos restantes
+    const orphanedTipoIds = removedComp.tiposLicenca.filter(id => !remainingTipos.has(id))
+    if (orphanedTipoIds.length === 0) return null
+
+    // Verifica se algum plano usa esses tipos
+    const orphanNames = orphanedTipoIds
+      .map(id => tiposLicenca.find(t => t.id === id)?.nome ?? id)
+      .join(', ')
+    const plansAffected = plans.some(p =>
+      p.licensings.some(l => orphanedTipoIds.includes(l.tipoLicencaId))
+    )
+    if (!plansAffected) return null
+
+    return `O componente "${removedComp.nome}" fornece os tipos de licença "${orphanNames}" que estão sendo usados em planos desta solução. Removê-lo pode afetar a configuração desses planos.`
+  }
+
+  function handleRemoveComponente(id: string) {
+    const warning = calcOrphanWarning(id)
+    setOrphanWarning(warning)
+    setSelectedComponenteIds(prev => prev.filter(cid => cid !== id))
+    setComponenteError(false)
+  }
 
   function handleOpenNewPlan() {
     setEditingPlanIndex(null)
