@@ -1,6 +1,7 @@
-import { Check, Copy, MessageCircle, Mail, ExternalLink } from 'lucide-react'
+import { Copy, MessageCircle, Mail, ExternalLink } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Button } from './ui/Button'
+import { Badge } from './ui/Badge'
 import type { Account, Organization } from '@/types'
 
 interface Props {
