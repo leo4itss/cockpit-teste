@@ -49,26 +49,10 @@ function CopyButton({ text }: { text: string }) {
 }
 
 function StatusBadge({ status }: { status: Account['status'] }) {
-  if (status === 'Criado') {
-    return (
-      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#16a34a]">
-        <span className="w-4 h-4 rounded-full bg-[#16a34a] flex items-center justify-center shrink-0">
-          <Check className="w-3 h-3 text-white" strokeWidth={2.5} />
-        </span>
-        Criado
-      </span>
-    )
+  if (status === 'Ativo' || status === 'Criado') {
+    return <Badge variant="success" showIcon>{status}</Badge>
   }
-  const styles: Record<string, string> = {
-    Ativo:   'bg-[#dbeafe] text-[#2563eb]',
-    Inativo: 'bg-[#f3f4f6] text-[#6b7280]',
-  }
-  return (
-    <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${styles[status] ?? styles['Inativo']}`}>
-      <span className="w-1.5 h-1.5 rounded-full bg-current" />
-      {status}
-    </span>
-  )
+  return <Badge variant="secondary">{status}</Badge>
 }
 
 /* ── main component ─────────────────────────────────────── */
