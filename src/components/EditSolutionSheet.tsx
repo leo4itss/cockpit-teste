@@ -197,11 +197,15 @@ export function EditSolutionSheet({
   const [editingPlanIndex, setEditingPlanIndex] = useState<number | null>(null)
   const [confirmVersionModal, setConfirmVersionModal] = useState(false)
   const [historyOpen, setHistoryOpen] = useState(false)
+  const [selectedComponenteIds, setSelectedComponenteIds] = useState<string[]>(solution?.componenteIds ?? [])
+  const [componenteSelecaoOpen, setComponenteSelecaoOpen] = useState(false)
+  const [componenteError, setComponenteError] = useState(false)
+  const [orphanWarning, setOrphanWarning] = useState<string | null>(null)
 
-  // Componentes são sempre read-only — não podem ser alterados após a solução ser criada
-  const componentesVinculados = componentes.filter(c =>
-    (solution?.componenteIds ?? []).includes(c.id)
-  )
+  const useInline = componentes.length <= THRESHOLD_INLINE
+
+  // Componentes vinculados derivados do estado editável
+  const componentesVinculados = componentes.filter(c => selectedComponenteIds.includes(c.id))
 
   // Re-sync form when solution changes
   const [lastSolution, setLastSolution] = useState(solution)
@@ -210,6 +214,9 @@ export function EditSolutionSheet({
     setForm(buildForm(solution))
     setPlans(activePlans(solution))
     setHistoryOpen(false)
+    setSelectedComponenteIds(solution?.componenteIds ?? [])
+    setComponenteError(false)
+    setOrphanWarning(null)
   }
 
   function buildForm(s: Solution | null) {
