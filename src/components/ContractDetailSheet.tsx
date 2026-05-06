@@ -1,11 +1,9 @@
-import { History, ChevronDown, ChevronUp } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Sheet } from './ui/Sheet'
 import { Button } from './ui/Button'
 import { Badge } from './ui/Badge'
 import { ProvisioningDots } from './ProvisioningDots'
-import { api } from '@/api/client'
-import type { Contract, ContractVersion } from '@/types'
+import type { Contract } from '@/types'
 
 interface Props {
   open: boolean
