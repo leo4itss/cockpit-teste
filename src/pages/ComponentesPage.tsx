@@ -68,7 +68,7 @@ export function ComponentesPage() {
   return (
     <div className="flex flex-col h-full">
       {/* Page header */}
-      <div className="border-b border-[#e5e7eb] bg-white shrink-0">
+      <div className="bg-white shrink-0">
         <div className="flex items-center justify-between px-8 py-4 h-[72px]">
           <h1 className="text-2xl font-bold text-[#030712]">Componentes</h1>
           <div className="flex items-center gap-2">
