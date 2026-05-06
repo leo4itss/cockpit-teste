@@ -143,7 +143,7 @@ export function AccountDetailSheet({ open, onClose, account, org, onEdit }: Prop
           <div className="flex flex-col gap-3">
             <label className="text-sm font-medium text-[#030712]">URL de acesso</label>
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2 flex-1 min-w-0 h-9 rounded-md border border-[#e5e7eb] bg-[#f9fafb] px-3 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
+              <div className="flex items-center gap-2 flex-1 min-w-0 h-9 rounded-md bg-[#f3f4f6] px-3">
                 <span className="text-sm text-[#030712] truncate flex-1">{accessUrl}</span>
                 <CopyButton text={accessUrl} />
               </div>
