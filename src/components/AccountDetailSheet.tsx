@@ -27,8 +27,8 @@ function ReadonlyField({ label, value, required }: { label: string; value?: stri
       <label className="text-sm font-medium text-[#030712]">
         {label}{required && <span className="text-[#dc2626] ml-0.5">*</span>}
       </label>
-      <div className="h-9 w-full rounded-md border border-[#e5e7eb] bg-[#f9fafb] px-3 flex items-center shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
-        <span className="text-sm text-[#030712] truncate">{value || '—'}</span>
+      <div className="h-9 w-full rounded-md bg-[#f3f4f6] px-3 flex items-center">
+        <span className="text-sm text-[#6b7280] truncate">{value || '—'}</span>
       </div>
     </div>
   )
