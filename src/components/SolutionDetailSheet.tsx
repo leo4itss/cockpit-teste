@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { ChevronDown, ChevronUp, Check, History } from 'lucide-react'
+import { ChevronDown, ChevronUp, History } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Button } from './ui/Button'
+import { Badge } from './ui/Badge'
 import type { Solution, Plan, Componente } from '@/types'
 
 interface Props {
