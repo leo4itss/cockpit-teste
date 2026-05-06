@@ -159,12 +159,11 @@ app.put('/solutions/:id', async (c) => {
   const [existing] = await db.select().from(solutions).where(eq(solutions.id, id))
   if (!existing) return c.json({ error: 'Not found' }, 404)
 
-  // Componentes são imutáveis após a criação
-  const sortedExisting = [...((existing.componenteIds as string[]) ?? [])].sort().join(',')
-  const sortedIncoming = [...((body.componenteIds as string[]) ?? [])].sort().join(',')
-  if (sortedExisting !== sortedIncoming) {
+  // ── Componentes: ao menos 1 vinculado ────────────────────
+  const incomingComponenteIds: string[] = body.componenteIds ?? []
+  if (incomingComponenteIds.length === 0) {
     return c.json({
-      error: 'Os componentes de uma solução não podem ser alterados após a criação. Para uma composição diferente, crie uma nova solução.',
+      error: 'A solução deve ter ao menos um componente vinculado.',
     }, 422)
   }
 
