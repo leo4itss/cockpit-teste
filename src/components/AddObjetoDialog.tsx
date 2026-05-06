@@ -199,10 +199,7 @@ export function AddObjetoDialog({ open, onClose, solutions, orgName, onSave }: P
                     </td>
                     <td className="px-2 py-3 text-sm text-[#030712] max-w-[260px] truncate">{row.licenciamento}</td>
                     <td className="px-2 py-3">
-                      <span className="inline-flex items-center gap-1 bg-[#dcfce7] text-[#16a34a] text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">
-                        <CircleCheck className="w-3 h-3" />
-                        {row.status}
-                      </span>
+                      <Badge variant="success" showIcon>{row.status}</Badge>
                     </td>
                   </tr>
                 )
