@@ -145,10 +145,7 @@ export function ComponentesPage() {
                       )}
                     </td>
                     <td className="px-2 py-2 h-[52px] text-center">
-                      <span className="inline-flex items-center gap-1 bg-[#dcfce7] text-[#16a34a] text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">
-                        <CircleCheck className="w-3 h-3" />
-                        Ativo
-                      </span>
+                      <Badge variant="success" showIcon>Ativo</Badge>
                     </td>
                   </tr>
                 ))}
