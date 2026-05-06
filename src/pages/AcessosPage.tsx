@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react'
-import { Search, Plus, Ellipsis, CircleCheck, Circle, FilePen, UserX } from 'lucide-react'
+import { Search, Plus, Ellipsis, FilePen, UserX } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Popover } from '@/components/ui/Popover'
 import { NewUserSheet } from '@/components/NewUserSheet'
