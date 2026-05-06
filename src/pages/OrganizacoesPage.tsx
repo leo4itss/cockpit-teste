@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, FolderOpen, Trash2 } from 'lucide-react'
+import { Plus, FolderOpen, Trash2, Circle } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { NewOrganizationSheet } from '@/components/NewOrganizationSheet'
