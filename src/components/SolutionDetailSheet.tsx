@@ -14,13 +14,11 @@ interface Props {
 
 function Field({ label, value, required }: { label: string; value?: string; required?: boolean }) {
   return (
-    <div className="flex flex-col gap-3">
-      <label className="text-sm font-medium text-[#030712]">
+    <div className="flex flex-col gap-1.5">
+      <p className="text-xs font-medium text-[#6b7280] uppercase tracking-wide">
         {label}{required && <span className="text-[#dc2626] ml-0.5">*</span>}
-      </label>
-      <div className="h-9 w-full rounded-md border border-[#e5e7eb] bg-[#f9fafb] px-3 flex items-center shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
-        <span className="text-sm text-[#030712] truncate">{value || '—'}</span>
-      </div>
+      </p>
+      <p className="text-sm text-[#030712]">{value || '—'}</p>
     </div>
   )
 }
