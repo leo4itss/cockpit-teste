@@ -96,9 +96,7 @@ function PlanCard({
                 v{plan.versao}
               </span>
             )}
-            <span className="text-[11px] font-semibold text-[#15803d] bg-[#dcfce7] px-2 py-0.5 rounded-full leading-none">
-              Ativa
-            </span>
+            <Badge variant="success" showIcon>Ativa</Badge>
           </div>
           {plan.description && (
             <p className="text-xs text-[#6b7280] leading-4 mt-0.5">{plan.description}</p>
