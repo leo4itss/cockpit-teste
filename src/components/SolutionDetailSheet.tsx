@@ -37,24 +37,10 @@ function Divider() {
 }
 
 function StatusBadge({ status }: { status: Solution['status'] }) {
-  if (status === 'Criado') {
-    return (
-      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#16a34a]">
-        <span className="w-4 h-4 rounded-full bg-[#16a34a] flex items-center justify-center shrink-0">
-          <Check className="w-3 h-3 text-white" strokeWidth={2.5} />
-        </span>
-        Criado
-      </span>
-    )
+  if (status === 'Ativo' || status === 'Criado') {
+    return <Badge variant="success" showIcon>{status}</Badge>
   }
-  return (
-    <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${
-      status === 'Ativo' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
-    }`}>
-      <span className="w-1.5 h-1.5 rounded-full bg-current" />
-      {status}
-    </span>
-  )
+  return <Badge variant="secondary">{status}</Badge>
 }
 
 function PlanItem({ plan, inactive = false }: { plan: Plan; inactive?: boolean }) {
