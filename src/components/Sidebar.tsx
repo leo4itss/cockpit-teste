@@ -78,7 +78,7 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
                 'flex items-center gap-2 h-8 px-2 rounded-md text-sm transition-colors',
                 collapsed && 'justify-center px-2',
                 isActive
-                  ? 'bg-[#f3f4f6] text-[#111827] font-medium'
+                  ? 'bg-[#111827] text-[#f9fafb] font-medium'
                   : 'text-[#030712] hover:bg-[#f3f4f6] font-normal'
               )
             }
@@ -94,7 +94,7 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
                 'flex items-center gap-2 h-8 px-2 rounded-md text-sm transition-colors',
                 collapsed && 'justify-center px-2',
                 isActive
-                  ? 'bg-[#f3f4f6] text-[#111827] font-medium'
+                  ? 'bg-[#111827] text-[#f9fafb] font-medium'
                   : 'text-[#030712] hover:bg-[#f3f4f6] font-normal'
               )
             }
@@ -110,7 +110,7 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
                 'flex items-center gap-2 h-8 px-2 rounded-md text-sm transition-colors',
                 collapsed && 'justify-center px-2',
                 isActive
-                  ? 'bg-[#f3f4f6] text-[#111827] font-medium'
+                  ? 'bg-[#111827] text-[#f9fafb] font-medium'
                   : 'text-[#030712] hover:bg-[#f3f4f6] font-normal'
               )
             }
