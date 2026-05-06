@@ -25,7 +25,7 @@ function ReadonlyField({ label, value, half }: { label: string; value?: string |
   return (
     <div className={`flex flex-col gap-2 ${half ? 'flex-1 min-w-0' : ''}`}>
       <label className="text-sm font-medium text-[#030712]">{label}</label>
-      <div className="h-9 px-3 flex items-center bg-[#f9fafb] border border-[#e5e7eb] rounded-md text-sm text-[#6b7280] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] truncate">
+      <div className="h-9 px-3 flex items-center bg-[#f3f4f6] rounded-md text-sm text-[#6b7280] truncate">
         {value ?? '—'}
       </div>
     </div>
