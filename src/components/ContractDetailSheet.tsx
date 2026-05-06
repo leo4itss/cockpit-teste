@@ -43,17 +43,6 @@ function ObjetoField({ label, value }: { label: string; value?: string | number 
   )
 }
 
-// Separa "NomeTipo: valor · NomeTipo2: valor2" em { tipo, valor }
-function parseLicenciamento(lic: string): { tipo: string; valor: string } {
-  if (!lic || lic === '—') return { tipo: '—', valor: '—' }
-  const parts = lic.split(' · ')
-  const tipos = parts.map(p => p.split(':')[0]?.trim() || '').filter(Boolean).join(', ')
-  const valores = parts.map(p => {
-    const idx = p.indexOf(':')
-    return idx >= 0 ? p.substring(idx + 1).trim() : ''
-  }).filter(Boolean).join(', ')
-  return { tipo: tipos || '—', valor: valores || '—' }
-}
 
 export function ContractDetailSheet({ open, onClose, contract, onEdit }: Props) {
 
