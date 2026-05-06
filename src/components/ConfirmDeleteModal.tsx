@@ -441,26 +441,25 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
           de ser excluída permanentemente. Durante esse período, os seguintes itens
           ficarão inacessíveis e serão excluídos permanentemente após 30 dias:
         </p>
-        <ul className="flex flex-col gap-1.5 p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-xs list-disc list-outside pl-6">
-          <li>Todas as contas vinculadas</li>
-          <li>Todos os contratos</li>
-          <li>Todas as soluções</li>
-          <li>Todos os dados associados</li>
-        </ul>
+        <div className="bg-red-50 border border-red-300 rounded-md p-4">
+          <ul className="flex flex-col gap-1 text-sm font-medium text-red-700 list-disc list-outside pl-5">
+            <li>Todas as contas vinculadas</li>
+            <li>Todos os contratos</li>
+            <li>Todas as soluções</li>
+            <li>Todos os dados associados</li>
+          </ul>
+        </div>
 
         {/* Bloco informativo — quarentena */}
-        <div className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-          <div className="flex flex-col gap-1 text-xs text-blue-800">
-            <p>
-              Durante os 30 dias de quarentena, você poderá cancelar a exclusão
-              acessando a opção <strong>"Cancelar exclusão"</strong> no menu de ações
-              da organização.
-            </p>
-            <p className="font-medium">
-              Exclusão permanente prevista para: {exclusaoFormatada}
-            </p>
-          </div>
+        <div className="flex items-start gap-4 bg-blue-50 border border-blue-300 rounded-md p-4">
+          <CircleAlert className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
+          <p className="text-sm font-medium text-blue-700 leading-5">
+            Durante os 30 dias de quarentena, você poderá cancelar a exclusão
+            acessando a opção <strong>"Cancelar exclusão"</strong> no menu de ações
+            da organização.
+            <br />
+            <span className="font-semibold">Exclusão permanente prevista para: {exclusaoFormatada}</span>
+          </p>
         </div>
 
         <div className="flex flex-col gap-1.5">
