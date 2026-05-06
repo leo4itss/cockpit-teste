@@ -156,18 +156,15 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
       >
         <div className="flex flex-col gap-4 text-sm text-[#030712]">
           <p>A conta <strong>"{name}"</strong> entrará em um período de <strong>quarentena de 30 dias</strong> antes de ser excluída permanentemente.</p>
-          <div className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-            <div className="flex flex-col gap-1 text-xs text-blue-800">
-              <p>
-                Durante os 30 dias de quarentena, você poderá cancelar a exclusão ativando
-                <strong> "Exibir contas deletadas"</strong> e clicando em{' '}
-                <RotateCcw className="inline w-3 h-3 mb-0.5" /> <strong>Cancelar exclusão</strong>.
-              </p>
-              <p className="font-medium">
-                Exclusão permanente prevista para: {exclusaoFormatada}
-              </p>
-            </div>
+          <div className="flex items-start gap-4 bg-blue-50 border border-blue-300 rounded-md p-4">
+            <CircleAlert className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
+            <p className="text-sm font-medium text-blue-700 leading-5">
+              Durante os 30 dias de quarentena, você poderá cancelar a exclusão ativando
+              <strong> "Exibir contas deletadas"</strong> e clicando em{' '}
+              <RotateCcw className="inline w-3 h-3 mb-0.5" /> <strong>Cancelar exclusão</strong>.
+              <br />
+              <span className="font-semibold">Exclusão permanente prevista para: {exclusaoFormatada}</span>
+            </p>
           </div>
         </div>
       </Modal>
