@@ -312,13 +312,18 @@ export function EditSolutionSheet({
 
   function doSave() {
     if (!solution) return
+    if (selectedComponenteIds.length === 0) {
+      setComponenteError(true)
+      setConfirmVersionModal(false)
+      return
+    }
     onSave({
       ...solution,
       name:              form.name,
       description:       form.description,
       arquitetoPAS:      form.arquitetoPAS,
       plans,
-      componenteIds:     solution.componenteIds, // componentes nunca mudam na edição
+      componenteIds:     selectedComponenteIds,
       marketplace:       form.marketplace ? 'Ativo' : 'Inativo',
       link01:            form.link01,
       titleLink01:       form.titleLink01,
