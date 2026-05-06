@@ -324,25 +324,6 @@ app.put('/api/contracts/:id', async (c) => {
   const [existing] = await db.select().from(contracts).where(eq(contracts.id, id))
   if (!existing) return c.json({ error: 'Not found' }, 404)
 
-  const existingObjetos = JSON.stringify(existing.objetos ?? [])
-  const incomingObjetos = JSON.stringify(body.objetos ?? [])
-  if (existingObjetos !== incomingObjetos) {
-    try {
-      const existingVersions = await db.select().from(contractVersions).where(eq(contractVersions.contratoId, id))
-      await db.insert(contractVersions).values({
-        id: crypto.randomUUID(),
-        contratoId: id,
-        versao: existingVersions.length + 1,
-        snapshotPlano: existing.objetos,
-        alteradoPor: 'sistema',
-        alteradoEm: new Date().toISOString(),
-        motivo: 'Contrato editado manualmente.',
-      })
-    } catch (err) {
-      console.error('[contract versioning error]', err)
-    }
-  }
-
   const [row] = await db.update(contracts).set(body).where(eq(contracts.id, id)).returning()
   if (!row) return c.json({ error: 'Not found' }, 404)
   return c.json(row)
