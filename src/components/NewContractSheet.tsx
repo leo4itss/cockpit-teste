@@ -159,9 +159,9 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
             </div>
 
             {/* Info box */}
-            <div className="flex items-center gap-3 bg-blue-50 border border-blue-300 rounded-md p-3">
+            <div className="flex items-center gap-3 bg-blue-50 border border-blue-300 rounded-lg p-3">
               <CircleAlert className="w-5 h-5 text-blue-700 shrink-0" />
-              <p className="text-sm font-medium text-blue-700 leading-4">
+              <p className="text-xs font-medium text-blue-700 leading-4">
                 Objetos do contrato reúnem soluções, planos e licenciamentos, definindo as condições e limites para atender às necessidades do cliente.
               </p>
             </div>
