@@ -408,8 +408,11 @@ app.delete('/api/tipos-licenca/:id', async (c) => {
 // ── Componentes ───────────────────────────────────────────────
 
 app.get('/api/componentes', async (c) => {
+  const includeInactive = c.req.query('include_inactive') === 'true'
   const rows = await db.select().from(componentes)
-  return c.json(rows)
+  // Por padrão filtra inativos; passa include_inactive=true para incluir
+  const filtered = includeInactive ? rows : rows.filter((r: any) => r.status !== 'Inativo')
+  return c.json(filtered)
 })
 
 app.get('/api/componentes/:id', async (c) => {
