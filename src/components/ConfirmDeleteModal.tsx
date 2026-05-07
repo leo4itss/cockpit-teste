@@ -476,4 +476,75 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
       </div>
     </Modal>
   )
+
+  // --- EXCLUIR COMPONENTE (sem vínculos) ---
+  if (variant === 'excluir-componente') {
+    return (
+      <Modal
+        open={open}
+        onClose={handleClose}
+        title="Excluir componente"
+        maxWidth="max-w-[480px]"
+        footer={
+          <>
+            <Button variant="outline" onClick={handleClose}>Cancelar</Button>
+            <Button variant="destructive" onClick={handleConfirm}>Excluir permanentemente</Button>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-4">
+          <p className="text-sm text-[#374151]">
+            Você está prestes a excluir permanentemente o componente <strong>"{name}"</strong>.
+            Esta ação não pode ser desfeita.
+          </p>
+          <div className="flex items-start gap-4 bg-blue-50 border border-blue-300 rounded-md p-4">
+            <CircleAlert className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
+            <p className="text-sm font-medium text-blue-700 leading-5">
+              Este componente não está vinculado a nenhuma solução e pode ser excluído com segurança.
+            </p>
+          </div>
+        </div>
+      </Modal>
+    )
+  }
+
+  // --- INATIVAR COMPONENTE (com vínculos) ---
+  if (variant === 'inativar-componente') {
+    return (
+      <Modal
+        open={open}
+        onClose={handleClose}
+        title="Inativar componente"
+        maxWidth="max-w-[480px]"
+        footer={
+          <>
+            <Button variant="outline" onClick={handleClose}>Cancelar</Button>
+            <Button variant="ghost" onClick={handleConfirm} className="text-amber-600 hover:bg-amber-50">
+              Inativar componente
+            </Button>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-4">
+          <p className="text-sm text-[#374151]">
+            O componente <strong>"{name}"</strong> está vinculado a soluções existentes e não pode ser excluído.
+            Ele será inativado e não ficará disponível para novas soluções.
+          </p>
+          <div className="bg-yellow-50 border border-yellow-300 rounded-md p-4">
+            <ul className="flex flex-col gap-1 text-sm font-medium text-yellow-700 list-disc list-outside pl-5">
+              <li>O componente não aparecerá mais ao criar ou editar soluções</li>
+              <li>As soluções que já utilizam este componente não são afetadas</li>
+              <li>Você poderá reativar o componente a qualquer momento</li>
+            </ul>
+          </div>
+          <div className="flex items-start gap-4 bg-blue-50 border border-blue-300 rounded-md p-4">
+            <CircleAlert className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
+            <p className="text-sm font-medium text-blue-700 leading-5">
+              A inativação é reversível. Para reativar, acesse o componente e clique em "Reativar".
+            </p>
+          </div>
+        </div>
+      </Modal>
+    )
+  }
 }
