@@ -111,7 +111,17 @@ export function ContractDetailSheet({ open, onClose, contract, onEdit }: Props) 
                   className="bg-[#f9fafb] border border-[#e5e7eb] rounded-2xl p-4 flex flex-col gap-3"
                 >
                   <ObjetoField label="Solução" value={obj.solucao} />
-                  <ObjetoField label="Plano" value={obj.plano} />
+                  <div className="flex flex-col gap-0.5">
+                    <p className="text-sm font-semibold text-[#030712]">Plano</p>
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-sm text-[#6b7280]">{obj.plano || '—'}</p>
+                      {obj.plano && obj.plano !== '—' && (
+                        <span className="text-[11px] font-medium text-[#6b7280] bg-[#f3f4f6] border border-[#e5e7eb] px-1.5 py-0.5 rounded leading-none">
+                          v{obj.planoVersao ?? 1}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                   <ObjetoField label="Licença" value={obj.licenciamento} />
                   <ObjetoField label="Organização contratada" value={obj.orgContratada} />
                   <ObjetoField label="Qtd contratada" value={obj.qtdContratada} />
