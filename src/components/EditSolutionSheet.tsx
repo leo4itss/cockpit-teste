@@ -649,11 +649,9 @@ export function EditSolutionSheet({
                         >
                           <div className="flex items-center gap-1.5">
                             <p className="text-sm font-medium text-[#374151]">{plan.name}</p>
-                            {plan.versao && (
-                              <span className="text-[11px] font-medium text-[#9ca3af] bg-[#f9fafb] border border-[#e5e7eb] px-1.5 py-0.5 rounded leading-none">
-                                v{plan.versao}
+                            <span className="text-[11px] font-medium text-[#9ca3af] bg-[#f9fafb] border border-[#e5e7eb] px-1.5 py-0.5 rounded leading-none">
+                                v{plan.versao ?? 1}
                               </span>
-                            )}
                             <span className="text-[11px] font-medium text-[#9ca3af] bg-[#f9fafb] border border-[#e5e7eb] px-1.5 py-0.5 rounded leading-none">
                               Inativo
                             </span>
