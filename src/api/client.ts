@@ -62,7 +62,8 @@ export const api = {
   getComponente: (id: string) => request<any>(`/api/componentes/${id}`),
   createComponente: (data: any) => request<any>('/api/componentes', { method: 'POST', body: JSON.stringify(data) }),
   updateComponente: (id: string, data: any) => request<any>(`/api/componentes/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-  deleteComponente: (id: string) => request<any>(`/api/componentes/${id}`, { method: 'DELETE' }),
+  deleteComponente: (id: string) => request<{ ok: boolean; action: 'excluido' | 'inativado'; componente?: any }>(`/api/componentes/${id}`, { method: 'DELETE' }),
+  reativarComponente: (id: string) => request<any>(`/api/componentes/${id}/reativar`, { method: 'PATCH' }),
 
   // Valida URL de metadata de um componente.
   // Retorna { ok: true, data: {...} } ou { ok: false, error: string }
