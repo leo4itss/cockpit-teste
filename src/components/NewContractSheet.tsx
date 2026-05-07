@@ -31,7 +31,7 @@ const RENOVACAO_OPTIONS = [
   { value: 'Anual', label: 'Anual' },
 ]
 
-const COLS = ['Solução', 'Organização contratada', 'Plano', 'Licenciamento', 'Qtd contratada']
+const COLS = ['Solução', 'Organização contratada', 'Plano', 'Licenciamento']
 
 export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solutions, onSave }: Props) {
   const activeAccounts = accounts.filter(a => !a.deletedAt)
