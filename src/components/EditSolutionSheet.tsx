@@ -344,6 +344,13 @@ export function EditSolutionSheet({
       return
     }
 
+    // Valida marketplace: ao menos um par de link+título quando ativo
+    if (form.marketplace) {
+      const pair1 = form.link01.trim() !== '' && form.titleLink01.trim() !== ''
+      const pair2 = form.link02.trim() !== '' && form.titleLink02.trim() !== ''
+      if (!pair1 && !pair2) return
+    }
+
     // Detecta se algum plano EXISTENTE teve conteúdo alterado (não planos novos)
     const stripMeta = ({ versao: _v, statusVersao: _s, criadoEm: _c, ...rest }: Plan) => rest
     const existingActive = activePlans(solution)
