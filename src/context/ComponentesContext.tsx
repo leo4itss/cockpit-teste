@@ -53,12 +53,30 @@ export function ComponentesProvider({ children }: { children: ReactNode }) {
     }
   }, [componentes])
 
-  const deleteComponente = useCallback(async (id: string) => {
-    setComponentes(prev => prev.filter(c => c.id !== id))
+  const deleteComponente = useCallback(async (id: string): Promise<'excluido' | 'inativado'> => {
     try {
-      await api.deleteComponente(id)
+      const result = await api.deleteComponente(id)
+      if (result.action === 'inativado' && result.componente) {
+        // Soft delete: atualiza status localmente
+        setComponentes(prev => prev.map(c => c.id === id ? { ...c, status: 'Inativo' } : c))
+      } else {
+        // Hard delete: remove da lista
+        setComponentes(prev => prev.filter(c => c.id !== id))
+      }
+      return result.action
     } catch {
-      // already removed locally
+      // Fallback offline: remove da lista
+      setComponentes(prev => prev.filter(c => c.id !== id))
+      return 'excluido'
+    }
+  }, [])
+
+  const reativarComponente = useCallback(async (id: string) => {
+    try {
+      const updated = await api.reativarComponente(id)
+      setComponentes(prev => prev.map(c => c.id === id ? { ...c, ...updated } : c))
+    } catch {
+      setComponentes(prev => prev.map(c => c.id === id ? { ...c, status: 'Ativo' } : c))
     }
   }, [])
 
