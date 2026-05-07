@@ -100,11 +100,9 @@ function PlanItem({ plan, inactive = false }: { plan: Plan; inactive?: boolean }
         </button>
         <div className="flex items-center gap-2 flex-1 min-w-0 flex-wrap">
           <p className="text-sm font-bold text-[#030712]">{plan.name}</p>
-          {plan.versao && (
-            <span className="text-[11px] font-medium text-[#6b7280] bg-[#f3f4f6] border border-[#e5e7eb] px-1.5 py-0.5 rounded leading-none">
-              v{plan.versao}
+          <span className="text-[11px] font-medium text-[#6b7280] bg-[#f3f4f6] border border-[#e5e7eb] px-1.5 py-0.5 rounded leading-none">
+              v{plan.versao ?? 1}
             </span>
-          )}
           <Badge variant="success" showIcon>Ativa</Badge>
           {plan.description && (
             <p className="w-full text-xs text-[#6b7280] leading-4 mt-0.5">{plan.description}</p>
