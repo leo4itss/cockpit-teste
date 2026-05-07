@@ -4,11 +4,12 @@ import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { ComponenteSheet, METADATA_MOCK_TIPOS } from '@/components/ComponenteSheet'
 import { ComponenteDetailSheet } from '@/components/ComponenteDetailSheet'
+import { ConfirmDeleteModal } from '@/components/ConfirmDeleteModal'
 import { useComponentes } from '@/context/ComponentesContext'
 import type { Componente } from '@/types'
 
 export function ComponentesPage() {
-  const { componentes, loading, addComponente, updateComponente, deleteComponente } = useComponentes()
+  const { componentes, loading, addComponente, updateComponente, deleteComponente, reativarComponente } = useComponentes()
   const [search, setSearch] = useState('')
 
   // Sheet de detalhe (leitura)
@@ -18,10 +19,19 @@ export function ComponentesPage() {
   const [sheetOpen, setSheetOpen] = useState(false)
   const [editingComponente, setEditingComponente] = useState<Componente | null>(null)
 
-  const filtered = componentes.filter(c =>
-    c.nome.toLowerCase().includes(search.toLowerCase()) ||
-    (c.descricao ?? '').toLowerCase().includes(search.toLowerCase())
-  )
+  // Modais de delete/inativar
+  const [deleteModal, setDeleteModal] = useState<'excluir-componente' | 'inativar-componente' | null>(null)
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
+
+  // Mostra ativos por padrão; toggle para ver inativos também
+  const [showInativos, setShowInativos] = useState(false)
+
+  const filtered = componentes
+    .filter(c => showInativos || c.status !== 'Inativo')
+    .filter(c =>
+      c.nome.toLowerCase().includes(search.toLowerCase()) ||
+      (c.descricao ?? '').toLowerCase().includes(search.toLowerCase())
+    )
 
   async function handleSave(data: Omit<Componente, 'id' | 'createdAt'>) {
     if (editingComponente) {
@@ -31,14 +41,12 @@ export function ComponentesPage() {
     }
   }
 
-  // Abre o detalhe ao clicar na linha da tabela
   function handleOpenDetail(c: Componente) {
     setDetailComponente(c)
   }
 
-  // Abre edição (vindo do detail sheet ou direto)
   function handleOpenEdit(c: Componente) {
-    setDetailComponente(null)   // fecha detalhe primeiro
+    setDetailComponente(null)
     setEditingComponente(c)
     setSheetOpen(true)
   }
@@ -55,16 +63,29 @@ export function ComponentesPage() {
 
   async function handleDeleteComponente() {
     if (!editingComponente) return
-    await deleteComponente(editingComponente.id)
+    const action = await deleteComponente(editingComponente.id)
     handleCloseSheet()
+    // Se for inativação, abre modal informativo para feedback
+    setPendingDeleteId(editingComponente.id)
+    setDeleteModal(action === 'inativado' ? 'inativar-componente' : 'excluir-componente')
   }
 
-  // Resolve nomes dos tipos a partir dos IDs (mock metadata ou fallback para ID)
+  async function handleConfirmModal() {
+    setDeleteModal(null)
+    setPendingDeleteId(null)
+  }
+
+  async function handleReativar(id: string) {
+    await reativarComponente(id)
+  }
+
   function tiposNomes(ids: string[]) {
     return ids
       .map(id => METADATA_MOCK_TIPOS.find(t => t.id === id)?.nome ?? id)
       .join(', ')
   }
+
+  const hasInativos = componentes.some(c => c.status === 'Inativo')
 
   return (
     <div className="flex flex-col h-full">
@@ -73,6 +94,18 @@ export function ComponentesPage() {
         <div className="flex items-center justify-between px-8 py-4 h-[72px]">
           <h1 className="text-2xl font-bold text-[#030712]">Componentes</h1>
           <div className="flex items-center gap-2">
+            {hasInativos && (
+              <button
+                onClick={() => setShowInativos(v => !v)}
+                className={`h-9 px-3 rounded-md text-sm font-medium border transition-colors ${
+                  showInativos
+                    ? 'bg-gray-100 border-gray-300 text-[#030712]'
+                    : 'border-[#e5e7eb] text-[#6b7280] hover:bg-gray-50'
+                }`}
+              >
+                {showInativos ? 'Ocultar inativos' : 'Ver inativos'}
+              </button>
+            )}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6b7280] opacity-50 pointer-events-none" />
               <input
@@ -112,43 +145,63 @@ export function ComponentesPage() {
                 <tr className="bg-white border-b border-[#e5e7eb]">
                   <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Nome</th>
                   <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Descrição</th>
-                  <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Tipos de Licensa</th>
+                  <th className="text-left px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Tipos de Licença</th>
                   <th className="text-center px-2 py-2.5 text-sm font-medium text-[#030712] opacity-40 h-10">Status</th>
+                  {showInativos && <th className="px-2 py-2.5 h-10" />}
                 </tr>
               </thead>
               <tbody>
-                {filtered.map(c => (
-                  <tr
-                    key={c.id}
-                    className="border-b border-[#e5e7eb] last:border-0 hover:bg-gray-50 cursor-pointer transition-colors"
-                    onClick={() => handleOpenDetail(c)}
-                  >
-                    <td className="px-2 py-2 h-[52px]">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-md bg-[#f3f4f6] border border-[#e5e7eb] flex items-center justify-center shrink-0 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
-                          <Cpu className="w-4 h-4 text-[#6b7280]" />
+                {filtered.map(c => {
+                  const isInativo = c.status === 'Inativo'
+                  return (
+                    <tr
+                      key={c.id}
+                      className={`border-b border-[#e5e7eb] last:border-0 transition-colors ${isInativo ? 'opacity-50' : 'hover:bg-gray-50 cursor-pointer'}`}
+                      onClick={() => !isInativo && handleOpenDetail(c)}
+                    >
+                      <td className="px-2 py-2 h-[52px]">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-md bg-[#f3f4f6] border border-[#e5e7eb] flex items-center justify-center shrink-0 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
+                            <Cpu className="w-4 h-4 text-[#6b7280]" />
+                          </div>
+                          <span className="text-sm font-medium text-[#030712]">{c.nome}</span>
                         </div>
-                        <span className="text-sm font-medium text-[#030712]">{c.nome}</span>
-                      </div>
-                    </td>
-                    <td className="px-2 py-2 h-[52px] text-sm text-[#030712] max-w-[200px] truncate">
-                      {c.descricao || '—'}
-                    </td>
-                    <td className="px-2 py-2 h-[52px] text-sm text-[#030712] max-w-[300px] truncate">
-                      {c.tiposLicenca.length === 0 ? (
-                        <span className="text-[#9ca3af]">—</span>
-                      ) : (
-                        <span title={tiposNomes(c.tiposLicenca)}>
-                          {c.tiposLicenca.length} tipo{c.tiposLicenca.length > 1 ? 's' : ''}{' '}
-                          <span className="text-[#6b7280]">({tiposNomes(c.tiposLicenca)})</span>
-                        </span>
+                      </td>
+                      <td className="px-2 py-2 h-[52px] text-sm text-[#030712] max-w-[200px] truncate">
+                        {c.descricao || '—'}
+                      </td>
+                      <td className="px-2 py-2 h-[52px] text-sm text-[#030712] max-w-[300px] truncate">
+                        {c.tiposLicenca.length === 0 ? (
+                          <span className="text-[#9ca3af]">—</span>
+                        ) : (
+                          <span title={tiposNomes(c.tiposLicenca)}>
+                            {c.tiposLicenca.length} tipo{c.tiposLicenca.length > 1 ? 's' : ''}{' '}
+                            <span className="text-[#6b7280]">({tiposNomes(c.tiposLicenca)})</span>
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-2 py-2 h-[52px] text-center">
+                        {isInativo
+                          ? <Badge variant="secondary">Inativo</Badge>
+                          : <Badge variant="success" showIcon>Ativo</Badge>
+                        }
+                      </td>
+                      {showInativos && (
+                        <td className="px-2 py-2 h-[52px] text-right">
+                          {isInativo && (
+                            <button
+                              type="button"
+                              onClick={e => { e.stopPropagation(); handleReativar(c.id) }}
+                              className="text-xs font-medium text-blue-600 hover:text-blue-800 transition-colors px-2 py-1 rounded hover:bg-blue-50"
+                            >
+                              Reativar
+                            </button>
+                          )}
+                        </td>
                       )}
-                    </td>
-                    <td className="px-2 py-2 h-[52px] text-center">
-                      <Badge variant="success" showIcon>Ativo</Badge>
-                    </td>
-                  </tr>
-                ))}
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
@@ -170,6 +223,22 @@ export function ComponentesPage() {
         onSave={handleSave}
         onDelete={editingComponente ? handleDeleteComponente : undefined}
         initialComponente={editingComponente ?? undefined}
+      />
+
+      {/* Modais de excluir/inativar componente */}
+      <ConfirmDeleteModal
+        open={deleteModal === 'excluir-componente'}
+        onClose={() => setDeleteModal(null)}
+        variant="excluir-componente"
+        name={componentes.find(c => c.id === pendingDeleteId)?.nome ?? ''}
+        onConfirm={handleConfirmModal}
+      />
+      <ConfirmDeleteModal
+        open={deleteModal === 'inativar-componente'}
+        onClose={() => setDeleteModal(null)}
+        variant="inativar-componente"
+        name={componentes.find(c => c.id === pendingDeleteId)?.nome ?? ''}
+        onConfirm={handleConfirmModal}
       />
     </div>
   )
