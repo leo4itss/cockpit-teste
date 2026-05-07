@@ -112,7 +112,7 @@ export interface ObjetoContrato {
   orgContratada: string
   plano: string
   licenciamento: string
-  qtdContratada: number
+  qtdContratada?: number  // deprecated — preservado apenas para dados históricos
   planoVersao?: number   // versão do plano vigente no momento da assinatura
 }
 
