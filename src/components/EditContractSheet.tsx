@@ -140,26 +140,18 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
               {objetos.length > 0 && (
                 <>
                   <Divider />
-                  <div className="grid grid-cols-[1fr_1fr_1fr_1fr_80px_32px] gap-2">
-                    {['Solução', 'Org. contratada', 'Plano', 'Licenciamento', 'Qtd', ''].map(col => (
+                  <div className="grid grid-cols-[1fr_1fr_1fr_1fr_32px] gap-2">
+                    {['Solução', 'Org. contratada', 'Plano', 'Licenciamento', ''].map(col => (
                       <p key={col} className="text-xs text-[#6b7280] leading-4">{col}</p>
                     ))}
                   </div>
                   <Divider />
                   {objetos.map((obj, i) => (
-                    <div key={i} className="grid grid-cols-[1fr_1fr_1fr_1fr_80px_32px] gap-2 items-center">
+                    <div key={i} className="grid grid-cols-[1fr_1fr_1fr_1fr_32px] gap-2 items-center">
                       <p className="text-sm text-[#030712] truncate">{obj.solucao}</p>
                       <p className="text-sm text-[#030712] truncate">{obj.orgContratada}</p>
                       <p className="text-sm text-[#030712] truncate">{obj.plano}</p>
                       <p className="text-sm text-[#030712] truncate">{obj.licenciamento}</p>
-                      <Input
-                        type="number"
-                        value={String(obj.qtdContratada)}
-                        onChange={e => setObjetos(prev =>
-                          prev.map((o, idx) => idx === i ? { ...o, qtdContratada: Number(e.target.value) } : o)
-                        )}
-                        disabled={isInactive}
-                      />
                       {!isInactive && (
                         <button
                           type="button"
