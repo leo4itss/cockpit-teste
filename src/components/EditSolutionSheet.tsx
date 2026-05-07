@@ -468,9 +468,9 @@ export function EditSolutionSheet({
             />
 
             {/* Info box */}
-            <div className="flex items-center gap-4 bg-blue-50 border border-blue-300 rounded-md p-4">
+            <div className="flex items-center gap-3 bg-blue-50 border border-blue-300 rounded-md p-3">
               <CircleAlert className="w-5 h-5 text-blue-700 shrink-0" />
-              <p className="text-sm font-medium text-blue-700 leading-5">
+              <p className="text-sm font-medium text-blue-700 leading-4">
                 Inclua informações relevantes para destacar o propósito e os diferenciais da solução, facilitando a compreensão e a comparação com outras opções.
               </p>
             </div>
