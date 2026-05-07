@@ -149,7 +149,18 @@ app.get('/solutions/:id', async (c) => {
   return row ? c.json(row) : c.json({ error: 'Not found' }, 404)
 })
 app.post('/solutions', async (c) => {
-  const [row] = await db.insert(solutions).values(await c.req.json()).returning()
+  const body = await c.req.json()
+  // Garante que todo plano criado já nasce com v1 registrada no histórico
+  const now = new Date().toISOString()
+  if (Array.isArray(body.plans)) {
+    body.plans = body.plans.map((p: any) => ({
+      ...p,
+      versao: p.versao ?? 1,
+      statusVersao: p.statusVersao ?? 'ativo',
+      criadoEm: p.criadoEm ?? now,
+    }))
+  }
+  const [row] = await db.insert(solutions).values(body).returning()
   return c.json(row, 201)
 })
 app.put('/solutions/:id', async (c) => {
