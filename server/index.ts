@@ -435,8 +435,28 @@ app.put('/api/componentes/:id', async (c) => {
 })
 
 app.delete('/api/componentes/:id', async (c) => {
-  await db.delete(componentes).where(eq(componentes.id, c.req.param('id')))
-  return c.json({ ok: true })
+  const id = c.req.param('id')
+  const [comp] = await db.select().from(componentes).where(eq(componentes.id, id))
+  if (!comp) return c.json({ error: 'Not found' }, 404)
+
+  // Verifica se há soluções com este componente vinculado
+  const allSolutions = await db.select().from(solutions)
+  const linked = allSolutions.some((sol: any) =>
+    Array.isArray(sol.componenteIds) && sol.componenteIds.includes(id)
+  )
+
+  if (linked) {
+    // Soft delete: inativa o componente, preserva dados
+    const [row] = await db.update(componentes)
+      .set({ status: 'Inativo' })
+      .where(eq(componentes.id, id))
+      .returning()
+    return c.json({ ok: true, action: 'inativado', componente: row })
+  }
+
+  // Sem vínculo: exclusão física
+  await db.delete(componentes).where(eq(componentes.id, id))
+  return c.json({ ok: true, action: 'excluido' })
 })
 
 /**
