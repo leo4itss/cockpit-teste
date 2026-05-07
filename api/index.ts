@@ -354,8 +354,34 @@ app.put('/componentes/:id', async (c) => {
   return row ? c.json(row) : c.json({ error: 'Not found' }, 404)
 })
 app.delete('/componentes/:id', async (c) => {
-  await db.delete(componentes).where(eq(componentes.id, c.req.param('id')))
-  return c.json({ ok: true })
+  const id = c.req.param('id')
+  const [comp] = await db.select().from(componentes).where(eq(componentes.id, id))
+  if (!comp) return c.json({ error: 'Not found' }, 404)
+
+  // Verifica se há soluções com este componente vinculado
+  const allSolutions = await db.select().from(solutions)
+  const linked = allSolutions.some((sol: any) =>
+    Array.isArray(sol.componenteIds) && sol.componenteIds.includes(id)
+  )
+
+  if (linked) {
+    const [row] = await db.update(componentes)
+      .set({ status: 'Inativo' })
+      .where(eq(componentes.id, id))
+      .returning()
+    return c.json({ ok: true, action: 'inativado', componente: row })
+  }
+
+  await db.delete(componentes).where(eq(componentes.id, id))
+  return c.json({ ok: true, action: 'excluido' })
+})
+app.patch('/componentes/:id/reativar', async (c) => {
+  const [row] = await db.update(componentes)
+    .set({ status: 'Ativo' })
+    .where(eq(componentes.id, c.req.param('id')))
+    .returning()
+  if (!row) return c.json({ error: 'Not found' }, 404)
+  return c.json(row)
 })
 app.post('/componentes/validate-metadata', async (c) => {
   const { url } = await c.req.json() as { url: string }
