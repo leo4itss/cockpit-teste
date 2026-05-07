@@ -9,7 +9,8 @@ interface ComponentesContextValue {
   loading: boolean
   addComponente: (data: Omit<Componente, 'id' | 'createdAt'>) => Promise<void>
   updateComponente: (id: string, data: Partial<Componente>) => Promise<void>
-  deleteComponente: (id: string) => Promise<void>
+  deleteComponente: (id: string) => Promise<'excluido' | 'inativado'>
+  reativarComponente: (id: string) => Promise<void>
 }
 
 const ComponentesContext = createContext<ComponentesContextValue | null>(null)
