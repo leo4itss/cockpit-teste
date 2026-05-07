@@ -124,7 +124,6 @@ export function ContractDetailSheet({ open, onClose, contract, onEdit }: Props) 
                   </div>
                   <ObjetoField label="Licença" value={obj.licenciamento} />
                   <ObjetoField label="Organização contratada" value={obj.orgContratada} />
-                  <ObjetoField label="Qtd contratada" value={obj.qtdContratada} />
                   <div className="flex flex-col gap-0.5">
                     <p className="text-sm font-semibold text-[#030712]">Status da publicação</p>
                     <ProvisioningDots status="COMPLETED" />
