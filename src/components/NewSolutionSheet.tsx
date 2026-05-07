@@ -33,9 +33,9 @@ function Divider() {
 
 function InfoBox({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-3 bg-blue-50 border border-blue-300 rounded-md p-3">
+    <div className="flex items-center gap-3 bg-blue-50 border border-blue-300 rounded-lg p-3">
       <CircleAlert className="w-5 h-5 text-blue-700 shrink-0" />
-      <p className="text-sm font-medium text-blue-700 leading-4">{children}</p>
+      <p className="text-xs font-medium text-blue-700 leading-4">{children}</p>
     </div>
   )
 }
