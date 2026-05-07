@@ -335,7 +335,12 @@ app.delete('/tipos-licenca/:id', async (c) => {
 })
 
 // ── Componentes ───────────────────────────────────────────────
-app.get('/componentes', async (c) => c.json(await db.select().from(componentes)))
+app.get('/componentes', async (c) => {
+  const includeInactive = c.req.query('include_inactive') === 'true'
+  const rows = await db.select().from(componentes)
+  const filtered = includeInactive ? rows : rows.filter((r: any) => r.status !== 'Inativo')
+  return c.json(filtered)
+})
 app.get('/componentes/:id', async (c) => {
   const [row] = await db.select().from(componentes).where(eq(componentes.id, c.req.param('id')))
   return row ? c.json(row) : c.json({ error: 'Not found' }, 404)
