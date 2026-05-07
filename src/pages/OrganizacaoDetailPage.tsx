@@ -885,9 +885,68 @@ export function OrganizacaoDetailPage() {
           )}
 
           {/* MARKETPLACE TAB */}
-          {tab === 'marketplace' && (
-            <EmptyState message="Marketplace em breve" description="Esta funcionalidade estará disponível em breve." />
-          )}
+          {tab === 'marketplace' && (() => {
+            const mktSolutions = solutions.filter(s => s.marketplace === 'Ativo')
+            if (mktSolutions.length === 0) {
+              return <EmptyState message="Nenhuma solução no marketplace" description="Ative o marketplace em uma solução para que ela apareça aqui." />
+            }
+            return (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                {mktSolutions.map(s => {
+                  const links = [
+                    s.link01 && s.titleLink01 ? { href: s.link01, label: s.titleLink01 } : null,
+                    s.link02 && s.titleLink02 ? { href: s.link02, label: s.titleLink02 } : null,
+                  ].filter(Boolean) as { href: string; label: string }[]
+
+                  const statusColor =
+                    s.marketplaceStatus === 'Disponível' ? 'bg-green-50 text-green-700 border border-green-200' :
+                    s.marketplaceStatus === 'Em breve'   ? 'bg-amber-50 text-amber-700 border border-amber-200' :
+                                                           'bg-gray-100 text-gray-600 border border-gray-200'
+
+                  return (
+                    <div key={s.id} className="flex flex-col gap-4 border border-[#e5e7eb] rounded-2xl p-5 bg-white">
+                      {/* header */}
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center shrink-0">
+                          <span className="text-gray-400 text-base font-bold">{s.name.charAt(0)}</span>
+                        </div>
+                        <div className="flex flex-col gap-1 min-w-0">
+                          <p className="text-sm font-semibold text-[#030712] leading-5 truncate">{s.name}</p>
+                          {s.marketplaceStatus && (
+                            <span className={`inline-flex w-fit text-xs font-medium px-2 py-0.5 rounded-full ${statusColor}`}>
+                              {s.marketplaceStatus}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* description */}
+                      {s.description && (
+                        <p className="text-sm text-[#6b7280] leading-5 line-clamp-2">{s.description}</p>
+                      )}
+
+                      {/* links */}
+                      {links.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-auto pt-1">
+                          {links.map((lk, i) => (
+                            <a
+                              key={i}
+                              href={lk.href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center h-8 px-3 border border-[#e5e7eb] rounded-md text-sm font-medium text-[#030712] hover:bg-gray-50 transition-colors shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]"
+                            >
+                              {lk.label}
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )
+          })()}
 
         </div>
       </div>
