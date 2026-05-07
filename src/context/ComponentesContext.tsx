@@ -81,7 +81,7 @@ export function ComponentesProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <ComponentesContext.Provider value={{ componentes, loading, addComponente, updateComponente, deleteComponente }}>
+    <ComponentesContext.Provider value={{ componentes, loading, addComponente, updateComponente, deleteComponente, reativarComponente }}>
       {children}
     </ComponentesContext.Provider>
   )
