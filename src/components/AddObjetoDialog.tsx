@@ -102,7 +102,6 @@ export function AddObjetoDialog({ open, onClose, solutions, orgName, onSave }: P
         orgContratada: r.orgContratada,
         plano: r.plano,
         licenciamento: r.licenciamento,
-        qtdContratada: 1,
         planoVersao: r.planoVersao,  // versão vigente no momento da assinatura
       }))
     onSave(objetos)
