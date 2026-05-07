@@ -132,7 +132,7 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
                 <>
                   <Divider />
                   {/* Cabeçalho */}
-                  <div className="grid grid-cols-5 gap-2">
+                  <div className="grid grid-cols-4 gap-2">
                     {COLS.map(col => (
                       <p key={col} className="text-xs text-[#6b7280] leading-4">{col}</p>
                     ))}
@@ -140,18 +140,11 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
                   <Divider />
                   {/* Linhas */}
                   {objetos.map((obj, i) => (
-                    <div key={i} className="grid grid-cols-5 gap-2 items-center">
+                    <div key={i} className="grid grid-cols-4 gap-2 items-center">
                       <p className="text-sm text-[#030712] truncate">{obj.solucao}</p>
                       <p className="text-sm text-[#030712] truncate">{obj.orgContratada}</p>
                       <p className="text-sm text-[#030712] truncate">{obj.plano}</p>
                       <p className="text-sm text-[#030712] truncate">{obj.licenciamento}</p>
-                      <Input
-                        type="number"
-                        value={String(obj.qtdContratada)}
-                        onChange={e => setObjetos(prev =>
-                          prev.map((o, idx) => idx === i ? { ...o, qtdContratada: Number(e.target.value) } : o)
-                        )}
-                      />
                     </div>
                   ))}
                 </>
