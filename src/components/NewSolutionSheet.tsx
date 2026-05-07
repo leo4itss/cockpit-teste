@@ -119,8 +119,8 @@ export function NewSolutionSheet({
 
   const baseValid = form.name.trim() !== '' && form.arquitetoPAS !== ''
   const marketplaceValid = !form.marketplace || (
-    form.link01.trim() !== '' && form.titleLink01.trim() !== '' &&
-    form.link02.trim() !== '' && form.titleLink02.trim() !== ''
+    (form.link01.trim() !== '' && form.titleLink01.trim() !== '') ||
+    (form.link02.trim() !== '' && form.titleLink02.trim() !== '')
   )
   const canSave = baseValid && marketplaceValid && selectedComponenteIds.length > 0
 
