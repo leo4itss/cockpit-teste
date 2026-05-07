@@ -5,6 +5,8 @@
 // - 'inativar-org': inativação reversível de org
 // - 'inativar-solucao': inativação de solução (avisa sobre contratos)
 // - 'inativar-contrato': inativação simples de contrato
+// - 'excluir-componente': exclusão permanente sem vínculos
+// - 'inativar-componente': soft delete por vínculo com soluções
 
 import { useState } from 'react'
 import { Modal } from './ui/Modal'
