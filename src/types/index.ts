@@ -76,6 +76,7 @@ export interface Componente {
   descricao?: string
   metadataUrl?: string
   tiposLicenca: string[]  // array de TipoLicenca.id disponíveis neste componente
+  status?: 'Ativo' | 'Inativo'
   createdAt: string
 }
 
