@@ -459,6 +459,15 @@ app.delete('/api/componentes/:id', async (c) => {
   return c.json({ ok: true, action: 'excluido' })
 })
 
+app.patch('/api/componentes/:id/reativar', async (c) => {
+  const [row] = await db.update(componentes)
+    .set({ status: 'Ativo' })
+    .where(eq(componentes.id, c.req.param('id')))
+    .returning()
+  if (!row) return c.json({ error: 'Not found' }, 404)
+  return c.json(row)
+})
+
 /**
  * Valida a URL de metadata de um componente.
  * Faz um GET na URL informada e verifica se o retorno contém
