@@ -442,9 +442,9 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
                   value={form.domain}
                   onChange={e => setField('domain', e.target.value)}
                 />
-                <div className="flex items-center gap-4 bg-blue-50 border border-blue-300 rounded-md p-4">
+                <div className="flex items-center gap-3 bg-blue-50 border border-blue-300 rounded-md p-3">
                   <CircleAlert className="w-5 h-5 text-blue-700 shrink-0" />
-                  <p className="text-sm font-medium text-blue-700 leading-5">
+                  <p className="text-sm font-medium text-blue-700 leading-4">
                     Escolha um nome único para o domínio. Este identificador não pode ser duplicado no sistema.
                   </p>
                 </div>
