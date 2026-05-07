@@ -66,11 +66,9 @@ function PlanItem({ plan, inactive = false }: { plan: Plan; inactive?: boolean }
       <div className="bg-white border border-[#e5e7eb] rounded-lg px-4 py-3 flex flex-col gap-1 opacity-70">
         <div className="flex items-center gap-2 flex-wrap">
           <p className="text-sm font-medium text-[#374151]">{plan.name}</p>
-          {plan.versao && (
-            <span className="text-[11px] font-medium text-[#9ca3af] bg-white border border-[#e5e7eb] px-1.5 py-0.5 rounded leading-none">
-              v{plan.versao}
+          <span className="text-[11px] font-medium text-[#9ca3af] bg-white border border-[#e5e7eb] px-1.5 py-0.5 rounded leading-none">
+              v{plan.versao ?? 1}
             </span>
-          )}
           <span className="text-[11px] font-medium text-[#9ca3af] bg-white border border-[#e5e7eb] px-1.5 py-0.5 rounded leading-none">
             Inativo
           </span>
