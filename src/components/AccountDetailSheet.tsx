@@ -203,16 +203,24 @@ export function AccountDetailSheet({ open, onClose, account, org, onEdit }: Prop
         {/* Usuários da conta */}
         <div className="flex flex-col gap-4">
           <SectionTitle>Usuários da conta</SectionTitle>
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2">
-              <p className="text-sm font-semibold text-[#030712]">Leonardo Rocha</p>
-              <span className="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full bg-[#2563eb] text-white">
-                Admin
-              </span>
+          {(!account.admins || account.admins.length === 0) ? (
+            <p className="text-sm text-[#9ca3af]">Nenhum usuário administrador cadastrado.</p>
+          ) : (
+            <div className="flex flex-col gap-4">
+              {account.admins.map((admin, i) => (
+                <div key={i} className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-semibold text-[#030712]">{admin.nome} {admin.sobrenome}</p>
+                    <span className="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full bg-[#2563eb] text-white">
+                      Admin
+                    </span>
+                  </div>
+                  <p className="text-sm text-[#6b7280]">{admin.email}</p>
+                  <p className="text-sm text-[#9ca3af]">@{admin.usuario}</p>
+                </div>
+              ))}
             </div>
-            <p className="text-sm text-[#6b7280]">grupoitss.teste@gmail.com</p>
-            <p className="text-sm text-[#9ca3af]">@leo.lins</p>
-          </div>
+          )}
         </div>
 
       </div>
