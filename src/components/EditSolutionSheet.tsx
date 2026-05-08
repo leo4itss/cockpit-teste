@@ -217,6 +217,7 @@ export function EditSolutionSheet({
     setHistoryOpen(false)
     setSelectedComponenteIds(solution?.componenteIds ?? [])
     setComponenteError(false)
+    setMarketplaceError(false)
     setOrphanWarning(null)
   }
 
