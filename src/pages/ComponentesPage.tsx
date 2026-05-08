@@ -251,14 +251,14 @@ export function ComponentesPage() {
       {/* Modais de excluir/inativar componente */}
       <ConfirmDeleteModal
         open={deleteModal === 'excluir-componente'}
-        onClose={() => setDeleteModal(null)}
+        onClose={handleCloseModal}
         variant="excluir-componente"
         name={componentes.find(c => c.id === pendingDeleteId)?.nome ?? ''}
         onConfirm={handleConfirmModal}
       />
       <ConfirmDeleteModal
         open={deleteModal === 'inativar-componente'}
-        onClose={() => setDeleteModal(null)}
+        onClose={handleCloseModal}
         variant="inativar-componente"
         name={componentes.find(c => c.id === pendingDeleteId)?.nome ?? ''}
         onConfirm={handleConfirmModal}
