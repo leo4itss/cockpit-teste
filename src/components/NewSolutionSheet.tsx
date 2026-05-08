@@ -60,10 +60,6 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
 
 /* ── options ───────────────────────────────────────────── */
 
-const ARQUITETOS = [
-  { value: 'marcelo', label: 'Marcelo Gomes' },
-  { value: 'ana', label: 'Ana Lima' },
-]
 
 const STATUS_OPTIONS = [
   { value: 'Ativo', label: 'Ativo' },
