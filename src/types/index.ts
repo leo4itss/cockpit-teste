@@ -60,6 +60,7 @@ export interface Account {
   descricao?: string
   logo?: string       // data URL ou URL externa
   isDefault?: boolean // true = conta padrão criada automaticamente com a org
+  admins?: AdminUser[]  // usuários administradores da conta
   status: 'Criado' | 'Ativo' | 'Inativo'
   createdAt: string
   deletedAt?: string  // null/undefined = ativa; preenchido = em quarentena (soft delete)
