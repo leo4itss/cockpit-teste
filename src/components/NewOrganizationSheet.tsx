@@ -37,10 +37,6 @@ const SEGMENTS = [
   { value: 'outro', label: 'Outro' },
 ]
 
-const ARQUITETOS = [
-  { value: 'marcelo', label: 'Marcelo Gomes' },
-  { value: 'ana', label: 'Ana Lima' },
-]
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return <p className="text-base font-bold text-[#030712] pb-3 leading-6">{children}</p>
