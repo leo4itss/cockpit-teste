@@ -687,7 +687,7 @@ export function EditSolutionSheet({
               label="Arquiteto PAS responsável"
               required
               placeholder="Selecione"
-              options={ARQUITETOS}
+              options={arquitetoOptions}
               value={form.arquitetoPAS}
               onChange={e => set('arquitetoPAS', e.target.value)}
               disabled={isInactive}
