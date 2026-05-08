@@ -387,7 +387,7 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete, on
               label="Arquiteto PAS responsável"
               required
               placeholder="Selecione"
-              options={ARQUITETOS}
+              options={arquitetoOptions}
               value={form.arquitetoPAS}
               onChange={e => set('arquitetoPAS', e.target.value)}
               disabled={isInactive}
