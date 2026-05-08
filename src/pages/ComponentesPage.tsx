@@ -128,18 +128,16 @@ export function ComponentesPage() {
         <div className="flex items-center justify-between px-8 py-4 h-[72px]">
           <h1 className="text-2xl font-bold text-[#030712]">Componentes</h1>
           <div className="flex items-center gap-2">
-            {hasInativos && (
-              <button
-                onClick={() => setShowInativos(v => !v)}
-                className={`h-9 px-3 rounded-md text-sm font-medium border transition-colors ${
-                  showInativos
-                    ? 'bg-gray-100 border-gray-300 text-[#030712]'
-                    : 'border-[#e5e7eb] text-[#6b7280] hover:bg-gray-50'
-                }`}
-              >
-                {showInativos ? 'Ocultar inativos' : 'Ver inativos'}
-              </button>
-            )}
+            <label className={`flex items-center gap-2 ${hasInativos ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'}`}>
+              <input
+                type="checkbox"
+                checked={showInativos && hasInativos}
+                onChange={e => hasInativos && setShowInativos(e.target.checked)}
+                disabled={!hasInativos}
+                className="w-4 h-4 rounded border border-[#e5e7eb] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] shrink-0 accent-[#2563eb] cursor-pointer"
+              />
+              <span className="text-sm font-medium text-[#030712] leading-none">Exibir componentes inativados</span>
+            </label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6b7280] opacity-50 pointer-events-none" />
               <input
