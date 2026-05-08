@@ -305,7 +305,7 @@ export function NewSolutionSheet({
             label="Arquiteto PAS responsável"
             required
             placeholder="Escolha o arquiteto"
-            options={ARQUITETOS}
+            options={arquitetoOptions}
             value={form.arquitetoPAS}
             onChange={e => set('arquitetoPAS', e.target.value)}
           />
