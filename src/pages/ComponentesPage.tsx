@@ -74,16 +74,17 @@ export function ComponentesPage() {
     handleCloseSheet()
     setPendingDeleteId(id)
 
-    // Checa vínculos: busca todas as soluções e verifica se alguma usa este componente
+    // Checa vínculos via API — fallback SEGURO: se a verificação falhar,
+    // assume que há vínculos (inativar) para nunca excluir por engano
     try {
-      const allSolutions = await import('@/api/client').then(m => m.api.getSolutions())
+      const allSolutions = await api.getSolutions()
       const linked = allSolutions.some((s: any) =>
         Array.isArray(s.componenteIds) && s.componenteIds.includes(id)
       )
       setDeleteModal(linked ? 'inativar-componente' : 'excluir-componente')
     } catch {
-      // Fallback offline: usa componentes do mock/context para checar
-      setDeleteModal('excluir-componente')
+      // Falha na verificação → opção segura: inativar
+      setDeleteModal('inativar-componente')
     }
   }
 
