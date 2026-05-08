@@ -80,6 +80,7 @@ export const accounts = pgTable('accounts', {
   descricao: text('descricao'),
   logo: text('logo'),                                    // data URL ou URL externa
   isDefault: boolean('is_default').notNull().default(false), // conta padrão da org
+  admins: jsonb('admins').notNull().default([]),              // AdminUser[] — usuários administradores da conta
   status: text('status').notNull().default('Criado'),
   createdAt: text('created_at').notNull(),
   deletedAt: text('deleted_at'),  // null = ativa; preenchido = em quarentena (soft delete)
