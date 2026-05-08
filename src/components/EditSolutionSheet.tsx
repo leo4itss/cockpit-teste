@@ -161,10 +161,6 @@ function PlanCard({
 
 /* ── options ─────────────────────────────────────────────── */
 
-const ARQUITETOS = [
-  { value: 'Marcelo', label: 'Marcelo' },
-  { value: 'Ana Lima', label: 'Ana Lima' },
-]
 
 const MARKETPLACE_STATUS = [
   { value: 'Em breve', label: 'Em breve' },
