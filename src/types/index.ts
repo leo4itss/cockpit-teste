@@ -31,6 +31,14 @@ export interface Organization {
   contacts: Contact[]
 }
 
+export interface AdminUser {
+  nome: string
+  sobrenome: string
+  email: string
+  usuario: string
+  senha: string
+}
+
 export interface Account {
   id: string
   orgId: string
