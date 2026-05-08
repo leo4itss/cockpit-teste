@@ -58,10 +58,6 @@ const DOC_TYPES = [
 
 const PAISES = [{ value: 'Brasil', label: 'Brasil' }]
 
-const ARQUITETOS = [
-  { value: 'Marcelo Gomes', label: 'Marcelo Gomes' },
-  { value: 'Ana Lima', label: 'Ana Lima' },
-]
 
 /* ── ellipsis menu ───────────────────────────────────────── */
 
