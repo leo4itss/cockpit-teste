@@ -6,6 +6,7 @@ import { ComponenteSheet, METADATA_MOCK_TIPOS } from '@/components/ComponenteShe
 import { ComponenteDetailSheet } from '@/components/ComponenteDetailSheet'
 import { ConfirmDeleteModal } from '@/components/ConfirmDeleteModal'
 import { useComponentes } from '@/context/ComponentesContext'
+import { api } from '@/api/client'
 import type { Componente } from '@/types'
 
 export function ComponentesPage() {
