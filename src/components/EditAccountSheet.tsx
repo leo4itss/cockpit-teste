@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { useUsers } from '@/context/UsersContext'
 import { Upload, MessageCircle, Mail, MoreVertical, Plus, Pencil, Trash2, Copy } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Input } from './ui/Input'
