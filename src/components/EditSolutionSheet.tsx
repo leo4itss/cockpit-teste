@@ -183,6 +183,7 @@ export function EditSolutionSheet({
   componentes,
   contracts,
 }: Props) {
+  const { arquitetoOptions } = useUsers()
   // Planos ativos = o que o usuário vê e edita; inativas ficam no histórico
   function activePlans(s: Solution | null): Plan[] {
     return (s?.plans ?? []).filter(p => !p.statusVersao || p.statusVersao === 'ativo')
