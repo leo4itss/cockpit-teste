@@ -7,9 +7,11 @@ import { AcessosPage } from './pages/AcessosPage'
 import { HomePage } from './pages/HomePage'
 import { ComponentesPage } from './pages/ComponentesPage'
 import { ComponentesProvider } from './context/ComponentesContext'
+import { UsersProvider } from './context/UsersContext'
 
 export default function App() {
   return (
+    <UsersProvider>
     <ComponentesProvider>
     <BrowserRouter>
       <Routes>
