@@ -147,10 +147,6 @@ function ImageUploadRow({
 
 /* ── options ─────────────────────────────────────────────── */
 
-const ARQUITETOS = [
-  { value: 'marcelo', label: 'Marcelo Gomes' },
-  { value: 'ana', label: 'Ana Lima' },
-]
 
 const DOC_TYPES = [
   { value: 'CNPJ', label: 'CNPJ' },
