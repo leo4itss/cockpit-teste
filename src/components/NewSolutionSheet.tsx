@@ -78,6 +78,7 @@ export function NewSolutionSheet({
   tiposLicenca,
 }: Props) {
   const { componentes } = useComponentes()
+  const { arquitetoOptions } = useUsers()
   const [form, setForm] = useState({
     name: '',
     description: '',
