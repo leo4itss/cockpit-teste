@@ -427,7 +427,7 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
               <Select
                 label="Arquiteto PAS responsável"
                 required
-                options={ARQUITETOS}
+                options={arquitetoOptions}
                 placeholder="Escolha o arquiteto"
                 value={form.arquitetoPAS}
                 onChange={e => setField('arquitetoPAS', e.target.value)}
