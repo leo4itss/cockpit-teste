@@ -239,6 +239,7 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
       })
       setContatos(org.contacts.map(contatoFromContact))
       setLogo(account.logo ?? '')
+      setAdmins(account.admins ?? [])
     }
   }, [open, account, org])
 
