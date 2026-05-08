@@ -200,6 +200,7 @@ export function EditSolutionSheet({
   const [selectedComponenteIds, setSelectedComponenteIds] = useState<string[]>(solution?.componenteIds ?? [])
   const [componenteSelecaoOpen, setComponenteSelecaoOpen] = useState(false)
   const [componenteError, setComponenteError] = useState(false)
+  const [marketplaceError, setMarketplaceError] = useState(false)
   const [orphanWarning, setOrphanWarning] = useState<string | null>(null)
 
   const useInline = componentes.length <= THRESHOLD_INLINE
