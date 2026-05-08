@@ -110,13 +110,23 @@ export function ComponenteSheet({ open, onClose, onSave, onDelete, isLinked, ini
       footer={
         <>
           {isEditing && onDelete && (
-            <Button
-              variant="ghost"
-              onClick={onDelete}
-              className="mr-auto text-red-600 hover:bg-red-50"
-            >
-              Excluir componente
-            </Button>
+            isLinked ? (
+              <Button
+                variant="ghost"
+                onClick={onDelete}
+                className="mr-auto text-amber-600 hover:bg-amber-50"
+              >
+                Inativar componente
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                onClick={onDelete}
+                className="mr-auto text-red-600 hover:bg-red-50"
+              >
+                Excluir componente
+              </Button>
+            )
           )}
           <Button variant="outline" onClick={handleClose}>Cancelar</Button>
           <Button
