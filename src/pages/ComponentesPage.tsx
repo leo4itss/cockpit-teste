@@ -49,10 +49,18 @@ export function ComponentesPage() {
     setDetailComponente(c)
   }
 
-  function handleOpenEdit(c: Componente) {
+  async function handleOpenEdit(c: Componente) {
     setDetailComponente(null)
     setEditingComponente(c)
+    setEditingIsLinked(null) // desconhecido enquanto carrega
     setSheetOpen(true)
+    // Pré-carrega status de vínculo para exibir botão correto no sheet
+    try {
+      const { linked } = await api.checkComponenteLinked(c.id)
+      setEditingIsLinked(linked)
+    } catch {
+      setEditingIsLinked(null)
+    }
   }
 
   function handleOpenNew() {
