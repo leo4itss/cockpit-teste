@@ -24,6 +24,9 @@ export function ComponentesPage() {
   const [deleteModal, setDeleteModal] = useState<'excluir-componente' | 'inativar-componente' | null>(null)
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
 
+  // Status de vínculo do componente sendo editado (pré-carregado ao abrir o sheet)
+  const [editingIsLinked, setEditingIsLinked] = useState<boolean | null>(null)
+
   // Mostra ativos por padrão; toggle para ver inativos também
   const [showInativos, setShowInativos] = useState(false)
 
