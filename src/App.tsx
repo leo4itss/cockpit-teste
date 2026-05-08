@@ -28,5 +28,6 @@ export default function App() {
       </Routes>
     </BrowserRouter>
     </ComponentesProvider>
+    </UsersProvider>
   )
 }
