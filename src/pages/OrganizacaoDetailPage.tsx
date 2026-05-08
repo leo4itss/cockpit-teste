@@ -857,8 +857,6 @@ export function OrganizacaoDetailPage() {
                           </td>
                           {/* Plano */}
                           <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.objetos[0]?.plano ?? '—'}</td>
-                          {/* Qtd contratada */}
-                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.objetos[0]?.qtdContratada ?? '—'}</td>
                           {/* Datas */}
                           <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.dataInicio}</td>
                           <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.dataTermino}</td>
