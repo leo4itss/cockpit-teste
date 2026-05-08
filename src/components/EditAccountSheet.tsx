@@ -214,7 +214,7 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
   const [showContatoDialog, setShowContatoDialog] = useState(false)
   const [editingContatoIdx, setEditingContatoIdx] = useState<number | null>(null)
 
-  const [admins, setAdmins] = useState<AdminUser[]>([])
+  const [admins, setAdmins] = useState<AdminUser[]>(() => account.admins ?? [])
   const [showAdminDialog, setShowAdminDialog] = useState(false)
   const [editingAdminIdx, setEditingAdminIdx] = useState<number | null>(null)
 
