@@ -135,6 +135,7 @@ function buildForm(org: Organization) {
 /* ── main ─────────────────────────────────────────────────── */
 
 export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete, onInativar, onActivate, canDelete }: Props) {
+  const { arquitetoOptions } = useUsers()
   const [form, setForm] = useState(() => buildForm(org))
   const [contacts, setContacts] = useState<Contact[]>(org.contacts ?? [])
   const [logoPreview, setLogoPreview] = useState<string>(org.logo ?? '')
