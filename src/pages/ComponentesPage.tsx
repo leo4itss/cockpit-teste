@@ -256,6 +256,7 @@ export function ComponentesPage() {
         onClose={handleCloseSheet}
         onSave={handleSave}
         onDelete={editingComponente ? handleDeleteComponente : undefined}
+        isLinked={editingIsLinked}
         initialComponente={editingComponente ?? undefined}
       />
 
