@@ -415,6 +415,15 @@ app.get('/api/componentes', async (c) => {
   return c.json(filtered)
 })
 
+app.get('/api/componentes/:id/linked', async (c) => {
+  const id = c.req.param('id')
+  const allSolutions = await db.select().from(solutions)
+  const linked = allSolutions.some((sol: any) =>
+    Array.isArray(sol.componenteIds) && sol.componenteIds.includes(id)
+  )
+  return c.json({ linked })
+})
+
 app.get('/api/componentes/:id', async (c) => {
   const [row] = await db.select().from(componentes).where(eq(componentes.id, c.req.param('id')))
   if (!row) return c.json({ error: 'Not found' }, 404)
