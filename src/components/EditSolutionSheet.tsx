@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { useUsers } from '@/context/UsersContext'
 import { ChevronUp, ChevronDown, MoreVertical, CircleAlert, Pencil, Trash2, TriangleAlert, History, Plus, Puzzle } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Input } from './ui/Input'
