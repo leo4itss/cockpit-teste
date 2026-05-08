@@ -74,13 +74,10 @@ export function ComponentesPage() {
     handleCloseSheet()
     setPendingDeleteId(id)
 
-    // Checa vínculos via API — fallback SEGURO: se a verificação falhar,
+    // Checa vínculos via endpoint dedicado — fallback SEGURO: se a verificação falhar,
     // assume que há vínculos (inativar) para nunca excluir por engano
     try {
-      const allSolutions = await api.getSolutions()
-      const linked = allSolutions.some((s: any) =>
-        Array.isArray(s.componenteIds) && s.componenteIds.includes(id)
-      )
+      const { linked } = await api.checkComponenteLinked(id)
       setDeleteModal(linked ? 'inativar-componente' : 'excluir-componente')
     } catch {
       // Falha na verificação → opção segura: inativar
