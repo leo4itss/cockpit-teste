@@ -297,6 +297,7 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
       subdomain:       form.subdomain,
       descricao:       form.descricao,
       logo:            logo || undefined,
+      admins,
     })
     onClose()
   }
