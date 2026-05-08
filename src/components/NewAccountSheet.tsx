@@ -35,10 +35,6 @@ const STATES = [
   { value: 'PR', label: 'PR' },
 ]
 
-const PAS_ARCHITECTS = [
-  { value: 'marcelo', label: 'Marcelo Gomes' },
-  { value: 'ana', label: 'Ana Lima' },
-]
 
 /* ── EllipsisMenu ────────────────────────────────────────── */
 
