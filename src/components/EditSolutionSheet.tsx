@@ -349,8 +349,12 @@ export function EditSolutionSheet({
     if (form.marketplace) {
       const pair1 = form.link01.trim() !== '' && form.titleLink01.trim() !== ''
       const pair2 = form.link02.trim() !== '' && form.titleLink02.trim() !== ''
-      if (!pair1 && !pair2) return
+      if (!pair1 && !pair2) {
+        setMarketplaceError(true)
+        return
+      }
     }
+    setMarketplaceError(false)
 
     // Detecta se algum plano EXISTENTE teve conteúdo alterado (não planos novos)
     const stripMeta = ({ versao: _v, statusVersao: _s, criadoEm: _c, ...rest }: Plan) => rest
