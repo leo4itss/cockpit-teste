@@ -341,6 +341,15 @@ app.get('/componentes', async (c) => {
   const filtered = includeInactive ? rows : rows.filter((r: any) => r.status !== 'Inativo')
   return c.json(filtered)
 })
+app.get('/componentes/:id/linked', async (c) => {
+  const id = c.req.param('id')
+  const allSolutions = await db.select().from(solutions)
+  const linked = allSolutions.some((sol: any) =>
+    Array.isArray(sol.componenteIds) && sol.componenteIds.includes(id)
+  )
+  return c.json({ linked })
+})
+
 app.get('/componentes/:id', async (c) => {
   const [row] = await db.select().from(componentes).where(eq(componentes.id, c.req.param('id')))
   return row ? c.json(row) : c.json({ error: 'Not found' }, 404)
