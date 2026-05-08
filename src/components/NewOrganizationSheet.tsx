@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { useUsers } from '@/context/UsersContext'
 import { Sheet } from './ui/Sheet'
 import { Input } from './ui/Input'
 import { Select } from './ui/Select'
