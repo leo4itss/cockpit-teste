@@ -60,6 +60,7 @@ export const api = {
   // Componentes
   getComponentes: () => request<any[]>('/api/componentes'),
   getComponente: (id: string) => request<any>(`/api/componentes/${id}`),
+  checkComponenteLinked: (id: string) => request<{ linked: boolean }>(`/api/componentes/${id}/linked`),
   createComponente: (data: any) => request<any>('/api/componentes', { method: 'POST', body: JSON.stringify(data) }),
   updateComponente: (id: string, data: any) => request<any>(`/api/componentes/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteComponente: (id: string) => request<{ ok: boolean; action: 'excluido' | 'inativado'; componente?: any }>(`/api/componentes/${id}`, { method: 'DELETE' }),
