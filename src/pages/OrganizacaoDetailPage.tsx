@@ -820,7 +820,6 @@ export function OrganizacaoDetailPage() {
                         <th className="text-left px-2 pb-2.5 align-bottom font-medium text-[#030712] opacity-40 h-10">Organização contratada</th>
                         <th className="text-left px-2 pb-2.5 align-bottom font-medium text-[#030712] opacity-40 h-10 w-[169px]">Soluções</th>
                         <th className="text-left px-2 pb-2.5 align-bottom font-medium text-[#030712] opacity-40 h-10 w-[85px]">Plano</th>
-                        <th className="text-left px-2 pb-2.5 align-bottom font-medium text-[#030712] opacity-40 h-10 w-[90px] leading-snug">Qtd contratada</th>
                         <th className="text-right px-2 pb-2.5 align-bottom font-medium text-[#030712] opacity-40 h-10 w-[109px]">Data início</th>
                         <th className="text-right px-2 pb-2.5 align-bottom font-medium text-[#030712] opacity-40 h-10 w-[109px]">Data término</th>
                         <th className="text-center px-2 pb-2.5 align-bottom font-medium text-[#030712] opacity-40 h-10 w-[120px]">Renovação</th>
