@@ -9,6 +9,8 @@ interface Props {
   onClose: () => void
   onSave: (data: Omit<Componente, 'id' | 'createdAt'>) => Promise<void>
   onDelete?: () => void
+  /** Se true, botão de remoção mostra "Inativar" em vez de "Excluir" */
+  isLinked?: boolean | null
   initialComponente?: Componente
 }
 
