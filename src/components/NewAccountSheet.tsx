@@ -229,6 +229,7 @@ export function NewAccountSheet({ open, onClose, orgId, onSave }: Props) {
       subdomain: form.subdomain,
       arquitetoPAS: form.arquitetoPAS,
       logo: logo || undefined,
+      admins,
       provisioningStatus: 'PENDING',
       status: 'Criado',
       createdAt: new Date().toLocaleDateString('pt-BR'),
