@@ -71,6 +71,7 @@ export function ComponentesPage() {
   function handleCloseSheet() {
     setSheetOpen(false)
     setEditingComponente(null)
+    setEditingIsLinked(null)
   }
 
   // Clique no botão "Excluir componente" do sheet:
