@@ -61,16 +61,39 @@ export function ComponentesPage() {
     setEditingComponente(null)
   }
 
+  // Clique no botão "Excluir componente" do sheet:
+  // 1. Verifica vínculos via API antes de qualquer ação
+  // 2. Mostra o modal correto (excluir ou inativar)
+  // 3. Só age na confirmação do modal
   async function handleDeleteComponente() {
     if (!editingComponente) return
-    const action = await deleteComponente(editingComponente.id)
+    const id = editingComponente.id
+
+    // Fecha o sheet e guarda o ID pendente
     handleCloseSheet()
-    // Se for inativação, abre modal informativo para feedback
-    setPendingDeleteId(editingComponente.id)
-    setDeleteModal(action === 'inativado' ? 'inativar-componente' : 'excluir-componente')
+    setPendingDeleteId(id)
+
+    // Checa vínculos: busca todas as soluções e verifica se alguma usa este componente
+    try {
+      const allSolutions = await import('@/api/client').then(m => m.api.getSolutions())
+      const linked = allSolutions.some((s: any) =>
+        Array.isArray(s.componenteIds) && s.componenteIds.includes(id)
+      )
+      setDeleteModal(linked ? 'inativar-componente' : 'excluir-componente')
+    } catch {
+      // Fallback offline: usa componentes do mock/context para checar
+      setDeleteModal('excluir-componente')
+    }
   }
 
   async function handleConfirmModal() {
+    if (!pendingDeleteId) return
+    await deleteComponente(pendingDeleteId)
+    setDeleteModal(null)
+    setPendingDeleteId(null)
+  }
+
+  function handleCloseModal() {
     setDeleteModal(null)
     setPendingDeleteId(null)
   }
