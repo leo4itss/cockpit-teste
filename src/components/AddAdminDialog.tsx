@@ -2,20 +2,16 @@ import { useState, useEffect } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import { Modal } from './ui/Modal'
 import { Button } from './ui/Button'
+import type { AdminUser } from '@/types'
+
+// Re-exporta para compatibilidade com imports existentes
+export type { AdminUser }
 
 interface Props {
   open: boolean
   onClose: () => void
   onAdd: (admin: AdminUser) => void
   initialAdmin?: AdminUser
-}
-
-export interface AdminUser {
-  nome: string
-  sobrenome: string
-  email: string
-  usuario: string
-  senha: string
 }
 
 /* ── sub-components ────────────────────────────────────── */
