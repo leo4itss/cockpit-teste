@@ -726,7 +726,7 @@ export function EditSolutionSheet({
                     required
                     placeholder="https://"
                     value={form.link01}
-                    onChange={e => set('link01', e.target.value)}
+                    onChange={e => { set('link01', e.target.value); setMarketplaceError(false) }}
                     disabled={isInactive}
                   />
                   <Input
@@ -734,10 +734,16 @@ export function EditSolutionSheet({
                     required
                     placeholder="ex: Adquirir"
                     value={form.titleLink01}
-                    onChange={e => set('titleLink01', e.target.value)}
+                    onChange={e => { set('titleLink01', e.target.value); setMarketplaceError(false) }}
                     disabled={isInactive}
                   />
                 </div>
+
+                {marketplaceError && (
+                  <p className="text-xs text-red-500 -mt-4">
+                    Preencha ao menos um par de link + título para salvar com marketplace ativo.
+                  </p>
+                )}
 
                 <div className="grid grid-cols-2 gap-4">
                   <Input
@@ -745,7 +751,7 @@ export function EditSolutionSheet({
                     required
                     placeholder="https://"
                     value={form.link02}
-                    onChange={e => set('link02', e.target.value)}
+                    onChange={e => { set('link02', e.target.value); setMarketplaceError(false) }}
                     disabled={isInactive}
                   />
                   <Input
@@ -753,7 +759,7 @@ export function EditSolutionSheet({
                     required
                     placeholder="ex: Saiba mais"
                     value={form.titleLink02}
-                    onChange={e => set('titleLink02', e.target.value)}
+                    onChange={e => { set('titleLink02', e.target.value); setMarketplaceError(false) }}
                     disabled={isInactive}
                   />
                 </div>
