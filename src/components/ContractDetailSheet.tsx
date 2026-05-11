@@ -71,7 +71,7 @@ export function ContractDetailSheet({ open, onClose, contract, onEdit }: Props) 
         {/* ── Identificação ─────────────────────────────── */}
         <div className="flex flex-col gap-1.5">
           <p className="text-base font-semibold text-[#030712]">Contrato: {shortId}</p>
-          <CriadoBadge />
+          <StatusBadge status={contract.status} />
         </div>
 
         <Divider />
