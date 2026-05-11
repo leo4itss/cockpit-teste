@@ -30,8 +30,14 @@ function ReadonlyField({ label, value, half }: { label: string; value?: string |
   )
 }
 
-function CriadoBadge() {
-  return <Badge variant="success" showIcon>Criado</Badge>
+function StatusBadge({ status }: { status: string }) {
+  const variant = status === 'Ativo' || status === 'Criado' ? 'success' : status === 'Pendente' ? 'warning' : 'default'
+  const label = status === 'Criado' ? 'Ativo' : status
+  return (
+    <div className="flex">
+      <Badge variant={variant} showIcon={variant === 'success'}>{label}</Badge>
+    </div>
+  )
 }
 
 function ObjetoField({ label, value }: { label: string; value?: string | number }) {
