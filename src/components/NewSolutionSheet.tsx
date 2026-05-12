@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useUsers } from '@/context/UsersContext'
 import { Sheet } from './ui/Sheet'
 import { Input } from './ui/Input'
@@ -9,6 +9,7 @@ import { PlanCard } from './PlanCard'
 import { NewPlanDialog } from './NewPlanDialog'
 import { ComponenteSelector } from './ComponenteSelector'
 import { ComponenteSelecaoSheet } from './ComponenteSelecaoSheet'
+import { useToast, ToastContainer } from './ui/Toast'
 import { useComponentes } from '@/context/ComponentesContext'
 import type { Solution, Plan, TipoLicenca } from '@/types'
 
