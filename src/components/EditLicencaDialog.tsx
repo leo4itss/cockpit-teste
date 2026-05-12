@@ -38,6 +38,7 @@ export function EditLicencaDialog({ open, onClose, objeto, onSave }: Props) {
   }
 
   function handleSave() {
+    if (!objeto) return
     // Detecta o que mudou para gerar descrição no histórico
     const original = objeto.valoresLicenca ?? []
     const alteracoes = valores
@@ -50,15 +51,19 @@ export function EditLicencaDialog({ open, onClose, objeto, onSave }: Props) {
       .filter(Boolean)
 
     const updatedObjeto: ObjetoContrato = {
-      ...objeto,
-      valoresLicenca: valores,
+      solucao: objeto.solucao ?? '',
+      orgContratada: objeto.orgContratada ?? '',
+      plano: objeto.plano ?? '',
       licenciamento: buildLicenciamentoLabel(valores),
+      planoVersao: objeto.planoVersao,
+      qtdContratada: objeto.qtdContratada,
+      valoresLicenca: valores,
     }
 
     const entrada: ContractHistoricoEntry = {
       timestamp: new Date().toISOString(),
-      solucao: objeto.solucao,
-      plano: objeto.plano,
+      solucao: objeto.solucao ?? '',
+      plano: objeto.plano ?? '',
       descricao: alteracoes.length > 0
         ? alteracoes.join('; ')
         : 'Nenhuma alteração detectada',
