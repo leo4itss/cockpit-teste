@@ -290,16 +290,22 @@ export function NewAccountSheet({ open, onClose, orgId, onSave }: Props) {
               description="Insira o logo da conta. Isso ajudará a identificar a conta de forma mais fácil e visual no sistema."
               preview={logo}
               onFileSelect={setLogo}
+              onSuccess={() => toast('Imagem adicionada com sucesso.', 'success')}
+              onError={() => toast('Não foi possível enviar a imagem. Use JPG ou PNG com até 10 MB.', 'error')}
             />
             <ImageUploadRow
               description="Insira o favicon da conta. Isso será exibido na aba do navegador. Formato: 64×64 pixels."
               preview={favicon}
               onFileSelect={setFavicon}
+              onSuccess={() => toast('Imagem adicionada com sucesso.', 'success')}
+              onError={() => toast('Não foi possível enviar a imagem. Use JPG ou PNG com até 10 MB.', 'error')}
             />
             <ImageUploadRow
               description="Insira o banner da conta. Isso será exibido na tela de login. Formato: 180×180 pixels."
               preview={banner}
               onFileSelect={setBanner}
+              onSuccess={() => toast('Imagem adicionada com sucesso.', 'success')}
+              onError={() => toast('Não foi possível enviar a imagem. Use JPG ou PNG com até 10 MB.', 'error')}
             />
             <div className="border-t border-gray-200" />
           </div>
