@@ -313,8 +313,10 @@ export function OrganizacaoDetailPage() {
     try {
       const updated = await api.updateAccount(account.id, { ...account, status: 'Inativo' })
       setAccounts(prev => prev.map(a => a.id === updated.id ? updated : a))
+      toast('Conta inativada com sucesso.', 'success')
     } catch {
       setAccounts(prev => prev.map(a => a.id === account.id ? { ...account, status: 'Inativo' } : a))
+      toast('Não foi possível inativar a conta. Tente novamente.', 'error')
     }
     // Cascata: inativa contratos vinculados
     const linkedContracts = contracts.filter(c => c.contratante === account.name && c.status !== 'Inativo')
