@@ -72,8 +72,22 @@ export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca
   }
 
   function handleSave() {
+    if (licensings.length === 0) {
+      toast('Complete as informações de licenciamento antes de adicionar o plano.', 'warning')
+      return
+    }
+    const hasEmptyTipo = licensings.some(l => l.tipoLicencaId === '')
+    if (hasEmptyTipo) {
+      toast('Selecione o tipo de licença.', 'warning')
+      return
+    }
     if (!canSave) return
     onSave({ name: name.trim(), description: description.trim(), upgradeUrl: upgradeUrl.trim(), licensings })
+    if (initialPlan) {
+      toast('Plano atualizado com sucesso.', 'success')
+    } else {
+      toast('Plano adicionado com sucesso.', 'success')
+    }
     handleClose()
   }
 
