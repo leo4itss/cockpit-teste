@@ -94,7 +94,7 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
   }
 
   function handleSave() {
-    onSave({ ...contract, objetos, historico })
+    onSave({ ...contract, objetos, historico, dataTermino, renovacao })
     onClose()
   }
 
