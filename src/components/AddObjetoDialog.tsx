@@ -72,6 +72,11 @@ function buildRows(solutions: Solution[], orgName: string): Row[] {
         planoVersao: plan.versao ?? 1,
         licenciamento,
         status: sol.status,
+        valoresLicenca: plan.licensings.map(l => ({
+          tipoLicencaNome: l.tipoLicencaNome || l.tipoLicencaId,
+          tipoLicencaUnidade: l.tipoLicencaUnidade,
+          valor: l.valorMinimo?.trim() || l.valor?.trim() || '',
+        })),
       })
     })
   })
