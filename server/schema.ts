@@ -110,6 +110,7 @@ export const contracts = pgTable('contracts', {
   orgId: text('org_id').notNull().references(() => organizations.id),
   contratante: text('contratante').notNull(),
   objetos: jsonb('objetos').notNull().default([]),  // ObjetoContrato[]
+  historico: jsonb('historico').notNull().default([]),  // ContractHistoricoEntry[]
   dataInicio: text('data_inicio').notNull(),
   dataTermino: text('data_termino').notNull(),
   renovacao: text('renovacao').notNull(),
