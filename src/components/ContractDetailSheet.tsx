@@ -129,7 +129,26 @@ export function ContractDetailSheet({ open, onClose, contract, onEdit }: Props) 
                       )}
                     </div>
                   </div>
-                  <ObjetoField label="Licença" value={obj.licenciamento} />
+
+                  {/* Valores de licença contratados */}
+                  {obj.valoresLicenca && obj.valoresLicenca.length > 0 ? (
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm font-semibold text-[#030712]">Licenciamento</p>
+                      <div className="flex flex-col gap-1">
+                        {obj.valoresLicenca.map((v, vi) => (
+                          <div key={vi} className="flex items-center justify-between">
+                            <p className="text-sm text-[#6b7280]">{v.tipoLicencaNome}</p>
+                            <p className="text-sm font-medium text-[#030712]">
+                              {v.valor || '—'}{v.tipoLicencaUnidade ? ` ${v.tipoLicencaUnidade}` : ''}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <ObjetoField label="Licença" value={obj.licenciamento} />
+                  )}
+
                   <ObjetoField label="Organização contratada" value={obj.orgContratada} />
                   <div className="flex flex-col gap-0.5">
                     <p className="text-sm font-semibold text-[#030712]">Status da publicação</p>
@@ -141,6 +160,47 @@ export function ContractDetailSheet({ open, onClose, contract, onEdit }: Props) 
           )}
         </div>
 
+        <Divider />
+
+        {/* ── Histórico de atualizações ─────────────────── */}
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-2">
+            <History className="w-4 h-4 text-[#6b7280]" />
+            <SectionTitle>Histórico de atualizações</SectionTitle>
+          </div>
+
+          {!contract.historico || contract.historico.length === 0 ? (
+            <p className="text-sm text-[#9ca3af]">Nenhum ajuste registrado ainda.</p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {contract.historico.map((entry, i) => {
+                const dt = new Date(entry.timestamp)
+                const dataFormatada = dt.toLocaleDateString('pt-BR', {
+                  day: '2-digit', month: '2-digit', year: 'numeric',
+                })
+                const horaFormatada = dt.toLocaleTimeString('pt-BR', {
+                  hour: '2-digit', minute: '2-digit',
+                })
+                return (
+                  <div
+                    key={i}
+                    className="border border-[#e5e7eb] rounded-xl p-3 flex flex-col gap-1.5"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-xs font-semibold text-[#030712]">
+                        {entry.solucao} · {entry.plano}
+                      </p>
+                      <p className="text-xs text-[#9ca3af] shrink-0">
+                        {dataFormatada} {horaFormatada}
+                      </p>
+                    </div>
+                    <p className="text-xs text-[#6b7280] leading-4">{entry.descricao}</p>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
 
       </div>
     </Sheet>
