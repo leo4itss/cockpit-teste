@@ -223,6 +223,7 @@ export function NewAccountSheet({ open, onClose, orgId, onSave }: Props) {
       setContatos(prev => prev.map((c, i) => i === editingContatoIdx ? contato : c))
     } else {
       setContatos(prev => [...prev, contato])
+      toast('Contato adicionado com sucesso.', 'success')
     }
     setEditingContatoIdx(null)
   }
@@ -232,6 +233,7 @@ export function NewAccountSheet({ open, onClose, orgId, onSave }: Props) {
       setAdmins(prev => prev.map((a, i) => i === editingAdminIdx ? admin : a))
     } else {
       setAdmins(prev => [...prev, admin])
+      toast('Usuário administrador definido com sucesso.', 'success')
     }
     setEditingAdminIdx(null)
   }
