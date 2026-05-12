@@ -108,6 +108,7 @@ export interface Licensing {
 export interface Plan {
   name: string
   description: string
+  upgradeUrl?: string                   // URL para "Fazer upgrade"
   licensings: Licensing[]
   versao?: number                       // número incremental: 1, 2, 3…
   statusVersao?: 'ativo' | 'inativo'   // undefined ou 'ativo' = vigente
