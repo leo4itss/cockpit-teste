@@ -131,23 +131,43 @@ export function ContractDetailSheet({ open, onClose, contract, onEdit }: Props) 
                   </div>
 
                   {/* Valores de licença contratados */}
-                  {obj.valoresLicenca && obj.valoresLicenca.length > 0 ? (
-                    <div className="flex flex-col gap-1">
-                      <p className="text-sm font-semibold text-[#030712]">Licenciamento</p>
+                  {(() => {
+                    // Linhas a exibir: preferência para valoresLicenca; fallback: parse da string licenciamento
+                    const linhas: { nome: string; valor: string }[] =
+                      obj.valoresLicenca && obj.valoresLicenca.length > 0
+                        ? obj.valoresLicenca.map(v => ({
+                            nome: v.tipoLicencaNome,
+                            valor: v.valor
+                              ? `${v.valor}${v.tipoLicencaUnidade ? ` ${v.tipoLicencaUnidade}` : ''}`
+                              : '—',
+                          }))
+                        : (obj.licenciamento && obj.licenciamento !== '—'
+                            ? obj.licenciamento.split(' · ').map(item => {
+                                const sep = item.indexOf(': ')
+                                return sep !== -1
+                                  ? { nome: item.slice(0, sep), valor: item.slice(sep + 2) }
+                                  : { nome: item, valor: '—' }
+                              })
+                            : [])
+
+                    return (
                       <div className="flex flex-col gap-1">
-                        {obj.valoresLicenca.map((v, vi) => (
-                          <div key={vi} className="flex items-center justify-between">
-                            <p className="text-sm text-[#6b7280]">{v.tipoLicencaNome}</p>
-                            <p className="text-sm font-medium text-[#030712]">
-                              {v.valor || '—'}{v.tipoLicencaUnidade ? ` ${v.tipoLicencaUnidade}` : ''}
-                            </p>
+                        <p className="text-sm font-semibold text-[#030712]">Licenciamento</p>
+                        {linhas.length > 0 ? (
+                          <div className="flex flex-col gap-1">
+                            {linhas.map((l, li) => (
+                              <div key={li} className="flex items-center justify-between">
+                                <p className="text-sm text-[#6b7280]">{l.nome}</p>
+                                <p className="text-sm font-medium text-[#030712]">{l.valor}</p>
+                              </div>
+                            ))}
                           </div>
-                        ))}
+                        ) : (
+                          <p className="text-sm text-[#6b7280]">—</p>
+                        )}
                       </div>
-                    </div>
-                  ) : (
-                    <ObjetoField label="Licença" value={obj.licenciamento} />
-                  )}
+                    )
+                  })()}
 
                   <ObjetoField label="Organização contratada" value={obj.orgContratada} />
                   <div className="flex flex-col gap-0.5">
