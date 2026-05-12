@@ -219,15 +219,16 @@ export function OrganizacaoDetailPage() {
     }
     setEditingAccount(null)
   }
-  async function handleUpdateContacts(contacts: Contact[], showRemoveToast?: boolean) {
+  async function handleUpdateContacts(contacts: Contact[]) {
     const previousContacts = org?.contacts ?? []
+    const isRemoval = contacts.length < previousContacts.length
     try {
       const saved = await api.updateOrganization(id!, { ...org, contacts })
       setOrg(saved)
     } catch {
       setOrg(prev => prev ? { ...prev, contacts } : prev)
     }
-    if (showRemoveToast) {
+    if (isRemoval) {
       toast('Contato removido.', 'success', {
         label: 'Desfazer',
         onClick: () => handleUpdateContacts(previousContacts),
