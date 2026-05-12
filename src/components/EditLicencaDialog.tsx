@@ -79,7 +79,7 @@ export function EditLicencaDialog({ open, onClose, objeto, onSave }: Props) {
     <Dialog
       open={open}
       onClose={onClose}
-      title="Ajustar licenciamento"
+      title="Editar licenciamento"
       description={`${objeto.solucao} · Plano ${objeto.plano}`}
       className="max-w-[480px]"
       footer={
