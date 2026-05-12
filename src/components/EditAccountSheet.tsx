@@ -380,9 +380,21 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
 
   return (
     <>
+      {showUnsavedDialog && (
+        <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full mx-4 flex flex-col gap-4">
+            <p className="text-base font-bold text-[#030712]">Editar conta</p>
+            <p className="text-sm text-[#6b7280]">Existem alterações não salvas. Deseja sair mesmo assim?</p>
+            <div className="flex gap-3 justify-end">
+              <Button variant="outline" onClick={() => setShowUnsavedDialog(false)}>Continuar editando</Button>
+              <Button onClick={() => { setShowUnsavedDialog(false); onClose() }}>Sair sem salvar</Button>
+            </div>
+          </div>
+        </div>
+      )}
       <Sheet
         open={open}
-        onClose={onClose}
+        onClose={handleRequestClose}
         title="Editar Conta"
         width="w-[640px]"
         footer={
@@ -406,7 +418,7 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
                 </Button>
               )
             )}
-            <Button variant="outline" onClick={onClose}>Cancelar</Button>
+            <Button variant="outline" onClick={handleRequestClose}>Cancelar</Button>
             {!isInactive && <Button onClick={handleSave}>Salvar</Button>}
           </>
         }
