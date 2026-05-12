@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Dialog } from './ui/Dialog'
 import { Button } from './ui/Button'
 import { Badge } from './ui/Badge'
-import type { Solution, ObjetoContrato } from '@/types'
+import type { Solution, ObjetoContrato, ValorLicencaContrato } from '@/types'
 
 // Alias mantido para compatibilidade com importadores existentes
 export type { ObjetoContrato as ObjetoSelecionado }
