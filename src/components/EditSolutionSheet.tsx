@@ -315,8 +315,10 @@ export function EditSolutionSheet({
   function handlePlanSave(plan: Plan) {
     if (editingPlanIndex !== null) {
       setPlans(prev => prev.map((p, i) => i === editingPlanIndex ? plan : p))
+      toast('Plano atualizado com sucesso.', 'success')
     } else {
       setPlans(prev => [...prev, plan])
+      toast('Plano adicionado com sucesso.', 'success')
     }
     setPlanDialogOpen(false)
     setEditingPlanIndex(null)
