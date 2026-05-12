@@ -1,8 +1,6 @@
 import { useState } from 'react'
 import { Plus, CircleAlert, Trash2, Pencil } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
-import { Input } from './ui/Input'
-import { Select } from './ui/Select'
 import { Button } from './ui/Button'
 import { AddObjetoDialog } from './AddObjetoDialog'
 import { EditLicencaDialog } from './EditLicencaDialog'
