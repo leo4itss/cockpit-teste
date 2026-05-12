@@ -59,6 +59,8 @@ function StatusBadge({ status }: { status: Account['status'] }) {
 /* ── main component ─────────────────────────────────────── */
 
 export function AccountDetailSheet({ open, onClose, account, org, onEdit }: Props) {
+  const { toasts, toast, dismiss } = useToast()
+
   if (!account || !org) return null
 
   const hasSubdomain = !!account.subdomain?.trim()
@@ -73,6 +75,7 @@ export function AccountDetailSheet({ open, onClose, account, org, onEdit }: Prop
   const enderecoFormatado = enderecoPartes.join(' | ')
 
   return (
+    <>
     <Sheet
       open={open}
       onClose={onClose}
