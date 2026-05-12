@@ -422,6 +422,7 @@ export function OrganizacaoDetailPage() {
     try {
       const updated = await api.updateSolution(solution.id, { ...solution, status: 'Inativo' })
       setSolutions(prev => prev.map(s => s.id === updated.id ? updated : s))
+      toast('Solução inativada com sucesso.', 'success')
       // Inativa contratos vinculados
       const linkedContracts = contracts.filter(c =>
         c.objetos.some(o => o.solucao === solution.name) && c.status !== 'Inativo'
@@ -434,6 +435,7 @@ export function OrganizacaoDetailPage() {
       ))
     } catch {
       setSolutions(prev => prev.map(s => s.id === solution.id ? { ...solution, status: 'Inativo' } : s))
+      toast('Não foi possível inativar a solução. Tente novamente.', 'error')
     }
     setSolutionInativarModal(false)
     setSolutionInativarTarget(null)
