@@ -155,6 +155,7 @@ function ImageUploadRow({
 
 export function NewAccountSheet({ open, onClose, orgId, onSave }: Props) {
   const { arquitetoOptions } = useUsers()
+  const { toasts, toast, dismiss } = useToast()
   const [logo, setLogo] = useState('')
   const [favicon, setFavicon] = useState('')
   const [banner, setBanner] = useState('')
