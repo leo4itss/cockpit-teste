@@ -307,10 +307,41 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
       updated = contatos.map((c, i) => i === editingContatoIdx ? contato : c)
     } else {
       updated = [...contatos, contato]
+      toast('Contato adicionado com sucesso.', 'success')
     }
     setContatos(updated)
     onUpdateContacts?.(updated.map(contactFromContato))
     setEditingContatoIdx(null)
+  }
+
+  function handleContatoRemove(idx: number) {
+    const removed = contatos[idx]
+    const updated = contatos.filter((_, i) => i !== idx)
+    setContatos(updated)
+    onUpdateContacts?.(updated.map(contactFromContato))
+    toast('Contato removido.', 'success', {
+      label: 'Desfazer',
+      onClick: () => {
+        const restored = [...updated.slice(0, idx), removed, ...updated.slice(idx)]
+        setContatos(restored)
+        onUpdateContacts?.(restored.map(contactFromContato))
+      },
+    })
+  }
+
+  function handleAdminRemove(idx: number) {
+    if (admins.length === 1) {
+      toast('A conta precisa ter um usuário administrador.', 'warning')
+      return
+    }
+    const removed = admins[idx]
+    setAdmins(prev => prev.filter((_, i) => i !== idx))
+    toast('Usuário administrador removido da organização.', 'success', {
+      label: 'Desfazer',
+      onClick: () => {
+        setAdmins(prev => [...prev.slice(0, idx), removed, ...prev.slice(idx)])
+      },
+    })
   }
 
   function handleAdminAdd(admin: AdminUser) {
@@ -318,6 +349,7 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
       setAdmins(prev => prev.map((a, i) => i === editingAdminIdx ? admin : a))
     } else {
       setAdmins(prev => [...prev, admin])
+      toast('Usuário administrador definido com sucesso.', 'success')
     }
     setEditingAdminIdx(null)
   }
