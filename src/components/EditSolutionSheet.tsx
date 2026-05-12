@@ -745,7 +745,12 @@ export function EditSolutionSheet({
             {/* Toggle */}
             <button
               type="button"
-              onClick={isInactive ? undefined : () => set('marketplace', !form.marketplace)}
+              onClick={isInactive ? undefined : () => {
+                const next = !form.marketplace
+                set('marketplace', next)
+                if (next) toast('A solução será exibida no marketplace.', 'success')
+                else toast('A solução não será exibida no marketplace.', 'success')
+              }}
               disabled={isInactive}
               className="flex items-start gap-3 w-fit disabled:opacity-60 disabled:cursor-not-allowed"
             >
