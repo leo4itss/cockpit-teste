@@ -104,6 +104,7 @@ function EllipsisMenu({
 /* ── Main ─────────────────────────────────────────────────── */
 export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props) {
   const { arquitetoOptions } = useUsers()
+  const { toasts, toast, dismiss } = useToast()
   const [form, setForm] = useState({
     name: '', razaoSocial: '', docType: 'CNPJ', docNumber: '',
     businessSegment: '', officialSite: 'http://',
