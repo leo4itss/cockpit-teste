@@ -189,6 +189,9 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
         : [...prev, c]
     )
     setEditingContactIdx(null)
+    if (editingContactIdx === null) {
+      toast('Contato adicionado com sucesso.', 'success')
+    }
   }
 
   function openAddAdmin() { setEditingAdminIdx(null); setAdminDialogOpen(true) }
