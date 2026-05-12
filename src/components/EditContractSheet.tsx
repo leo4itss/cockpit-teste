@@ -25,18 +25,15 @@ function Divider() {
   return <div className="border-t border-[#e5e7eb] w-full" />
 }
 
-const RENOVACAO_OPTIONS = [
-  { value: 'Automática', label: 'Automática' },
-  { value: 'Manual', label: 'Manual' },
-  { value: 'Anual', label: 'Anual' },
-]
-
-function buildForm(c: Contract) {
-  return {
-    dataInicio: c.dataInicio,
-    dataTermino: c.dataTermino,
-    renovacao: c.renovacao,
-  }
+function ReadonlyField({ label, value, half }: { label: string; value?: string; half?: boolean }) {
+  return (
+    <div className={`flex flex-col gap-2 ${half ? 'flex-1 min-w-0' : ''}`}>
+      <label className="text-sm font-medium text-[#030712]">{label}</label>
+      <div className="h-9 px-3 flex items-center bg-[#f3f4f6] rounded-md text-sm text-[#6b7280] truncate">
+        {value ?? '—'}
+      </div>
+    </div>
+  )
 }
 
 export function EditContractSheet({ open, onClose, contract, solutions, onSave, onInativar, onActivate }: Props) {
