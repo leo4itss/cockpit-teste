@@ -215,9 +215,11 @@ export function OrganizacaoDetailPage() {
       const saved = await api.updateAccount(updated.id, updated)
       setAccounts(prev => prev.map(a => a.id === saved.id ? saved : a))
       setSelectedAccount(saved)
+      toast('Conta atualizada com sucesso.', 'success')
     } catch {
       setAccounts(prev => prev.map(a => a.id === updated.id ? updated : a))
       setSelectedAccount(updated)
+      toast('Não foi possível salvar as alterações. Tente novamente.', 'error')
     }
     setEditingAccount(null)
   }
