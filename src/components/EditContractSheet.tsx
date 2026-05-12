@@ -120,12 +120,9 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
           <div className="flex flex-col gap-7">
             <SectionTitle>Dados do contrato</SectionTitle>
 
-            <Select
+            <ReadonlyField
               label="Conta contratante (onde as soluções desse contrato vão aparecer)"
-              options={[{ value: contract.contratante, label: contract.contratante }]}
               value={contract.contratante}
-              onChange={() => {}}
-              disabled={isInactive}
             />
 
             {/* Card soluções / planos / licenciamentos */}
