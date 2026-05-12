@@ -71,13 +71,14 @@ export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca
 
   function handleSave() {
     if (!canSave) return
-    onSave({ name: name.trim(), description: description.trim(), licensings })
+    onSave({ name: name.trim(), description: description.trim(), upgradeUrl: upgradeUrl.trim(), licensings })
     handleClose()
   }
 
   function handleClose() {
     setName('')
     setDescription('')
+    setUpgradeUrl('')
     setLicensings([])
     onClose()
   }
