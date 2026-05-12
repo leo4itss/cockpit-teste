@@ -107,18 +107,32 @@ function ImageUploadRow({
   preview,
   onFileSelect,
   disabled,
+  onError,
+  onSuccess,
 }: {
   description: string
   preview: string
   onFileSelect: (dataUrl: string) => void
   disabled?: boolean
+  onError?: () => void
+  onSuccess?: () => void
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
+    const validTypes = ['image/jpeg', 'image/png']
+    const maxSize = 10 * 1024 * 1024 // 10 MB
+    if (!validTypes.includes(file.type) || file.size > maxSize) {
+      onError?.()
+      e.target.value = ''
+      return
+    }
     const reader = new FileReader()
-    reader.onload = ev => onFileSelect(ev.target?.result as string)
+    reader.onload = ev => {
+      onFileSelect(ev.target?.result as string)
+      onSuccess?.()
+    }
     reader.readAsDataURL(file)
   }
   return (
@@ -131,7 +145,7 @@ function ImageUploadRow({
       </div>
       <div className="flex flex-col gap-2 flex-1 min-w-0">
         <p className="text-sm text-[#6b7280] leading-5">{description}</p>
-        <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleChange} disabled={disabled} />
+        <input ref={inputRef} type="file" accept="image/jpeg,image/png" className="hidden" onChange={handleChange} disabled={disabled} />
         {!disabled && (
           <button
             type="button"
