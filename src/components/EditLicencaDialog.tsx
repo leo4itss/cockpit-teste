@@ -1,0 +1,126 @@
+import { useState, useEffect } from 'react'
+import { Dialog } from './ui/Dialog'
+import { Button } from './ui/Button'
+import type { ObjetoContrato, ValorLicencaContrato, ContractHistoricoEntry } from '@/types'
+
+interface Props {
+  open: boolean
+  onClose: () => void
+  objeto: ObjetoContrato | null
+  onSave: (updated: ObjetoContrato, historico: ContractHistoricoEntry) => void
+}
+
+/** Reconstrói a string de licenciamento a partir dos valores editados */
+function buildLicenciamentoLabel(valores: ValorLicencaContrato[]): string {
+  return valores
+    .map(v => {
+      const unidade = v.tipoLicencaUnidade ?? ''
+      return v.valor ? `${v.tipoLicencaNome}: ${v.valor} ${unidade}`.trim() : v.tipoLicencaNome
+    })
+    .join(' · ') || '—'
+}
+
+export function EditLicencaDialog({ open, onClose, objeto, onSave }: Props) {
+  const [valores, setValores] = useState<ValorLicencaContrato[]>([])
+
+  useEffect(() => {
+    if (open && objeto) {
+      setValores(
+        (objeto.valoresLicenca ?? []).map(v => ({ ...v }))
+      )
+    }
+  }, [open, objeto])
+
+  if (!objeto) return null
+
+  function handleValorChange(index: number, novoValor: string) {
+    setValores(prev => prev.map((v, i) => i === index ? { ...v, valor: novoValor } : v))
+  }
+
+  function handleSave() {
+    // Detecta o que mudou para gerar descrição no histórico
+    const original = objeto.valoresLicenca ?? []
+    const alteracoes = valores
+      .map((v, i) => {
+        const ant = original[i]?.valor ?? ''
+        if (ant === v.valor) return null
+        const unidade = v.tipoLicencaUnidade ?? ''
+        return `${v.tipoLicencaNome}: ${ant || '—'} → ${v.valor || '—'} ${unidade}`.trim()
+      })
+      .filter(Boolean)
+
+    const updatedObjeto: ObjetoContrato = {
+      ...objeto,
+      valoresLicenca: valores,
+      licenciamento: buildLicenciamentoLabel(valores),
+    }
+
+    const entrada: ContractHistoricoEntry = {
+      timestamp: new Date().toISOString(),
+      solucao: objeto.solucao,
+      plano: objeto.plano,
+      descricao: alteracoes.length > 0
+        ? alteracoes.join('; ')
+        : 'Nenhuma alteração detectada',
+    }
+
+    onSave(updatedObjeto, entrada)
+    onClose()
+  }
+
+  const temValores = valores.length > 0
+
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      title="Ajustar licenciamento"
+      description={`${objeto.solucao} · Plano ${objeto.plano}`}
+      className="max-w-[480px]"
+      footer={
+        <>
+          <Button variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button onClick={handleSave}>Salvar ajuste</Button>
+        </>
+      }
+    >
+      <div className="flex flex-col gap-6">
+
+        {/* Aviso contextual */}
+        <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
+          <p className="text-xs font-medium text-amber-700 leading-5">
+            Os valores ajustados aqui são específicos deste contrato e não alteram o plano original da solução.
+            Um registro será salvo no histórico de atualizações.
+          </p>
+        </div>
+
+        {/* Campos de valor por tipo de licença */}
+        {!temValores ? (
+          <p className="text-sm text-[#9ca3af] text-center py-4">
+            Nenhum tipo de licença configurado neste plano.
+          </p>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {valores.map((v, i) => (
+              <div key={i} className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-[#030712]">
+                  {v.tipoLicencaNome}
+                  {v.tipoLicencaUnidade && (
+                    <span className="text-xs text-[#6b7280] font-normal ml-1">({v.tipoLicencaUnidade})</span>
+                  )}
+                </label>
+                <input
+                  type="text"
+                  value={v.valor}
+                  onChange={e => handleValorChange(i, e.target.value)}
+                  placeholder="ex: 15"
+                  className="h-9 w-full rounded-md border border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#030712] placeholder:text-[#9ca3af] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors"
+                />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </Dialog>
+  )
+}
