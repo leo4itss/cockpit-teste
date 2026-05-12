@@ -2,6 +2,7 @@ import { Copy, MessageCircle, Mail, ExternalLink } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Button } from './ui/Button'
 import { Badge } from './ui/Badge'
+import { useToast, ToastContainer } from './ui/Toast'
 import type { Account, Organization } from '@/types'
 
 interface Props {
