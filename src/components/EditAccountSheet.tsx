@@ -432,18 +432,24 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
               preview={logo}
               onFileSelect={setLogo}
               disabled={isInactive}
+              onSuccess={() => toast('Imagem adicionada com sucesso.', 'success')}
+              onError={() => toast('Não foi possível enviar a imagem. Use JPG ou PNG com até 10 MB.', 'error')}
             />
             <ImageUploadRow
               description="Insira o favicon da conta. Isso será exibido na aba do navegador. Formato: 64×64 pixels."
               preview={favicon}
               onFileSelect={setFavicon}
               disabled={isInactive}
+              onSuccess={() => toast('Imagem adicionada com sucesso.', 'success')}
+              onError={() => toast('Não foi possível enviar a imagem. Use JPG ou PNG com até 10 MB.', 'error')}
             />
             <ImageUploadRow
               description="Insira o banner da conta. Isso será exibido na tela de login. Formato: 180×180 pixels."
               preview={banner}
               onFileSelect={setBanner}
               disabled={isInactive}
+              onSuccess={() => toast('Imagem adicionada com sucesso.', 'success')}
+              onError={() => toast('Não foi possível enviar a imagem. Use JPG ou PNG com até 10 MB.', 'error')}
             />
             <div className="border-t border-gray-200" />
           </div>
