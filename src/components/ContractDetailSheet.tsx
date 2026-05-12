@@ -2,6 +2,7 @@ import { Sheet } from './ui/Sheet'
 import { Button } from './ui/Button'
 import { Badge } from './ui/Badge'
 import { ProvisioningDots } from './ProvisioningDots'
+import { History } from 'lucide-react'
 import type { Contract } from '@/types'
 
 interface Props {
