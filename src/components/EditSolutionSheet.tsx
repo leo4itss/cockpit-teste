@@ -280,8 +280,13 @@ export function EditSolutionSheet({
   function handleRemoveComponente(id: string) {
     const warning = calcOrphanWarning(id)
     setOrphanWarning(warning)
+    const previousIds = selectedComponenteIds
     setSelectedComponenteIds(prev => prev.filter(cid => cid !== id))
     setComponenteError(false)
+    toast('Componente removido da solução.', 'success', {
+      label: 'Desfazer',
+      onClick: () => setSelectedComponenteIds(previousIds),
+    })
   }
 
   function handleOpenNewPlan() {
