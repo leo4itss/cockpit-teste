@@ -267,8 +267,9 @@ export function OrganizacaoDetailPage() {
   async function handleDeleteOrg() {
     try {
       await api.updateOrganization(org!.id, { ...org, status: 'Inativo' })
+      toast('Organização inativada com sucesso.', 'success')
     } catch {
-      // fallback silencioso
+      toast('Não foi possível inativar a organização. Tente novamente.', 'error')
     }
     setOrgDeleteModal(null)
     navigate('/organizacoes')
@@ -279,8 +280,9 @@ export function OrganizacaoDetailPage() {
     if (!org) return
     try {
       await api.deleteOrganization(org.id)
+      toast('Organização excluída com sucesso.', 'success')
     } catch {
-      // fallback silencioso
+      toast('Não foi possível excluir a organização. Verifique se existem contas, soluções ou contratos vinculados.', 'error')
     }
     setOrgExcluirModal(false)
     navigate('/organizacoes')
