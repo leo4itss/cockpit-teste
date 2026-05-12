@@ -38,7 +38,14 @@ function ReadonlyField({ label, value, half }: { label: string; value?: string; 
   )
 }
 
+const RENOVACAO_OPTIONS = [
+  { value: 'Automática', label: 'Automática' },
+  { value: 'Manual', label: 'Manual' },
+]
+
 export function EditContractSheet({ open, onClose, contract, solutions, onSave, onInativar, onActivate }: Props) {
+  const [dataTermino, setDataTermino] = useState(contract.dataTermino)
+  const [renovacao, setRenovacao] = useState(contract.renovacao)
   const [objetos, setObjetos] = useState<ObjetoContrato[]>(contract.objetos ?? [])
   const [historico, setHistorico] = useState<ContractHistoricoEntry[]>(contract.historico ?? [])
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -50,6 +57,8 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
   const [lastContract, setLastContract] = useState(contract)
   if (contract !== lastContract) {
     setLastContract(contract)
+    setDataTermino(contract.dataTermino)
+    setRenovacao(contract.renovacao)
     setObjetos(contract.objetos ?? [])
     setHistorico(contract.historico ?? [])
   }
