@@ -831,7 +831,7 @@ export function EditSolutionSheet({
         footer={
           <>
             <Button variant="outline" onClick={() => setConfirmVersionModal(false)}>Cancelar</Button>
-            <Button onClick={doSave}>Confirmar</Button>
+            <Button onClick={() => doSave(true)}>Confirmar</Button>
           </>
         }
       >
