@@ -151,28 +151,44 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
               {objetos.length > 0 && (
                 <>
                   <Divider />
-                  <div className="grid grid-cols-[1fr_1fr_1fr_1fr_32px] gap-2">
-                    {['Solução', 'Org. contratada', 'Plano', 'Licenciamento', ''].map(col => (
-                      <p key={col} className="text-xs text-[#6b7280] leading-4">{col}</p>
+                  <div className="grid grid-cols-[1fr_1fr_1fr_1fr_32px_32px] gap-2">
+                    {['Solução', 'Org. contratada', 'Plano', 'Licenciamento', '', ''].map((col, i) => (
+                      <p key={i} className="text-xs text-[#6b7280] leading-4">{col}</p>
                     ))}
                   </div>
                   <Divider />
                   {objetos.map((obj, i) => (
-                    <div key={i} className="grid grid-cols-[1fr_1fr_1fr_1fr_32px] gap-2 items-center">
+                    <div key={i} className="grid grid-cols-[1fr_1fr_1fr_1fr_32px_32px] gap-2 items-center">
                       <p className="text-sm text-[#030712] truncate">{obj.solucao}</p>
                       <p className="text-sm text-[#030712] truncate">{obj.orgContratada}</p>
                       <p className="text-sm text-[#030712] truncate">{obj.plano}</p>
                       <p className="text-sm text-[#030712] truncate">{obj.licenciamento}</p>
-                      {!isInactive && (
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveObjeto(i)}
-                          className="w-8 h-8 flex items-center justify-center text-[#6b7280] hover:text-[#dc2626] transition-colors shrink-0"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                      {!isInactive ? (
+                        <>
+                          {/* Editar valores de licença */}
+                          <button
+                            type="button"
+                            title="Ajustar valores de licença"
+                            onClick={() => setEditLicencaObjeto({ obj, index: i })}
+                            className="w-8 h-8 flex items-center justify-center text-[#6b7280] hover:text-[#2563eb] transition-colors shrink-0"
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                          </button>
+                          {/* Remover objeto */}
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveObjeto(i)}
+                            className="w-8 h-8 flex items-center justify-center text-[#6b7280] hover:text-[#dc2626] transition-colors shrink-0"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-8 h-8 shrink-0" />
+                          <div className="w-8 h-8 shrink-0" />
+                        </>
                       )}
-                      {isInactive && <div className="w-8 h-8 shrink-0" />}
                     </div>
                   ))}
                 </>
