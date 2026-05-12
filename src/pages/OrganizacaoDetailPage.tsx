@@ -202,8 +202,10 @@ export function OrganizacaoDetailPage() {
     try {
       const saved = await api.updateOrganization(id!, { ...org, ...data })
       setOrg(saved)
+      toast('Organização atualizada com sucesso.', 'success')
     } catch {
       setOrg(prev => prev ? { ...prev, ...data } : prev)
+      toast('Não foi possível salvar as alterações. Tente novamente.', 'error')
     }
   }
   async function handleSaveAccount(updated: Account) {
