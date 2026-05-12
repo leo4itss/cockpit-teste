@@ -262,6 +262,35 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
     setForm(f => ({ ...f, [field]: value }))
   }
 
+  function hasUnsavedChanges() {
+    const initialForm = {
+      name:            account.name,
+      razaoSocial:     account.razaoSocial    ?? org.razaoSocial    ?? '',
+      tipoDocumento:   account.tipoDocumento  ?? org.docType        ?? 'CNPJ',
+      numeroDocumento: account.numeroDocumento ?? org.docNumber     ?? '',
+      segmentoNegocio: account.segmentoNegocio ?? org.businessSegment ?? '',
+      siteOficial:     account.siteOficial    ?? org.officialSite   ?? '',
+      pais:            account.pais           ?? org.country        ?? 'brasil',
+      cep:             account.cep            ?? org.zipCode        ?? '',
+      endereco:        account.endereco       ?? org.address        ?? '',
+      complemento:     account.complemento    ?? org.complement     ?? '',
+      estado:          account.estado         ?? org.state          ?? '',
+      cidade:          account.cidade         ?? org.city           ?? '',
+      arquitetoPAS:    account.arquitetoPAS,
+      subdomain:       account.subdomain      ?? '',
+      descricao:       account.descricao      ?? '',
+    }
+    return JSON.stringify(form) !== JSON.stringify(initialForm) || logo !== (account.logo ?? '')
+  }
+
+  function handleRequestClose() {
+    if (!isInactive && hasUnsavedChanges()) {
+      setShowUnsavedDialog(true)
+    } else {
+      onClose()
+    }
+  }
+
   function openEditContato(idx: number) {
     setEditingContatoIdx(idx)
     setShowContatoDialog(true)
