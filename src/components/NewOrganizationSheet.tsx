@@ -165,6 +165,14 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
 
   function handleSave() {
     if (!canSave) return
+    if (admins.length === 0) {
+      toast('Defina um usuário administrador para continuar.', 'warning')
+      return
+    }
+    if (contacts.length === 0) {
+      toast('Defina ao menos um contato para continuar.', 'warning')
+      return
+    }
     const businessSegment = form.businessSegment === 'outro'
       ? outroSegmento.trim() || 'Outro'
       : form.businessSegment
