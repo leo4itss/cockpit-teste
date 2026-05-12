@@ -203,6 +203,9 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
         : [...prev, a]
     )
     setEditingAdminIdx(null)
+    if (editingAdminIdx === null) {
+      toast('Usuário administrador definido com sucesso.', 'success')
+    }
   }
 
   return (
