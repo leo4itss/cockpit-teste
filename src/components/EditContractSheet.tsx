@@ -71,10 +71,17 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
     setObjetos(prev => prev.filter((_, i) => i !== index))
   }
 
+  function handleLicencaSave(updated: ObjetoContrato, entrada: ContractHistoricoEntry) {
+    setObjetos(prev => prev.map((obj, i) => i === editLicencaObjeto?.index ? updated : obj))
+    setHistorico(prev => [entrada, ...prev])
+    setEditLicencaObjeto(null)
+  }
+
   function handleSave() {
     onSave({
       ...contract,
       objetos,
+      historico,
       dataInicio: form.dataInicio,
       dataTermino: form.dataTermino,
       renovacao: form.renovacao,
