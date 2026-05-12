@@ -327,12 +327,16 @@ export function EditSolutionSheet({
     setEditingPlanIndex(null)
   }
 
-  function doSave() {
+  function doSave(isNewVersion = false) {
     if (!solution) return
     if (selectedComponenteIds.length === 0) {
       setComponenteError(true)
+      toast('Selecione pelo menos um componente para criar a solução.', 'warning')
       setConfirmVersionModal(false)
       return
+    }
+    if (isNewVersion) {
+      toast('Nova versão do plano criada com sucesso.', 'success')
     }
     onSave({
       ...solution,
