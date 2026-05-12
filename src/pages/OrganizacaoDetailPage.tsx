@@ -247,6 +247,7 @@ export function OrganizacaoDetailPage() {
       const saved = await api.updateSolution(updated.id, updated)
       setSolutions(prev => prev.map(s => s.id === saved.id ? saved : s))
       setSelectedSolution(saved)
+      toast('Solução atualizada com sucesso.', 'success')
       // Recarrega contratos pois o backend sincronizou os objetos
       api.getContracts(id).then(fresh => {
         setContracts(fresh)
@@ -256,6 +257,7 @@ export function OrganizacaoDetailPage() {
     } catch {
       setSolutions(prev => prev.map(s => s.id === updated.id ? updated : s))
       setSelectedSolution(updated)
+      toast('Não foi possível salvar as alterações. Tente novamente.', 'error')
     }
     setEditingSolution(null)
   }
