@@ -552,11 +552,7 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
                       {!isInactive && (
                         <EllipsisMenu
                           onEdit={() => openEditContato(i)}
-                          onRemove={() => {
-                            const updated = contatos.filter((_, idx) => idx !== i)
-                            setContatos(updated)
-                            onUpdateContacts?.(updated.map(contactFromContato))
-                          }}
+                          onRemove={() => handleContatoRemove(i)}
                           editLabel="Editar contato"
                           removeLabel="Remover contato"
                         />
