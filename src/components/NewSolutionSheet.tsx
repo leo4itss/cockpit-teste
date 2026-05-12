@@ -179,7 +179,29 @@ export function NewSolutionSheet({
             </div>
             <div className="flex flex-col gap-2 min-w-0">
               <p className="text-sm text-gray-500 leading-snug">Insira o ícone mobile da solução. Formato: 512×512 pixels.</p>
-              <button className="inline-flex items-center gap-2 h-9 px-4 border border-gray-200 rounded-md text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors w-fit">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png"
+                className="hidden"
+                onChange={e => {
+                  const file = e.target.files?.[0]
+                  if (!file) return
+                  const isValidType = file.type === 'image/jpeg' || file.type === 'image/png'
+                  const isValidSize = file.size <= 10 * 1024 * 1024
+                  if (!isValidType || !isValidSize) {
+                    toast('Não foi possível enviar a imagem. Use JPG ou PNG com até 10 MB.', 'error')
+                  } else {
+                    toast('Imagem adicionada com sucesso.', 'success')
+                  }
+                  e.target.value = ''
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="inline-flex items-center gap-2 h-9 px-4 border border-gray-200 rounded-md text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors w-fit"
+              >
                 <Upload className="w-4 h-4 text-gray-400" />
                 Escolher imagem
               </button>
