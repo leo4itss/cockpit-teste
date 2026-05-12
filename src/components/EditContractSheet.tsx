@@ -259,6 +259,13 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
         orgName={contract.contratante}
         onSave={handleObjetosSave}
       />
+
+      <EditLicencaDialog
+        open={!!editLicencaObjeto}
+        onClose={() => setEditLicencaObjeto(null)}
+        objeto={editLicencaObjeto?.obj ?? null}
+        onSave={handleLicencaSave}
+      />
     </>
   )
 }
