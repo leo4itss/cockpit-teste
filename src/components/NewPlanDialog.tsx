@@ -33,6 +33,7 @@ function emptyLicensing(): Licensing {
 /* ── main ───────────────────────────────────────────────── */
 
 export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca }: Props) {
+  const { toasts, toast, dismiss } = useToast()
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [upgradeUrl, setUpgradeUrl] = useState('')
