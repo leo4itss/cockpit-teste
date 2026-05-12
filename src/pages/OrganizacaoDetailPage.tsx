@@ -1114,6 +1114,7 @@ export function OrganizacaoDetailPage() {
           onActivate={() => handleActivateContract(editingContract)}
         />
       )}
+      <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </div>
   )
 }
