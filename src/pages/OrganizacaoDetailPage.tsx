@@ -75,6 +75,7 @@ export function OrganizacaoDetailPage() {
       setContracts(mockContracts.filter(c => c.orgId === id))
       setTiposLicenca(mockTiposLicenca)
       setLoading(false)
+      toast('Não foi possível carregar as contas. Tente novamente em alguns instantes.', 'error')
     })
   }, [id])
 
