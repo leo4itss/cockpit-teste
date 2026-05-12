@@ -44,7 +44,9 @@ function buildForm(c: Contract) {
 export function EditContractSheet({ open, onClose, contract, solutions, onSave, onInativar, onActivate }: Props) {
   const [form, setForm] = useState(() => buildForm(contract))
   const [objetos, setObjetos] = useState<ObjetoContrato[]>(contract.objetos ?? [])
+  const [historico, setHistorico] = useState<ContractHistoricoEntry[]>(contract.historico ?? [])
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [editLicencaObjeto, setEditLicencaObjeto] = useState<{ obj: ObjetoContrato; index: number } | null>(null)
 
   const isInactive = contract.status === 'Inativo'
 
