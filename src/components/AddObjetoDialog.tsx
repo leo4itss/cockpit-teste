@@ -42,6 +42,7 @@ function buildRows(solutions: Solution[], orgName: string): Row[] {
         planoVersao: 1,
         licenciamento: '—',
         status: sol.status,
+        valoresLicenca: [],
       })
       return
     }
