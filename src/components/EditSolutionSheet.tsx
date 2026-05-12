@@ -362,6 +362,7 @@ export function EditSolutionSheet({
     // Valida mínimo de componentes antes de qualquer outra coisa
     if (selectedComponenteIds.length === 0) {
       setComponenteError(true)
+      toast('Selecione pelo menos um componente para criar a solução.', 'warning')
       return
     }
 
@@ -371,6 +372,7 @@ export function EditSolutionSheet({
       const pair2 = form.link02.trim() !== '' && form.titleLink02.trim() !== ''
       if (!pair1 && !pair2) {
         setMarketplaceError(true)
+        toast('Complete as informações de marketplace antes de publicar a solução.', 'warning')
         return
       }
     }
