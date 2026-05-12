@@ -204,27 +204,9 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
           <div className="flex flex-col gap-7">
             <SectionTitle>Vigência</SectionTitle>
 
-            <div className="flex gap-7 items-start">
-              <div className="w-[234px]">
-                <Input
-                  label="Data de início"
-                  required
-                  type="date"
-                  value={form.dataInicio}
-                  onChange={e => set('dataInicio', e.target.value)}
-                  disabled={isInactive}
-                />
-              </div>
-              <div className="w-[234px]">
-                <Input
-                  label="Data de término"
-                  required
-                  type="date"
-                  value={form.dataTermino}
-                  onChange={e => set('dataTermino', e.target.value)}
-                  disabled={isInactive}
-                />
-              </div>
+            <div className="flex gap-4 items-start">
+              <ReadonlyField label="Data de início" value={contract.dataInicio} half />
+              <ReadonlyField label="Data de término" value={contract.dataTermino} half />
             </div>
 
             <Divider />
@@ -234,14 +216,7 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
           <div className="flex flex-col gap-7">
             <SectionTitle>Renovação</SectionTitle>
 
-            <Select
-              label="Tipo de renovação"
-              options={RENOVACAO_OPTIONS}
-              placeholder="Selecione"
-              value={form.renovacao}
-              onChange={e => set('renovacao', e.target.value)}
-              disabled={isInactive}
-            />
+            <ReadonlyField label="Tipo de renovação" value={contract.renovacao} />
           </div>
 
         </div>
