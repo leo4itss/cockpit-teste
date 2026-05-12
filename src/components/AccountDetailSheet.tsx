@@ -60,7 +60,10 @@ function StatusBadge({ status }: { status: Account['status'] }) {
 export function AccountDetailSheet({ open, onClose, account, org, onEdit }: Props) {
   if (!account || !org) return null
 
-  const accessUrl = `http://${account.subdomain}.hml.pas.app.br/assistant`
+  const hasSubdomain = !!account.subdomain?.trim()
+  const accessUrl = hasSubdomain
+    ? `http://${account.subdomain}.hml.pas.app.br`
+    : ''
 
   const enderecoPartes = [
     account.endereco || org.address,
