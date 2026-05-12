@@ -188,8 +188,10 @@ export function OrganizacaoDetailPage() {
     try {
       const saved = await api.createSolution(local)
       setSolutions(prev => [...prev, saved])
+      toast('Solução criada com sucesso.', 'success')
     } catch {
       setSolutions(prev => [...prev, local])
+      toast('Não foi possível criar a solução. Revise os dados e tente novamente.', 'error')
     }
   }
   async function handleAddContract(contract: Omit<Contract, 'id'>) {
