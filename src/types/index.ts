@@ -114,6 +114,24 @@ export interface Plan {
   criadoEm?: string                     // ISO timestamp da criação desta versão
 }
 
+// ── Valor de licença contratado ───────────────────────────────
+// Representa o valor real acordado no contrato para cada tipo de licença
+// de um plano. Independente do plano cadastrado — pode ser ajustado sem
+// alterar o plano original.
+export interface ValorLicencaContrato {
+  tipoLicencaNome: string
+  tipoLicencaUnidade?: string
+  valor: string   // valor contratado (ex: "15", "500")
+}
+
+// ── Entrada de histórico do contrato ─────────────────────────
+export interface ContractHistoricoEntry {
+  timestamp: string   // ISO — data/hora do ajuste
+  solucao: string     // nome da solução afetada
+  plano: string       // nome do plano afetado
+  descricao: string   // texto legível do que mudou (ex: "Usuário nominal: 10 → 15 usuários")
+}
+
 // ── Objeto do Contrato ────────────────────────────────────────
 // Um contrato pode ter múltiplos objetos — cada um referencia uma
 // combinação de solução + plano + licenciamento + organização contratada.
@@ -123,7 +141,8 @@ export interface ObjetoContrato {
   plano: string
   licenciamento: string
   qtdContratada?: number  // deprecated — preservado apenas para dados históricos
-  planoVersao?: number   // versão do plano vigente no momento da assinatura
+  planoVersao?: number    // versão do plano vigente no momento da assinatura
+  valoresLicenca?: ValorLicencaContrato[]  // valores reais acordados neste contrato
 }
 
 export interface Solution {
