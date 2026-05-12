@@ -872,6 +872,7 @@ export function EditSolutionSheet({
         </div>
       </Dialog>
 
+      <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </>
   )
 }
