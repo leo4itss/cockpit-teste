@@ -15,6 +15,7 @@ interface Row {
   planoVersao: number
   licenciamento: string
   status: string
+  valoresLicenca: ValorLicencaContrato[]
 }
 
 interface Props {
