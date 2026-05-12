@@ -71,6 +71,22 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
     setObjetos(prev => prev.filter((_, i) => i !== index))
   }
 
+  /** Enriquece o objeto com valoresLicenca do plano nas solutions, se ainda não tiver */
+  function enrichObjeto(obj: ObjetoContrato): ObjetoContrato {
+    if (obj.valoresLicenca && obj.valoresLicenca.length > 0) return obj
+    const sol = solutions.find(s => s.name === obj.solucao)
+    const plan = sol?.plans.find(p => p.name === obj.plano)
+    if (!plan || plan.licensings.length === 0) return obj
+    return {
+      ...obj,
+      valoresLicenca: plan.licensings.map(l => ({
+        tipoLicencaNome: l.tipoLicencaNome || l.tipoLicencaId,
+        tipoLicencaUnidade: l.tipoLicencaUnidade,
+        valor: l.valorMinimo?.trim() || l.valor?.trim() || '',
+      })),
+    }
+  }
+
   function handleLicencaSave(updated: ObjetoContrato, entrada: ContractHistoricoEntry) {
     setObjetos(prev => prev.map((obj, i) => i === editLicencaObjeto?.index ? updated : obj))
     setHistorico(prev => [entrada, ...prev])
