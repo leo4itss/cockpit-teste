@@ -80,6 +80,8 @@ export function NewSolutionSheet({
 }: Props) {
   const { componentes } = useComponentes()
   const { arquitetoOptions } = useUsers()
+  const { toasts, toast, dismiss } = useToast()
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [form, setForm] = useState({
     name: '',
     description: '',
