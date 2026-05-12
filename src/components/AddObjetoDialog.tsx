@@ -108,7 +108,8 @@ export function AddObjetoDialog({ open, onClose, solutions, orgName, onSave }: P
         orgContratada: r.orgContratada,
         plano: r.plano,
         licenciamento: r.licenciamento,
-        planoVersao: r.planoVersao,  // versão vigente no momento da assinatura
+        planoVersao: r.planoVersao,
+        valoresLicenca: r.valoresLicenca,
       }))
     onSave(objetos)
     setSelected(new Set())
