@@ -469,8 +469,27 @@ export function EditSolutionSheet({
                 <p className="text-sm font-normal text-[#6b7280] leading-5">
                   Insira o ícone mobile da solução. Formato: 512×512 pixels.
                 </p>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png"
+                  className="hidden"
+                  onChange={e => {
+                    const file = e.target.files?.[0]
+                    if (!file) return
+                    const isValidType = file.type === 'image/jpeg' || file.type === 'image/png'
+                    const isValidSize = file.size <= 10 * 1024 * 1024
+                    if (!isValidType || !isValidSize) {
+                      toast('Não foi possível enviar a imagem. Use JPG ou PNG com até 10 MB.', 'error')
+                    } else {
+                      toast('Imagem adicionada com sucesso.', 'success')
+                    }
+                    e.target.value = ''
+                  }}
+                />
                 <button
                   type="button"
+                  onClick={() => fileInputRef.current?.click()}
                   className="inline-flex items-center gap-2 h-9 px-4 border border-[#e5e7eb] rounded-md text-sm font-medium text-[#030712] bg-white hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors w-fit"
                 >
                   Escolher imagem
