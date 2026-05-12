@@ -410,8 +410,9 @@ export function OrganizacaoDetailPage() {
     try {
       await api.deleteSolution(solutionDeleteTarget.id)
       setSolutions(prev => prev.filter(s => s.id !== solutionDeleteTarget.id))
+      toast('Solução excluída com sucesso.', 'success')
     } catch {
-      // silencioso
+      toast('Não foi possível excluir a solução. Tente novamente.', 'error')
     }
     setSolutionDeleteTarget(null)
     setEditingSolution(null)
