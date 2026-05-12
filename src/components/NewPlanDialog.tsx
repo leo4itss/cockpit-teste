@@ -99,7 +99,7 @@ export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca
       open={open}
       onClose={handleClose}
       title={initialPlan ? 'Editar plano' : 'Novo plano'}
-      width="w-[560px]"
+      width="w-[640px]"
       footer={
         <>
           <Button variant="outline" onClick={handleClose}>Cancelar</Button>
@@ -125,11 +125,23 @@ export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca
 
         <Input
           label="Descrição"
-          required
           placeholder="Descreva aqui o seu plano"
           value={description}
           onChange={e => setDescription(e.target.value)}
         />
+
+        {/* URL da página de upgrade */}
+        <div className="flex flex-col gap-2">
+          <Input
+            label="URL da página de upgrade"
+            placeholder="https://"
+            value={upgradeUrl}
+            onChange={e => setUpgradeUrl(e.target.value)}
+          />
+          <p className="text-sm text-[#6b7280]">
+            Informe o endereço para onde o usuário será direcionado ao clicar em "Fazer upgrade".
+          </p>
+        </div>
 
         {/* Licenciamento */}
         <div className="border border-gray-200 rounded-2xl p-6 flex flex-col gap-6">
