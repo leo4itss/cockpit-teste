@@ -36,11 +36,11 @@ function ReadonlyField({ label, value, required }: { label: string; value?: stri
   )
 }
 
-function CopyButton({ text }: { text: string }) {
+function CopyButton({ text, onCopy }: { text: string; onCopy?: () => void }) {
   return (
     <button
       type="button"
-      onClick={() => navigator.clipboard.writeText(text)}
+      onClick={() => { navigator.clipboard.writeText(text); onCopy?.() }}
       className="text-[#6b7280] hover:text-[#030712] transition-colors shrink-0"
       title="Copiar"
     >
