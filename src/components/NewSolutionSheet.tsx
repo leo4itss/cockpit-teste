@@ -126,7 +126,12 @@ export function NewSolutionSheet({
   const canSave = baseValid && marketplaceValid && selectedComponenteIds.length > 0
 
   function handleSave() {
-    if (!canSave) return
+    if (!canSave) {
+      if (selectedComponenteIds.length === 0) {
+        toast('Selecione pelo menos um componente para criar a solução.', 'warning')
+      }
+      return
+    }
     onSave({
       orgId,
       name: form.name,
