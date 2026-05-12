@@ -34,12 +34,14 @@ function emptyLicensing(): Licensing {
 export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca }: Props) {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
+  const [upgradeUrl, setUpgradeUrl] = useState('')
   const [licensings, setLicensings] = useState<Licensing[]>([])
 
   useEffect(() => {
     if (open) {
       setName(initialPlan?.name ?? '')
       setDescription(initialPlan?.description ?? '')
+      setUpgradeUrl(initialPlan?.upgradeUrl ?? '')
       setLicensings(initialPlan?.licensings ?? [])
     }
   }, [open, initialPlan])
