@@ -359,10 +359,12 @@ export function OrganizacaoDetailPage() {
   async function handleDeleteAccount(account: Account) {
     try {
       await api.deleteAccount(account.id)
+      setAccounts(prev => prev.filter(a => a.id !== account.id))
+      toast('Conta excluída com sucesso.', 'success')
     } catch {
-      // silencioso
+      setAccounts(prev => prev.filter(a => a.id !== account.id))
+      toast('Não foi possível excluir a conta. Verifique se existem soluções ou contratos vinculados.', 'error')
     }
-    setAccounts(prev => prev.filter(a => a.id !== account.id))
     setAccountExcluirModal(false)
     setAccountExcluirTarget(null)
     setEditingAccount(null)
