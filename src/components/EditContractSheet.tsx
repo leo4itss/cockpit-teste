@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { Plus, CircleAlert, Trash2 } from 'lucide-react'
+import { Plus, CircleAlert, Trash2, Pencil } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Input } from './ui/Input'
 import { Select } from './ui/Select'
 import { Button } from './ui/Button'
 import { AddObjetoDialog } from './AddObjetoDialog'
-import type { Contract, Solution, ObjetoContrato } from '@/types'
+import { EditLicencaDialog } from './EditLicencaDialog'
+import type { Contract, Solution, ObjetoContrato, ContractHistoricoEntry } from '@/types'
 
 interface Props {
   open: boolean
