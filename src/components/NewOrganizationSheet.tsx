@@ -148,8 +148,18 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
   function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
+    const validTypes = ['image/jpeg', 'image/png']
+    const maxBytes = 10 * 1024 * 1024 // 10 MB
+    if (!validTypes.includes(file.type) || file.size > maxBytes) {
+      toast('Não foi possível enviar a imagem. Use JPG ou PNG com até 10 MB.', 'error')
+      e.target.value = ''
+      return
+    }
     const reader = new FileReader()
-    reader.onload = ev => setLogoPreview(ev.target?.result as string)
+    reader.onload = ev => {
+      setLogoPreview(ev.target?.result as string)
+      toast('Imagem adicionada com sucesso.', 'success')
+    }
     reader.readAsDataURL(file)
   }
 
