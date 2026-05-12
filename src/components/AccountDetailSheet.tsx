@@ -135,15 +135,25 @@ export function AccountDetailSheet({ open, onClose, account, org, onEdit }: Prop
                 <span className="text-sm text-[#030712] truncate flex-1">{accessUrl}</span>
                 <CopyButton text={accessUrl} />
               </div>
-              <a
-                href={accessUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 h-9 px-3 border border-[#e5e7eb] rounded-md text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] whitespace-nowrap transition-colors shrink-0"
-              >
-                <ExternalLink className="w-3.5 h-3.5 text-[#6b7280]" />
-                Acessar a solução
-              </a>
+              {hasSubdomain ? (
+                <a
+                  href={accessUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 h-9 px-3 border border-[#e5e7eb] rounded-md text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] whitespace-nowrap transition-colors shrink-0"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 text-[#6b7280]" />
+                  Acessar conta
+                </a>
+              ) : (
+                <span
+                  title="A URL de acesso ainda não está configurada para esta conta."
+                  className="inline-flex items-center gap-1.5 h-9 px-3 border border-[#e5e7eb] rounded-md text-sm font-medium text-[#9ca3af] bg-[#f9fafb] whitespace-nowrap shrink-0 cursor-not-allowed"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 text-[#d1d5db]" />
+                  Acessar conta
+                </span>
+              )}
             </div>
           </div>
 
