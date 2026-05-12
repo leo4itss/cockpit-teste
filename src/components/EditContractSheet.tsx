@@ -56,6 +56,7 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
     setLastContract(contract)
     setForm(buildForm(contract))
     setObjetos(contract.objetos ?? [])
+    setHistorico(contract.historico ?? [])
   }
 
   function set(field: string, value: string) {
