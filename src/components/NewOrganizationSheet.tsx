@@ -491,6 +491,7 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
         onAdd={handleSaveAdmin}
         initialAdmin={editingAdminIdx !== null ? admins[editingAdminIdx] : undefined}
       />
+      <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </>
   )
 }
