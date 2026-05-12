@@ -32,6 +32,7 @@ type Tab = 'conta' | 'solucoes' | 'contrato' | 'marketplace'
 export function OrganizacaoDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { toasts, toast, dismiss } = useToast()
   const [tab, setTab] = useState<Tab>('conta')
   const [org, setOrg] = useState<Organization | null>(null)
   const [accounts, setAccounts] = useState<Account[]>([])
