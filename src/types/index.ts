@@ -173,6 +173,7 @@ export interface Contract {
   dataTermino: string
   renovacao: string
   status: 'Ativo' | 'Inativo' | 'Pendente'
+  historico?: ContractHistoricoEntry[]  // log de ajustes de licença
 }
 
 export interface User {
