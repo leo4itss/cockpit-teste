@@ -176,8 +176,10 @@ export function OrganizacaoDetailPage() {
     try {
       const saved = await api.createAccount(local)
       setAccounts(prev => [...prev, saved])
+      toast('Conta criada com sucesso.', 'success')
     } catch {
       setAccounts(prev => [...prev, local])
+      toast('Não foi possível criar a conta. Revise os dados e tente novamente.', 'error')
     }
   }
   async function handleAddSolution(solution: Omit<Solution, 'id'>) {
