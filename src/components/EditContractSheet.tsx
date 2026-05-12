@@ -185,7 +185,7 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
                           <button
                             type="button"
                             title="Ajustar valores de licença"
-                            onClick={() => setEditLicencaObjeto({ obj, index: i })}
+                            onClick={() => setEditLicencaObjeto({ obj: enrichObjeto(obj), index: i })}
                             className="w-8 h-8 flex items-center justify-center text-[#6b7280] hover:text-[#2563eb] transition-colors shrink-0"
                           >
                             <Pencil className="w-3.5 h-3.5" />
