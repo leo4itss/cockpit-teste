@@ -295,7 +295,16 @@ export function EditSolutionSheet({
   }
 
   function handleRemovePlan(index: number) {
+    const removed = plans[index]
     setPlans(prev => prev.filter((_, i) => i !== index))
+    toast('Plano removido da solução.', 'success', {
+      label: 'Desfazer',
+      onClick: () => setPlans(prev => {
+        const copy = [...prev]
+        copy.splice(index, 0, removed)
+        return copy
+      }),
+    })
   }
 
   function handlePlanSave(plan: Plan) {
