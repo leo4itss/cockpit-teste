@@ -611,7 +611,7 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
                     {!isInactive && (
                       <EllipsisMenu
                         onEdit={() => openEditAdmin(i)}
-                        onRemove={() => setAdmins(prev => prev.filter((_, idx) => idx !== i))}
+                        onRemove={() => handleAdminRemove(i)}
                         editLabel="Editar usuário"
                         removeLabel="Remover usuário"
                       />
