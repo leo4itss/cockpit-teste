@@ -83,11 +83,6 @@ export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca
     }
     if (!canSave) return
     onSave({ name: name.trim(), description: description.trim(), upgradeUrl: upgradeUrl.trim(), licensings })
-    if (initialPlan) {
-      toast('Plano atualizado com sucesso.', 'success')
-    } else {
-      toast('Plano adicionado com sucesso.', 'success')
-    }
     handleClose()
   }
 
