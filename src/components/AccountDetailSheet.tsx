@@ -137,7 +137,7 @@ export function AccountDetailSheet({ open, onClose, account, org, onEdit }: Prop
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-2 flex-1 min-w-0 h-9 rounded-md bg-[#f3f4f6] px-3">
                 <span className="text-sm text-[#030712] truncate flex-1">{accessUrl}</span>
-                <CopyButton text={accessUrl} />
+                <CopyButton text={accessUrl} onCopy={() => toast('URL copiada.', 'success')} />
               </div>
               {hasSubdomain ? (
                 <a
