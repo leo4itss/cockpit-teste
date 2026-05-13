@@ -357,6 +357,23 @@ export function EditUserSheet({ open, onClose, user, onSave, onDelete }: Props) 
         value={form.etiquetas}
         onSave={v => set('etiquetas', v)}
       />
+
+      <Dialog
+        open={unsavedDialogOpen}
+        onClose={() => setUnsavedDialogOpen(false)}
+        title="Editar usuário"
+        className="max-w-md"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setUnsavedDialogOpen(false)}>Continuar editando</Button>
+            <Button onClick={() => { setUnsavedDialogOpen(false); onClose() }}>Sair sem salvar</Button>
+          </>
+        }
+      >
+        <p className="text-sm text-[#030712] leading-5">
+          Existem alterações não salvas. Deseja sair mesmo assim?
+        </p>
+      </Dialog>
     </>
   )
 }
