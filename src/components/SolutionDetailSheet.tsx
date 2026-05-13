@@ -40,7 +40,7 @@ function StatusBadge({ status }: { status: Solution['status'] }) {
   if (status === 'Ativo' || status === 'Criado') {
     return <Badge variant="success" showIcon>{status}</Badge>
   }
-  return <Badge variant="secondary">{status}</Badge>
+  return <Badge variant="secondary" showIcon>{status}</Badge>
 }
 
 function PlanItem({ plan, inactive = false }: { plan: Plan; inactive?: boolean }) {
