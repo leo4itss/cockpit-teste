@@ -422,6 +422,23 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete, on
         onAdd={handleContactSave}
         initialData={editingContact?.data}
       />
+
+      <Dialog
+        open={unsavedDialogOpen}
+        onClose={() => setUnsavedDialogOpen(false)}
+        title="Editar organização"
+        className="max-w-md"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setUnsavedDialogOpen(false)}>Continuar editando</Button>
+            <Button onClick={() => { setUnsavedDialogOpen(false); onClose() }}>Sair sem salvar</Button>
+          </>
+        }
+      >
+        <p className="text-sm text-[#030712] leading-5">
+          Existem alterações não salvas. Deseja sair mesmo assim?
+        </p>
+      </Dialog>
     </>
   )
 }
