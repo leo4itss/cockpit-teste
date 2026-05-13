@@ -135,7 +135,7 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
     <>
       <Sheet
         open={open}
-        onClose={onClose}
+        onClose={handleClose}
         title="Editar Contrato"
         width="w-[640px]"
         footer={
@@ -153,7 +153,7 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
                 </Button>
               )
             )}
-            <Button variant="outline" onClick={onClose}>Cancelar</Button>
+            <Button variant="outline" onClick={handleClose}>Cancelar</Button>
             {!isInactive && <Button onClick={handleSave}>Salvar</Button>}
           </>
         }
