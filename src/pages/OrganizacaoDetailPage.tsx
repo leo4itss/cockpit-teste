@@ -391,8 +391,10 @@ export function OrganizacaoDetailPage() {
     try {
       const updated = await api.updateContract(contract.id, { ...contract, status: 'Inativo' })
       setContracts(prev => prev.map(c => c.id === updated.id ? updated : c))
+      toast('Contrato inativado com sucesso.', 'success')
     } catch {
       setContracts(prev => prev.map(c => c.id === contract.id ? { ...contract, status: 'Inativo' } : c))
+      toast('Não foi possível inativar o contrato.\nTente novamente.', 'error')
     }
     setContractInativarModal(false)
     setContractInativarTarget(null)
