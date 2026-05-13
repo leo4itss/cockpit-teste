@@ -715,8 +715,8 @@ export function OrganizacaoDetailPage() {
                               <td className={`px-2 py-2 h-[52px] text-sm text-center ${isInativo ? 'text-[#9ca3af]' : 'text-[#030712]'}`}>{a.arquitetoPAS}</td>
                               <td className="px-2 py-2 h-[52px] text-center">
                                 <Badge
-                                  variant={a.status === 'Inativo' ? 'default' : 'success'}
-                                  showIcon={a.status !== 'Inativo'}
+                                  variant={a.status === 'Inativo' ? 'secondary' : 'success'}
+                                  showIcon
                                 >
                                   {a.status === 'Inativo' ? 'Inativo' : 'Ativo'}
                                 </Badge>
