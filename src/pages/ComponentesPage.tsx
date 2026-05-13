@@ -259,7 +259,7 @@ export function ComponentesPage() {
                       </td>
                       <td className="px-2 py-2 h-[52px] text-center">
                         {isInativo
-                          ? <Badge variant="secondary">Inativo</Badge>
+                          ? <Badge variant="secondary" showIcon>Inativo</Badge>
                           : <Badge variant="success" showIcon>Ativo</Badge>
                         }
                       </td>
