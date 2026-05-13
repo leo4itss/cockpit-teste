@@ -161,7 +161,7 @@ export function OrganizacoesPage() {
                     {org.status === 'Ativo' ? (
                       <Badge variant="success" showIcon>Ativo</Badge>
                     ) : (
-                      <Badge variant="secondary">{org.status}</Badge>
+                      <Badge variant="secondary" showIcon>{org.status}</Badge>
                     )}
                   </td>
                   <td className="px-2 py-3 w-10" onClick={e => e.stopPropagation()}>
