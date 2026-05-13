@@ -185,6 +185,23 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete, on
     setContactDialogOpen(true)
   }
 
+  function hasUnsavedChanges() {
+    if (isInactive) return false
+    return (
+      JSON.stringify(form) !== JSON.stringify(buildForm(org)) ||
+      JSON.stringify(contacts) !== JSON.stringify(org.contacts ?? []) ||
+      logoPreview !== (org.logo ?? '')
+    )
+  }
+
+  function handleClose() {
+    if (hasUnsavedChanges()) {
+      setUnsavedDialogOpen(true)
+    } else {
+      onClose()
+    }
+  }
+
   function handleSave() {
     onSave({ ...org, ...form, logo: logoPreview || undefined, contacts })
     onClose()
