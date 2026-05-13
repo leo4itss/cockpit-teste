@@ -19,6 +19,7 @@ const ComponentesContext = createContext<ComponentesContextValue | null>(null)
 export function ComponentesProvider({ children }: { children: ReactNode }) {
   const [componentes, setComponentes] = useState<Componente[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     api.getComponentes()
@@ -29,6 +30,7 @@ export function ComponentesProvider({ children }: { children: ReactNode }) {
       .catch(() => {
         setComponentes(mockComponentes)
         setLoading(false)
+        setError(true)
       })
   }, [])
 
