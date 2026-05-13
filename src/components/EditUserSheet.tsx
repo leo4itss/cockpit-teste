@@ -185,7 +185,7 @@ export function EditUserSheet({ open, onClose, user, onSave, onDelete }: Props) 
                 Excluir usuário
               </Button>
             )}
-            <Button variant="outline" onClick={onClose}>Cancelar</Button>
+            <Button variant="outline" onClick={handleClose}>Cancelar</Button>
             <Button onClick={handleSave}>Salvar</Button>
           </>
         }
