@@ -318,6 +318,8 @@ export function ComponentesPage() {
         name={componentes.find(c => c.id === pendingDeleteId)?.nome ?? ''}
         onConfirm={handleConfirmModal}
       />
+
+      <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </div>
   )
 }
