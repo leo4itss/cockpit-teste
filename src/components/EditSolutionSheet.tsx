@@ -439,7 +439,7 @@ export function EditSolutionSheet({
     <>
       <Sheet
         open={open}
-        onClose={onClose}
+        onClose={handleClose}
         title="Editar Solução"
         width="w-[640px]"
         footer={
