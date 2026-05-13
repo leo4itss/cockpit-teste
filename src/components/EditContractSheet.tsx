@@ -123,6 +123,7 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
     setObjetos(prev => prev.map((obj, i) => i === editLicencaObjeto?.index ? updated : obj))
     setHistorico(prev => [entrada, ...prev])
     setEditLicencaObjeto(null)
+    toast('Licença atualizada com sucesso.', 'success')
   }
 
   function handleSave() {
