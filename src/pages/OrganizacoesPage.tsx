@@ -138,7 +138,7 @@ export function OrganizacoesPage() {
               {filtered.map((org) => (
                 <tr
                   key={org.id}
-                  className="group/row border-b border-[#e5e7eb] last:border-0 hover:bg-gray-50 cursor-pointer transition-colors bg-white"
+                  className="group/row border-b border-[#e5e7eb] last:border-0 hover:bg-gray-50 cursor-pointer transition-colors"
                   onClick={() => navigate(`/organizacoes/${org.id}`)}
                 >
                   <td className="px-4 py-3 h-[52px]">
