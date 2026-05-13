@@ -120,6 +120,32 @@ export function EditUserSheet({ open, onClose, user, onSave, onDelete }: Props) 
     setForm(f => ({ ...f, [field]: value }))
   }
 
+  function hasUnsavedChanges() {
+    if (!user) return false
+    return (
+      form.nomeCompleto !== user.nomeCompleto ||
+      form.usuario !== user.usuario ||
+      form.senha !== (user.senha ?? '') ||
+      form.pais !== user.pais ||
+      form.telefone !== user.telefone ||
+      form.area !== user.area ||
+      form.cargo !== user.cargo ||
+      form.papel !== user.papel ||
+      form.etiquetas !== user.etiquetas ||
+      form.formatoData !== user.formatoData ||
+      form.formatoHora !== user.formatoHora ||
+      form.fusoHorario !== user.fusoHorario
+    )
+  }
+
+  function handleClose() {
+    if (hasUnsavedChanges()) {
+      setUnsavedDialogOpen(true)
+    } else {
+      onClose()
+    }
+  }
+
   function handleSave() {
     if (!user) return
     onSave({
