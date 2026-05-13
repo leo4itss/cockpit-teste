@@ -199,8 +199,10 @@ export function OrganizacaoDetailPage() {
     try {
       const saved = await api.createContract(local)
       setContracts(prev => [...prev, saved])
+      toast('Contrato criado com sucesso.', 'success')
     } catch {
       setContracts(prev => [...prev, local])
+      toast('Não foi possível criar o contrato.\nRevise os dados e tente novamente.', 'error')
     }
   }
   async function handleEditOrg(data: Omit<Organization, 'id' | 'qtdContas' | 'qtdSolucoes' | 'qtdContratos' | 'contacts'>) {
