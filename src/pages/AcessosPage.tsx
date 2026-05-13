@@ -161,7 +161,7 @@ export function AcessosPage() {
                       {user.status === 'Ativo' ? (
                         <Badge variant="success" showIcon>Ativo</Badge>
                       ) : (
-                        <Badge variant="secondary">{user.status}</Badge>
+                        <Badge variant="secondary" showIcon>{user.status}</Badge>
                       )}
                     </td>
                     <td className="px-4 py-3 text-sm text-[#030712]">{user.ultimoAcesso}</td>
