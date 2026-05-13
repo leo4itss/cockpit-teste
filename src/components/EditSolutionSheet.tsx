@@ -198,6 +198,7 @@ export function EditSolutionSheet({
   const [editingPlanIndex, setEditingPlanIndex] = useState<number | null>(null)
   const [confirmVersionModal, setConfirmVersionModal] = useState(false)
   const [historyOpen, setHistoryOpen] = useState(false)
+  const [unsavedDialogOpen, setUnsavedDialogOpen] = useState(false)
   const [selectedComponenteIds, setSelectedComponenteIds] = useState<string[]>(solution?.componenteIds ?? [])
   const [componenteSelecaoOpen, setComponenteSelecaoOpen] = useState(false)
   const [componenteError, setComponenteError] = useState(false)
