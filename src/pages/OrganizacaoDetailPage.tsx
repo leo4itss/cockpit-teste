@@ -824,8 +824,8 @@ export function OrganizacaoDetailPage() {
                           {/* Status — badge centralizado */}
                           <td className="px-2 py-2 h-[52px] w-[131px] text-center">
                             <Badge
-                              variant={s.status === 'Ativo' ? 'success' : 'default'}
-                              showIcon={s.status === 'Ativo'}
+                              variant={s.status === 'Ativo' ? 'success' : 'secondary'}
+                              showIcon
                             >
                               {s.status}
                             </Badge>
