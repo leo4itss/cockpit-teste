@@ -15,6 +15,7 @@ export function OrganizacoesPage() {
   const [loading, setLoading] = useState(true)
   const [error] = useState<string | null>(null)
   const [showInativas, setShowInativas] = useState(false)
+  const [search, setSearch] = useState('')
   const [sheetOpen, setSheetOpen] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<Organization | null>(null)
   const [deleteModal, setDeleteModal] = useState<'inativar' | null>(null)
