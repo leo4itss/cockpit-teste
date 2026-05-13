@@ -94,6 +94,7 @@ export function EditUserSheet({ open, onClose, user, onSave, onDelete }: Props) 
     fusoHorario: '',
   })
   const [etiquetaDialogOpen, setEtiquetaDialogOpen] = useState(false)
+  const [unsavedDialogOpen, setUnsavedDialogOpen] = useState(false)
 
   useEffect(() => {
     if (user && open) {
