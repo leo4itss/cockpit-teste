@@ -13,7 +13,7 @@ export function Badge({ children, variant = 'default', showIcon = false, classNa
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 rounded-[2px] px-2 py-1 text-xs font-semibold',
+        'inline-flex items-center gap-1 rounded-[2px] px-2 py-1 text-xs font-semibold w-fit',
         {
           'bg-green-200 text-green-700': variant === 'success',
           'bg-yellow-50 text-yellow-700 border border-yellow-200': variant === 'warning',
