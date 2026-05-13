@@ -85,10 +85,22 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
 
   function handleObjetosSave(novos: ObjetoContrato[]) {
     setObjetos(prev => [...prev, ...novos])
+    if (novos.length > 0) {
+      toast('Objeto adicionado ao contrato.', 'success')
+    }
   }
 
   function handleRemoveObjeto(index: number) {
+    const removed = objetos[index]
     setObjetos(prev => prev.filter((_, i) => i !== index))
+    toast('Objeto removido do contrato.', 'success', {
+      label: 'Desfazer',
+      onClick: () => setObjetos(prev => {
+        const copy = [...prev]
+        copy.splice(index, 0, removed)
+        return copy
+      }),
+    })
   }
 
   /** Enriquece o objeto com valoresLicenca do plano nas solutions, se ainda não tiver */
