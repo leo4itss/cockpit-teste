@@ -59,10 +59,20 @@ export function ComponentesPage() {
   }, [search, filtered.length]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleSave(data: Omit<Componente, 'id' | 'createdAt'>) {
-    if (editingComponente) {
-      await updateComponente(editingComponente.id, data)
-    } else {
-      await addComponente(data)
+    try {
+      if (editingComponente) {
+        await updateComponente(editingComponente.id, data)
+        toast('Componentes atualizada com sucesso.', 'success')
+      } else {
+        await addComponente(data)
+        toast('Componente criada com sucesso.', 'success')
+      }
+    } catch {
+      if (editingComponente) {
+        toast('Não foi possível salvar as alterações.\nTente novamente.', 'error')
+      } else {
+        toast('Não foi possível criar a componente.\nRevise os dados e tente novamente.', 'error')
+      }
     }
   }
 
