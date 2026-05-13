@@ -295,6 +295,26 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
         objeto={editLicencaObjeto?.obj ?? null}
         onSave={handleLicencaSave}
       />
+
+      {/* Dialog de alterações não salvas */}
+      <Dialog
+        open={unsavedDialogOpen}
+        onClose={() => setUnsavedDialogOpen(false)}
+        title="Editar contrato"
+        className="max-w-md"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setUnsavedDialogOpen(false)}>Continuar editando</Button>
+            <Button onClick={() => { setUnsavedDialogOpen(false); onClose() }}>Sair sem salvar</Button>
+          </>
+        }
+      >
+        <p className="text-sm text-[#030712] leading-5">
+          Existem alterações não salvas. Deseja sair mesmo assim?
+        </p>
+      </Dialog>
+
+      <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </>
   )
 }
