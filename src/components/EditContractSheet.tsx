@@ -46,12 +46,14 @@ const RENOVACAO_OPTIONS = [
 ]
 
 export function EditContractSheet({ open, onClose, contract, solutions, onSave, onInativar, onActivate }: Props) {
+  const { toasts, toast, dismiss } = useToast()
   const [dataTermino, setDataTermino] = useState(contract.dataTermino)
   const [renovacao, setRenovacao] = useState(contract.renovacao)
   const [objetos, setObjetos] = useState<ObjetoContrato[]>(contract.objetos ?? [])
   const [historico, setHistorico] = useState<ContractHistoricoEntry[]>(contract.historico ?? [])
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editLicencaObjeto, setEditLicencaObjeto] = useState<{ obj: ObjetoContrato; index: number } | null>(null)
+  const [unsavedDialogOpen, setUnsavedDialogOpen] = useState(false)
 
   const isInactive = contract.status === 'Inativo'
 
@@ -63,6 +65,22 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
     setRenovacao(contract.renovacao)
     setObjetos(contract.objetos ?? [])
     setHistorico(contract.historico ?? [])
+  }
+
+  function hasUnsavedChanges() {
+    return (
+      dataTermino !== contract.dataTermino ||
+      renovacao !== contract.renovacao ||
+      JSON.stringify(objetos) !== JSON.stringify(contract.objetos ?? [])
+    )
+  }
+
+  function handleClose() {
+    if (!isInactive && hasUnsavedChanges()) {
+      setUnsavedDialogOpen(true)
+    } else {
+      onClose()
+    }
   }
 
   function handleObjetosSave(novos: ObjetoContrato[]) {
