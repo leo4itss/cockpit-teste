@@ -1,14 +1,15 @@
 import { cn } from '@/lib/utils'
-import { BadgeCheck } from 'lucide-react'
+import { BadgeCheck, CircleMinus } from 'lucide-react'
 
 interface BadgeProps {
   children: React.ReactNode
   variant?: 'success' | 'warning' | 'error' | 'info' | 'default' | 'secondary'
-  showIcon?: boolean   // exibe BadgeCheck 12×12 antes do texto
+  showIcon?: boolean   // exibe ícone 12×12 antes do texto (BadgeCheck para success, CircleMinus para secondary)
   className?: string
 }
 
 export function Badge({ children, variant = 'default', showIcon = false, className }: BadgeProps) {
+  const Icon = variant === 'secondary' ? CircleMinus : BadgeCheck
   return (
     <span
       className={cn(
@@ -24,7 +25,7 @@ export function Badge({ children, variant = 'default', showIcon = false, classNa
         className
       )}
     >
-      {showIcon && <BadgeCheck className="w-3 h-3 shrink-0" />}
+      {showIcon && <Icon className="w-3 h-3 shrink-0" />}
       {children}
     </span>
   )
