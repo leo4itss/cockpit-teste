@@ -32,11 +32,11 @@ function ReadonlyField({ label, value, half }: { label: string; value?: string |
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const variant = status === 'Ativo' || status === 'Criado' ? 'success' : status === 'Pendente' ? 'warning' : 'default'
+  const variant = status === 'Ativo' || status === 'Criado' ? 'success' : status === 'Pendente' ? 'warning' : 'secondary'
   const label = status === 'Criado' ? 'Ativo' : status
   return (
     <div className="flex">
-      <Badge variant={variant} showIcon={variant === 'success'}>{label}</Badge>
+      <Badge variant={variant} showIcon={variant !== 'warning'}>{label}</Badge>
     </div>
   )
 }
