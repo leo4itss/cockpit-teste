@@ -268,9 +268,11 @@ export function OrganizacaoDetailPage() {
       const saved = await api.updateContract(updated.id, updated)
       setContracts(prev => prev.map(c => c.id === saved.id ? saved : c))
       setSelectedContract(saved)
+      toast('Contrato atualizado com sucesso.', 'success')
     } catch {
       setContracts(prev => prev.map(c => c.id === updated.id ? updated : c))
       setSelectedContract(updated)
+      toast('Não foi possível salvar as alterações.\nTente novamente.', 'error')
     }
     setEditingContract(null)
   }
