@@ -213,7 +213,7 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete, on
     <>
       <Sheet
         open={open}
-        onClose={onClose}
+        onClose={handleClose}
         title="Editar organização"
         width="w-[640px]"
         footer={
