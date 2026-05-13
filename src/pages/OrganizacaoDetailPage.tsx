@@ -75,7 +75,7 @@ export function OrganizacaoDetailPage() {
       setContracts(mockContracts.filter(c => c.orgId === id))
       setTiposLicenca(mockTiposLicenca)
       setLoading(false)
-      toast('Não foi possível carregar as soluções. Tente novamente em alguns instantes.', 'error')
+      toast('Não foi possível carregar os contratos.\nTente novamente em alguns instantes.', 'error')
     })
   }, [id])
 
