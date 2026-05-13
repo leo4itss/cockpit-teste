@@ -46,6 +46,18 @@ export function ComponentesPage() {
       (c.descricao ?? '').toLowerCase().includes(search.toLowerCase())
     )
 
+  // Toast: busca sem resultados (node 13)
+  const lastEmptySearchRef = useRef('')
+  useEffect(() => {
+    if (search && filtered.length === 0 && lastEmptySearchRef.current !== search) {
+      lastEmptySearchRef.current = search
+      toast('Nenhuma componente encontrado para esta busca.\nVerifique o termo pesquisado.', 'warning')
+    }
+    if (!search || filtered.length > 0) {
+      lastEmptySearchRef.current = ''
+    }
+  }, [search, filtered.length]) // eslint-disable-line react-hooks/exhaustive-deps
+
   async function handleSave(data: Omit<Componente, 'id' | 'createdAt'>) {
     if (editingComponente) {
       await updateComponente(editingComponente.id, data)
