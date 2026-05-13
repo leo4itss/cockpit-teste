@@ -133,13 +133,19 @@ export function OrganizacoesPage() {
         <div className="flex flex-col items-center justify-center py-24 gap-3">
           <FolderOpen className="w-10 h-10 text-gray-300" />
           <p className="text-base font-medium text-gray-700">Nenhuma organização encontrada</p>
-          <p className="text-sm text-gray-500 text-center">
-            Ainda não há organizações cadastradas no sistema.<br />
-            Crie uma nova organização para provisionar a conta.
-          </p>
-          <Button onClick={() => setSheetOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" /> Criar organização
-          </Button>
+          {search ? (
+            <p className="text-sm text-gray-500 text-center">Tente buscar por outro termo.</p>
+          ) : (
+            <>
+              <p className="text-sm text-gray-500 text-center">
+                Ainda não há organizações cadastradas no sistema.<br />
+                Crie uma nova organização para provisionar a conta.
+              </p>
+              <Button onClick={() => setSheetOpen(true)}>
+                <Plus className="w-4 h-4 mr-2" /> Criar organização
+              </Button>
+            </>
+          )}
         </div>
       ) : (
         <div className="px-8 pt-6 pb-8">
