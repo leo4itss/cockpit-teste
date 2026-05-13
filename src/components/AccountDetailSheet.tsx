@@ -53,7 +53,7 @@ function StatusBadge({ status }: { status: Account['status'] }) {
   if (status === 'Ativo' || status === 'Criado') {
     return <Badge variant="success" showIcon>{status}</Badge>
   }
-  return <Badge variant="secondary">{status}</Badge>
+  return <Badge variant="secondary" showIcon>{status}</Badge>
 }
 
 /* ── main component ─────────────────────────────────────── */
