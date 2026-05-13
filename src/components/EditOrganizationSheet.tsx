@@ -142,6 +142,7 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete, on
   const [logoPreview, setLogoPreview] = useState<string>(org.logo ?? '')
   const [contactDialogOpen, setContactDialogOpen] = useState(false)
   const [editingContact, setEditingContact] = useState<{ idx: number; data: ContactData } | null>(null)
+  const [unsavedDialogOpen, setUnsavedDialogOpen] = useState(false)
   const logoInputRef = useRef<HTMLInputElement>(null)
 
   // Re-sync when org prop changes
