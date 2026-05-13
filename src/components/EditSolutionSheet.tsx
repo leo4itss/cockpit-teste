@@ -405,6 +405,23 @@ export function EditSolutionSheet({
   // Solução inativa: somente leitura
   const isInactive = solution.status === 'Inativo'
 
+  function hasUnsavedChanges() {
+    if (isInactive) return false
+    return (
+      JSON.stringify(form) !== JSON.stringify(buildForm(solution)) ||
+      JSON.stringify(plans) !== JSON.stringify(activePlans(solution)) ||
+      JSON.stringify(selectedComponenteIds) !== JSON.stringify(solution?.componenteIds ?? [])
+    )
+  }
+
+  function handleClose() {
+    if (hasUnsavedChanges()) {
+      setUnsavedDialogOpen(true)
+    } else {
+      onClose()
+    }
+  }
+
   // Planos inativados = histórico de versões anteriores
   const inactivePlans = (solution.plans ?? []).filter(p => p.statusVersao === 'inativo')
 
