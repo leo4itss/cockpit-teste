@@ -237,7 +237,7 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete, on
                 </Button>
               )
             )}
-            <Button variant="outline" onClick={onClose}>Cancelar</Button>
+            <Button variant="outline" onClick={handleClose}>Cancelar</Button>
             {!isInactive && <Button onClick={handleSave}>Salvar</Button>}
           </>
         }
