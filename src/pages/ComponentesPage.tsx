@@ -15,6 +15,13 @@ export function ComponentesPage() {
   const { toasts, toast, dismiss } = useToast()
   const [search, setSearch] = useState('')
 
+  // Toast: erro de carregamento (node 1)
+  useEffect(() => {
+    if (error) {
+      toast('Não foi possível carregar os componentes.\nTente novamente em alguns instantes.', 'error')
+    }
+  }, [error]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Sheet de detalhe (leitura)
   const [detailComponente, setDetailComponente] = useState<Componente | null>(null)
 
