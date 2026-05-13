@@ -901,8 +901,8 @@ export function OrganizacaoDetailPage() {
                           {/* Status */}
                           <td className="px-2 py-2 h-[52px] text-center">
                             <Badge
-                              variant={c.status === 'Ativo' ? 'success' : c.status === 'Pendente' ? 'warning' : 'default'}
-                              showIcon={c.status === 'Ativo'}
+                              variant={c.status === 'Ativo' ? 'success' : c.status === 'Pendente' ? 'warning' : 'secondary'}
+                              showIcon={c.status !== 'Pendente'}
                             >
                               {c.status}
                             </Badge>
