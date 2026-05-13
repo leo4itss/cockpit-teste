@@ -171,7 +171,7 @@ export function EditUserSheet({ open, onClose, user, onSave, onDelete }: Props) 
     <>
       <Sheet
         open={open}
-        onClose={onClose}
+        onClose={handleClose}
         title="Editar Usuário"
         width="w-[640px]"
         footer={
