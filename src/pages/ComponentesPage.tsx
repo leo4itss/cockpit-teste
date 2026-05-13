@@ -130,7 +130,21 @@ export function ComponentesPage() {
 
   async function handleConfirmModal() {
     if (!pendingDeleteId) return
-    await deleteComponente(pendingDeleteId)
+    const isInativar = deleteModal === 'inativar-componente'
+    try {
+      await deleteComponente(pendingDeleteId)
+      if (isInativar) {
+        toast('Componente inativada com sucesso.', 'success')
+      } else {
+        toast('Componente excluído com sucesso.', 'success')
+      }
+    } catch {
+      if (isInativar) {
+        toast('Não foi possível inativar o componente.\nTente novamente.', 'error')
+      } else {
+        toast('Não foi possível excluir o componente.\nTente novamente.', 'error')
+      }
+    }
     setDeleteModal(null)
     setPendingDeleteId(null)
   }
