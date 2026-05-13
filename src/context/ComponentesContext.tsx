@@ -7,6 +7,7 @@ import type { Componente } from '@/types'
 interface ComponentesContextValue {
   componentes: Componente[]
   loading: boolean
+  error: boolean
   addComponente: (data: Omit<Componente, 'id' | 'createdAt'>) => Promise<void>
   updateComponente: (id: string, data: Partial<Componente>) => Promise<void>
   deleteComponente: (id: string) => Promise<'excluido' | 'inativado'>
