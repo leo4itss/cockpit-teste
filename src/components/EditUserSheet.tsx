@@ -4,6 +4,7 @@ import { Sheet } from './ui/Sheet'
 import { Input } from './ui/Input'
 import { Select } from './ui/Select'
 import { Button } from './ui/Button'
+import { Dialog } from './ui/Dialog'
 import { EtiquetaDialog } from './EtiquetaDialog'
 import type { User } from '@/types'
 
