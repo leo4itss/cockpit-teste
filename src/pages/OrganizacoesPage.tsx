@@ -30,7 +30,14 @@ export function OrganizacoesPage() {
       })
   }, [])
 
-  const filtered = orgs.filter(o => showInativas || o.status !== 'Inativo')
+  const filtered = orgs
+    .filter(o => showInativas || o.status !== 'Inativo')
+    .filter(o =>
+      !search ||
+      o.name.toLowerCase().includes(search.toLowerCase()) ||
+      (o.domain ?? '').toLowerCase().includes(search.toLowerCase()) ||
+      (o.activitySector ?? '').toLowerCase().includes(search.toLowerCase())
+    )
 
   async function handleDeleteOrg(org: Organization) {
     try {
