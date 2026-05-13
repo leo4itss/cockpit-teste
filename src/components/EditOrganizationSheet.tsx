@@ -5,6 +5,7 @@ import { Sheet } from './ui/Sheet'
 import { Input } from './ui/Input'
 import { Select } from './ui/Select'
 import { Button } from './ui/Button'
+import { Dialog } from './ui/Dialog'
 import { NewContactDialog, type ContactData } from './NewContactDialog'
 import type { Contact, Organization } from '@/types'
 
