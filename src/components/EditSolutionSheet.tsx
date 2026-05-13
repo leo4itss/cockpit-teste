@@ -472,7 +472,7 @@ export function EditSolutionSheet({
                 Excluir solução
               </Button>
             )}
-            <Button variant="outline" onClick={onClose}>Cancelar</Button>
+            <Button variant="outline" onClick={handleClose}>Cancelar</Button>
             {!isInactive && <Button onClick={handleSave}>Salvar</Button>}
           </>
         }
