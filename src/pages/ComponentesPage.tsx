@@ -11,7 +11,8 @@ import { api } from '@/api/client'
 import type { Componente } from '@/types'
 
 export function ComponentesPage() {
-  const { componentes, loading, addComponente, updateComponente, deleteComponente, reativarComponente } = useComponentes()
+  const { componentes, loading, error, addComponente, updateComponente, deleteComponente, reativarComponente } = useComponentes()
+  const { toasts, toast, dismiss } = useToast()
   const [search, setSearch] = useState('')
 
   // Sheet de detalhe (leitura)
