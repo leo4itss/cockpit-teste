@@ -1,0 +1,84 @@
+/**
+ * Mock de relações FGA e personas de teste.
+ *
+ * IDs alinhados com src/data/mock.ts e server/seed.ts:
+ *   Orgs:     '1'=Apple  '2'=Santacruz  '3'=Margatastiltda  '4'=Nadapedra  '5'=Agropocereal
+ *   Accounts: 'a1'=Apple 'a2'=Santacruz 'a3'=Margatastiltda ...
+ *   Users:    '1'=Leonardo  '2'=Ana  '3'=Marcelo  '4'=Carla
+ *
+ * Não existe em produção — apenas para demonstração do PoC.
+ */
+
+import type { FGARelations, Persona } from '@/types'
+
+// ── Relações FGA ──────────────────────────────────────────────
+
+export const mockFGARelations: FGARelations = {
+
+  // ── Platform Admin ──────────────────────────────────────────
+  // Leonardo (id='1'): acesso irrestrito a tudo.
+  platformAdmins: ['1'],
+
+  // ── Org Admin ───────────────────────────────────────────────
+  // Ana (id='2'): org_admin da Org '1' (Apple).
+  // → pode gerenciar contas, usuários, grupos e contratos da Apple.
+  // → também é account_admin da conta 'a1' (herdado do papel de Org Admin no PoC).
+  orgAdmins: [
+    { userId: '2', orgId: '1' },
+  ],
+
+  // ── PAS Architect ────────────────────────────────────────────
+  // Marcelo (id='3'): pas_architect da Org '1' (Apple).
+  // → pode ver orgs e gerenciar componentes.
+  // → NÃO vê gestão de usuários, grupos, contas ou contratos.
+  pasArchitects: [
+    { userId: '3', orgId: '1' },
+  ],
+
+  // ── Account Admin ────────────────────────────────────────────
+  // Ana (id='2'): account_admin da conta 'a1' (Apple).
+  // Carla (id='4'): account_admin da conta 'a2' (Santacruz).
+  //   → Carla só enxerga a conta a2 — não vê outras contas, org inteira nem contratos.
+  accountAdmins: [
+    { userId: '2', accountId: 'a1' },
+    { userId: '4', accountId: 'a2' },
+  ],
+
+  // ── Members ──────────────────────────────────────────────────
+  // Membros diretos de conta (sem papel de admin).
+  // Populados dinamicamente via user_account_memberships no banco real.
+  accountMembers: [],
+
+  // ── Group Members ────────────────────────────────────────────
+  // Populados dinamicamente via usuario_grupos no banco real.
+  groupMembers: [],
+}
+
+// ── Personas de teste ─────────────────────────────────────────
+
+export const mockPersonas: Persona[] = [
+  {
+    userId: '1',
+    label: 'Platform Admin',
+    description: 'Leonardo — acesso irrestrito a todas as orgs e recursos',
+    color: 'from-orange-400 to-red-500',
+  },
+  {
+    userId: '2',
+    label: 'Org Admin',
+    description: 'Ana — admin da Org Apple; também account_admin da conta Apple',
+    color: 'from-blue-400 to-indigo-500',
+  },
+  {
+    userId: '3',
+    label: 'PAS Architect',
+    description: 'Marcelo — gerencia componentes; não vê contas, usuários ou contratos',
+    color: 'from-green-400 to-teal-500',
+  },
+  {
+    userId: '4',
+    label: 'Account Admin',
+    description: 'Carla — admin restrita à conta Santacruz (a2)',
+    color: 'from-purple-400 to-violet-500',
+  },
+]

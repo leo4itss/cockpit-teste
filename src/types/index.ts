@@ -197,3 +197,94 @@ export interface User {
   createdAt: string
   avatar?: string
 }
+
+// ── Grupos e Permissões ───────────────────────────────────────
+
+/**
+ * Grupo de usuários com escopo org-level ou conta-level.
+ *
+ * escopo='org'   → disponível para todas as contas da organização.
+ *                  orgId preenchido, accountId null.
+ * escopo='conta' → restrito a uma conta específica.
+ *                  accountId preenchido, orgId null.
+ *                  Account Admin pode criar e gerenciar.
+ */
+export interface Grupo {
+  id: string
+  nome: string
+  descricao?: string
+  escopo: 'org' | 'conta'
+  orgId?: string       // preenchido quando escopo='org'
+  accountId?: string   // preenchido quando escopo='conta'
+  status: 'Ativo' | 'Inativo'
+  createdAt: string
+  // campos enriquecidos pelo backend (opcionais)
+  qtdMembros?: number
+}
+
+/**
+ * Vínculo entre usuário e grupo (tabela usuario_grupos).
+ * Escreve tupla FGA: user:<userId> member group:<grupoId>
+ */
+export interface UsuarioGrupo {
+  id: string
+  userId: string
+  grupoId: string
+  assignedAt: string
+}
+
+/**
+ * Vínculo entre usuário e conta, com papel (tabela user_account_memberships).
+ *
+ * papel='member'        → usuário comum da conta.
+ * papel='account_admin' → administrador da conta (promovido pelo Org Admin).
+ *
+ * Escreve tuplas FGA:
+ *   member        → user:<userId> member        account:<accountId>
+ *   account_admin → user:<userId> account_admin account:<accountId>
+ */
+export interface UserAccountMembership {
+  id: string
+  userId: string
+  accountId: string
+  papel: 'member' | 'account_admin'
+  assignedAt: string
+}
+
+// ── Modelo FGA ────────────────────────────────────────────────
+
+/**
+ * Estado completo das relações FGA carregadas para o usuário atual.
+ * Em produção, essas relações viriam do SDK do OpenFGA.
+ * No PoC, são mockadas e carregadas no AuthContext.
+ */
+export interface FGARelations {
+  // IDs dos usuários com papel platform_admin (acesso global)
+  platformAdmins: string[]
+
+  // Usuários com papel org_admin em organizações específicas
+  orgAdmins: Array<{ userId: string; orgId: string }>
+
+  // Usuários com papel pas_architect em organizações específicas
+  pasArchitects: Array<{ userId: string; orgId: string }>
+
+  // Usuários com papel account_admin em contas específicas
+  accountAdmins: Array<{ userId: string; accountId: string }>
+
+  // Usuários com papel member em contas específicas
+  accountMembers: Array<{ userId: string; accountId: string }>
+
+  // Membros de grupos (user → group)
+  groupMembers: Array<{ userId: string; groupId: string }>
+}
+
+/**
+ * Persona de teste para switcher de perfil no PoC.
+ * Não existe em produção — apenas para demonstração.
+ */
+export interface Persona {
+  userId: string
+  label: string
+  description: string
+  color: string // classe Tailwind de gradiente, ex: 'from-orange-400 to-red-500'
+}

@@ -525,4 +525,23 @@ export const users: User[] = [
     ultimoAcesso: '10/03/2026',
     createdAt: '01/01/2026',
   },
+  // Persona de Account Admin — id='4' alinhado com mockFGARelations
+  {
+    id: '4',
+    nomeCompleto: 'Carla Santos',
+    usuario: 'carlasantos',
+    email: 'carla.santos@grupoitss.com.br',
+    pais: 'Brasil',
+    telefone: '(13) 9 8800-4400',
+    area: 'Operações',
+    cargo: 'Account Admin',
+    papel: 'Account Admin',
+    etiquetas: '',
+    formatoData: 'DD/MM/YYYY',
+    formatoHora: '24h',
+    fusoHorario: 'America/Sao_Paulo',
+    status: 'Ativo',
+    ultimoAcesso: '13/05/2026',
+    createdAt: '01/03/2026',
+  },
 ]

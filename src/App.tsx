@@ -8,9 +8,11 @@ import { HomePage } from './pages/HomePage'
 import { ComponentesPage } from './pages/ComponentesPage'
 import { ComponentesProvider } from './context/ComponentesContext'
 import { UsersProvider } from './context/UsersContext'
+import { AuthProvider } from './context/AuthContext'
 
 export default function App() {
   return (
+    <AuthProvider>
     <UsersProvider>
     <ComponentesProvider>
     <BrowserRouter>
@@ -29,5 +31,6 @@ export default function App() {
     </BrowserRouter>
     </ComponentesProvider>
     </UsersProvider>
+    </AuthProvider>
   )
 }

@@ -136,3 +136,56 @@ export const users = pgTable('users', {
   createdAt: text('created_at').notNull(),
   avatar: text('avatar'),
 })
+
+// ── Grupos ────────────────────────────────────────────────────
+// Grupos de usuários com escopo org-level ou conta-level.
+//
+// Regras de escopo (FGA):
+//   escopo='org'   → orgId preenchido, accountId null
+//                    Grupo disponível para todas as contas da org.
+//   escopo='conta' → accountId preenchido, orgId null
+//                    Grupo restrito à conta — Account Admin pode criá-lo.
+//
+// Papéis por componente são armazenados em user_account_memberships
+// e resolvidos pelo engine FGA em tempo de leitura.
+export const grupos = pgTable('grupos', {
+  id: text('id').primaryKey(),
+  nome: text('nome').notNull(),
+  descricao: text('descricao'),
+  // 'org' → disponível em toda a organização
+  // 'conta' → restrito à conta específica
+  escopo: text('escopo').notNull().default('org'), // 'org' | 'conta'
+  orgId: text('org_id').references(() => organizations.id),
+  accountId: text('account_id').references(() => accounts.id),
+  status: text('status').notNull().default('Ativo'), // 'Ativo' | 'Inativo'
+  createdAt: text('created_at').notNull(),
+})
+
+// ── Membros de Grupo ──────────────────────────────────────────
+// Relação N:N entre usuários e grupos.
+// Escreve tupla FGA: user:<userId> member group:<grupoId>
+export const usuarioGrupos = pgTable('usuario_grupos', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id),
+  grupoId: text('grupo_id').notNull().references(() => grupos.id),
+  assignedAt: text('assigned_at').notNull(),
+})
+
+// ── Vínculos Usuário–Conta ────────────────────────────────────
+// Registra que um usuário pertence a uma conta e qual é seu papel.
+//
+// papel='member'        → usuário comum da conta
+// papel='account_admin' → administrador da conta (promovido pelo Org Admin)
+//
+// Escreve tupla FGA:
+//   member        → user:<userId> member account:<accountId>
+//   account_admin → user:<userId> account_admin account:<accountId>
+//
+// Nota: um usuário pode ser account_admin de várias contas.
+export const userAccountMemberships = pgTable('user_account_memberships', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id),
+  accountId: text('account_id').notNull().references(() => accounts.id),
+  papel: text('papel').notNull().default('member'), // 'member' | 'account_admin'
+  assignedAt: text('assigned_at').notNull(),
+})
