@@ -9,6 +9,9 @@ import { ComponentesPage } from './pages/ComponentesPage'
 import { ComponentesProvider } from './context/ComponentesContext'
 import { UsersProvider } from './context/UsersContext'
 import { AuthProvider } from './context/AuthContext'
+import { GruposPage } from './pages/GruposPage'
+import { UsuariosPage } from './pages/UsuariosPage'
+import { ContasPage } from './pages/ContasPage'
 
 export default function App() {
   return (
@@ -21,8 +24,11 @@ export default function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Navigate to="/home" replace />} />
           <Route path="organizacoes" element={<OrganizacoesPage />} />
-          <Route path="acessos" element={<AcessosPage />} />
-          <Route path="componentes" element={<ComponentesPage />} />
+          <Route path="acessos"      element={<AcessosPage />} />
+          <Route path="componentes"  element={<ComponentesPage />} />
+          <Route path="grupos"       element={<GruposPage />} />
+          <Route path="usuarios"     element={<UsuariosPage />} />
+          <Route path="contas"       element={<ContasPage />} />
         </Route>
         <Route path="/organizacoes/:id" element={<DetailLayout />}>
           <Route index element={<OrganizacaoDetailPage />} />

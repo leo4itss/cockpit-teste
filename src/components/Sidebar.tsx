@@ -1,6 +1,9 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Building2, Users, PanelLeft, Puzzle } from 'lucide-react'
+import { Building2, Users, PanelLeft, Puzzle, Shield, BookUser, Landmark } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useIsPlatformAdmin, useIsOrgAdmin, useIsPasArchitect, useIsAccountAdmin } from '@/authz'
+
+// ── Logo ITSS ─────────────────────────────────────────────────
 
 const ITSSIcon = () => (
   <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -17,6 +20,55 @@ const ITSSIcon = () => (
   </svg>
 )
 
+// ── NavItem reutilizável ──────────────────────────────────────
+
+function NavItem({
+  to,
+  icon: Icon,
+  label,
+  collapsed,
+}: {
+  to: string
+  icon: React.ElementType
+  label: string
+  collapsed: boolean
+}) {
+  return (
+    <NavLink
+      to={to}
+      className={({ isActive }) =>
+        cn(
+          'flex items-center gap-2 h-8 px-2 rounded-md text-sm transition-colors',
+          collapsed && 'justify-center',
+          isActive
+            ? 'bg-[#111827] text-[#f9fafb] font-medium'
+            : 'text-[#030712] hover:bg-[#e5e7eb] hover:text-[#111827] font-normal'
+        )
+      }
+    >
+      <Icon className="w-4 h-4 shrink-0" />
+      {!collapsed && <span className="whitespace-nowrap">{label}</span>}
+    </NavLink>
+  )
+}
+
+// ── Divisor de seção ──────────────────────────────────────────
+
+function SectionLabel({ label, collapsed }: { label: string; collapsed: boolean }) {
+  if (collapsed) {
+    return <div className="border-t border-[#e5e7eb] mx-1 my-1" />
+  }
+  return (
+    <div className="h-7 flex items-center px-2 mt-1">
+      <span className="text-[10px] font-semibold text-[#9ca3af] uppercase tracking-wider leading-none">
+        {label}
+      </span>
+    </div>
+  )
+}
+
+// ── Sidebar ───────────────────────────────────────────────────
+
 interface SidebarProps {
   collapsed: boolean
   onCollapse: (val: boolean) => void
@@ -25,6 +77,24 @@ interface SidebarProps {
 export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
   const navigate = useNavigate()
 
+  // Perfis do usuário atual (via AuthContext → engine FGA)
+  const isPlatformAdmin = useIsPlatformAdmin()
+  const isOrgAdmin      = useIsOrgAdmin()
+  const isPasArchitect  = useIsPasArchitect()
+  const isAccountAdmin  = useIsAccountAdmin()
+
+  // Derivados de visibilidade por perfil
+  // Account Admin puro: só tem papel de account_admin, nenhum outro
+  const isAccountAdminOnly = isAccountAdmin && !isPlatformAdmin && !isOrgAdmin && !isPasArchitect
+
+  // Itens visíveis para cada grupo
+  const showOrganizacoes = !isAccountAdminOnly                          // todos exceto Account Admin
+  const showGrupos       = !isAccountAdminOnly                          // todos exceto Account Admin
+  const showComponentes  = !isAccountAdminOnly                          // todos exceto Account Admin
+  const showUsuarios     = isPlatformAdmin || isOrgAdmin                // plataforma + org
+  const showContas       = isPlatformAdmin || isOrgAdmin                // plataforma + org
+  // Acessos: sempre visível (é a home do Account Admin)
+
   return (
     <aside
       className={cn(
@@ -32,7 +102,7 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
         collapsed ? 'w-[52px]' : 'w-64'
       )}
     >
-      {/* Header */}
+      {/* Header / Logo */}
       <div className="bg-white p-2 shrink-0">
         <div
           className={cn(
@@ -40,7 +110,6 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
             collapsed && 'justify-center'
           )}
         >
-          {/* Logo */}
           <div
             onClick={() => navigate('/home')}
             className="bg-[#f9fafb] rounded-lg shrink-0 flex items-center justify-center w-8 h-8 cursor-pointer hover:bg-gray-100 transition-colors"
@@ -54,10 +123,7 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
                 ITSS
               </span>
               <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onCollapse(true)
-                }}
+                onClick={e => { e.stopPropagation(); onCollapse(true) }}
                 className="p-1.5 rounded-md hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors shrink-0"
                 title="Recolher sidebar"
               >
@@ -69,55 +135,38 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
       </div>
 
       {/* Nav */}
-      <div className="flex flex-col flex-1 min-h-0">
-        <div className="p-2 flex flex-col gap-1 shrink-0">
-          <NavLink
-            to="/organizacoes"
-            className={({ isActive }) =>
-              cn(
-                'flex items-center gap-2 h-8 px-2 rounded-md text-sm transition-colors',
-                collapsed && 'justify-center px-2',
-                isActive
-                  ? 'bg-[#111827] text-[#f9fafb] font-medium'
-                  : 'text-[#030712] hover:bg-[#e5e7eb] hover:text-[#111827] font-normal'
-              )
-            }
-          >
-            <Building2 className="w-4 h-4 shrink-0" />
-            {!collapsed && <span className="whitespace-nowrap">Organizações</span>}
-          </NavLink>
+      <div className="flex flex-col flex-1 min-h-0 overflow-y-auto">
+        <div className="p-2 flex flex-col shrink-0">
 
-          <NavLink
-            to="/acessos"
-            className={({ isActive }) =>
-              cn(
-                'flex items-center gap-2 h-8 px-2 rounded-md text-sm transition-colors',
-                collapsed && 'justify-center px-2',
-                isActive
-                  ? 'bg-[#111827] text-[#f9fafb] font-medium'
-                  : 'text-[#030712] hover:bg-[#e5e7eb] hover:text-[#111827] font-normal'
-              )
-            }
-          >
-            <Users className="w-4 h-4 shrink-0" />
-            {!collapsed && <span className="whitespace-nowrap">Acessos</span>}
-          </NavLink>
+          {/* ── Grupo: principal ── */}
+          <div className="flex flex-col gap-1">
+            {showOrganizacoes && (
+              <NavItem to="/organizacoes" icon={Building2} label="Organizações" collapsed={collapsed} />
+            )}
+            <NavItem to="/acessos" icon={Users} label="Acessos" collapsed={collapsed} />
+            {showGrupos && (
+              <NavItem to="/grupos" icon={Shield} label="Grupos" collapsed={collapsed} />
+            )}
+            {showComponentes && (
+              <NavItem to="/componentes" icon={Puzzle} label="Componentes" collapsed={collapsed} />
+            )}
+          </div>
 
-          <NavLink
-            to="/componentes"
-            className={({ isActive }) =>
-              cn(
-                'flex items-center gap-2 h-8 px-2 rounded-md text-sm transition-colors',
-                collapsed && 'justify-center px-2',
-                isActive
-                  ? 'bg-[#111827] text-[#f9fafb] font-medium'
-                  : 'text-[#030712] hover:bg-[#e5e7eb] hover:text-[#111827] font-normal'
-              )
-            }
-          >
-            <Puzzle className="w-4 h-4 shrink-0" />
-            {!collapsed && <span className="whitespace-nowrap">Componentes</span>}
-          </NavLink>
+          {/* ── Grupo: organização (Platform Admin + Org Admin) ── */}
+          {(showUsuarios || showContas) && (
+            <>
+              <SectionLabel label="Organização" collapsed={collapsed} />
+              <div className="flex flex-col gap-1">
+                {showUsuarios && (
+                  <NavItem to="/usuarios" icon={BookUser} label="Usuários" collapsed={collapsed} />
+                )}
+                {showContas && (
+                  <NavItem to="/contas" icon={Landmark} label="Contas" collapsed={collapsed} />
+                )}
+              </div>
+            </>
+          )}
+
         </div>
       </div>
     </aside>

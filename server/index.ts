@@ -11,8 +11,11 @@ import {
   users,
   tiposLicenca,
   componentes,
+  grupos,
+  usuarioGrupos,
+  userAccountMemberships,
 } from './schema'
-import { eq } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 
 const app = new Hono()
 
@@ -514,6 +517,273 @@ app.post('/api/componentes/validate-metadata', async (c) => {
       : 'URL inacessível'
     return c.json({ ok: false, error: msg })
   }
+})
+
+// ── Grupos ────────────────────────────────────────────────────
+//
+// Regras de escopo:
+//   escopo='org'   → filtrado por orgId
+//   escopo='conta' → filtrado por accountId
+//
+// Tuplas FGA escritas em cada mutação (comentadas no PoC;
+// em produção seriam chamadas ao SDK do OpenFGA).
+
+/**
+ * GET /api/grupos
+ * Query params opcionais: orgId, accountId
+ * Retorna grupos enriquecidos com qtdMembros.
+ */
+app.get('/api/grupos', async (c) => {
+  const { orgId, accountId } = c.req.query()
+
+  // Busca todos os grupos (filtro aplicado em memória para simplicidade no PoC)
+  const rows = await db.select().from(grupos)
+
+  const filtered = rows.filter((g: any) => {
+    if (orgId && accountId) return g.orgId === orgId || g.accountId === accountId
+    if (orgId)              return g.orgId === orgId
+    if (accountId)          return g.accountId === accountId
+    return true
+  })
+
+  // Enriquece com qtdMembros
+  const membros = await db.select().from(usuarioGrupos)
+  const result = filtered.map((g: any) => ({
+    ...g,
+    qtdMembros: membros.filter((m: any) => m.grupoId === g.id).length,
+  }))
+
+  return c.json(result)
+})
+
+/**
+ * GET /api/grupos/:id
+ */
+app.get('/api/grupos/:id', async (c) => {
+  const [row] = await db.select().from(grupos).where(eq(grupos.id, c.req.param('id')))
+  if (!row) return c.json({ error: 'Not found' }, 404)
+
+  const membros = await db.select().from(usuarioGrupos).where(eq(usuarioGrupos.grupoId, row.id))
+  return c.json({ ...row, qtdMembros: membros.length })
+})
+
+/**
+ * POST /api/grupos
+ * Body: { id?, nome, descricao?, escopo, orgId?, accountId? }
+ *
+ * Escreve tupla FGA (PoC: comentado):
+ *   group:<id> org organization:<orgId>          (escopo=org)
+ *   group:<id> account account:<accountId>        (escopo=conta)
+ */
+app.post('/api/grupos', async (c) => {
+  const body = await c.req.json()
+  const id = body.id ?? crypto.randomUUID()
+  const createdAt = new Date().toLocaleDateString('pt-BR')
+
+  const [row] = await db.insert(grupos).values({
+    id,
+    nome: body.nome,
+    descricao: body.descricao ?? null,
+    escopo: body.escopo ?? 'org',
+    orgId: body.orgId ?? null,
+    accountId: body.accountId ?? null,
+    status: 'Ativo',
+    createdAt,
+  }).returning()
+
+  // TODO (produção): await fga.write({ user: `group:${id}`, relation: 'org', object: `organization:${orgId}` })
+
+  return c.json(row, 201)
+})
+
+/**
+ * PUT /api/grupos/:id
+ * Body: campos parciais de grupo (nome, descricao, status)
+ */
+app.put('/api/grupos/:id', async (c) => {
+  const body = await c.req.json()
+  const [row] = await db
+    .update(grupos)
+    .set({ nome: body.nome, descricao: body.descricao, status: body.status })
+    .where(eq(grupos.id, c.req.param('id')))
+    .returning()
+  if (!row) return c.json({ error: 'Not found' }, 404)
+  return c.json(row)
+})
+
+/**
+ * DELETE /api/grupos/:id
+ * Remove grupo e todos os seus vínculos de membros.
+ *
+ * Escreve tupla FGA (PoC: comentado):
+ *   DELETE group:<id> member user:*
+ */
+app.delete('/api/grupos/:id', async (c) => {
+  const id = c.req.param('id')
+
+  // Remove vínculos de membros primeiro (FK)
+  await db.delete(usuarioGrupos).where(eq(usuarioGrupos.grupoId, id))
+
+  const [row] = await db.delete(grupos).where(eq(grupos.id, id)).returning()
+  if (!row) return c.json({ error: 'Not found' }, 404)
+
+  // TODO (produção): await fga.deleteRelationshipTuples([{ user: `group:${id}`, ... }])
+
+  return c.json({ ok: true })
+})
+
+// ── Membros de Grupo ──────────────────────────────────────────
+
+/**
+ * GET /api/grupos/:id/membros
+ * Retorna lista de usuários que são membros do grupo (com dados do user).
+ */
+app.get('/api/grupos/:id/membros', async (c) => {
+  const grupoId = c.req.param('id')
+  const links = await db.select().from(usuarioGrupos).where(eq(usuarioGrupos.grupoId, grupoId))
+  if (links.length === 0) return c.json([])
+
+  const userIds = links.map((l: any) => l.userId)
+  const allUsers = await db.select().from(users)
+  const membros = allUsers.filter((u: any) => userIds.includes(u.id))
+  return c.json(membros)
+})
+
+/**
+ * POST /api/grupos/:id/membros
+ * Body: { userId }
+ *
+ * Escreve tupla FGA (PoC: comentado):
+ *   user:<userId> member group:<grupoId>
+ */
+app.post('/api/grupos/:id/membros', async (c) => {
+  const grupoId = c.req.param('id')
+  const { userId } = await c.req.json()
+
+  // Idempotente: ignora se já for membro
+  const existing = await db
+    .select()
+    .from(usuarioGrupos)
+    .where(and(eq(usuarioGrupos.grupoId, grupoId), eq(usuarioGrupos.userId, userId)))
+
+  if (existing.length > 0) return c.json(existing[0])
+
+  const [row] = await db.insert(usuarioGrupos).values({
+    id: crypto.randomUUID(),
+    userId,
+    grupoId,
+    assignedAt: new Date().toLocaleDateString('pt-BR'),
+  }).returning()
+
+  // TODO (produção): await fga.write({ user: `user:${userId}`, relation: 'member', object: `group:${grupoId}` })
+
+  return c.json(row, 201)
+})
+
+/**
+ * DELETE /api/grupos/:id/membros/:userId
+ *
+ * Escreve tupla FGA (PoC: comentado):
+ *   DELETE user:<userId> member group:<grupoId>
+ */
+app.delete('/api/grupos/:id/membros/:userId', async (c) => {
+  const grupoId = c.req.param('id')
+  const userId  = c.req.param('userId')
+
+  await db
+    .delete(usuarioGrupos)
+    .where(and(eq(usuarioGrupos.grupoId, grupoId), eq(usuarioGrupos.userId, userId)))
+
+  // TODO (produção): await fga.deleteTuples([{ user: `user:${userId}`, relation: 'member', object: `group:${grupoId}` }])
+
+  return c.json({ ok: true })
+})
+
+// ── Vínculos Usuário–Conta ────────────────────────────────────
+
+/**
+ * GET /api/accounts/:id/membros
+ * Lista usuários vinculados à conta com seu papel (member | account_admin).
+ */
+app.get('/api/accounts/:id/membros', async (c) => {
+  const accountId = c.req.param('id')
+  const links = await db
+    .select()
+    .from(userAccountMemberships)
+    .where(eq(userAccountMemberships.accountId, accountId))
+
+  if (links.length === 0) return c.json([])
+
+  const userIds  = links.map((l: any) => l.userId)
+  const allUsers = await db.select().from(users)
+  const membros  = allUsers
+    .filter((u: any) => userIds.includes(u.id))
+    .map((u: any) => ({
+      ...u,
+      papel: links.find((l: any) => l.userId === u.id)?.papel ?? 'member',
+    }))
+
+  return c.json(membros)
+})
+
+/**
+ * POST /api/accounts/:id/membros
+ * Body: { userId, papel: 'member' | 'account_admin' }
+ *
+ * Escreve tupla FGA:
+ *   user:<userId> <papel> account:<accountId>
+ */
+app.post('/api/accounts/:id/membros', async (c) => {
+  const accountId = c.req.param('id')
+  const { userId, papel = 'member' } = await c.req.json()
+
+  // Upsert: atualiza papel se já existir vínculo
+  const existing = await db
+    .select()
+    .from(userAccountMemberships)
+    .where(and(
+      eq(userAccountMemberships.accountId, accountId),
+      eq(userAccountMemberships.userId, userId),
+    ))
+
+  if (existing.length > 0) {
+    const [row] = await db
+      .update(userAccountMemberships)
+      .set({ papel })
+      .where(eq(userAccountMemberships.id, existing[0].id))
+      .returning()
+    return c.json(row)
+  }
+
+  const [row] = await db.insert(userAccountMemberships).values({
+    id: crypto.randomUUID(),
+    userId,
+    accountId,
+    papel,
+    assignedAt: new Date().toLocaleDateString('pt-BR'),
+  }).returning()
+
+  // TODO (produção): await fga.write({ user: `user:${userId}`, relation: papel, object: `account:${accountId}` })
+
+  return c.json(row, 201)
+})
+
+/**
+ * DELETE /api/accounts/:id/membros/:userId
+ * Remove vínculo do usuário com a conta (não exclui o usuário da org).
+ */
+app.delete('/api/accounts/:id/membros/:userId', async (c) => {
+  const accountId = c.req.param('id')
+  const userId    = c.req.param('userId')
+
+  await db
+    .delete(userAccountMemberships)
+    .where(and(
+      eq(userAccountMemberships.accountId, accountId),
+      eq(userAccountMemberships.userId, userId),
+    ))
+
+  return c.json({ ok: true })
 })
 
 // ── Start ─────────────────────────────────────────────────────
