@@ -73,4 +73,37 @@ export const api = {
       '/api/componentes/validate-metadata',
       { method: 'POST', body: JSON.stringify({ url }) }
     ),
+
+  // Grupos
+  getGrupos: (params?: { orgId?: string; accountId?: string }) => {
+    const p = new URLSearchParams()
+    if (params?.orgId)     p.set('orgId', params.orgId)
+    if (params?.accountId) p.set('accountId', params.accountId)
+    const qs = p.toString()
+    return request<any[]>(`/api/grupos${qs ? `?${qs}` : ''}`)
+  },
+  getGrupo:     (id: string)           => request<any>(`/api/grupos/${id}`),
+  createGrupo:  (data: any)            => request<any>('/api/grupos', { method: 'POST', body: JSON.stringify(data) }),
+  updateGrupo:  (id: string, data: any)=> request<any>(`/api/grupos/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteGrupo:  (id: string)           => request<{ ok: boolean }>(`/api/grupos/${id}`, { method: 'DELETE' }),
+
+  // Membros de grupo
+  getGrupoMembros:   (grupoId: string)              => request<any[]>(`/api/grupos/${grupoId}/membros`),
+  addGrupoMembro:    (grupoId: string, userId: string) =>
+    request<any>(`/api/grupos/${grupoId}/membros`, { method: 'POST', body: JSON.stringify({ userId }) }),
+  removeGrupoMembro: (grupoId: string, userId: string) =>
+    request<any>(`/api/grupos/${grupoId}/membros/${userId}`, { method: 'DELETE' }),
+
+  // Membros de conta
+  getAccountMembros:    (accountId: string) => request<any[]>(`/api/accounts/${accountId}/membros`),
+  addAccountMembro:     (accountId: string, data: { userId: string; papel: string }) =>
+    request<any>(`/api/accounts/${accountId}/membros`, { method: 'POST', body: JSON.stringify(data) }),
+  removeAccountMembro:  (accountId: string, userId: string) =>
+    request<any>(`/api/accounts/${accountId}/membros/${userId}`, { method: 'DELETE' }),
+
+  // Lookup de usuário por e-mail (busca client-side) — retorna User | null
+  lookupUserByEmail: async (email: string): Promise<any | null> => {
+    const all = await request<any[]>('/api/users')
+    return all.find((u: any) => u.email.toLowerCase() === email.toLowerCase()) ?? null
+  },
 }
