@@ -196,6 +196,23 @@ export const componentPermissions = pgTable('component_permissions', {
   index('idx_comp_perm_lookup').on(t.entidadeTipo, t.entidadeId, t.componenteId, t.acao),
 ])
 
+// ── Entitlements por Conta ───────────────────────────────────
+// Registra quais capabilities estão ativas para cada conta.
+//
+// Equivale à tupla FGA:
+//   account:<accountId> enabled_for_tenant capability:<capability>
+//
+// Exemplo: capability='assistant.use' → conta pode usar o Assistente de IA.
+// A regra de decisão é: allow = permission AND entitlement.
+export const accountEntitlements = pgTable('account_entitlements', {
+  id:         text('id').primaryKey(),
+  accountId:  text('account_id').notNull().references(() => accounts.id),
+  capability: text('capability').notNull(), // e.g. 'assistant.use'
+  enabledAt:  text('enabled_at').notNull(),
+}, (t) => [
+  index('idx_account_entitlements').on(t.accountId, t.capability),
+])
+
 // ── Vínculos Usuário–Conta ────────────────────────────────────
 // Registra que um usuário pertence a uma conta e qual é seu papel.
 //

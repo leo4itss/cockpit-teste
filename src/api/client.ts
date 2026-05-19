@@ -107,6 +107,20 @@ export const api = {
     return all.find((u: any) => u.email.toLowerCase() === email.toLowerCase()) ?? null
   },
 
+  // Entitlements por conta (capability:assistant.use etc.)
+  // Equivale à tupla FGA: account:<id> enabled_for_tenant capability:<cap>
+  getEntitlements: (accountId: string) =>
+    request<any[]>(`/api/accounts/${accountId}/entitlements`),
+  addEntitlement: (accountId: string, capability: string) =>
+    request<any>(`/api/accounts/${accountId}/entitlements`, {
+      method: 'POST',
+      body: JSON.stringify({ capability }),
+    }),
+  removeEntitlement: (accountId: string, capability: string) =>
+    request<{ ok: boolean }>(`/api/accounts/${accountId}/entitlements/${encodeURIComponent(capability)}`, {
+      method: 'DELETE',
+    }),
+
   // Permissões granulares por componente
   getPermissions: (params: { entidade_tipo?: string; entidade_id?: string; componente_id?: string }) => {
     const p = new URLSearchParams()

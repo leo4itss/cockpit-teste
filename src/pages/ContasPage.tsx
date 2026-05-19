@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import {
   Plus, Search, Ellipsis, Eye,
   ShieldCheck, UserMinus, Loader2, AlertCircle, Building2,
+  Bot, Database, Layers, CheckCircle2, XCircle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
@@ -313,9 +314,46 @@ function RemoverMembroDialog({ open, onClose, membro, account, onConfirm }: Remo
   )
 }
 
+// ── Catálogo de Capabilities ──────────────────────────────────
+// Alinhado com o spec: capability:assistant.use (policy-assistant-river-valadao.md)
+
+type CapabilityDef = {
+  id: string
+  nome: string
+  descricao: string
+  icon: React.ElementType
+  color: string
+}
+
+const CAPABILITIES: CapabilityDef[] = [
+  {
+    id:       'assistant.use',
+    nome:     'Assistente de IA',
+    descricao: 'Permite que usuários da conta utilizem o assistente de IA (chat, RAG, agentes). Obrigatório para qualquer ação no assistente.',
+    icon:     Bot,
+    color:    'text-violet-500',
+  },
+  {
+    id:       'knowledge.use',
+    nome:     'Base de Conhecimento',
+    descricao: 'Permite acesso à base de conhecimento corporativa para leitura e edição de documentos.',
+    icon:     Database,
+    color:    'text-blue-500',
+  },
+  {
+    id:       'analytics.use',
+    nome:     'Analytics',
+    descricao: 'Permite acesso aos dashboards e relatórios analíticos da conta.',
+    icon:     Layers,
+    color:    'text-teal-500',
+  },
+]
+
 // ─────────────────────────────────────────────────────────────
 // ContaDetailSheet
 // ─────────────────────────────────────────────────────────────
+
+type ContaDetailTab = 'usuarios' | 'capacidades'
 
 interface ContaDetailProps {
   open:     boolean
@@ -324,20 +362,38 @@ interface ContaDetailProps {
 }
 
 function ContaDetailSheet({ open, onClose, account }: ContaDetailProps) {
+  const [tab, setTab] = useState<ContaDetailTab>('usuarios')
+
+  // ── Usuários ────────────────────────────────────────────────
   const [membros, setMembros]         = useState<MembroWithPapel[]>([])
   const [loading, setLoading]         = useState(false)
   const [showPromover, setShowPromover] = useState(false)
   const [pendingRemover, setPendingRemover] = useState<MembroWithPapel | null>(null)
 
+  // ── Capacidades ─────────────────────────────────────────────
+  const [activeCapabilities, setActiveCapabilities] = useState<string[]>([])
+  const [loadingCaps, setLoadingCaps]     = useState(false)
+  const [togglingCap, setTogglingCap]     = useState<string | null>(null)
+
   useEffect(() => {
     if (!open || !account) return
     setLoading(true)
+    setLoadingCaps(true)
+    setTab('usuarios')
+
     api.getAccountMembros(account.id)
       .then((data: any[]) => {
         setMembros(data as MembroWithPapel[])
         setLoading(false)
       })
       .catch(() => setLoading(false))
+
+    api.getEntitlements(account.id)
+      .then((data: any[]) => {
+        setActiveCapabilities(data.map((e: any) => e.capability))
+        setLoadingCaps(false)
+      })
+      .catch(() => setLoadingCaps(false))
   }, [open, account])
 
   const elegíveis = useMemo(
@@ -360,9 +416,27 @@ function ContaDetailSheet({ open, onClose, account }: ContaDetailProps) {
     setPendingRemover(null)
   }
 
+  async function handleToggleCapability(capId: string) {
+    if (!account || togglingCap) return
+    const isActive = activeCapabilities.includes(capId)
+    setTogglingCap(capId)
+    try {
+      if (isActive) {
+        await api.removeEntitlement(account.id, capId)
+        setActiveCapabilities(prev => prev.filter(c => c !== capId))
+      } else {
+        await api.addEntitlement(account.id, capId)
+        setActiveCapabilities(prev => [...prev, capId])
+      }
+    } finally {
+      setTogglingCap(null)
+    }
+  }
+
   function handleClose() {
     setMembros([]); setLoading(false)
     setShowPromover(false); setPendingRemover(null)
+    setActiveCapabilities([]); setLoadingCaps(false); setTogglingCap(null)
     onClose()
   }
 
@@ -383,84 +457,181 @@ function ContaDetailSheet({ open, onClose, account }: ContaDetailProps) {
 
         <NestedSheetBody noPadding>
 
-          {/* Header da seção de usuários */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-            <p className="text-sm font-medium text-[#030712]">
-              Usuários vinculados
-              {!loading && (
-                <span className="ml-1.5 text-xs font-normal text-[#6b7280]">({membros.length})</span>
-              )}
-            </p>
+          {/* Tabs */}
+          <div className="flex border-b border-gray-200 px-6">
+            {(['usuarios', 'capacidades'] as ContaDetailTab[]).map(t => (
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                className={cn(
+                  'px-1 py-3 mr-6 text-sm font-medium border-b-2 -mb-px transition-colors',
+                  tab === t
+                    ? 'border-[#030712] text-[#030712]'
+                    : 'border-transparent text-[#6b7280] hover:text-[#030712]'
+                )}
+              >
+                {t === 'usuarios' ? (
+                  <>Usuários {!loading && <span className="ml-1 text-xs font-normal text-[#6b7280]">({membros.length})</span>}</>
+                ) : (
+                  <>Capacidades {!loadingCaps && <span className="ml-1 text-xs font-normal text-[#6b7280]">({activeCapabilities.length}/{CAPABILITIES.length})</span>}</>
+                )}
+              </button>
+            ))}
           </div>
 
-          {/* Lista de membros */}
-          <div className="flex-1 overflow-y-auto">
-            {loading ? (
-              <div className="flex items-center justify-center py-12 text-sm text-gray-500">
-                Carregando usuários...
-              </div>
-            ) : membros.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 gap-2">
-                <Building2 className="w-8 h-8 text-gray-300" />
-                <p className="text-sm font-medium text-[#030712]">Nenhum usuário vinculado</p>
-                <p className="text-xs text-[#6b7280] text-center max-w-xs">
-                  Usuários são vinculados a esta conta pelo Org Admin na tela de Usuários.
+          {/* ── Aba Usuários ── */}
+          {tab === 'usuarios' && (
+            <div className="flex-1 overflow-y-auto">
+              {loading ? (
+                <div className="flex items-center justify-center py-12 text-sm text-gray-500">
+                  Carregando usuários...
+                </div>
+              ) : membros.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 gap-2">
+                  <Building2 className="w-8 h-8 text-gray-300" />
+                  <p className="text-sm font-medium text-[#030712]">Nenhum usuário vinculado</p>
+                  <p className="text-xs text-[#6b7280] text-center max-w-xs">
+                    Usuários são vinculados a esta conta pelo Org Admin na tela de Usuários.
+                  </p>
+                </div>
+              ) : (
+                <table className="w-full">
+                  <tbody>
+                    {membros.map(membro => (
+                      <tr
+                        key={membro.id}
+                        className="group border-b border-gray-50 hover:bg-gray-50/60 transition-colors last:border-b-0"
+                      >
+                        <td className="pl-6 pr-3 py-3">
+                          <div className="flex items-center gap-3">
+                            <Avatar nome={membro.nomeCompleto} />
+                            <div className="min-w-0">
+                              <p className="text-sm font-medium text-[#030712] truncate">{membro.nomeCompleto}</p>
+                              <p className="text-xs text-[#6b7280] truncate">{membro.email}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-3 py-3 whitespace-nowrap">
+                          <PapelBadge papel={membro.papel} />
+                        </td>
+                        <td className="pr-6 pl-3 py-3 text-right">
+                          <div className="invisible group-hover:visible">
+                            <button
+                              onClick={() => setPendingRemover(membro)}
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-red-600 hover:bg-red-50 transition-colors"
+                            >
+                              <UserMinus className="w-3.5 h-3.5" />
+                              Remover da conta
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          )}
+
+          {/* ── Aba Capacidades ── */}
+          {tab === 'capacidades' && (
+            <div className="flex-1 overflow-y-auto">
+              {/* Banner explicativo */}
+              <div className="mx-6 mt-5 mb-4 p-3.5 rounded-xl border border-blue-100 bg-blue-50">
+                <p className="text-xs text-blue-800 leading-relaxed">
+                  <strong>Regra de decisão:</strong> <code className="bg-blue-100 px-1 rounded text-[11px]">allow = permission AND entitlement</code><br />
+                  Ativar uma capacidade aqui equivale à tupla FGA{' '}
+                  <code className="bg-blue-100 px-1 rounded text-[11px]">account:{account.id} enabled_for_tenant capability:X</code>.
+                  Sem o entitlement ativo, nenhuma permissão individual é suficiente para liberar o acesso.
                 </p>
               </div>
-            ) : (
-              <table className="w-full">
-                <tbody>
-                  {membros.map(membro => (
-                    <tr
-                      key={membro.id}
-                      className="group border-b border-gray-50 hover:bg-gray-50/60 transition-colors last:border-b-0"
-                    >
-                      {/* Avatar + nome + e-mail */}
-                      <td className="pl-6 pr-3 py-3">
-                        <div className="flex items-center gap-3">
-                          <Avatar nome={membro.nomeCompleto} />
-                          <div className="min-w-0">
-                            <p className="text-sm font-medium text-[#030712] truncate">{membro.nomeCompleto}</p>
-                            <p className="text-xs text-[#6b7280] truncate">{membro.email}</p>
+
+              {loadingCaps ? (
+                <div className="flex items-center justify-center py-12 text-sm text-gray-500">
+                  Carregando capacidades...
+                </div>
+              ) : (
+                <div className="px-6 pb-6 flex flex-col gap-3">
+                  {CAPABILITIES.map(cap => {
+                    const isActive  = activeCapabilities.includes(cap.id)
+                    const isLoading = togglingCap === cap.id
+                    const Icon      = cap.icon
+                    return (
+                      <div
+                        key={cap.id}
+                        className={cn(
+                          'flex items-start gap-4 p-4 rounded-xl border transition-colors',
+                          isActive
+                            ? 'border-green-200 bg-green-50/60'
+                            : 'border-gray-200 bg-white',
+                        )}
+                      >
+                        {/* Ícone */}
+                        <div className={cn('mt-0.5 shrink-0', cap.color)}>
+                          <Icon className="w-5 h-5" />
+                        </div>
+
+                        {/* Texto */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <p className="text-sm font-medium text-[#030712]">{cap.nome}</p>
+                            {isActive
+                              ? <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-green-700 bg-green-100 border border-green-200 rounded-full px-2 py-0.5">
+                                  <CheckCircle2 className="w-3 h-3" /> Ativo
+                                </span>
+                              : <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-gray-500 bg-gray-100 border border-gray-200 rounded-full px-2 py-0.5">
+                                  <XCircle className="w-3 h-3" /> Inativo
+                                </span>
+                            }
                           </div>
+                          <p className="text-xs text-[#6b7280] leading-relaxed">{cap.descricao}</p>
+                          <p className="text-[10px] text-gray-400 mt-1 font-mono">capability:{cap.id}</p>
                         </div>
-                      </td>
 
-                      {/* Papel */}
-                      <td className="px-3 py-3 whitespace-nowrap">
-                        <PapelBadge papel={membro.papel} />
-                      </td>
+                        {/* Toggle */}
+                        <button
+                          onClick={() => handleToggleCapability(cap.id)}
+                          disabled={!!togglingCap}
+                          className={cn(
+                            'shrink-0 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none mt-0.5',
+                            isActive ? 'bg-green-500' : 'bg-gray-200',
+                            togglingCap && 'opacity-50 cursor-not-allowed',
+                          )}
+                          title={isActive ? 'Desativar' : 'Ativar'}
+                        >
+                          {isLoading
+                            ? <Loader2 className="w-3.5 h-3.5 text-white animate-spin absolute left-1/2 -translate-x-1/2" />
+                            : <span className={cn(
+                                'inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform',
+                                isActive ? 'translate-x-6' : 'translate-x-1',
+                              )} />
+                          }
+                        </button>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          )}
 
-                      {/* Ações — visível só no hover */}
-                      <td className="pr-6 pl-3 py-3 text-right">
-                        <div className="invisible group-hover:visible">
-                          <button
-                            onClick={() => setPendingRemover(membro)}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-red-600 hover:bg-red-50 transition-colors"
-                            title="Remover da conta"
-                          >
-                            <UserMinus className="w-3.5 h-3.5" />
-                            Remover da conta
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
         </NestedSheetBody>
 
         <NestedSheetFooter className="justify-between">
-          <Button
-            variant="outline"
-            onClick={() => setShowPromover(true)}
-            disabled={loading || elegíveis.length === 0}
-          >
-            <ShieldCheck className="w-4 h-4 mr-1.5" />
-            Promover a Account Admin
-          </Button>
+          {tab === 'usuarios' ? (
+            <Button
+              variant="outline"
+              onClick={() => setShowPromover(true)}
+              disabled={loading || elegíveis.length === 0}
+            >
+              <ShieldCheck className="w-4 h-4 mr-1.5" />
+              Promover a Account Admin
+            </Button>
+          ) : (
+            <p className="text-xs text-[#6b7280]">
+              Alterações são aplicadas imediatamente e refletem nas tuplas FGA.
+            </p>
+          )}
           <Button variant="ghost" onClick={handleClose}>Fechar</Button>
         </NestedSheetFooter>
       </NestedSheet>

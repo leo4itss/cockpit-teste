@@ -6,7 +6,7 @@ import { Popover } from '@/components/ui/Popover'
 import { CriarGrupoOrgSheet } from '@/components/grupos/CriarGrupoOrgSheet'
 import { GrupoDetailSheet } from '@/components/grupos/GrupoDetailSheet'
 import { api } from '@/api/client'
-import { useAuthz, useIsOrgAdmin, useIsAccountAdmin } from '@/authz/hooks'
+import { useAuthz, useIsPlatformAdmin, useIsOrgAdmin, useIsAccountAdmin } from '@/authz/hooks'
 import type { Account, Grupo } from '@/types'
 
 // ── Badge de escopo ───────────────────────────────────────────
@@ -21,8 +21,9 @@ function EscopoBadge({ escopo }: { escopo: 'org' | 'conta' }) {
 
 export function GruposPage() {
   const { currentUser, relations } = useAuthz()
-  const isOrgAdmin     = useIsOrgAdmin()
-  const isAccountAdmin = useIsAccountAdmin()
+  const isPlatformAdmin = useIsPlatformAdmin()
+  const isOrgAdmin      = useIsOrgAdmin()
+  const isAccountAdmin  = useIsAccountAdmin()
   const adminOrgId = relations.orgAdmins.find(a => a.userId === currentUser.id)?.orgId ?? '1'
 
   const [grupos, setGrupos]   = useState<Grupo[]>([])
@@ -34,17 +35,20 @@ export function GruposPage() {
   const [showDetail, setShowDetail]       = useState(false)
   const [selectedGrupo, setSelectedGrupo] = useState<Grupo | null>(null)
 
+  // Platform Admin vê todos os grupos (sem filtro de org); os demais filtram pela sua org.
+  const queryOrgId = isPlatformAdmin ? undefined : adminOrgId
+
   useEffect(() => {
     setLoading(true)
     Promise.all([
-      api.getGrupos({ orgId: adminOrgId }),
-      api.getAccounts(adminOrgId),
+      api.getGrupos(queryOrgId ? { orgId: queryOrgId } : undefined),
+      api.getAccounts(queryOrgId),
     ]).then(([fetchedGrupos, fetchedContas]) => {
       setGrupos(fetchedGrupos)
       setContas(fetchedContas)
       setLoading(false)
     }).catch(() => setLoading(false))
-  }, [adminOrgId])
+  }, [queryOrgId])
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase()
@@ -67,11 +71,11 @@ export function GruposPage() {
 
   // ── Render ────────────────────────────────────────────────
 
-  if (!isOrgAdmin && !isAccountAdmin) {
+  if (!isPlatformAdmin && !isOrgAdmin && !isAccountAdmin) {
     return (
       <div className="flex flex-col items-center justify-center h-full py-24 gap-2">
         <p className="text-sm font-medium text-gray-600">Acesso restrito</p>
-        <p className="text-xs text-gray-400">Esta página está disponível apenas para Org Admin e Account Admin.</p>
+        <p className="text-xs text-gray-400">Esta página está disponível apenas para Platform Admin, Org Admin e Account Admin.</p>
       </div>
     )
   }

@@ -15,6 +15,7 @@ import {
   usuarioGrupos,
   userAccountMemberships,
   componentPermissions,
+  accountEntitlements,
 } from './schema'
 import { eq, and } from 'drizzle-orm'
 
@@ -868,6 +869,80 @@ app.delete('/api/permissions', async (c) => {
       eq(componentPermissions.acao,         acao),
     )
   )
+
+  return c.json({ ok: true })
+})
+
+// ── Entitlements ─────────────────────────────────────────────
+//
+// Equivale à tupla FGA: account:<id> enabled_for_tenant capability:<cap>
+// Regra de decisão: allow = permission AND entitlement
+
+/**
+ * GET /api/accounts/:id/entitlements
+ * Retorna as capabilities ativas para a conta.
+ */
+app.get('/api/accounts/:id/entitlements', async (c) => {
+  const accountId = c.req.param('id')
+  const rows = await db
+    .select()
+    .from(accountEntitlements)
+    .where(eq(accountEntitlements.accountId, accountId))
+  return c.json(rows)
+})
+
+/**
+ * POST /api/accounts/:id/entitlements
+ * Body: { capability: string }
+ * Ativa uma capability para a conta. Idempotente — ignora se já existir.
+ */
+app.post('/api/accounts/:id/entitlements', async (c) => {
+  const accountId = c.req.param('id')
+  const { capability } = await c.req.json()
+
+  if (!capability) return c.json({ error: 'capability é obrigatório' }, 400)
+
+  // Verifica se já existe (idempotente)
+  const [existing] = await db
+    .select()
+    .from(accountEntitlements)
+    .where(
+      and(
+        eq(accountEntitlements.accountId, accountId),
+        eq(accountEntitlements.capability, capability),
+      )
+    )
+  if (existing) return c.json(existing, 200)
+
+  const [row] = await db
+    .insert(accountEntitlements)
+    .values({
+      id:         crypto.randomUUID(),
+      accountId,
+      capability,
+      enabledAt:  new Date().toISOString(),
+    })
+    .returning()
+
+  return c.json(row, 201)
+})
+
+/**
+ * DELETE /api/accounts/:id/entitlements/:capability
+ * Desativa uma capability para a conta.
+ */
+app.delete('/api/accounts/:id/entitlements/:capability', async (c) => {
+  const accountId  = c.req.param('id')
+  const capability = c.req.param('capability')
+
+  await db
+    .delete(accountEntitlements)
+    .where(
+      and(
+        eq(accountEntitlements.accountId, accountId),
+        eq(accountEntitlements.capability, capability),
+      )
+    )
 
   return c.json({ ok: true })
 })
