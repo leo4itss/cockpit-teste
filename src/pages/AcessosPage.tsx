@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Search, Plus, Ellipsis, FilePen, UserX, Eye, Trash2 } from 'lucide-react'
+import { Search, Plus, Ellipsis, FilePen, UserX, Eye, Trash2, Building2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Popover } from '@/components/ui/Popover'
@@ -9,7 +9,7 @@ import { EditUserSheet } from '@/components/EditUserSheet'
 import { ConvidarUsuarioSheet } from '@/components/usuarios/ConvidarUsuarioSheet'
 import { CriarUsuarioSheet } from '@/components/usuarios/CriarUsuarioSheet'
 import { api } from '@/api/client'
-import { useAdminAccountId, useIsPlatformAdmin, useIsOrgAdmin } from '@/authz/hooks'
+import { useAdminAccountId, useIsPlatformAdmin, useIsOrgAdmin, useIsAccountAdmin } from '@/authz/hooks'
 import { cn } from '@/lib/utils'
 import type { User, Grupo } from '@/types'
 
@@ -64,9 +64,11 @@ export function AcessosPage() {
   const abaParam = searchParams.get('aba') as Aba | null
   const abaAtiva: Aba = abaParam === 'grupos' ? 'grupos' : 'usuarios'
 
-  const accountId       = useAdminAccountId() ?? 'a1'
+  const rawAccountId    = useAdminAccountId()          // null quando a persona não é Account Admin
+  const accountId       = rawAccountId ?? ''            // string vazia → sem conta resolvida
   const isPlatformAdmin = useIsPlatformAdmin()
   const isOrgAdmin      = useIsOrgAdmin()
+  const isAccountAdmin  = useIsAccountAdmin()
 
   // Nome da conta — carregado para exibir o contexto da conta no header
   const [accountNome, setAccountNome] = useState<string | null>(null)
@@ -201,6 +203,25 @@ export function AcessosPage() {
   }
 
   // ── Render ──────────────────────────────────────────────────
+
+  // Quando não há conta vinculada à persona atual (Platform Admin, PAS Architect…)
+  if (!rawAccountId) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full py-24 gap-4">
+        <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+          <Building2 className="w-6 h-6 text-gray-400" />
+        </div>
+        <div className="text-center max-w-sm">
+          <p className="text-sm font-semibold text-gray-800">Nenhuma conta vinculada</p>
+          <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+            {isPlatformAdmin || isOrgAdmin
+              ? 'Você está como Platform Admin ou Org Admin. Esta página exibe acessos de uma conta específica — navegue até uma conta em Contas para acessá-la diretamente.'
+              : 'Esta página está disponível apenas para Account Admins vinculados a uma conta.'}
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div>
