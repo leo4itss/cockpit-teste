@@ -66,11 +66,19 @@ function FieldLabel({ children, required, hint }: {
   )
 }
 
+// Papéis disponíveis — Account Admin segue o mesmo catálogo do Org Admin
+const PAPEIS_OPCOES = [
+  { value: 'Viewer', label: 'Viewer',        desc: 'Leitura e consulta' },
+  { value: 'User',   label: 'User',          desc: 'Uso padrão' },
+  { value: 'Admin',  label: 'Administrador', desc: 'Acesso completo' },
+]
+
 // ── Componente principal ──────────────────────────────────────
 
 export function CriarGrupoSheet({ open, onClose, accountId, onSuccess }: Props) {
   const [nome, setNome]           = useState('')
   const [descricao, setDescricao] = useState('')
+  const [papel, setPapel]         = useState('User')
   const [searchMembro, setSearchMembro] = useState('')
   const [allUsers, setAllUsers]   = useState<User[]>([])
   const [membros, setMembros]     = useState<User[]>([])
@@ -119,6 +127,7 @@ export function CriarGrupoSheet({ open, onClose, accountId, onSuccess }: Props) 
         id:        crypto.randomUUID(),
         nome:      nome.trim(),
         descricao: descricao.trim() || null,
+        papel,
         escopo:    'conta',
         orgId:     null,
         accountId,
@@ -141,7 +150,7 @@ export function CriarGrupoSheet({ open, onClose, accountId, onSuccess }: Props) 
   }
 
   function handleClose() {
-    setNome(''); setDescricao(''); setSearchMembro('')
+    setNome(''); setDescricao(''); setPapel('User'); setSearchMembro('')
     setMembros([]); setError(null)
     onClose()
   }
@@ -186,6 +195,32 @@ export function CriarGrupoSheet({ open, onClose, accountId, onSuccess }: Props) 
               disabled={saving}
               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none disabled:bg-gray-50"
             />
+          </div>
+
+          {/* Papel */}
+          <div className="flex flex-col gap-2">
+            <FieldLabel required hint="Define o nível de acesso padrão dos membros deste grupo.">
+              Papel
+            </FieldLabel>
+            <div className="grid grid-cols-3 gap-2">
+              {PAPEIS_OPCOES.map(p => (
+                <button
+                  key={p.value}
+                  type="button"
+                  onClick={() => setPapel(p.value)}
+                  disabled={saving}
+                  className={cn(
+                    'flex flex-col items-start px-3 py-2.5 rounded-lg border text-left transition-colors',
+                    papel === p.value
+                      ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
+                      : 'border-gray-200 bg-white hover:bg-gray-50'
+                  )}
+                >
+                  <span className="text-sm font-medium text-[#030712]">{p.label}</span>
+                  <span className="text-xs text-[#6b7280] mt-0.5 leading-tight">{p.desc}</span>
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Escopo — read-only para Account Admin */}

@@ -62,9 +62,17 @@ function FieldLabel({ children, required, hint }: {
 
 // ── Componente principal ──────────────────────────────────────
 
+// Papéis disponíveis — abstração sobre as tuplas FGA de permissão
+const PAPEIS = [
+  { value: 'Viewer', label: 'Viewer',     desc: 'Acesso de leitura e consulta' },
+  { value: 'User',   label: 'User',       desc: 'Uso padrão do assistente' },
+  { value: 'Admin',  label: 'Administrador', desc: 'Acesso completo à gestão' },
+]
+
 export function CriarGrupoOrgSheet({ open, onClose, orgId, contas, onSuccess }: Props) {
   const [nome, setNome]                         = useState('')
   const [descricao, setDescricao]               = useState('')
+  const [papel, setPapel]                       = useState('User')
   const [escopo, setEscopo]                     = useState<'org' | 'conta'>('org')
   const [contaSelecionada, setContaSelecionada] = useState('')
   const [searchMembro, setSearchMembro]         = useState('')
@@ -115,6 +123,7 @@ export function CriarGrupoOrgSheet({ open, onClose, orgId, contas, onSuccess }: 
         id:        crypto.randomUUID(),
         nome:      nome.trim(),
         descricao: descricao.trim() || null,
+        papel,
         escopo,
         orgId:     escopo === 'org'   ? orgId             : null,
         accountId: escopo === 'conta' ? contaSelecionada  : null,
@@ -136,7 +145,7 @@ export function CriarGrupoOrgSheet({ open, onClose, orgId, contas, onSuccess }: 
   }
 
   function handleClose() {
-    setNome(''); setDescricao(''); setEscopo('org')
+    setNome(''); setDescricao(''); setPapel('User'); setEscopo('org')
     setContaSelecionada(''); setSearchMembro('')
     setMembros([]); setError(null)
     onClose()
@@ -182,6 +191,32 @@ export function CriarGrupoOrgSheet({ open, onClose, orgId, contas, onSuccess }: 
               disabled={saving}
               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none disabled:bg-gray-50"
             />
+          </div>
+
+          {/* Papel — seletor visual */}
+          <div className="flex flex-col gap-2">
+            <FieldLabel required hint="Define o nível de acesso padrão dos membros deste grupo.">
+              Papel
+            </FieldLabel>
+            <div className="grid grid-cols-3 gap-2">
+              {PAPEIS.map(p => (
+                <button
+                  key={p.value}
+                  type="button"
+                  onClick={() => setPapel(p.value)}
+                  disabled={saving}
+                  className={cn(
+                    'flex flex-col items-start px-3 py-2.5 rounded-lg border text-left transition-colors',
+                    papel === p.value
+                      ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
+                      : 'border-gray-200 bg-white hover:bg-gray-50'
+                  )}
+                >
+                  <span className="text-sm font-medium text-[#030712]">{p.label}</span>
+                  <span className="text-xs text-[#6b7280] mt-0.5 leading-tight">{p.desc}</span>
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Escopo — seletor visual */}

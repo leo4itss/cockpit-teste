@@ -586,6 +586,7 @@ app.post('/api/grupos', async (c) => {
     id,
     nome: body.nome,
     descricao: body.descricao ?? null,
+    papel: body.papel ?? '',
     escopo: body.escopo ?? 'org',
     orgId: body.orgId ?? null,
     accountId: body.accountId ?? null,
@@ -606,7 +607,7 @@ app.put('/api/grupos/:id', async (c) => {
   const body = await c.req.json()
   const [row] = await db
     .update(grupos)
-    .set({ nome: body.nome, descricao: body.descricao, status: body.status })
+    .set({ nome: body.nome, descricao: body.descricao, papel: body.papel, status: body.status })
     .where(eq(grupos.id, c.req.param('id')))
     .returning()
   if (!row) return c.json({ error: 'Not found' }, 404)

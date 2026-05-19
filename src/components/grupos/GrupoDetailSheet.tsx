@@ -12,7 +12,7 @@
  */
 
 import { useState, useEffect, useMemo } from 'react'
-import { Search, UserPlus, UserMinus, Shield, Loader2 } from 'lucide-react'
+import { Search, UserPlus, UserMinus, Shield, Loader2, Pencil, Check, X } from 'lucide-react'
 import {
   NestedSheet,
   NestedSheetHeader,
@@ -53,6 +53,105 @@ function EscopoBadge({ escopo }: { escopo: 'org' | 'conta' }) {
   return escopo === 'org'
     ? <Badge variant="info">Organização</Badge>
     : <Badge variant="default" className="bg-violet-50 text-violet-700 border border-violet-200">Conta</Badge>
+}
+
+// Opções de papel — alinhadas com benchmark Auth0 FGA
+const PAPEIS_OPCOES = [
+  { value: 'Viewer', label: 'Viewer',        desc: 'Leitura e consulta',    cls: 'bg-gray-100 text-gray-600 border-gray-200' },
+  { value: 'User',   label: 'User',          desc: 'Uso padrão',            cls: 'bg-blue-50 text-blue-700 border-blue-200' },
+  { value: 'Admin',  label: 'Administrador', desc: 'Acesso completo',       cls: 'bg-orange-50 text-orange-700 border-orange-200' },
+]
+
+// Badge estático — usado quando não está editando
+function PapelBadge({ papel }: { papel?: string }) {
+  const opt = PAPEIS_OPCOES.find(p => p.value === papel)
+  if (!opt) return null
+  return (
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${opt.cls}`}>
+      {opt.label}
+    </span>
+  )
+}
+
+// Editor inline de papel — dropdown com confirm/cancel
+interface PapelEditorProps {
+  papel:     string
+  onSave:    (novo: string) => Promise<void>
+}
+function PapelEditor({ papel, onSave }: PapelEditorProps) {
+  const [editing, setEditing]   = useState(false)
+  const [draft, setDraft]       = useState(papel)
+  const [saving, setSaving]     = useState(false)
+
+  // Sincroniza quando o grupo muda (ex: sheet reabre)
+  useEffect(() => { setDraft(papel); setEditing(false) }, [papel])
+
+  async function handleSave() {
+    if (draft === papel) { setEditing(false); return }
+    setSaving(true)
+    try {
+      await onSave(draft)
+      setEditing(false)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  function handleCancel() {
+    setDraft(papel)
+    setEditing(false)
+  }
+
+  const opt = PAPEIS_OPCOES.find(p => p.value === papel)
+
+  if (!editing) {
+    return (
+      <button
+        onClick={() => setEditing(true)}
+        className="group inline-flex items-center gap-1.5 rounded-full transition-colors"
+        title="Editar papel"
+      >
+        {opt
+          ? <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${opt.cls}`}>{opt.label}</span>
+          : <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border border-dashed border-gray-300 text-gray-400">Definir papel</span>
+        }
+        <Pencil className="w-3 h-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+      </button>
+    )
+  }
+
+  return (
+    <div className="flex items-center gap-1.5">
+      <select
+        value={draft}
+        onChange={e => setDraft(e.target.value)}
+        disabled={saving}
+        autoFocus
+        className="text-xs border border-gray-300 rounded-md px-2 py-1 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white disabled:opacity-60"
+      >
+        <option value="">— sem papel —</option>
+        {PAPEIS_OPCOES.map(p => (
+          <option key={p.value} value={p.value}>{p.label} — {p.desc}</option>
+        ))}
+      </select>
+      <button
+        onClick={handleSave}
+        disabled={saving}
+        className="p-1 rounded text-green-600 hover:bg-green-50 transition-colors disabled:opacity-50"
+        title="Confirmar"
+      >
+        {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+      </button>
+      <button
+        onClick={handleCancel}
+        disabled={saving}
+        className="p-1 rounded text-gray-400 hover:bg-gray-100 transition-colors"
+        title="Cancelar"
+      >
+        <X className="w-3.5 h-3.5" />
+      </button>
+    </div>
+  )
 }
 
 // ── Seção de busca para adicionar membro ──────────────────────
@@ -143,6 +242,13 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome 
   const [addingId, setAddingId]         = useState<string | null>(null)
   const [removingId, setRemovingId]     = useState<string | null>(null)
   const [showAtribuir, setShowAtribuir] = useState(false)
+  // Papel local — permite edição inline sem recarregar a lista pai
+  const [localPapel, setLocalPapel]     = useState(grupo?.papel ?? '')
+
+  // Sincroniza papel local quando o grupo muda
+  useEffect(() => {
+    setLocalPapel(grupo?.papel ?? '')
+  }, [grupo?.id, grupo?.papel])
 
   // Carrega membros e todos os usuários ao abrir
   useEffect(() => {
@@ -158,7 +264,7 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome 
       setAllUsers(users)
       setLoadingMembros(false)
     }).catch(() => setLoadingMembros(false))
-  }, [open, grupo])
+  }, [open, grupo?.id])
 
   // ── Adicionar membro ─────────────────────────────────────
 
@@ -187,6 +293,19 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome 
     }
   }
 
+  // ── Editar papel ─────────────────────────────────────────
+
+  async function handleSavePapel(novoPapel: string) {
+    if (!grupo) return
+    await api.updateGrupo(grupo.id, {
+      nome:      grupo.nome,
+      descricao: grupo.descricao ?? null,
+      papel:     novoPapel,
+      status:    grupo.status,
+    })
+    setLocalPapel(novoPapel)
+  }
+
   // ── Atribuir permissões ──────────────────────────────────
 
   function handleAtribuirSuccess() {
@@ -208,6 +327,7 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome 
       <NestedSheetHeader onClose={handleClose}>
         <div className="flex items-center gap-2 mb-1">
           <EscopoBadge escopo={grupo.escopo} />
+          <PapelEditor papel={localPapel} onSave={handleSavePapel} />
         </div>
         <NestedSheetTitle>{grupo.nome}</NestedSheetTitle>
         {grupo.descricao && (
