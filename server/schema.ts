@@ -157,6 +157,10 @@ export const grupos = pgTable('grupos', {
   escopo: text('escopo').notNull().default('org'), // 'org' | 'conta'
   orgId: text('org_id').references(() => organizations.id),
   accountId: text('account_id').references(() => accounts.id),
+  // Papel padrão do grupo — abstração sobre as tuplas FGA de permissão.
+  // 'Viewer' → leitura/consulta | 'User' → uso padrão | 'Admin' → acesso completo
+  // Valor vazio = sem papel definido (grupo criado antes dessa feature)
+  papel: text('papel').notNull().default(''),
   status: text('status').notNull().default('Ativo'), // 'Ativo' | 'Inativo'
   createdAt: text('created_at').notNull(),
 })

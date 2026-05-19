@@ -216,6 +216,14 @@ export interface Grupo {
   escopo: 'org' | 'conta'
   orgId?: string       // preenchido quando escopo='org'
   accountId?: string   // preenchido quando escopo='conta'
+  /**
+   * Papel padrão do grupo — abstração sobre as tuplas FGA de permissão.
+   * 'Viewer' → leitura/consulta
+   * 'User'   → uso padrão do assistente
+   * 'Admin'  → acesso completo
+   * ''       → sem papel definido
+   */
+  papel?: string
   status: 'Ativo' | 'Inativo'
   createdAt: string
   // campos enriquecidos pelo backend (opcionais)
