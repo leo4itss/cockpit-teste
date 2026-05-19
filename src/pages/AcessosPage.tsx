@@ -4,11 +4,12 @@ import { Search, Plus, Ellipsis, FilePen, UserX, Eye, Trash2 } from 'lucide-reac
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Popover } from '@/components/ui/Popover'
-import { UserDetailSheet } from '@/components/UserDetailSheet'
+import { UsuarioDetailAccountSheet } from '@/components/usuarios/UsuarioDetailAccountSheet'
 import { EditUserSheet } from '@/components/EditUserSheet'
 import { ConvidarUsuarioSheet } from '@/components/usuarios/ConvidarUsuarioSheet'
+import { CriarUsuarioSheet } from '@/components/usuarios/CriarUsuarioSheet'
 import { api } from '@/api/client'
-import { useAdminAccountId } from '@/authz/hooks'
+import { useAdminAccountId, useIsPlatformAdmin, useIsOrgAdmin } from '@/authz/hooks'
 import { cn } from '@/lib/utils'
 import type { User, Grupo } from '@/types'
 
@@ -46,7 +47,9 @@ export function AcessosPage() {
   const abaParam = searchParams.get('aba') as Aba | null
   const abaAtiva: Aba = abaParam === 'grupos' ? 'grupos' : 'usuarios'
 
-  const accountId = useAdminAccountId() ?? 'a1'
+  const accountId     = useAdminAccountId() ?? 'a1'
+  const isPlatformAdmin = useIsPlatformAdmin()
+  const isOrgAdmin      = useIsOrgAdmin()
 
   function setAba(aba: Aba) {
     setSearchParams({ aba }, { replace: true })
@@ -57,6 +60,7 @@ export function AcessosPage() {
   const [loadingUsers, setLoadingUsers]     = useState(true)
   const [searchUsers, setSearchUsers]       = useState('')
   const [showConvidarSheet, setShowConvidarSheet] = useState(false)
+  const [showCriarSheet, setShowCriarSheet]       = useState(false)
   const [showDetailSheet, setShowDetailSheet]     = useState(false)
   const [showEditSheet, setShowEditSheet]         = useState(false)
   const [selectedUser, setSelectedUser]           = useState<User | null>(null)
@@ -77,6 +81,10 @@ export function AcessosPage() {
   }, [users, searchUsers])
 
   function handleConvidarSuccess(user: User) {
+    setUsers(prev => prev.find(u => u.id === user.id) ? prev : [...prev, user])
+  }
+
+  function handleCriarSuccess(user: User) {
     setUsers(prev => prev.find(u => u.id === user.id) ? prev : [...prev, user])
   }
 
@@ -188,9 +196,21 @@ export function AcessosPage() {
             )}
           </div>
           {abaAtiva === 'usuarios' ? (
-            <Button onClick={() => setShowConvidarSheet(true)}>
-              <Plus className="w-4 h-4 mr-1.5" />Convidar usuário
-            </Button>
+            <div className="flex items-center gap-2">
+              {(isPlatformAdmin || isOrgAdmin) && (
+                <button
+                  onClick={() => setShowCriarSheet(true)}
+                  className="inline-flex items-center gap-1.5 h-9 px-3 rounded-md border border-gray-200 bg-white text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Criar usuário
+                  <span className="ml-0.5 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-700 leading-none">Dev</span>
+                </button>
+              )}
+              <Button onClick={() => setShowConvidarSheet(true)}>
+                <Plus className="w-4 h-4 mr-1.5" />Convidar usuário
+              </Button>
+            </div>
           ) : (
             <Button onClick={() => setShowCriarGrupoSheet(true)}>
               <Plus className="w-4 h-4 mr-1.5" />Criar grupo
@@ -371,16 +391,22 @@ export function AcessosPage() {
       )}
 
       {/* Sheets — Usuários */}
+      <CriarUsuarioSheet
+        open={showCriarSheet}
+        onClose={() => setShowCriarSheet(false)}
+        onSuccess={handleCriarSuccess}
+      />
       <ConvidarUsuarioSheet
         open={showConvidarSheet}
         onClose={() => setShowConvidarSheet(false)}
         accountId={accountId}
         onSuccess={handleConvidarSuccess}
       />
-      <UserDetailSheet
+      <UsuarioDetailAccountSheet
         open={showDetailSheet}
         onClose={() => setShowDetailSheet(false)}
         user={selectedUser}
+        accountId={accountId}
         onEdit={handleEditUser}
       />
       <EditUserSheet

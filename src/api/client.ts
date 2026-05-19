@@ -106,4 +106,17 @@ export const api = {
     const all = await request<any[]>('/api/users')
     return all.find((u: any) => u.email.toLowerCase() === email.toLowerCase()) ?? null
   },
+
+  // Permissões granulares por componente
+  getPermissions: (params: { entidade_tipo?: string; entidade_id?: string; componente_id?: string }) => {
+    const p = new URLSearchParams()
+    if (params.entidade_tipo) p.set('entidade_tipo', params.entidade_tipo)
+    if (params.entidade_id)   p.set('entidade_id',   params.entidade_id)
+    if (params.componente_id) p.set('componente_id', params.componente_id)
+    return request<any[]>(`/api/permissions?${p.toString()}`)
+  },
+  addPermission: (data: { entidade_tipo: string; entidade_id: string; componente_id: string; acao: string }) =>
+    request<any>('/api/permissions', { method: 'POST', body: JSON.stringify(data) }),
+  removePermission: (data: { entidade_tipo: string; entidade_id: string; componente_id: string; acao: string }) =>
+    request<any>('/api/permissions', { method: 'DELETE', body: JSON.stringify(data) }),
 }

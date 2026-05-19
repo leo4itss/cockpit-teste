@@ -1,14 +1,13 @@
 /**
- * ConvidarUsuarioSheet — Account Admin convida usuário para a conta.
+ * ConvidarUsuarioSheet — convida usuário para a organização ou para uma conta.
  *
- * Fluxo:
- *   1. Digita e-mail → sai do campo (onBlur) → lookup na API
- *   2. Encontrado   → card verde com avatar + nome
- *   3. Não encontrado → campo de nome completo aparece (novo cadastro)
- *   4. Papel fixo: Member (promoção a Account Admin é responsabilidade do Org Admin)
- *   5. Confirmar:
- *      - Encontrado:     addAccountMembro(accountId, { userId, papel: 'member' })
- *      - Não encontrado: createUser(...) → addAccountMembro(...)
+ * modo='org'  (Org Admin):
+ *   Lookup por e-mail → encontrado: já está na org, retorna o User.
+ *   Não encontrado: cria usuário e retorna. Sem vínculo de conta.
+ *
+ * modo='conta' (Account Admin, default):
+ *   Lookup por e-mail → encontrado: vincula à conta como Member.
+ *   Não encontrado: cria usuário e vincula. Requer accountId.
  */
 
 import { useState } from 'react'
@@ -28,11 +27,12 @@ import type { User } from '@/types'
 // ── Tipos ─────────────────────────────────────────────────────
 
 interface Props {
-  open: boolean
-  onClose: () => void
-  /** Conta em que o usuário será vinculado como Member */
-  accountId: string
-  /** Chamado com o User criado/encontrado após confirmação */
+  open:     boolean
+  onClose:  () => void
+  /** 'conta' (default) vincula à conta | 'org' apenas cria/encontra na org */
+  modo?:    'org' | 'conta'
+  /** Obrigatório quando modo='conta' */
+  accountId?: string
   onSuccess: (user: User) => void
 }
 
@@ -68,7 +68,9 @@ function TextInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
 
 // ── Componente principal ──────────────────────────────────────
 
-export function ConvidarUsuarioSheet({ open, onClose, accountId, onSuccess }: Props) {
+export function ConvidarUsuarioSheet({ open, onClose, modo = 'conta', accountId, onSuccess }: Props) {
+  const isOrg = modo === 'org'
+
   const [email, setEmail]               = useState('')
   const [lookupState, setLookupState]   = useState<LookupState>('idle')
   const [foundUser, setFoundUser]       = useState<User | null>(null)
@@ -120,15 +122,19 @@ export function ConvidarUsuarioSheet({ open, onClose, accountId, onSuccess }: Pr
     setError(null)
 
     try {
-      let userId: string
       let userToReturn: User
 
       if (lookupState === 'found' && foundUser) {
-        userId = foundUser.id
+        // Usuário já existe na organização
         userToReturn = foundUser
+        if (!isOrg && accountId) {
+          // modo='conta': vincula à conta
+          await api.addAccountMembro(accountId, { userId: foundUser.id, papel: 'member' })
+        }
       } else {
+        // Criar novo usuário
         const now = new Date().toLocaleDateString('pt-BR')
-        const novo: User = await api.createUser({
+        userToReturn = await api.createUser({
           id: crypto.randomUUID(),
           nomeCompleto,
           usuario: email.split('@')[0].replace(/[^a-z0-9]/gi, '').toLowerCase(),
@@ -140,11 +146,12 @@ export function ConvidarUsuarioSheet({ open, onClose, accountId, onSuccess }: Pr
           fusoHorario: 'Brasil (Brasília)',
           status: 'Ativo', ultimoAcesso: now, createdAt: now,
         })
-        userId = novo.id
-        userToReturn = novo
+        if (!isOrg && accountId) {
+          // modo='conta': vincula à conta após criar
+          await api.addAccountMembro(accountId, { userId: userToReturn.id, papel: 'member' })
+        }
       }
 
-      await api.addAccountMembro(accountId, { userId, papel: 'member' })
       onSuccess(userToReturn)
       handleClose()
     } catch (e: unknown) {
@@ -160,16 +167,27 @@ export function ConvidarUsuarioSheet({ open, onClose, accountId, onSuccess }: Pr
     onClose()
   }
 
+  // ── Textos por modo ───────────────────────────────────────
+
+  const descricao = isOrg
+    ? 'Digite o e-mail. Se o usuário já existir será exibido; caso contrário, um novo cadastro será criado na organização.'
+    : 'Digite o e-mail. Se o usuário já existir na organização será vinculado à conta; caso contrário, um novo cadastro será criado.'
+
+  const foundMsg = isOrg
+    ? 'Usuário encontrado na organização. Será adicionado à lista.'
+    : 'Usuário encontrado na organização. Será vinculado a esta conta como Member.'
+
+  const notFoundMsg = isOrg
+    ? 'Preencha o nome para criar um novo usuário na organização.'
+    : 'Preencha o nome para criar um novo cadastro e vinculá-lo à conta.'
+
   // ── Render ────────────────────────────────────────────────
 
   return (
     <NestedSheet open={open} onClose={handleClose} width="w-[520px]">
       <NestedSheetHeader onClose={handleClose}>
         <NestedSheetTitle>Convidar usuário</NestedSheetTitle>
-        <NestedSheetDescription>
-          Digite o e-mail. Se o usuário já existir na organização será vinculado à conta;
-          caso contrário, um novo cadastro será criado automaticamente.
-        </NestedSheetDescription>
+        <NestedSheetDescription>{descricao}</NestedSheetDescription>
       </NestedSheetHeader>
 
       <NestedSheetBody>
@@ -206,9 +224,7 @@ export function ConvidarUsuarioSheet({ open, onClose, accountId, onSuccess }: Pr
                     <p className="text-xs text-[#6b7280] truncate">{foundUser.email}</p>
                   </div>
                 </div>
-                <p className="text-xs text-green-700">
-                  Usuário encontrado na organização. Será vinculado a esta conta como <strong>Member</strong>.
-                </p>
+                <p className="text-xs text-green-700">{foundMsg}</p>
               </div>
             </div>
           )}
@@ -220,9 +236,7 @@ export function ConvidarUsuarioSheet({ open, onClose, accountId, onSuccess }: Pr
                 <AlertCircle className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-semibold text-blue-900">Usuário não encontrado</p>
-                  <p className="text-xs text-blue-700 mt-0.5">
-                    Preencha o nome para criar um novo cadastro e vinculá-lo à conta.
-                  </p>
+                  <p className="text-xs text-blue-700 mt-0.5">{notFoundMsg}</p>
                 </div>
               </div>
               <div className="flex flex-col gap-1.5">
@@ -239,8 +253,8 @@ export function ConvidarUsuarioSheet({ open, onClose, accountId, onSuccess }: Pr
             </div>
           )}
 
-          {/* Papel fixo — aparece após lookup */}
-          {(lookupState === 'found' || lookupState === 'not-found') && (
+          {/* Papel — apenas para modo='conta' */}
+          {!isOrg && (lookupState === 'found' || lookupState === 'not-found') && (
             <div className="flex flex-col gap-1.5">
               <FieldLabel>Papel na conta</FieldLabel>
               <div className="flex items-center gap-2 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-md">

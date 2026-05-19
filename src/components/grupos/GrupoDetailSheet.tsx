@@ -5,9 +5,9 @@
  *   - Lista de membros com avatar, nome e e-mail
  *   - Adicionar membro via busca inline (dropdown de sugestões)
  *   - Remover membro com confirmação (ação visível só no hover)
- *   - Atribuir papel ao grupo → abre AtribuirPapelSheet aninhada (nível 2)
+ *   - Atribuir permissões ao grupo → abre AtribuirPermissoesSheet aninhada (nível 2)
  *
- * O AtribuirPapelSheet é renderizado dentro do contexto do GrupoDetailSheet,
+ * O AtribuirPermissoesSheet é renderizado dentro do contexto do GrupoDetailSheet,
  * recebendo automaticamente nível 2 (painel z=60, overlay z=59).
  */
 
@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/nested-sheet'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
-import { AtribuirPapelSheet, type PapelAtribuido } from '@/components/permissoes/AtribuirPapelSheet'
+import { AtribuirPermissoesSheet } from '@/components/permissoes/AtribuirPermissoesSheet'
 import { api } from '@/api/client'
 import { cn } from '@/lib/utils'
 import type { User, Grupo } from '@/types'
@@ -187,11 +187,10 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome 
     }
   }
 
-  // ── Atribuir papel ───────────────────────────────────────
+  // ── Atribuir permissões ──────────────────────────────────
 
-  function handleAtribuirSuccess(atribuicoes: PapelAtribuido[]) {
-    // PoC: log das atribuições confirmadas
-    console.info('[FGA] Papéis atribuídos ao grupo:', grupo?.nome, atribuicoes)
+  function handleAtribuirSuccess() {
+    console.info('[FGA] Permissões atualizadas para o grupo:', grupo?.nome)
   }
 
   function handleClose() {
@@ -309,11 +308,12 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome 
           />
         )}
 
-        {/* AtribuirPapelSheet aninhada — nível 2 automaticamente */}
-        <AtribuirPapelSheet
+        {/* AtribuirPermissoesSheet aninhada — nível 2 automaticamente */}
+        <AtribuirPermissoesSheet
           open={showAtribuir}
           onClose={() => setShowAtribuir(false)}
           entityType="grupo"
+          entityId={grupo.id}
           entityNome={grupo.nome}
           accountId={accountId}
           accountNome={accountNome}
@@ -327,7 +327,7 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome 
           onClick={() => setShowAtribuir(true)}
         >
           <Shield className="w-4 h-4 mr-1.5" />
-          Atribuir papel ao grupo
+          Atribuir permissões ao grupo
         </Button>
         <Button variant="ghost" onClick={handleClose}>
           Fechar

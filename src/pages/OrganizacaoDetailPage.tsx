@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Copy, Phone, Mail, RotateCcw } from 'lucide-react'
+import { Copy, Phone, Mail, RotateCcw, UserPlus } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { useToast, ToastContainer } from '@/components/ui/Toast'
 import { Badge } from '@/components/ui/Badge'
@@ -16,7 +16,9 @@ import { SolutionDetailSheet } from '@/components/SolutionDetailSheet'
 import { EditSolutionSheet } from '@/components/EditSolutionSheet'
 import { ContractDetailSheet } from '@/components/ContractDetailSheet'
 import { EditContractSheet } from '@/components/EditContractSheet'
+import { ConvidarUsuarioSheet } from '@/components/usuarios/ConvidarUsuarioSheet'
 import { api } from '@/api/client'
+import { useAuthz, useIsPlatformAdmin, useIsOrgAdmin, useIsPasArchitect } from '@/authz/hooks'
 import { useComponentes } from '@/context/ComponentesContext'
 import {
   organizations as mockOrgs,
@@ -25,7 +27,7 @@ import {
   contracts as mockContracts,
   tiposLicenca as mockTiposLicenca,
 } from '@/data/mock'
-import type { Account, Solution, Contract, Organization, Contact, TipoLicenca } from '@/types'
+import type { Account, Solution, Contract, Organization, Contact, TipoLicenca, User } from '@/types'
 
 type Tab = 'conta' | 'solucoes' | 'contrato' | 'marketplace'
 
@@ -33,6 +35,10 @@ export function OrganizacaoDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { toasts, toast, dismiss } = useToast()
+  const { relations } = useAuthz()
+  const isPlatformAdmin = useIsPlatformAdmin()
+  const isOrgAdmin = useIsOrgAdmin()
+  const isPasArchitect = useIsPasArchitect()
   const [tab, setTab] = useState<Tab>('conta')
   const [org, setOrg] = useState<Organization | null>(null)
   const [accounts, setAccounts] = useState<Account[]>([])
@@ -79,11 +85,21 @@ export function OrganizacaoDetailPage() {
     })
   }, [id])
 
+  // Métricas de usuários
+  const [userCount, setUserCount]           = useState(0)
+  const [loadingMetrics, setLoadingMetrics] = useState(true)
+  useEffect(() => {
+    api.getUsers()
+      .then((users: User[]) => { setUserCount(users.length); setLoadingMetrics(false) })
+      .catch(() => setLoadingMetrics(false))
+  }, [])
+
   // Create sheets
   const [sheetAccount, setSheetAccount] = useState(false)
   const [sheetSolution, setSheetSolution] = useState(false)
   const [sheetContract, setSheetContract] = useState(false)
   const [sheetEditOrg, setSheetEditOrg] = useState(false)
+  const [showCriarOrgAdmin, setShowCriarOrgAdmin] = useState(false)
 
   // Delete / inativar org modals
   const [orgDeleteModal, setOrgDeleteModal] = useState<'inativar' | null>(null)
@@ -170,6 +186,10 @@ export function OrganizacaoDetailPage() {
       <p className="text-gray-500">Organização não encontrada.</p>
     </div>
   )
+
+  // Métricas derivadas
+  const orgAdminCount    = relations.orgAdmins.filter(a => a.orgId === id).length
+  const activeAccountCount = accounts.filter(a => a.status !== 'Inativo').length
 
   // Tenta a API; se falhar (sem backend/sem .env), cai no fallback local
   async function handleAddAccount(account: Omit<Account, 'id'>) {
@@ -609,63 +629,81 @@ export function OrganizacaoDetailPage() {
                   : 'Esta funcionalidade estará disponível em breve.'}
               </p>
             </div>
-            <div className="flex items-center gap-8 shrink-0">
-              {tab === 'conta' && (() => {
-                const hasInativas = accounts.some(a => a.status === 'Inativo')
-                return (
-                  <label className={`flex items-start gap-2 ${hasInativas ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'}`}>
-                    <input
-                      type="checkbox"
-                      checked={showInativosAccount && hasInativas}
-                      onChange={e => hasInativas && setShowInativosAccount(e.target.checked)}
-                      disabled={!hasInativas}
-                      className="w-4 h-4 mt-[1px] rounded border border-[#e5e7eb] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] shrink-0 accent-[#2563eb] cursor-pointer"
-                    />
-                    <span className="text-sm font-medium text-[#030712] leading-none">Exibir contas inativadas</span>
-                  </label>
-                )
-              })()}
-              {tab === 'solucoes' && (() => {
-                const hasInativas = solutions.some(s => s.status === 'Inativo')
-                return (
-                  <label className={`flex items-start gap-2 ${hasInativas ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'}`}>
-                    <input
-                      type="checkbox"
-                      checked={showInativas && hasInativas}
-                      onChange={e => hasInativas && setShowInativas(e.target.checked)}
-                      disabled={!hasInativas}
-                      className="w-4 h-4 mt-[1px] rounded border border-[#e5e7eb] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] shrink-0 accent-[#2563eb] cursor-pointer"
-                    />
-                    <span className="text-sm font-medium text-[#030712] leading-none">Exibir soluções inativadas</span>
-                  </label>
-                )
-              })()}
-              {tab === 'contrato' && (() => {
-                const hasInativos = contracts.some(c => c.status === 'Inativo')
-                return (
-                  <label className={`flex items-start gap-2 ${hasInativos ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'}`}>
-                    <input
-                      type="checkbox"
-                      checked={showInativosContract && hasInativos}
-                      onChange={e => hasInativos && setShowInativosContract(e.target.checked)}
-                      disabled={!hasInativos}
-                      className="w-4 h-4 mt-[1px] rounded border border-[#e5e7eb] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] shrink-0 accent-[#2563eb] cursor-pointer"
-                    />
-                    <span className="text-sm font-medium text-[#030712] leading-none">Exibir contratos inativados</span>
-                  </label>
-                )
-              })()}
-              {tab !== 'marketplace' && (
-                <Button onClick={() => {
-                  if (tab === 'conta') setSheetAccount(true)
-                  else if (tab === 'solucoes') setSheetSolution(true)
-                  else if (tab === 'contrato') setSheetContract(true)
-                }}>
-                  {tab === 'conta' ? 'Criar Conta'
-                    : tab === 'solucoes' ? 'Criar Solução'
-                    : 'Criar Contrato'}
+            <div className="flex items-center gap-3 shrink-0">
+              {/* Botão global — criação de Org Admin (Platform Admin only) */}
+              {isPlatformAdmin && (
+                <Button variant="outline" onClick={() => setShowCriarOrgAdmin(true)}>
+                  <UserPlus className="w-4 h-4 mr-1.5" />
+                  Criar Org Admin
                 </Button>
               )}
+
+              <div className="flex items-center gap-8">
+                {tab === 'conta' && (() => {
+                  const hasInativas = accounts.some(a => a.status === 'Inativo')
+                  return (
+                    <label className={`flex items-start gap-2 ${hasInativas ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'}`}>
+                      <input
+                        type="checkbox"
+                        checked={showInativosAccount && hasInativas}
+                        onChange={e => hasInativas && setShowInativosAccount(e.target.checked)}
+                        disabled={!hasInativas}
+                        className="w-4 h-4 mt-[1px] rounded border border-[#e5e7eb] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] shrink-0 accent-[#2563eb] cursor-pointer"
+                      />
+                      <span className="text-sm font-medium text-[#030712] leading-none">Exibir contas inativadas</span>
+                    </label>
+                  )
+                })()}
+                {tab === 'solucoes' && (() => {
+                  const hasInativas = solutions.some(s => s.status === 'Inativo')
+                  return (
+                    <label className={`flex items-start gap-2 ${hasInativas ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'}`}>
+                      <input
+                        type="checkbox"
+                        checked={showInativas && hasInativas}
+                        onChange={e => hasInativas && setShowInativas(e.target.checked)}
+                        disabled={!hasInativas}
+                        className="w-4 h-4 mt-[1px] rounded border border-[#e5e7eb] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] shrink-0 accent-[#2563eb] cursor-pointer"
+                      />
+                      <span className="text-sm font-medium text-[#030712] leading-none">Exibir soluções inativadas</span>
+                    </label>
+                  )
+                })()}
+                {tab === 'contrato' && (() => {
+                  const hasInativos = contracts.some(c => c.status === 'Inativo')
+                  return (
+                    <label className={`flex items-start gap-2 ${hasInativos ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'}`}>
+                      <input
+                        type="checkbox"
+                        checked={showInativosContract && hasInativos}
+                        onChange={e => hasInativos && setShowInativosContract(e.target.checked)}
+                        disabled={!hasInativos}
+                        className="w-4 h-4 mt-[1px] rounded border border-[#e5e7eb] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] shrink-0 accent-[#2563eb] cursor-pointer"
+                      />
+                      <span className="text-sm font-medium text-[#030712] leading-none">Exibir contratos inativados</span>
+                    </label>
+                  )
+                })()}
+                {tab !== 'marketplace' && (() => {
+                  const canCreate =
+                    tab === 'conta'     ? (isPlatformAdmin || isOrgAdmin) :
+                    tab === 'solucoes'  ? (isPlatformAdmin || isPasArchitect) :
+                    tab === 'contrato'  ? isPlatformAdmin :
+                    false
+                  if (!canCreate) return null
+                  return (
+                    <Button onClick={() => {
+                      if (tab === 'conta') setSheetAccount(true)
+                      else if (tab === 'solucoes') setSheetSolution(true)
+                      else if (tab === 'contrato') setSheetContract(true)
+                    }}>
+                      {tab === 'conta' ? 'Criar Conta'
+                        : tab === 'solucoes' ? 'Criar Solução'
+                        : 'Criar Contrato'}
+                    </Button>
+                  )
+                })()}
+              </div>
             </div>
           </div>
         </div>
@@ -676,6 +714,24 @@ export function OrganizacaoDetailPage() {
           {/* CONTA TAB */}
           {tab === 'conta' && (
             <>
+              {/* Cards de métricas */}
+              <div className="flex divide-x divide-gray-200 bg-white border border-gray-200 rounded-2xl overflow-hidden mb-6">
+                {[
+                  { label: 'Total de usuários',        value: userCount,         loading: loadingMetrics },
+                  { label: 'Contas ativas',             value: activeAccountCount, loading: false         },
+                  { label: 'Administradores da org',   value: orgAdminCount,     loading: false         },
+                ].map(m => (
+                  <div key={m.label} className="flex-1 px-6 py-4 min-w-0">
+                    <p className="text-2xl font-bold text-[#030712] leading-8">
+                      {m.loading
+                        ? <span className="inline-block w-8 h-6 bg-gray-100 rounded animate-pulse" />
+                        : m.value}
+                    </p>
+                    <p className="text-xs text-[#6b7280] mt-0.5">{m.label}</p>
+                  </div>
+                ))}
+              </div>
+
               {(() => {
                 const visibleAccounts = accounts.filter(a => showInativosAccount || a.status !== 'Inativo')
                 return visibleAccounts.length === 0 ? (
@@ -1137,6 +1193,12 @@ export function OrganizacaoDetailPage() {
           onActivate={() => handleActivateContract(editingContract)}
         />
       )}
+      <ConvidarUsuarioSheet
+        open={showCriarOrgAdmin}
+        onClose={() => setShowCriarOrgAdmin(false)}
+        modo="org"
+        onSuccess={() => {}}
+      />
       <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </div>
   )

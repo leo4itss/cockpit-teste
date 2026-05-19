@@ -1,0 +1,336 @@
+/**
+ * CriarGrupoOrgSheet — Org Admin cria grupo com escopo selecionável.
+ *
+ * Escopo:
+ *   'org'   → disponível para todas as contas da organização
+ *   'conta' → restrito a uma conta específica (selecionada no form)
+ */
+
+import { useState, useEffect, useMemo } from 'react'
+import { Search, X, Loader2, AlertCircle, ChevronDown } from 'lucide-react'
+import {
+  NestedSheet,
+  NestedSheetHeader,
+  NestedSheetTitle,
+  NestedSheetDescription,
+  NestedSheetBody,
+  NestedSheetFooter,
+} from '@/components/ui/nested-sheet'
+import { Button } from '@/components/ui/Button'
+import { api } from '@/api/client'
+import { cn } from '@/lib/utils'
+import type { User, Account, Grupo } from '@/types'
+
+// ── Tipos ─────────────────────────────────────────────────────
+
+interface Props {
+  open:      boolean
+  onClose:   () => void
+  orgId:     string
+  contas:    Account[]
+  onSuccess: (grupo: Grupo) => void
+}
+
+// ── Helpers ───────────────────────────────────────────────────
+
+function Avatar({ nome, size = 'sm' }: { nome: string; size?: 'sm' | 'md' }) {
+  const ini = nome.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase()
+  return (
+    <div className={cn(
+      'rounded-full bg-[#e5e7eb] flex items-center justify-center font-semibold text-[#6b7280] select-none shrink-0',
+      size === 'sm' ? 'w-6 h-6 text-[10px]' : 'w-8 h-8 text-xs',
+    )}>
+      {ini}
+    </div>
+  )
+}
+
+function FieldLabel({ children, required, hint }: {
+  children: React.ReactNode
+  required?: boolean
+  hint?: string
+}) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <label className="text-sm font-medium text-[#030712]">
+        {children}{required && <span className="text-red-500 ml-0.5">*</span>}
+      </label>
+      {hint && <p className="text-xs text-[#6b7280]">{hint}</p>}
+    </div>
+  )
+}
+
+// ── Componente principal ──────────────────────────────────────
+
+export function CriarGrupoOrgSheet({ open, onClose, orgId, contas, onSuccess }: Props) {
+  const [nome, setNome]                         = useState('')
+  const [descricao, setDescricao]               = useState('')
+  const [escopo, setEscopo]                     = useState<'org' | 'conta'>('org')
+  const [contaSelecionada, setContaSelecionada] = useState('')
+  const [searchMembro, setSearchMembro]         = useState('')
+  const [allUsers, setAllUsers]                 = useState<User[]>([])
+  const [membros, setMembros]                   = useState<User[]>([])
+  const [saving, setSaving]                     = useState(false)
+  const [error, setError]                       = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!open) return
+    api.getUsers().then(setAllUsers).catch(() => {})
+  }, [open])
+
+  const sugestoes = useMemo(() => {
+    const q = searchMembro.trim().toLowerCase()
+    if (!q) return []
+    const selecionadosIds = new Set(membros.map(m => m.id))
+    return allUsers
+      .filter(u => !selecionadosIds.has(u.id))
+      .filter(u =>
+        u.nomeCompleto.toLowerCase().includes(q) ||
+        u.email.toLowerCase().includes(q)
+      )
+      .slice(0, 6)
+  }, [searchMembro, allUsers, membros])
+
+  function addMembro(user: User) {
+    setMembros(prev => prev.find(m => m.id === user.id) ? prev : [...prev, user])
+    setSearchMembro('')
+  }
+
+  function removeMembro(userId: string) {
+    setMembros(prev => prev.filter(m => m.id !== userId))
+  }
+
+  const canSave =
+    nome.trim().length > 0 &&
+    (escopo === 'org' || contaSelecionada !== '')
+
+  async function handleSave() {
+    if (!canSave) return
+    setSaving(true)
+    setError(null)
+
+    try {
+      const now = new Date().toLocaleDateString('pt-BR')
+      const grupo: Grupo = await api.createGrupo({
+        id:        crypto.randomUUID(),
+        nome:      nome.trim(),
+        descricao: descricao.trim() || null,
+        escopo,
+        orgId:     escopo === 'org'   ? orgId             : null,
+        accountId: escopo === 'conta' ? contaSelecionada  : null,
+        status:    'Ativo',
+        createdAt: now,
+      })
+
+      if (membros.length > 0) {
+        await Promise.all(membros.map(m => api.addGrupoMembro(grupo.id, m.id)))
+      }
+
+      onSuccess({ ...grupo, qtdMembros: membros.length })
+      handleClose()
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Erro ao criar grupo.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  function handleClose() {
+    setNome(''); setDescricao(''); setEscopo('org')
+    setContaSelecionada(''); setSearchMembro('')
+    setMembros([]); setError(null)
+    onClose()
+  }
+
+  // ── Render ────────────────────────────────────────────────
+
+  return (
+    <NestedSheet open={open} onClose={handleClose} width="w-[560px]">
+      <NestedSheetHeader onClose={handleClose}>
+        <NestedSheetTitle>Criar grupo</NestedSheetTitle>
+        <NestedSheetDescription>
+          Grupos de organização ficam disponíveis em todas as contas. Grupos de conta são restritos a uma conta específica.
+        </NestedSheetDescription>
+      </NestedSheetHeader>
+
+      <NestedSheetBody>
+        <div className="flex flex-col gap-6">
+
+          {/* Nome */}
+          <div className="flex flex-col gap-1.5">
+            <FieldLabel required hint="Visível para todos os membros da organização.">
+              Nome do grupo
+            </FieldLabel>
+            <input
+              type="text"
+              value={nome}
+              onChange={e => setNome(e.target.value)}
+              placeholder="Ex: Equipe de Atendimento"
+              disabled={saving}
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:bg-gray-50"
+            />
+          </div>
+
+          {/* Descrição */}
+          <div className="flex flex-col gap-1.5">
+            <FieldLabel>Descrição</FieldLabel>
+            <textarea
+              value={descricao}
+              onChange={e => setDescricao(e.target.value)}
+              placeholder="Descreva o propósito deste grupo (opcional)"
+              rows={3}
+              disabled={saving}
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none disabled:bg-gray-50"
+            />
+          </div>
+
+          {/* Escopo — seletor visual */}
+          <div className="flex flex-col gap-2">
+            <FieldLabel required>Escopo</FieldLabel>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setEscopo('org')}
+                disabled={saving}
+                className={cn(
+                  'flex flex-col items-start px-4 py-3 rounded-lg border text-left transition-colors',
+                  escopo === 'org'
+                    ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
+                    : 'border-gray-200 bg-white hover:bg-gray-50'
+                )}
+              >
+                <span className="text-sm font-medium text-[#030712]">Organização</span>
+                <span className="text-xs text-[#6b7280] mt-0.5">Disponível em todas as contas</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setEscopo('conta')}
+                disabled={saving}
+                className={cn(
+                  'flex flex-col items-start px-4 py-3 rounded-lg border text-left transition-colors',
+                  escopo === 'conta'
+                    ? 'border-violet-500 bg-violet-50 ring-1 ring-violet-500'
+                    : 'border-gray-200 bg-white hover:bg-gray-50'
+                )}
+              >
+                <span className="text-sm font-medium text-[#030712]">Conta específica</span>
+                <span className="text-xs text-[#6b7280] mt-0.5">Restrito a uma conta</span>
+              </button>
+            </div>
+
+            {/* Select de conta — aparece ao escolher "Conta específica" */}
+            {escopo === 'conta' && (
+              <div className="relative mt-1">
+                <select
+                  value={contaSelecionada}
+                  onChange={e => setContaSelecionada(e.target.value)}
+                  disabled={saving || contas.length === 0}
+                  className="w-full appearance-none pl-3 pr-8 py-2.5 text-sm border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-colors disabled:bg-gray-50 text-[#030712]"
+                >
+                  <option value="">Selecione a conta...</option>
+                  {contas.map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+              </div>
+            )}
+          </div>
+
+          {/* Busca de membros */}
+          <div className="flex flex-col gap-2">
+            <FieldLabel>Usuários</FieldLabel>
+
+            {/* Chips dos selecionados */}
+            {membros.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {membros.map(m => (
+                  <span
+                    key={m.id}
+                    className="inline-flex items-center gap-1.5 px-2 py-1 bg-blue-50 border border-blue-200 rounded-full text-xs font-medium text-blue-700"
+                  >
+                    <Avatar nome={m.nomeCompleto} size="sm" />
+                    {m.nomeCompleto.split(' ')[0]}
+                    <button
+                      onClick={() => removeMembro(m.id)}
+                      className="hover:text-blue-900 transition-colors ml-0.5"
+                      title={`Remover ${m.nomeCompleto}`}
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Campo de busca */}
+            <div className="relative">
+              <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-colors">
+                <Search className="w-4 h-4 text-gray-400 shrink-0" />
+                <input
+                  type="text"
+                  value={searchMembro}
+                  onChange={e => setSearchMembro(e.target.value)}
+                  placeholder="Buscar usuário por nome ou e-mail..."
+                  disabled={saving}
+                  className="flex-1 bg-transparent text-sm outline-none text-[#030712] placeholder:text-[#6b7280]"
+                />
+                {searchMembro && (
+                  <button onClick={() => setSearchMembro('')} className="text-gray-400 hover:text-gray-600 leading-none text-base">×</button>
+                )}
+              </div>
+
+              {/* Dropdown de sugestões */}
+              {sugestoes.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20 overflow-hidden">
+                  {sugestoes.map(user => (
+                    <button
+                      key={user.id}
+                      onClick={() => addMembro(user)}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 transition-colors text-left"
+                    >
+                      <Avatar nome={user.nomeCompleto} size="md" />
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-[#030712] truncate">{user.nomeCompleto}</p>
+                        <p className="text-xs text-[#6b7280] truncate">{user.email}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Sem resultados */}
+              {searchMembro.trim().length > 0 && sugestoes.length === 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20 px-4 py-3">
+                  <p className="text-sm text-[#6b7280]">Nenhum usuário encontrado.</p>
+                </div>
+              )}
+            </div>
+
+            {membros.length === 0 && (
+              <p className="text-xs text-[#6b7280]">
+                Você pode adicionar membros agora ou depois, no detalhe do grupo.
+              </p>
+            )}
+          </div>
+
+          {/* Erro */}
+          {error && (
+            <div className="flex items-start gap-2 p-3 rounded-lg border border-red-200 bg-red-50">
+              <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+              <p className="text-sm text-red-700">{error}</p>
+            </div>
+          )}
+
+        </div>
+      </NestedSheetBody>
+
+      <NestedSheetFooter>
+        <Button variant="outline" onClick={handleClose} disabled={saving}>Cancelar</Button>
+        <Button onClick={handleSave} disabled={!canSave || saving}>
+          {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Criando...</> : 'Criar grupo'}
+        </Button>
+      </NestedSheetFooter>
+    </NestedSheet>
+  )
+}

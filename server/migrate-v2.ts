@@ -50,6 +50,14 @@ async function main() {
   `
   console.log('✅ Tabela user_account_memberships criada')
 
+  // Reparo: tabelas criadas antes desta migration podem faltar colunas
+  await sql`ALTER TABLE usuario_grupos ADD COLUMN IF NOT EXISTS assigned_at text NOT NULL DEFAULT ''`
+  await sql`ALTER TABLE user_account_memberships ADD COLUMN IF NOT EXISTS assigned_at text NOT NULL DEFAULT ''`
+  await sql`ALTER TABLE user_account_memberships ADD COLUMN IF NOT EXISTS papel text NOT NULL DEFAULT 'member'`
+  // Legado: versão antiga usava created_at em vez de assigned_at
+  await sql`ALTER TABLE user_account_memberships DROP COLUMN IF EXISTS created_at`
+  console.log('✅ Colunas ausentes garantidas (assigned_at, papel); legado created_at removido')
+
   // Índices úteis para queries FGA
   await sql`CREATE INDEX IF NOT EXISTS idx_usuario_grupos_user    ON usuario_grupos(user_id)`
   await sql`CREATE INDEX IF NOT EXISTS idx_usuario_grupos_grupo   ON usuario_grupos(grupo_id)`

@@ -14,6 +14,7 @@ import {
   grupos,
   usuarioGrupos,
   userAccountMemberships,
+  componentPermissions,
 } from './schema'
 import { eq, and } from 'drizzle-orm'
 
@@ -782,6 +783,91 @@ app.delete('/api/accounts/:id/membros/:userId', async (c) => {
       eq(userAccountMemberships.accountId, accountId),
       eq(userAccountMemberships.userId, userId),
     ))
+
+  return c.json({ ok: true })
+})
+
+// ── Permissões Granulares ────────────────────────────────────
+
+/**
+ * GET /api/permissions
+ * Query: entidade_tipo, entidade_id, componente_id (todos opcionais — combináveis)
+ * Retorna lista de registros de component_permissions que satisfazem os filtros.
+ */
+app.get('/api/permissions', async (c) => {
+  const entidadeTipo = c.req.query('entidade_tipo')
+  const entidadeId   = c.req.query('entidade_id')
+  const componenteId = c.req.query('componente_id')
+
+  const conditions = []
+  if (entidadeTipo) conditions.push(eq(componentPermissions.entidadeTipo, entidadeTipo))
+  if (entidadeId)   conditions.push(eq(componentPermissions.entidadeId,   entidadeId))
+  if (componenteId) conditions.push(eq(componentPermissions.componenteId, componenteId))
+
+  const rows = conditions.length > 0
+    ? await db.select().from(componentPermissions).where(and(...conditions))
+    : await db.select().from(componentPermissions)
+
+  return c.json(rows)
+})
+
+/**
+ * POST /api/permissions
+ * Body: { entidade_tipo, entidade_id, componente_id, acao }
+ * Cria a permissão se ainda não existir (idempotente).
+ */
+app.post('/api/permissions', async (c) => {
+  const body = await c.req.json()
+  const { entidade_tipo, entidade_id, componente_id, acao } = body
+
+  if (!entidade_tipo || !entidade_id || !componente_id || !acao) {
+    return c.json({ error: 'entidade_tipo, entidade_id, componente_id e acao são obrigatórios' }, 400)
+  }
+
+  // Idempotente: retorna existente se já houver
+  const existing = await db.select().from(componentPermissions).where(
+    and(
+      eq(componentPermissions.entidadeTipo, entidade_tipo),
+      eq(componentPermissions.entidadeId,   entidade_id),
+      eq(componentPermissions.componenteId, componente_id),
+      eq(componentPermissions.acao,         acao),
+    )
+  )
+  if (existing.length > 0) return c.json(existing[0], 200)
+
+  const [row] = await db.insert(componentPermissions).values({
+    id:           crypto.randomUUID(),
+    entidadeTipo: entidade_tipo,
+    entidadeId:   entidade_id,
+    componenteId: componente_id,
+    acao,
+    createdAt:    new Date().toISOString(),
+  }).returning()
+
+  return c.json(row, 201)
+})
+
+/**
+ * DELETE /api/permissions
+ * Body: { entidade_tipo, entidade_id, componente_id, acao }
+ * Remove a permissão correspondente.
+ */
+app.delete('/api/permissions', async (c) => {
+  const body = await c.req.json()
+  const { entidade_tipo, entidade_id, componente_id, acao } = body
+
+  if (!entidade_tipo || !entidade_id || !componente_id || !acao) {
+    return c.json({ error: 'entidade_tipo, entidade_id, componente_id e acao são obrigatórios' }, 400)
+  }
+
+  await db.delete(componentPermissions).where(
+    and(
+      eq(componentPermissions.entidadeTipo, entidade_tipo),
+      eq(componentPermissions.entidadeId,   entidade_id),
+      eq(componentPermissions.componenteId, componente_id),
+      eq(componentPermissions.acao,         acao),
+    )
+  )
 
   return c.json({ ok: true })
 })

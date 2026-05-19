@@ -6,11 +6,13 @@ import { Badge } from '@/components/ui/Badge'
 import { NewOrganizationSheet } from '@/components/NewOrganizationSheet'
 import { ConfirmDeleteModal } from '@/components/ConfirmDeleteModal'
 import { api } from '@/api/client'
+import { useIsPlatformAdmin } from '@/authz/hooks'
 import { organizations as mockOrgs } from '@/data/mock'
 import type { Organization } from '@/types'
 
 export function OrganizacoesPage() {
   const navigate = useNavigate()
+  const isPlatformAdmin = useIsPlatformAdmin()
   const [orgs, setOrgs] = useState<Organization[]>([])
   const [loading, setLoading] = useState(true)
   const [error] = useState<string | null>(null)
@@ -115,9 +117,11 @@ export function OrganizacoesPage() {
               </button>
             )}
           </div>
-          <Button onClick={() => setSheetOpen(true)}>
-            <Plus className="w-4 h-4 mr-1.5" /> Criar Organização
-          </Button>
+          {isPlatformAdmin && (
+            <Button onClick={() => setSheetOpen(true)}>
+              <Plus className="w-4 h-4 mr-1.5" /> Criar Organização
+            </Button>
+          )}
         </div>
       </div>
 
@@ -141,9 +145,11 @@ export function OrganizacoesPage() {
                 Ainda não há organizações cadastradas no sistema.<br />
                 Crie uma nova organização para provisionar a conta.
               </p>
-              <Button onClick={() => setSheetOpen(true)}>
-                <Plus className="w-4 h-4 mr-2" /> Criar organização
-              </Button>
+              {isPlatformAdmin && (
+                <Button onClick={() => setSheetOpen(true)}>
+                  <Plus className="w-4 h-4 mr-2" /> Criar organização
+                </Button>
+              )}
             </>
           )}
         </div>

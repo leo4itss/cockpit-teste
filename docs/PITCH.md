@@ -85,13 +85,13 @@ Perfis cobertos: **Platform Admin**, **PAS Architect**, **Org Admin** e **Accoun
 
 **Aba Usuários**
 - `[Convidar usuário]` → **Sheet** → lookup por e-mail (onBlur) → se existe na org vincula à conta, se não existe cria e vincula → define papel Member (Account Admin é promovido pelo Org Admin, não no convite)
-- Clica em usuário → **Sheet** de detalhe → vê grupos do usuário na conta → `[Atribuir papel]` → **Sheet** aninhada → lista componentes disponíveis → seleciona papel por componente (viewer / user|editor / admin) → tupla FGA escrita no backend
+- Clica em usuário → **Sheet** de detalhe → vê grupos do usuário na conta → `[Atribuir permissões]` → **Sheet** aninhada → lista componentes disponíveis → para cada componente: checkboxes de ações granulares → tuplas FGA escritas no backend por ação
 - `[Remover usuário da conta]` → **Dialog** de confirmação → remove vínculo (não exclui da org)
 
 **Aba Grupos**
 - Vê dois tipos de grupo com badge visual — grupos herdados da org e grupos locais da conta
 - `[Criar grupo]` → **Sheet** → grupo nasce escopado à conta — não aparece em outras contas
-- Clica em grupo → **Sheet** de detalhe → vê membros → `[Atribuir papel ao grupo]` → **Sheet** aninhada → atribui papel por componente → todos os membros herdam
+- Clica em grupo → **Sheet** de detalhe → vê membros → `[Atribuir permissões ao grupo]` → **Sheet** aninhada → checkboxes de ações granulares por componente → todos os membros herdam
 - `[Excluir grupo]` → **Dialog** de confirmação
 
 ---
@@ -140,6 +140,80 @@ Só pode ser Account Admin quem já é usuário vinculado à conta. O fluxo é:
 3. Seleciona um usuário e promove a Account Admin via Dialog de confirmação
 
 Account Admin **não** é definido no momento do convite — o convite sempre cria um usuário com papel Member.
+
+---
+
+## Permissões Granulares por Componente
+
+### Decisão
+Em vez de papéis agregados (viewer/editor/admin), o sistema usa **checkboxes de ações individuais** por componente — inspirado no modelo do Confluence. Cada ação é uma tupla FGA independente no backend.
+
+### Base de Conhecimento — ações disponíveis
+Baseado no DSL 1 (`pasta` + `documento`):
+
+| Ação | Descrição |
+|---|---|
+| `pode_ler` | Lê documentos e pastas |
+| `pode_editar` | Edita conteúdo existente |
+| `pode_criar_documento` | Cria novos documentos |
+| `pode_enviar_para_aprovacao` | Envia documento para fluxo de aprovação |
+| `pode_aprovar` | Aprova documentos enviados |
+| `pode_publicar` | Publica documentos aprovados |
+| `pode_excluir` | Exclui documentos e pastas |
+
+### Assistente de IA — ações disponíveis
+Baseado no DSL 2 (`assistant`):
+
+| Ação | Descrição |
+|---|---|
+| `can_use_assistant` | Usa o assistente e cria conversas |
+| `can_view_consulted_sources` | Visualiza fontes consultadas |
+| `can_share_conversation_results` | Compartilha resultados de conversas |
+| `can_upload_rag_sources` | Faz upload de fontes RAG |
+| `can_configure_agents` | Configura agentes do assistente |
+| `can_manage_business_scenarios` | Gerencia cenários de negócio |
+| `can_manage_users` | Gerencia usuários do assistente |
+
+### Interface — AtribuirPermissoesSheet
+A sheet de atribuição substitui dropdowns de papel por **grupos de checkboxes por componente**:
+
+```
+┌─────────────────────────────────────────┐
+│ Atribuir permissões — João Silva    [X] │
+├─────────────────────────────────────────┤
+│ Assistente de IA                        │
+│ ☑ Usar o assistente                    │
+│ ☑ Visualizar fontes consultadas        │
+│ ☐ Compartilhar resultados              │
+│ ☐ Upload de fontes RAG                 │
+│ ☐ Configurar agentes                   │
+│ ☐ Gerenciar cenários                   │
+│ ☐ Gerenciar usuários                   │
+├─────────────────────────────────────────┤
+│ Base de Conhecimento                    │
+│ ☑ Ler documentos                       │
+│ ☑ Editar conteúdo                      │
+│ ☐ Criar documentos                     │
+│ ☐ Enviar para aprovação                │
+│ ☐ Aprovar documentos                   │
+│ ☐ Publicar documentos                  │
+│ ☐ Excluir                              │
+├─────────────────────────────────────────┤
+│              [Cancelar]  [Salvar]       │
+└─────────────────────────────────────────┘
+```
+
+### Backend — tuplas FGA por ação
+Cada checkbox marcado gera uma tupla independente:
+- `user:{id}` + `pode_ler` + `componente:{id}`
+- `user:{id}` + `can_use_assistant` + `componente:{id}`
+
+Desmarcado remove a tupla correspondente. Grupos herdam todas as tuplas dos membros.
+
+### Tabela no banco
+Nova tabela `component_permissions`:
+- `id`, `entidade_tipo` ('user' | 'group'), `entidade_id`, `componente_id`, `acao`, `created_at`
+- Índice composto em `(entidade_tipo, entidade_id, componente_id, acao)` para lookup rápido
 
 ---
 

@@ -1,4 +1,4 @@
-import { pgTable, text, integer, jsonb, boolean } from 'drizzle-orm/pg-core'
+import { pgTable, text, integer, jsonb, boolean, index } from 'drizzle-orm/pg-core'
 
 // ── Tipos de Licença ─────────────────────────────────────────
 // Entidades independentes que descrevem dimensões de licenciamento
@@ -170,6 +170,31 @@ export const usuarioGrupos = pgTable('usuario_grupos', {
   grupoId: text('grupo_id').notNull().references(() => grupos.id),
   assignedAt: text('assigned_at').notNull(),
 })
+
+// ── Permissões Granulares por Componente ──────────────────────
+// Cada linha representa uma ação concedida a um usuário ou grupo
+// em um componente específico.
+//
+// entidade_tipo: 'user' | 'group'
+// acao:
+//   Assistente de IA → can_use_assistant | can_view_consulted_sources |
+//                      can_upload_rag_sources | can_configure_agents |
+//                      can_manage_business_scenarios | can_manage_users
+//   Base de Conhecimento → pode_ler | pode_editar | pode_criar_documento |
+//                          pode_enviar_para_aprovacao | pode_aprovar |
+//                          pode_publicar | pode_excluir
+//
+// Equivale a uma tupla FGA: <entidade_tipo>:<entidade_id> <acao> componente:<componente_id>
+export const componentPermissions = pgTable('component_permissions', {
+  id:           text('id').primaryKey(),
+  entidadeTipo: text('entidade_tipo').notNull(), // 'user' | 'group'
+  entidadeId:   text('entidade_id').notNull(),
+  componenteId: text('componente_id').notNull(),
+  acao:         text('acao').notNull(),
+  createdAt:    text('created_at').notNull(),
+}, (t) => [
+  index('idx_comp_perm_lookup').on(t.entidadeTipo, t.entidadeId, t.componenteId, t.acao),
+])
 
 // ── Vínculos Usuário–Conta ────────────────────────────────────
 // Registra que um usuário pertence a uma conta e qual é seu papel.

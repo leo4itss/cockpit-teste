@@ -88,9 +88,9 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
   const isAccountAdminOnly = isAccountAdmin && !isPlatformAdmin && !isOrgAdmin && !isPasArchitect
 
   // Itens visíveis para cada grupo
-  const showOrganizacoes = !isAccountAdminOnly                          // todos exceto Account Admin
-  const showGrupos       = !isAccountAdminOnly                          // todos exceto Account Admin
-  const showComponentes  = !isAccountAdminOnly                          // todos exceto Account Admin
+  const showOrganizacoes = !isAccountAdminOnly                          // todos exceto Account Admin puro
+  const showGrupos       = isPlatformAdmin || isOrgAdmin || isAccountAdmin // Platform Admin + Org Admin + Account Admin
+  const showComponentes  = true                                         // todos podem visualizar
   const showUsuarios     = isPlatformAdmin || isOrgAdmin                // plataforma + org
   const showContas       = isPlatformAdmin || isOrgAdmin                // plataforma + org
   // Acessos: sempre visível (é a home do Account Admin)

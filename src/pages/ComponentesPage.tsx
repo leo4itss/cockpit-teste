@@ -7,12 +7,16 @@ import { ComponenteDetailSheet } from '@/components/ComponenteDetailSheet'
 import { ConfirmDeleteModal } from '@/components/ConfirmDeleteModal'
 import { useToast, ToastContainer } from '@/components/ui/Toast'
 import { useComponentes } from '@/context/ComponentesContext'
+import { useIsPlatformAdmin, useIsPasArchitect } from '@/authz/hooks'
 import { api } from '@/api/client'
 import type { Componente } from '@/types'
 
 export function ComponentesPage() {
   const { componentes, loading, error, addComponente, updateComponente, deleteComponente, reativarComponente } = useComponentes()
   const { toasts, toast, dismiss } = useToast()
+  const isPlatformAdmin = useIsPlatformAdmin()
+  const isPasArchitect  = useIsPasArchitect()
+  const canCreate = isPlatformAdmin || isPasArchitect
   const [search, setSearch] = useState('')
 
   // Toast: erro de carregamento (node 1)
@@ -201,10 +205,12 @@ export function ComponentesPage() {
                 </button>
               )}
             </div>
-            <Button onClick={handleOpenNew}>
-              <Plus className="w-4 h-4 mr-1.5" />
-              Adicionar componente
-            </Button>
+            {canCreate && (
+              <Button onClick={handleOpenNew}>
+                <Plus className="w-4 h-4 mr-1.5" />
+                Adicionar componente
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -214,7 +220,7 @@ export function ComponentesPage() {
         {loading ? (
           <p className="text-sm text-[#6b7280]">Carregando...</p>
         ) : filtered.length === 0 ? (
-          <EmptyState search={search} onNew={handleOpenNew} />
+          <EmptyState search={search} onNew={canCreate ? handleOpenNew : undefined} />
         ) : (
           <div className="border border-[#e5e7eb] rounded-2xl overflow-x-auto">
             <table className="w-full text-sm">
@@ -324,7 +330,7 @@ export function ComponentesPage() {
   )
 }
 
-function EmptyState({ search, onNew }: { search: string; onNew: () => void }) {
+function EmptyState({ search, onNew }: { search: string; onNew?: () => void }) {
   if (search) {
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-2">
@@ -339,12 +345,16 @@ function EmptyState({ search, onNew }: { search: string; onNew: () => void }) {
       <FolderOpen className="w-8 h-8 text-[#9ca3af]" />
       <div className="flex flex-col items-center gap-1">
         <p className="text-sm font-medium text-[#030712]">Nenhum componente encontrado</p>
-        <p className="text-xs text-[#6b7280]">Adicione o primeiro componente para começar.</p>
+        <p className="text-xs text-[#6b7280]">
+          {onNew ? 'Adicione o primeiro componente para começar.' : 'Nenhum componente cadastrado ainda.'}
+        </p>
       </div>
-      <Button onClick={onNew}>
-        <Plus className="w-4 h-4 mr-1.5" />
-        Adicionar componente
-      </Button>
+      {onNew && (
+        <Button onClick={onNew}>
+          <Plus className="w-4 h-4 mr-1.5" />
+          Adicionar componente
+        </Button>
+      )}
     </div>
   )
 }
