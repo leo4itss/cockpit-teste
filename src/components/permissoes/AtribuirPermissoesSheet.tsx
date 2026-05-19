@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Search, Bot, Database, Layers, Users } from 'lucide-react'
+import { Search, Bot, Database, Layers, Users, Lock } from 'lucide-react'
 import {
   NestedSheet,
   NestedSheetHeader,
@@ -20,10 +20,14 @@ type ComponenteTipo = 'assistente-ia' | 'base-conhecimento' | 'default'
 interface AcaoItem { acao: string; label: string }
 
 const ACOES: Record<ComponenteTipo, AcaoItem[]> = {
+  // Ordem: do mais básico (uso) ao mais privilegiado (administração)
+  // Alinhado com o modelo FGA oficial: openfga/authorization-model.fga
   'assistente-ia': [
     { acao: 'can_use_assistant',             label: 'Usar o assistente' },
+    { acao: 'can_share_conversation_results',label: 'Compartilhar resultados de conversas' },
     { acao: 'can_view_consulted_sources',    label: 'Visualizar fontes consultadas' },
     { acao: 'can_upload_rag_sources',        label: 'Upload de fontes RAG' },
+    { acao: 'can_create_assistant',          label: 'Criar assistente' },
     { acao: 'can_configure_agents',          label: 'Configurar agentes' },
     { acao: 'can_manage_business_scenarios', label: 'Gerenciar cenários de negócio' },
     { acao: 'can_manage_users',              label: 'Gerenciar usuários' },
@@ -42,6 +46,14 @@ const ACOES: Record<ComponenteTipo, AcaoItem[]> = {
     { acao: 'can_edit',   label: 'Editar' },
     { acao: 'can_manage', label: 'Administrar' },
   ],
+}
+
+// ── Mapeamento tipo → capability id ───────────────────────────
+// Alinhado com account_entitlements: capability = 'assistant.use' | 'knowledge.use' | 'analytics.use'
+// Componentes do tipo 'default' não têm capability associada (sempre disponíveis).
+const CAPABILITY_MAP: Partial<Record<ComponenteTipo, string>> = {
+  'assistente-ia':    'assistant.use',
+  'base-conhecimento':'knowledge.use',
 }
 
 interface Props {
@@ -64,10 +76,11 @@ function inferirTipo(nome: string): ComponenteTipo {
   return 'default'
 }
 
-function ComponenteIcon({ tipo }: { tipo: ComponenteTipo }) {
-  if (tipo === 'assistente-ia')     return <Bot      className="w-5 h-5 text-violet-500 shrink-0" />
-  if (tipo === 'base-conhecimento') return <Database className="w-5 h-5 text-blue-500 shrink-0" />
-  return                                   <Layers   className="w-5 h-5 text-gray-400 shrink-0" />
+function ComponenteIcon({ tipo, locked }: { tipo: ComponenteTipo; locked?: boolean }) {
+  const cls = locked ? 'opacity-40' : ''
+  if (tipo === 'assistente-ia')     return <Bot      className={cn('w-5 h-5 text-violet-500 shrink-0', cls)} />
+  if (tipo === 'base-conhecimento') return <Database className={cn('w-5 h-5 text-blue-500 shrink-0', cls)} />
+  return                                   <Layers   className={cn('w-5 h-5 text-gray-400 shrink-0', cls)} />
 }
 
 // ── Componente principal ───────────────────────────────────────
@@ -75,11 +88,12 @@ function ComponenteIcon({ tipo }: { tipo: ComponenteTipo }) {
 export function AtribuirPermissoesSheet({
   open, onClose, entityType, entityId, entityNome, accountId, accountNome, onSuccess,
 }: Props) {
-  const [componentes, setComponentes] = useState<Componente[]>([])
-  const [loading, setLoading]         = useState(true)
-  const [search, setSearch]           = useState('')
-  const [saving, setSaving]           = useState(false)
-  const [saveError, setSaveError]     = useState<string | null>(null)
+  const [componentes, setComponentes]       = useState<Componente[]>([])
+  const [activeCapabilities, setActiveCapabilities] = useState<Set<string>>(new Set())
+  const [loading, setLoading]               = useState(true)
+  const [search, setSearch]                 = useState('')
+  const [saving, setSaving]                 = useState(false)
+  const [saveError, setSaveError]           = useState<string | null>(null)
 
   // componenteId → string[] de ações ativas
   const [original, setOriginal] = useState<Record<string, string[]>>({})
@@ -87,43 +101,62 @@ export function AtribuirPermissoesSheet({
 
   useEffect(() => {
     if (!open) return
+    let cancelled = false
     setLoading(true)
     setSearch('')
 
     const entidadeTipo = entityType === 'usuario' ? 'user' : 'group'
 
-    // Componentes e permissões são independentes: falha em permissões não bloqueia
-    // a listagem de componentes — a sheet abre sem marcações e o usuário pode salvar.
-    api.getComponentes()
-      .then((comps: Componente[]) => {
-        const ativos = comps.filter((c: Componente) => c.status !== 'Inativo')
+    // Entitlements só se aplicam a grupos/usuários de uma conta específica.
+    // Para grupos org-scoped (accountId vazio), todos os componentes ficam disponíveis.
+    const entitlementsFetch: Promise<any[]> = accountId
+      ? api.getEntitlements(accountId).catch(() => [])
+      : Promise.resolve([])
+
+    // Permissões e entitlements são opcionais: falha deles não bloqueia a listagem.
+    Promise.all([
+      api.getComponentes(),
+      api.getPermissions({ entidade_tipo: entidadeTipo, entidade_id: entityId }).catch(() => []),
+      entitlementsFetch,
+    ])
+      .then(([comps, perms, entitlements]) => {
+        if (cancelled) return
+
+        const ativos = (comps as Componente[]).filter(c => c.status !== 'Inativo')
         setComponentes(ativos)
 
-        const emptyMap: Record<string, string[]> = {}
-        ativos.forEach((c: Componente) => { emptyMap[c.id] = [] })
+        // Constrói o Set de capabilities ativas.
+        // Se accountId vazio (grupo org) ou entitlements vazio → Set vazio → nenhum lock.
+        const caps = new Set<string>(
+          (entitlements as any[]).map((e: any) => e.capability as string)
+        )
+        // Grupos org-scoped não têm conta → sem entitlement check → tudo desbloqueado
+        setActiveCapabilities(accountId ? caps : new Set<string>(['assistant.use', 'knowledge.use', 'analytics.use']))
 
-        // Tenta carregar permissões existentes; se falhar, abre com tudo desmarcado
-        api.getPermissions({ entidade_tipo: entidadeTipo, entidade_id: entityId })
-          .then((perms: any[]) => {
-            const permMap: Record<string, string[]> = { ...emptyMap }
-            // Drizzle retorna camelCase: componenteId (não componente_id)
-            perms.forEach((p: any) => {
-              const cid = p.componenteId ?? p.componente_id
-              if (cid !== undefined && permMap[cid] !== undefined) {
-                permMap[cid] = [...permMap[cid], p.acao]
-              }
-            })
-            setOriginal(permMap)
-            setDraft(JSON.parse(JSON.stringify(permMap)))
-          })
-          .catch(() => {
-            setOriginal(emptyMap)
-            setDraft(JSON.parse(JSON.stringify(emptyMap)))
-          })
-          .finally(() => setLoading(false))
+        // Monta mapa de permissões existentes
+        const emptyMap: Record<string, string[]> = {}
+        ativos.forEach(c => { emptyMap[c.id] = [] })
+
+        const permMap: Record<string, string[]> = { ...emptyMap }
+        ;(perms as any[]).forEach((p: any) => {
+          const cid = p.componenteId ?? p.componente_id
+          if (cid !== undefined && permMap[cid] !== undefined) {
+            permMap[cid] = [...permMap[cid], p.acao]
+          }
+        })
+
+        setOriginal(permMap)
+        setDraft(JSON.parse(JSON.stringify(permMap)))
       })
-      .catch(() => setLoading(false))
-  }, [open, entityId, entityType])
+      .catch(() => {
+        // Só cai aqui se getComponentes() falhar — o resto já tem .catch() individual
+        if (cancelled) return
+        setOriginal({}); setDraft({})
+      })
+      .finally(() => { if (!cancelled) setLoading(false) })
+
+    return () => { cancelled = true }
+  }, [open, entityId, entityType, accountId])
 
   const filtered = useMemo(() => {
     if (!search.trim()) return componentes
@@ -193,12 +226,20 @@ export function AtribuirPermissoesSheet({
   }
 
   function handleClose() {
-    setSearch(''); setOriginal({}); setDraft({}); setComponentes([]); setSaveError(null)
+    setSearch(''); setOriginal({}); setDraft({}); setComponentes([])
+    setActiveCapabilities(new Set()); setSaveError(null)
     onClose()
   }
 
   const contaNome = accountNome ?? accountId
   const isGrupo   = entityType === 'grupo'
+
+  // Conta quantos componentes estão bloqueados por falta de entitlement
+  const bloqueadosCount = filtered.filter(c => {
+    const tipo = inferirTipo(c.nome)
+    const cap  = CAPABILITY_MAP[tipo]
+    return cap !== undefined && !activeCapabilities.has(cap)
+  }).length
 
   return (
     <NestedSheet open={open} onClose={handleClose} width="w-[560px]">
@@ -219,6 +260,19 @@ export function AtribuirPermissoesSheet({
               <p className="text-sm text-violet-800">
                 Você está atribuindo permissões ao <strong>grupo {entityNome}</strong>.
                 Todos os membros herdarão estas permissões automaticamente.
+              </p>
+            </div>
+          )}
+
+          {/* Banner de entitlements bloqueados */}
+          {!loading && bloqueadosCount > 0 && (
+            <div className="flex items-start gap-3 mx-6 mt-5 p-3.5 rounded-xl border border-amber-200 bg-amber-50">
+              <Lock className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <p className="text-sm text-amber-800">
+                <strong>{bloqueadosCount} {bloqueadosCount === 1 ? 'componente' : 'componentes'}</strong>{' '}
+                {bloqueadosCount === 1 ? 'está bloqueado' : 'estão bloqueados'} porque a capability correspondente
+                não está ativa para esta conta. Ative-a em{' '}
+                <strong>Contas → Capacidades</strong> antes de atribuir permissões.
               </p>
             </div>
           )}
@@ -256,25 +310,60 @@ export function AtribuirPermissoesSheet({
                   const acoes  = ACOES[tipo]
                   const ativas = draft[comp.id] ?? []
 
+                  // Verifica se a capability deste componente está ativa na conta
+                  const capRequired = CAPABILITY_MAP[tipo]
+                  const locked      = capRequired !== undefined && !activeCapabilities.has(capRequired)
+
                   return (
-                    <div key={comp.id} className="px-6 py-4">
+                    <div
+                      key={comp.id}
+                      className={cn(
+                        'px-6 py-4 transition-colors',
+                        locked && 'bg-gray-50/80',
+                      )}
+                    >
                       {/* Header do componente */}
                       <div className="flex items-start gap-3 mb-3">
-                        <div className="mt-0.5"><ComponenteIcon tipo={tipo} /></div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium text-[#030712] leading-5">{comp.nome}</p>
+                        <div className="mt-0.5">
+                          <ComponenteIcon tipo={tipo} locked={locked} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className={cn(
+                              'text-sm font-medium leading-5',
+                              locked ? 'text-gray-400' : 'text-[#030712]',
+                            )}>
+                              {comp.nome}
+                            </p>
+                            {locked && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700 border border-amber-200">
+                                <Lock className="w-2.5 h-2.5" />
+                                Capability inativa
+                              </span>
+                            )}
+                            {!locked && ativas.length > 0 && (
+                              <span className="text-xs font-medium text-blue-600 bg-blue-50 border border-blue-100 rounded-full px-2 py-0.5">
+                                {ativas.length}/{acoes.length}
+                              </span>
+                            )}
+                          </div>
                           {comp.descricao && (
-                            <p className="text-xs text-[#6b7280] leading-4 mt-0.5 truncate max-w-sm">{comp.descricao}</p>
+                            <p className={cn(
+                              'text-xs leading-4 mt-0.5 truncate max-w-sm',
+                              locked ? 'text-gray-400' : 'text-[#6b7280]',
+                            )}>
+                              {comp.descricao}
+                            </p>
+                          )}
+                          {locked && capRequired && (
+                            <p className="text-[10px] text-amber-600 mt-1 font-mono">
+                              requer: capability:{capRequired}
+                            </p>
                           )}
                         </div>
-                        {ativas.length > 0 && (
-                          <span className="ml-auto shrink-0 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-100 rounded-full px-2 py-0.5">
-                            {ativas.length}/{acoes.length}
-                          </span>
-                        )}
                       </div>
 
-                      {/* Checkboxes */}
+                      {/* Checkboxes — desabilitados se bloqueado */}
                       <div className="grid grid-cols-1 gap-1 pl-8">
                         {acoes.map(({ acao, label }) => {
                           const checked = ativas.includes(acao)
@@ -282,25 +371,29 @@ export function AtribuirPermissoesSheet({
                             <label
                               key={acao}
                               className={cn(
-                                'flex items-center gap-2.5 px-3 py-2 rounded-lg cursor-pointer select-none transition-colors',
-                                'hover:bg-gray-50',
-                                checked && 'bg-blue-50/60 hover:bg-blue-50',
+                                'flex items-center gap-2.5 px-3 py-2 rounded-lg select-none transition-colors',
+                                locked
+                                  ? 'opacity-40 cursor-not-allowed'
+                                  : 'cursor-pointer hover:bg-gray-50',
+                                !locked && checked && 'bg-blue-50/60 hover:bg-blue-50',
                                 saving && 'pointer-events-none opacity-60',
                               )}
                             >
                               <input
                                 type="checkbox"
                                 checked={checked}
-                                onChange={() => toggle(comp.id, acao)}
-                                disabled={saving}
+                                onChange={() => !locked && toggle(comp.id, acao)}
+                                disabled={saving || locked}
                                 className={cn(
-                                  'w-4 h-4 rounded border-gray-300 cursor-pointer',
-                                  'accent-blue-600',
+                                  'w-4 h-4 rounded border-gray-300',
+                                  locked ? 'cursor-not-allowed' : 'cursor-pointer accent-blue-600',
                                 )}
                               />
                               <span className={cn(
                                 'text-sm',
-                                checked ? 'text-[#030712] font-medium' : 'text-[#374151]',
+                                locked
+                                  ? 'text-gray-400'
+                                  : checked ? 'text-[#030712] font-medium' : 'text-[#374151]',
                               )}>
                                 {label}
                               </span>
