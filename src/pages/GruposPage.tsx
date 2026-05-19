@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import { Plus, Search, Ellipsis, Info, Eye, Trash2 } from 'lucide-react'
+import { Plus, Search, Ellipsis, Eye, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Popover } from '@/components/ui/Popover'
@@ -15,6 +15,21 @@ function EscopoBadge({ escopo }: { escopo: 'org' | 'conta' }) {
   return escopo === 'org'
     ? <Badge variant="info">Organização</Badge>
     : <Badge variant="default" className="bg-violet-50 text-violet-700 border border-violet-200">Conta</Badge>
+}
+
+function PapelBadge({ papel }: { papel?: string }) {
+  if (!papel) return <span className="text-xs text-gray-400">—</span>
+  const variants: Record<string, string> = {
+    'Viewer': 'bg-gray-100 text-gray-600 border-gray-200',
+    'User':   'bg-blue-50 text-blue-700 border-blue-200',
+    'Admin':  'bg-orange-50 text-orange-700 border-orange-200',
+  }
+  const cls = variants[papel] ?? 'bg-gray-100 text-gray-600 border-gray-200'
+  return (
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${cls}`}>
+      {papel}
+    </span>
+  )
 }
 
 // ── Página ────────────────────────────────────────────────────
@@ -85,11 +100,15 @@ export function GruposPage() {
       {/* Header */}
       <div className="flex items-start justify-between px-8 py-4 gap-6">
         <div className="min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-600 border border-blue-200">Escopo: Organização</span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-green-50 text-green-700 border border-green-200">Org Admin</span>
+          </div>
           <h1 className="text-2xl font-bold leading-8 text-[#030712]">Grupos</h1>
           <p className="text-sm text-[#6b7280] mt-1">
-            Organize usuários em grupos para atribuir permissões em conjunto. Grupos com escopo{' '}
-            <strong className="font-medium text-[#374151]">Organização</strong> ficam disponíveis em todas as contas;
-            grupos com escopo <strong className="font-medium text-[#374151]">Conta</strong> são restritos a uma conta específica.
+            Gerencie grupos de acesso da organização. Grupos com escopo{' '}
+            <strong className="font-medium text-[#374151]">Organização</strong> são criados aqui e ficam disponíveis em todas as contas.
+            Grupos com escopo <strong className="font-medium text-[#374151]">Conta</strong> são criados pelo Account Admin dentro de cada conta, em <strong className="font-medium text-[#374151]">Acessos</strong>.
           </p>
         </div>
         <Button onClick={() => setShowCriar(true)} className="shrink-0 mt-1">
@@ -124,13 +143,8 @@ export function GruposPage() {
               <tr className="border-b border-gray-200">
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[260px]">Grupo</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[100px]">Membros</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[140px]">
-                  <span className="flex items-center gap-1">
-                    Componentes
-                    <Info className="w-3 h-3 opacity-60" />
-                  </span>
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[140px]">Escopo</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[110px]">Papel</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[130px]">Escopo</th>
                 <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 w-[80px]">Ações</th>
               </tr>
             </thead>
@@ -159,8 +173,10 @@ export function GruposPage() {
                       {grupo.qtdMembros ?? 0}
                     </td>
 
-                    {/* Componentes — placeholder até integração */}
-                    <td className="px-4 py-3 text-sm text-[#6b7280]">—</td>
+                    {/* Papel */}
+                    <td className="px-4 py-3">
+                      <PapelBadge papel={grupo.papel} />
+                    </td>
 
                     {/* Escopo */}
                     <td className="px-4 py-3">

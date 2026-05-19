@@ -377,24 +377,31 @@ function ContaDetailSheet({ open, onClose, account }: ContaDetailProps) {
 
   useEffect(() => {
     if (!open || !account) return
+    let cancelled = false
+
     setLoading(true)
     setLoadingCaps(true)
     setTab('usuarios')
 
     api.getAccountMembros(account.id)
       .then((data: any[]) => {
+        if (cancelled) return
         setMembros(data as MembroWithPapel[])
         setLoading(false)
       })
-      .catch(() => setLoading(false))
+      .catch(() => { if (!cancelled) setLoading(false) })
 
     api.getEntitlements(account.id)
       .then((data: any[]) => {
+        if (cancelled) return
         setActiveCapabilities(data.map((e: any) => e.capability))
         setLoadingCaps(false)
       })
-      .catch(() => setLoadingCaps(false))
-  }, [open, account])
+      .catch(() => { if (!cancelled) setLoadingCaps(false) })
+
+    return () => { cancelled = true }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, account?.id])
 
   const elegíveis = useMemo(
     () => membros.filter(m => m.papel !== 'account_admin'),
@@ -722,9 +729,13 @@ export function ContasPage() {
       {/* Header */}
       <div className="flex items-start justify-between px-8 py-4 gap-6">
         <div className="min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-600 border border-blue-200">Escopo: Organização</span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-green-50 text-green-700 border border-green-200">Org Admin</span>
+          </div>
           <h1 className="text-2xl font-bold leading-8 text-[#030712]">Contas</h1>
           <p className="text-sm text-[#6b7280] mt-1">
-            Gerencie as contas da organização, vincule usuários e promova administradores de conta.
+            Contas são subdivisões da organização — cada uma com seus próprios usuários, grupos e capacidades ativas. Aqui você cria contas, vincula usuários, promove administradores e ativa capabilities via aba <strong className="font-medium text-[#374151]">Capacidades</strong>.
           </p>
         </div>
         <Button onClick={() => setShowCriar(true)} className="shrink-0 mt-1">

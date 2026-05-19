@@ -175,7 +175,14 @@ export function ComponentesPage() {
       {/* Page header */}
       <div className="bg-white shrink-0">
         <div className="flex items-center justify-between px-8 py-4 h-[72px]">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-500 border border-gray-200">Escopo: Plataforma</span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-600 border border-purple-200">Platform Admin</span>
+          </div>
           <h1 className="text-2xl font-bold text-[#030712]">Componentes</h1>
+          <p className="text-sm text-[#6b7280] mt-0.5">
+            Módulos e serviços que compõem as Soluções PAS. Cada componente define quais permissões granulares (<code className="text-xs bg-gray-100 px-1 rounded">can_use_assistant</code>, <code className="text-xs bg-gray-100 px-1 rounded">pode_ler</code>…) podem ser atribuídas a usuários e grupos via <strong className="font-medium text-[#374151]">Acessos</strong>.
+          </p>
           <div className="flex items-center gap-2">
             <label className={`flex items-center gap-2 ${hasInativos ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'}`}>
               <input

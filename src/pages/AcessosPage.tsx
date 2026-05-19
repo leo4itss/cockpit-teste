@@ -40,6 +40,23 @@ function EscopoBadge({ escopo }: { escopo: 'org' | 'conta' }) {
     : <Badge variant="default" className="bg-violet-50 text-violet-700 border border-violet-200">Conta</Badge>
 }
 
+// ── Badge de papel ────────────────────────────────────────────
+
+function PapelBadge({ papel }: { papel?: string }) {
+  if (!papel) return <span className="text-xs text-gray-400">—</span>
+  const variants: Record<string, string> = {
+    'Viewer': 'bg-gray-100 text-gray-600 border-gray-200',
+    'User':   'bg-blue-50 text-blue-700 border-blue-200',
+    'Admin':  'bg-orange-50 text-orange-700 border-orange-200',
+  }
+  const cls = variants[papel] ?? 'bg-gray-100 text-gray-600 border-gray-200'
+  return (
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${cls}`}>
+      {papel}
+    </span>
+  )
+}
+
 // ─────────────────────────────────────────────────────────────
 
 export function AcessosPage() {
@@ -47,9 +64,18 @@ export function AcessosPage() {
   const abaParam = searchParams.get('aba') as Aba | null
   const abaAtiva: Aba = abaParam === 'grupos' ? 'grupos' : 'usuarios'
 
-  const accountId     = useAdminAccountId() ?? 'a1'
+  const accountId       = useAdminAccountId() ?? 'a1'
   const isPlatformAdmin = useIsPlatformAdmin()
   const isOrgAdmin      = useIsOrgAdmin()
+
+  // Nome da conta — carregado para exibir o contexto da conta no header
+  const [accountNome, setAccountNome] = useState<string | null>(null)
+  useEffect(() => {
+    if (!accountId) return
+    api.getAccount(accountId)
+      .then((acc: any) => setAccountNome(acc?.name ?? null))
+      .catch(() => setAccountNome(null))
+  }, [accountId])
 
   function setAba(aba: Aba) {
     setSearchParams({ aba }, { replace: true })
@@ -179,8 +205,23 @@ export function AcessosPage() {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between px-8 py-4">
-        <h1 className="text-2xl font-bold leading-8 text-[#030712]">Acessos e usuários</h1>
+      <div className="flex items-start justify-between px-8 py-4 gap-6">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-violet-50 text-violet-600 border border-violet-200">Escopo: Conta</span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-orange-50 text-orange-600 border border-orange-200">Account Admin</span>
+            {accountNome && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-50 text-gray-600 border border-gray-200">
+                Conta: <strong className="font-semibold">{accountNome}</strong>
+              </span>
+            )}
+          </div>
+          <h1 className="text-2xl font-bold leading-8 text-[#030712]">Acessos e usuários</h1>
+          <p className="text-sm text-[#6b7280] mt-1">
+            Gerencie quem acessa <strong className="font-medium text-[#374151]">esta conta</strong> e com quais permissões.
+            Diferente de <strong className="font-medium text-[#374151]">Usuários</strong> (visão da organização), aqui você vê apenas os membros e grupos desta conta específica.
+          </p>
+        </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
             <Search className="w-4 h-4 text-gray-400 opacity-50" />
@@ -315,8 +356,8 @@ export function AcessosPage() {
       {abaAtiva === 'grupos' && (
         <div className="px-8 pt-6 pb-8">
           <p className="text-sm text-[#6b7280] mb-4">
-            Grupos com escopo <strong>Organização</strong> são herdados e visíveis em todas as contas.
-            Grupos com escopo <strong>Conta</strong> são exclusivos desta conta e podem ser gerenciados aqui.
+            Grupos com escopo <strong>Organização</strong> são criados pelo Org Admin e herdados por todas as contas — você pode atribuir permissões a eles, mas não editá-los aqui.
+            Grupos com escopo <strong>Conta</strong> são exclusivos desta conta e gerenciados pelo Account Admin.
           </p>
           <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
             <table className="w-full">
@@ -324,14 +365,15 @@ export function AcessosPage() {
                 <tr className="border-b border-gray-200">
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[240px]">Grupo</th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[100px]">Membros</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[140px]">Escopo</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[110px]">Papel</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[130px]">Escopo</th>
                   <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 w-[100px]">Status</th>
                   <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 w-[80px]">Ações</th>
                 </tr>
               </thead>
               <tbody>
                 {loadingGrupos ? (
-                  <tr><td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-500">Carregando...</td></tr>
+                  <tr><td colSpan={6} className="px-4 py-8 text-center text-sm text-gray-500">Carregando...</td></tr>
                 ) : filteredGrupos.length > 0 ? (
                   filteredGrupos.map(grupo => (
                     <tr
@@ -346,6 +388,7 @@ export function AcessosPage() {
                         )}
                       </td>
                       <td className="px-4 py-3 text-sm text-[#030712]">{grupo.qtdMembros ?? 0}</td>
+                      <td className="px-4 py-3"><PapelBadge papel={grupo.papel} /></td>
                       <td className="px-4 py-3"><EscopoBadge escopo={grupo.escopo} /></td>
                       <td className="px-4 py-3 text-center">
                         {grupo.status === 'Ativo'
@@ -378,7 +421,7 @@ export function AcessosPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="px-4 py-12 text-center">
+                    <td colSpan={6} className="px-4 py-12 text-center">
                       <p className="text-sm font-medium text-[#030712]">Nenhum grupo encontrado</p>
                       <p className="text-xs text-[#6b7280] mt-1">Crie um grupo para organizar os usuários desta conta.</p>
                     </td>
