@@ -88,11 +88,11 @@ export function OrganizacoesPage() {
             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-600 border border-purple-200">Platform Admin</span>
           </div>
           <h1 className="text-2xl font-bold leading-8 text-[#030712]">Organizações</h1>
-          <p className="text-sm text-[#6b7280] mt-1">
+          <p className="text-sm text-[#6b7280] mt-1 max-w-[1080px]">
             Cadastre e gerencie as organizações clientes da plataforma PAS. Cada organização pode ter múltiplas contas, soluções e contratos vinculados.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0 mt-1">
           {(() => {
             const hasInativas = orgs.some(o => o.status === 'Inativo')
             return (

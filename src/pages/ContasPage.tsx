@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import {
-  Plus, Search, Ellipsis, Eye,
-  ShieldCheck, UserMinus, Loader2, AlertCircle, Building2,
+  Search, Ellipsis, Eye,
+  ShieldCheck, UserMinus, Loader2, Building2,
   Bot, Database, Layers, CheckCircle2, XCircle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
@@ -65,107 +65,6 @@ function StatusBadge({ status }: { status: Account['status'] }) {
   if (status === 'Ativo')  return <Badge variant="success">Ativo</Badge>
   if (status === 'Criado') return <Badge variant="info">Criado</Badge>
   return <Badge variant="secondary">Inativo</Badge>
-}
-
-// ─────────────────────────────────────────────────────────────
-// CriarContaSheet — Sheet simples para Org Admin criar conta
-// ─────────────────────────────────────────────────────────────
-
-interface CriarContaProps {
-  open:      boolean
-  onClose:   () => void
-  orgId:     string
-  onSuccess: (account: Account) => void
-}
-
-function CriarContaSheet({ open, onClose, orgId, onSuccess }: CriarContaProps) {
-  const [nome, setNome]       = useState('')
-  const [saving, setSaving]   = useState(false)
-  const [error, setError]     = useState<string | null>(null)
-
-  const canSave = nome.trim().length > 0
-
-  async function handleSave() {
-    if (!canSave) return
-    setSaving(true)
-    setError(null)
-    try {
-      const subdomain = nome.trim().toLowerCase()
-        .replace(/[^a-z0-9]/g, '-')
-        .replace(/-+/g, '-')
-        .replace(/^-|-$/g, '')
-      const account: Account = await api.createAccount({
-        id:                 crypto.randomUUID(),
-        orgId,
-        name:               nome.trim(),
-        subdomain,
-        provisioningStatus: 'PENDING',
-        arquitetoPAS:       '',
-        status:             'Criado',
-        createdAt:          new Date().toLocaleDateString('pt-BR'),
-      })
-      onSuccess(account)
-      handleClose()
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Erro ao criar conta.')
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  function handleClose() {
-    setNome(''); setError(null)
-    onClose()
-  }
-
-  return (
-    <NestedSheet open={open} onClose={handleClose} width="w-[480px]">
-      <NestedSheetHeader onClose={handleClose}>
-        <NestedSheetTitle>Criar conta</NestedSheetTitle>
-        <NestedSheetDescription>
-          A conta nasce sem contrato. O contrato é vinculado posteriormente pelo Platform Admin ou Org Admin.
-        </NestedSheetDescription>
-      </NestedSheetHeader>
-
-      <NestedSheetBody>
-        <div className="flex flex-col gap-5">
-
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-[#030712]">
-              Nome da conta <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={nome}
-              onChange={e => setNome(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter' && canSave) handleSave() }}
-              placeholder="Ex: Filial Sul"
-              disabled={saving}
-              autoFocus
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:bg-gray-50"
-            />
-            <p className="text-xs text-[#6b7280]">
-              Subdomínio gerado automaticamente a partir do nome.
-            </p>
-          </div>
-
-          {error && (
-            <div className="flex items-start gap-2 p-3 rounded-lg border border-red-200 bg-red-50">
-              <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-              <p className="text-sm text-red-700">{error}</p>
-            </div>
-          )}
-        </div>
-      </NestedSheetBody>
-
-      <NestedSheetFooter>
-        <Button variant="outline" onClick={handleClose} disabled={saving}>Cancelar</Button>
-        <Button onClick={handleSave} disabled={!canSave || saving}>
-          {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Criando...</> : 'Criar conta'}
-        </Button>
-      </NestedSheetFooter>
-    </NestedSheet>
-  )
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -679,7 +578,6 @@ export function ContasPage() {
   const [loading, setLoading]       = useState(true)
   const [search, setSearch]         = useState('')
 
-  const [showCriar, setShowCriar]           = useState(false)
   const [showDetail, setShowDetail]         = useState(false)
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null)
 
@@ -734,14 +632,10 @@ export function ContasPage() {
             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-green-50 text-green-700 border border-green-200">Org Admin</span>
           </div>
           <h1 className="text-2xl font-bold leading-8 text-[#030712]">Contas</h1>
-          <p className="text-sm text-[#6b7280] mt-1">
-            Contas são subdivisões da organização — cada uma com seus próprios usuários, grupos e capacidades ativas. Aqui você cria contas, vincula usuários, promove administradores e ativa capabilities via aba <strong className="font-medium text-[#374151]">Capacidades</strong>.
+          <p className="text-sm text-[#6b7280] mt-1 max-w-[1080px]">
+            Contas são subdivisões da organização — cada uma com seus próprios usuários, grupos e capacidades ativas. Para criar uma conta, acesse o detalhe da organização em <strong className="font-medium text-[#374151]">Organizações</strong>.
           </p>
         </div>
-        <Button onClick={() => setShowCriar(true)} className="shrink-0 mt-1">
-          <Plus className="w-4 h-4 mr-1.5" />
-          Criar conta
-        </Button>
       </div>
 
       <div className="px-8 pb-8 space-y-4">
@@ -851,12 +745,6 @@ export function ContasPage() {
       </div>
 
       {/* Sheets */}
-      <CriarContaSheet
-        open={showCriar}
-        onClose={() => setShowCriar(false)}
-        orgId={adminOrgId ?? ''}
-        onSuccess={acc => setAccounts(prev => [...prev, acc])}
-      />
       <ContaDetailSheet
         open={showDetail}
         onClose={() => setShowDetail(false)}

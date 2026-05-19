@@ -238,12 +238,12 @@ export function AcessosPage() {
             )}
           </div>
           <h1 className="text-2xl font-bold leading-8 text-[#030712]">Acessos e usuários</h1>
-          <p className="text-sm text-[#6b7280] mt-1">
+          <p className="text-sm text-[#6b7280] mt-1 max-w-[1080px]">
             Gerencie quem acessa <strong className="font-medium text-[#374151]">esta conta</strong> e com quais permissões.
             Diferente de <strong className="font-medium text-[#374151]">Usuários</strong> (visão da organização), aqui você vê apenas os membros e grupos desta conta específica.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0 mt-1">
           <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
             <Search className="w-4 h-4 text-gray-400 opacity-50" />
             <input
