@@ -134,9 +134,12 @@ export function AtribuirPermissoesSheet({
   const [saveError, setSaveError]           = useState<string | null>(null)
   const [defaultsAplicados, setDefaultsAplicados] = useState(false)
 
-  // componenteId → string[] de ações ativas
+  // componenteId → string[] de ações ativas (diretas)
   const [original, setOriginal] = useState<Record<string, string[]>>({})
   const [draft, setDraft]       = useState<Record<string, string[]>>({})
+  // componenteId → { acao → nome do grupo que concede } (permissões herdadas via grupo)
+  const [inherited, setInherited] = useState<Record<string, Record<string, string>>>({})
+
 
   useEffect(() => {
     if (!open) return
