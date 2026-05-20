@@ -455,6 +455,21 @@ export function InstanciaDetailSheet({
       <NestedSheetFooter className="justify-end">
         <Button variant="ghost" onClick={handleClose}>Fechar</Button>
       </NestedSheetFooter>
+
+      {/* Sheet de permissões granulares por membro dentro da instância */}
+      {membroPermissoes && (
+        <AtribuirPermissoesSheet
+          open={showPermissoes}
+          onClose={() => { setShowPermissoes(false); setMembroPermissoes(null) }}
+          entityType="usuario"
+          entityId={membroPermissoes.entidadeId}
+          entityNome={membroPermissoes.displayName ?? membroPermissoes.entidadeId}
+          accountId={accountId}
+          instanciaId={instancia.id}
+          instanciaComponenteId={instancia.componenteId}
+          instanciaNome={instancia.nome}
+        />
+      )}
     </NestedSheet>
   )
 }
