@@ -310,9 +310,12 @@ export function AtribuirPermissoesSheet({
   return (
     <NestedSheet open={open} onClose={handleClose} width="w-[560px]">
       <NestedSheetHeader onClose={handleClose}>
-        <NestedSheetTitle>Atribuir permissões — {entityNome}</NestedSheetTitle>
+        <NestedSheetTitle>Permissões — {entityNome}</NestedSheetTitle>
         <NestedSheetDescription>
-          Selecione as ações permitidas em cada componente disponível na conta <strong>{contaNome}</strong>.
+          {instanciaId
+            ? <>Ações permitidas para <strong>{entityNome}</strong> na instância <strong>{instanciaNome}</strong>.</>
+            : <>Selecione as ações permitidas em cada componente disponível na conta <strong>{contaNome}</strong>.</>
+          }
         </NestedSheetDescription>
       </NestedSheetHeader>
 
