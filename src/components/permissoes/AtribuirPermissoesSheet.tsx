@@ -469,9 +469,9 @@ export function AtribuirPermissoesSheet({
                                 Capability inativa
                               </span>
                             )}
-                            {!locked && ativas.length > 0 && (
+                            {!locked && ativasVisiveis.size > 0 && (
                               <span className="text-xs font-medium text-blue-600 bg-blue-50 border border-blue-100 rounded-full px-2 py-0.5">
-                                {ativas.length}/{acoes.length}
+                                {ativasVisiveis.size}/{acoes.length}
                               </span>
                             )}
                           </div>
