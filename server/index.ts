@@ -401,7 +401,9 @@ app.get('/api/users/:id/grupos', async (c) => {
   const grupoIds = memberships.map(m => m.grupoId)
   if (grupoIds.length === 0) return c.json([])
 
-  // 2. Busca os grupos correspondentes, opcionalmente filtrado por conta
+  // 2. Busca os grupos correspondentes, opcionalmente filtrado por conta.
+  // Inclui: grupos da conta específica OU grupos org-scoped (accountId null) que
+  // afetam qualquer conta da organização.
   const rows = await db
     .select()
     .from(grupos)
@@ -409,8 +411,10 @@ app.get('/api/users/:id/grupos', async (c) => {
       accountId
         ? and(
             inArray(grupos.id, grupoIds),
-            // inclui grupos da conta OU grupos org (escopo='org') — ambos afetam o usuário
-            eq(grupos.accountId, accountId),
+            or(
+              eq(grupos.accountId, accountId), // grupos da conta
+              isNull(grupos.accountId),         // grupos org-scoped
+            ),
           )
         : inArray(grupos.id, grupoIds)
     )
