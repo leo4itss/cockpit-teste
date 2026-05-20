@@ -431,9 +431,12 @@ export function AtribuirPermissoesSheet({
             ) : (
               <div className="divide-y divide-gray-100">
                 {filtered.map(comp => {
-                  const tipo   = inferirTipo(comp.nome)
-                  const acoes  = ACOES[tipo]
-                  const ativas = draft[comp.id] ?? []
+                  const tipo          = inferirTipo(comp.nome)
+                  const acoes         = ACOES[tipo]
+                  const ativas        = draft[comp.id] ?? []
+                  const inheritedComp = inherited[comp.id] ?? {}
+                  // Total visível = diretas + herdadas (sem duplicar)
+                  const ativasVisiveis = new Set([...ativas, ...Object.keys(inheritedComp)])
 
                   // Verifica se a capability deste componente está ativa na conta
                   const capRequired = CAPABILITY_MAP[tipo]
