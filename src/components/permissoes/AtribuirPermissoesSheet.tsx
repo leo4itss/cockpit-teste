@@ -282,7 +282,17 @@ export function AtribuirPermissoesSheet({
     return draftAcoes.some(a => !orig.has(a))
   })
 
-  const totalAcoes = Object.values(draft).reduce((acc, v) => acc + v.length, 0)
+  // Total visível = diretas + herdadas (sem duplicar)
+  const totalAcoes = useMemo(() => {
+    const allIds = new Set<string>()
+    for (const [cid, acoes] of Object.entries(draft)) {
+      acoes.forEach(a => allIds.add(`${cid}:${a}`))
+    }
+    for (const [cid, acaoMap] of Object.entries(inherited)) {
+      Object.keys(acaoMap).forEach(a => allIds.add(`${cid}:${a}`))
+    }
+    return allIds.size
+  }, [draft, inherited])
 
   async function handleSalvar() {
     setSaving(true)
