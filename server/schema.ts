@@ -235,3 +235,39 @@ export const userAccountMemberships = pgTable('user_account_memberships', {
   papel: text('papel').notNull().default('member'), // 'member' | 'account_admin'
   assignedAt: text('assigned_at').notNull(),
 })
+
+// ── Instâncias de Componente ──────────────────────────────────
+// Uma instância é uma cópia configurada de um componente dentro de uma conta.
+// Ex: "Assistente Vanessa" = instância do componente "Assistente de IA" na conta Comgas.
+//
+// Tupla FGA: instance:<id> component component:<componenteId>
+//            instance:<id> account  account:<accountId>
+export const instancias = pgTable('instancias', {
+  id:           text('id').primaryKey(),
+  componenteId: text('componente_id').notNull().references(() => componentes.id),
+  accountId:    text('account_id').notNull().references(() => accounts.id),
+  nome:         text('nome').notNull(),
+  descricao:    text('descricao'),
+  status:       text('status').notNull().default('Ativo'), // 'Ativo' | 'Inativo'
+  createdAt:    text('created_at').notNull(),
+}, (t) => [
+  index('idx_instancias_componente').on(t.componenteId, t.accountId),
+])
+
+// ── Membros de Instância ──────────────────────────────────────
+// Quem pode acessar uma instância específica, e com qual papel.
+//
+// papel: 'viewer' → leitura, 'member' → uso padrão, 'admin' → acesso completo
+//
+// Tupla FGA: user:<entidadeId>  <papel> instance:<instanciaId>
+//            group:<entidadeId> <papel> instance:<instanciaId>
+export const instanciaMembros = pgTable('instancia_membros', {
+  id:           text('id').primaryKey(),
+  instanciaId:  text('instancia_id').notNull().references(() => instancias.id),
+  entidadeTipo: text('entidade_tipo').notNull(), // 'user' | 'group'
+  entidadeId:   text('entidade_id').notNull(),
+  papel:        text('papel').notNull(),          // 'viewer' | 'member' | 'admin'
+  assignedAt:   text('assigned_at').notNull(),
+}, (t) => [
+  index('idx_instancia_membros_lookup').on(t.instanciaId, t.entidadeTipo, t.entidadeId),
+])

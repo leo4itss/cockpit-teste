@@ -16,6 +16,8 @@ import {
   userAccountMemberships,
   componentPermissions,
   accountEntitlements,
+  instancias,
+  instanciaMembros,
 } from './schema'
 import { eq, and } from 'drizzle-orm'
 
@@ -945,6 +947,170 @@ app.delete('/api/accounts/:id/entitlements/:capability', async (c) => {
       )
     )
 
+  return c.json({ ok: true })
+})
+
+// ── Instâncias de Componente ──────────────────────────────────
+
+/**
+ * GET /api/instancias
+ * Query params: componenteId, accountId (opcionais, combináveis)
+ * Retorna instâncias + qtdMembros enriquecido.
+ */
+app.get('/api/instancias', async (c) => {
+  const { componenteId, accountId } = c.req.query()
+  let rows = await db.select().from(instancias)
+  if (componenteId) rows = rows.filter((r: any) => r.componenteId === componenteId)
+  if (accountId)    rows = rows.filter((r: any) => r.accountId    === accountId)
+
+  const allMembros = await db.select().from(instanciaMembros)
+  const result = rows.map((inst: any) => ({
+    ...inst,
+    qtdMembros: allMembros.filter((m: any) => m.instanciaId === inst.id).length,
+  }))
+  return c.json(result)
+})
+
+/**
+ * GET /api/instancias/:id
+ */
+app.get('/api/instancias/:id', async (c) => {
+  const id = c.req.param('id')
+  const rows = await db.select().from(instancias).where(eq(instancias.id, id))
+  if (!rows.length) return c.json({ error: 'Instância não encontrada' }, 404)
+  return c.json(rows[0])
+})
+
+/**
+ * POST /api/instancias
+ * Body: { componenteId, accountId, nome, descricao? }
+ */
+app.post('/api/instancias', async (c) => {
+  const body = await c.req.json()
+  const { componenteId, accountId, nome, descricao } = body
+  if (!componenteId || !accountId || !nome) {
+    return c.json({ error: 'componenteId, accountId e nome são obrigatórios' }, 400)
+  }
+  const [row] = await db.insert(instancias).values({
+    id:           crypto.randomUUID(),
+    componenteId,
+    accountId,
+    nome,
+    descricao:    descricao ?? null,
+    status:       'Ativo',
+    createdAt:    new Date().toLocaleDateString('pt-BR'),
+  }).returning()
+  return c.json(row, 201)
+})
+
+/**
+ * PUT /api/instancias/:id
+ * Body: { nome?, descricao?, status? }
+ */
+app.put('/api/instancias/:id', async (c) => {
+  const id   = c.req.param('id')
+  const body = await c.req.json()
+  const [row] = await db
+    .update(instancias)
+    .set(body)
+    .where(eq(instancias.id, id))
+    .returning()
+  return c.json(row)
+})
+
+/**
+ * DELETE /api/instancias/:id
+ * Exclui instância — membros são removidos por CASCADE no DB.
+ */
+app.delete('/api/instancias/:id', async (c) => {
+  const id = c.req.param('id')
+  await db.delete(instancias).where(eq(instancias.id, id))
+  return c.json({ ok: true })
+})
+
+// ── Membros de Instância ──────────────────────────────────────
+
+/**
+ * GET /api/instancias/:id/membros
+ * Retorna membros enriquecidos com displayName e email.
+ */
+app.get('/api/instancias/:id/membros', async (c) => {
+  const instanciaId = c.req.param('id')
+  const membros = await db
+    .select()
+    .from(instanciaMembros)
+    .where(eq(instanciaMembros.instanciaId, instanciaId))
+
+  if (!membros.length) return c.json([])
+
+  const allUsers  = await db.select().from(users)
+  const allGrupos = await db.select().from(grupos)
+
+  const enriched = membros.map((m: any) => {
+    if (m.entidadeTipo === 'user') {
+      const u = allUsers.find((u: any) => u.id === m.entidadeId)
+      return { ...m, displayName: u?.nomeCompleto ?? m.entidadeId, email: u?.email }
+    } else {
+      const g = allGrupos.find((g: any) => g.id === m.entidadeId)
+      return { ...m, displayName: g?.nome ?? m.entidadeId }
+    }
+  })
+  return c.json(enriched)
+})
+
+/**
+ * POST /api/instancias/:id/membros
+ * Body: { entidadeTipo: 'user'|'group', entidadeId, papel: 'viewer'|'member'|'admin' }
+ * Upsert: atualiza papel se o membro já existir.
+ */
+app.post('/api/instancias/:id/membros', async (c) => {
+  const instanciaId  = c.req.param('id')
+  const body         = await c.req.json()
+  const { entidadeTipo, entidadeId, papel } = body
+
+  if (!entidadeTipo || !entidadeId || !papel) {
+    return c.json({ error: 'entidadeTipo, entidadeId e papel são obrigatórios' }, 400)
+  }
+
+  // Verifica se já é membro
+  const existing = await db.select().from(instanciaMembros).where(
+    and(
+      eq(instanciaMembros.instanciaId,  instanciaId),
+      eq(instanciaMembros.entidadeTipo, entidadeTipo),
+      eq(instanciaMembros.entidadeId,   entidadeId),
+    )
+  )
+
+  if (existing.length > 0) {
+    const [row] = await db
+      .update(instanciaMembros)
+      .set({ papel })
+      .where(eq(instanciaMembros.id, existing[0].id))
+      .returning()
+    return c.json(row)
+  }
+
+  const [row] = await db.insert(instanciaMembros).values({
+    id:           crypto.randomUUID(),
+    instanciaId,
+    entidadeTipo,
+    entidadeId,
+    papel,
+    assignedAt:   new Date().toLocaleDateString('pt-BR'),
+  }).returning()
+
+  // TODO (produção): await fga.write({ user: `${entidadeTipo}:${entidadeId}`, relation: papel, object: `instance:${instanciaId}` })
+
+  return c.json(row, 201)
+})
+
+/**
+ * DELETE /api/instancias/:id/membros/:membroId
+ * membroId = id da linha em instancia_membros (não o entidadeId).
+ */
+app.delete('/api/instancias/:id/membros/:membroId', async (c) => {
+  const membroId = c.req.param('membroId')
+  await db.delete(instanciaMembros).where(eq(instanciaMembros.id, membroId))
   return c.json({ ok: true })
 })
 
