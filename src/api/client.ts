@@ -121,17 +121,20 @@ export const api = {
       method: 'DELETE',
     }),
 
-  // Permissões granulares por componente
-  getPermissions: (params: { entidade_tipo?: string; entidade_id?: string; componente_id?: string }) => {
+  // Permissões granulares por componente (e opcionalmente por instância)
+  getPermissions: (params: { entidade_tipo?: string; entidade_id?: string; componente_id?: string; instancia_id?: string | null }) => {
     const p = new URLSearchParams()
     if (params.entidade_tipo) p.set('entidade_tipo', params.entidade_tipo)
     if (params.entidade_id)   p.set('entidade_id',   params.entidade_id)
     if (params.componente_id) p.set('componente_id', params.componente_id)
+    // instancia_id=null → filtra só permissões sem instância; undefined → sem filtro
+    if (params.instancia_id !== undefined)
+      p.set('instancia_id', params.instancia_id ?? 'null')
     return request<any[]>(`/api/permissions?${p.toString()}`)
   },
-  addPermission: (data: { entidade_tipo: string; entidade_id: string; componente_id: string; acao: string }) =>
+  addPermission: (data: { entidade_tipo: string; entidade_id: string; componente_id: string; acao: string; instancia_id?: string }) =>
     request<any>('/api/permissions', { method: 'POST', body: JSON.stringify(data) }),
-  removePermission: (data: { entidade_tipo: string; entidade_id: string; componente_id: string; acao: string }) =>
+  removePermission: (data: { entidade_tipo: string; entidade_id: string; componente_id: string; acao: string; instancia_id?: string }) =>
     request<any>('/api/permissions', { method: 'DELETE', body: JSON.stringify(data) }),
 
   // Instâncias de Componente
