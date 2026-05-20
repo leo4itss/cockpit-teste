@@ -6,13 +6,15 @@ import { Badge } from '@/components/ui/Badge'
 import { NewOrganizationSheet } from '@/components/NewOrganizationSheet'
 import { ConfirmDeleteModal } from '@/components/ConfirmDeleteModal'
 import { api } from '@/api/client'
-import { useIsPlatformAdmin } from '@/authz/hooks'
+import { useIsPlatformAdmin, useIsOrgAdmin, useAdminOrgId } from '@/authz/hooks'
 import { organizations as mockOrgs } from '@/data/mock'
 import type { Organization } from '@/types'
 
 export function OrganizacoesPage() {
   const navigate = useNavigate()
   const isPlatformAdmin = useIsPlatformAdmin()
+  const isOrgAdmin = useIsOrgAdmin()
+  const adminOrgId = useAdminOrgId()
   const [orgs, setOrgs] = useState<Organization[]>([])
   const [loading, setLoading] = useState(true)
   const [error] = useState<string | null>(null)
@@ -33,6 +35,7 @@ export function OrganizacoesPage() {
   }, [])
 
   const filtered = orgs
+    .filter(o => !isOrgAdmin || !adminOrgId || o.id === adminOrgId)
     .filter(o => showInativas || o.status !== 'Inativo')
     .filter(o =>
       !search ||
@@ -84,16 +87,27 @@ export function OrganizacoesPage() {
       <div className="flex items-start justify-between px-8 py-4 gap-6">
         <div className="min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-500 border border-gray-200">Escopo: Plataforma</span>
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-600 border border-purple-200">Platform Admin</span>
+            {isPlatformAdmin ? (
+              <>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-500 border border-gray-200">Escopo: Plataforma</span>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-600 border border-purple-200">Platform Admin</span>
+              </>
+            ) : (
+              <>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-500 border border-gray-200">Escopo: Organização</span>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-600 border border-blue-200">Org Admin</span>
+              </>
+            )}
           </div>
           <h1 className="text-2xl font-bold leading-8 text-[#030712]">Organizações</h1>
           <p className="text-sm text-[#6b7280] mt-1 max-w-[1080px]">
-            Cadastre e gerencie as organizações clientes da plataforma PAS. Cada organização pode ter múltiplas contas, soluções e contratos vinculados.
+            {isPlatformAdmin
+              ? 'Cadastre e gerencie as organizações clientes da plataforma PAS. Cada organização pode ter múltiplas contas, soluções e contratos vinculados.'
+              : 'Visualize e gerencie os dados da sua organização.'}
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0 mt-1">
-          {(() => {
+          {isPlatformAdmin && (() => {
             const hasInativas = orgs.some(o => o.status === 'Inativo')
             return (
               <label className={`flex items-center gap-2 ${hasInativas ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'}`}>
