@@ -494,7 +494,36 @@ export function AtribuirPermissoesSheet({
                       {/* Checkboxes — desabilitados se bloqueado */}
                       <div className="grid grid-cols-1 gap-1 pl-8">
                         {acoes.map(({ acao, label }) => {
-                          const checked = ativas.includes(acao)
+                          const isHerited  = !!inheritedComp[acao]
+                          const isDirect   = ativas.includes(acao)
+                          const checked    = isDirect || isHerited
+                          const grupoNome  = inheritedComp[acao]
+
+                          // Herdada: aparece marcada mas não pode ser desmarcada
+                          if (isHerited && !isDirect) {
+                            return (
+                              <div
+                                key={acao}
+                                className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-emerald-50/60 select-none"
+                                title={`Herdado do grupo "${grupoNome}"`}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked
+                                  readOnly
+                                  disabled
+                                  className="w-4 h-4 rounded border-gray-300 cursor-default accent-emerald-600"
+                                />
+                                <span className="text-sm text-[#374151]">{label}</span>
+                                <span className="ml-auto shrink-0 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-emerald-100 text-emerald-700 border border-emerald-200">
+                                  <Users className="w-2.5 h-2.5" />
+                                  {grupoNome}
+                                </span>
+                              </div>
+                            )
+                          }
+
+                          // Direta (com ou sem herança adicional)
                           return (
                             <label
                               key={acao}
