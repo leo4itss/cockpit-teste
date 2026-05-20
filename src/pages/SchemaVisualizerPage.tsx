@@ -113,8 +113,8 @@ function TableNode({ data }: { data: TableNodeData }) {
 
 // ── Nó de entidade FGA ────────────────────────────────────────
 
-function FGANode({ data }: NodeProps) {
-  const d = data as FGANodeData
+function FGANode({ data }: { data: FGANodeData }) {
+  const d = data
   const isRelation = d.category === 'relation'
 
   return (
