@@ -146,23 +146,31 @@ export function AtribuirPermissoesSheet({
     setDefaultsAplicados(false)
 
     const entidadeTipo = entityType === 'usuario' ? 'user' : 'group'
+    const modoInstancia = !!instanciaId
 
-    // Entitlements só se aplicam a grupos/usuários de uma conta específica.
-    // Para grupos org-scoped (accountId vazio), todos os componentes ficam disponíveis.
     const entitlementsFetch: Promise<any[]> = accountId
       ? api.getEntitlements(accountId).catch(() => [])
       : Promise.resolve([])
 
-    // Permissões e entitlements são opcionais: falha deles não bloqueia a listagem.
     Promise.all([
       api.getComponentes(),
-      api.getPermissions({ entidade_tipo: entidadeTipo, entidade_id: entityId }).catch(() => []),
+      api.getPermissions({
+        entidade_tipo: entidadeTipo,
+        entidade_id:   entityId,
+        ...(modoInstancia
+          ? { instancia_id: instanciaId }          // modo instância: só perms desta instância
+          : { instancia_id: null }),                // modo componente: só perms sem instância
+      }).catch(() => []),
       entitlementsFetch,
     ])
       .then(([comps, perms, entitlements]) => {
         if (cancelled) return
 
-        const ativos = (comps as Componente[]).filter(c => c.status !== 'Inativo')
+        let ativos = (comps as Componente[]).filter(c => c.status !== 'Inativo')
+        // Modo instância: exibe apenas o componente da instância
+        if (modoInstancia && instanciaComponenteId) {
+          ativos = ativos.filter(c => c.id === instanciaComponenteId)
+        }
         setComponentes(ativos)
 
         // Constrói o Set de capabilities ativas.
