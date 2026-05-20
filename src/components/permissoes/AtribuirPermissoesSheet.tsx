@@ -96,6 +96,10 @@ interface Props {
   accountNome?: string
   papel?:      string   // papel do grupo — usado para pré-selecionar defaults
   onSuccess?:  () => void
+  // Modo instância: restringe à instância e ao componente específico
+  instanciaId?:         string
+  instanciaComponenteId?: string
+  instanciaNome?:       string
 }
 
 // ── Helpers ────────────────────────────────────────────────────
