@@ -850,7 +850,7 @@ app.get('/api/permissions', async (c) => {
   if (entidadeId)   conditions.push(eq(componentPermissions.entidadeId,   entidadeId))
   if (componenteId) conditions.push(eq(componentPermissions.componenteId, componenteId))
   if (instanciaId && instanciaId !== 'null') conditions.push(eq(componentPermissions.instanciaId, instanciaId))
-  if (instanciaId === 'null') conditions.push(eq(componentPermissions.instanciaId, null as any))
+  if (instanciaId === 'null') conditions.push(isNull(componentPermissions.instanciaId))
 
   const rows = conditions.length > 0
     ? await db.select().from(componentPermissions).where(and(...conditions))
