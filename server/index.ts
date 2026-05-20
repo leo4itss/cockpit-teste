@@ -19,7 +19,7 @@ import {
   instancias,
   instanciaMembros,
 } from './schema'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, inArray } from 'drizzle-orm'
 
 const app = new Hono()
 
