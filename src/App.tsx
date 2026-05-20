@@ -30,6 +30,7 @@ export default function App() {
           <Route path="grupos"       element={<GruposPage />} />
           <Route path="usuarios"     element={<UsuariosPage />} />
           <Route path="contas"       element={<ContasPage />} />
+          <Route path="schema"       element={<SchemaVisualizerPage />} />
         </Route>
         <Route path="/organizacoes/:id" element={<DetailLayout />}>
           <Route index element={<OrganizacaoDetailPage />} />
