@@ -266,6 +266,7 @@ export function AtribuirPermissoesSheet({
               entidade_id:   entityId,
               componente_id: comp.id,
               acao,
+              ...(instanciaId ? { instancia_id: instanciaId } : {}),
             })
           }
         }
@@ -276,6 +277,7 @@ export function AtribuirPermissoesSheet({
               entidade_id:   entityId,
               componente_id: comp.id,
               acao,
+              ...(instanciaId ? { instancia_id: instanciaId } : {}),
             })
           }
         }
