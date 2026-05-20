@@ -49,6 +49,13 @@ export const api = {
   createUser: (data: any) => request<any>('/api/users', { method: 'POST', body: JSON.stringify(data) }),
   updateUser: (id: string, data: any) => request<any>(`/api/users/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteUser: (id: string) => request<any>(`/api/users/${id}`, { method: 'DELETE' }),
+  // Grupos nos quais o usuário é membro (opcionalmente filtrado por conta)
+  getUserGrupos: (userId: string, accountId?: string) => {
+    const p = new URLSearchParams()
+    if (accountId) p.set('accountId', accountId)
+    const qs = p.toString()
+    return request<any[]>(`/api/users/${userId}/grupos${qs ? `?${qs}` : ''}`)
+  },
 
   // Tipos de Licença
   getTiposLicenca: () => request<any[]>('/api/tipos-licenca'),
