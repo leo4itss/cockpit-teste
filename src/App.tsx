@@ -12,6 +12,7 @@ import { AuthProvider } from './context/AuthContext'
 import { GruposPage } from './pages/GruposPage'
 import { UsuariosPage } from './pages/UsuariosPage'
 import { ContasPage } from './pages/ContasPage'
+import SchemaVisualizerPage from './pages/SchemaVisualizerPage'
 
 export default function App() {
   return (
