@@ -15,7 +15,7 @@ import type { Componente } from '@/types'
 
 // ── Tipos ──────────────────────────────────────────────────────
 
-type ComponenteTipo = 'assistente-ia' | 'base-conhecimento' | 'default'
+type ComponenteTipo = 'assistente-ia' | 'base-conhecimento' | 'analytics' | 'default'
 
 interface AcaoItem { acao: string; label: string }
 
@@ -41,6 +41,11 @@ const ACOES: Record<ComponenteTipo, AcaoItem[]> = {
     { acao: 'pode_publicar',              label: 'Publicar documentos' },
     { acao: 'pode_excluir',               label: 'Excluir' },
   ],
+  'analytics': [
+    { acao: 'can_view_dashboards',   label: 'Visualizar dashboards' },
+    { acao: 'can_export_reports',    label: 'Exportar relatórios' },
+    { acao: 'can_manage_analytics',  label: 'Administrar analytics' },
+  ],
   'default': [
     { acao: 'can_view',   label: 'Visualizar' },
     { acao: 'can_edit',   label: 'Editar' },
@@ -54,6 +59,7 @@ const ACOES: Record<ComponenteTipo, AcaoItem[]> = {
 const CAPABILITY_MAP: Partial<Record<ComponenteTipo, string>> = {
   'assistente-ia':    'assistant.use',
   'base-conhecimento':'knowledge.use',
+  'analytics':        'analytics.use',
 }
 
 interface Props {
@@ -71,8 +77,9 @@ interface Props {
 
 function inferirTipo(nome: string): ComponenteTipo {
   const n = nome.toLowerCase()
-  if (n.includes('assistente') || n.includes('pas core') || n.includes('analytics')) return 'assistente-ia'
+  if (n.includes('assistente') || n.includes('pas core')) return 'assistente-ia'
   if (n.includes('base') || n.includes('knowledge') || n.includes('kb') || n.includes('jurídic')) return 'base-conhecimento'
+  if (n.includes('analytics') || n.includes('analytic')) return 'analytics'
   return 'default'
 }
 
@@ -80,6 +87,7 @@ function ComponenteIcon({ tipo, locked }: { tipo: ComponenteTipo; locked?: boole
   const cls = locked ? 'opacity-40' : ''
   if (tipo === 'assistente-ia')     return <Bot      className={cn('w-5 h-5 text-violet-500 shrink-0', cls)} />
   if (tipo === 'base-conhecimento') return <Database className={cn('w-5 h-5 text-blue-500 shrink-0', cls)} />
+  if (tipo === 'analytics')         return <Layers   className={cn('w-5 h-5 text-emerald-500 shrink-0', cls)} />
   return                                   <Layers   className={cn('w-5 h-5 text-gray-400 shrink-0', cls)} />
 }
 
