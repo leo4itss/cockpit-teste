@@ -825,21 +825,23 @@ app.get('/api/permissions', async (c) => {
  */
 app.post('/api/permissions', async (c) => {
   const body = await c.req.json()
-  const { entidade_tipo, entidade_id, componente_id, acao } = body
+  const { entidade_tipo, entidade_id, componente_id, acao, instancia_id } = body
 
   if (!entidade_tipo || !entidade_id || !componente_id || !acao) {
     return c.json({ error: 'entidade_tipo, entidade_id, componente_id e acao são obrigatórios' }, 400)
   }
 
-  // Idempotente: retorna existente se já houver
-  const existing = await db.select().from(componentPermissions).where(
-    and(
-      eq(componentPermissions.entidadeTipo, entidade_tipo),
-      eq(componentPermissions.entidadeId,   entidade_id),
-      eq(componentPermissions.componenteId, componente_id),
-      eq(componentPermissions.acao,         acao),
-    )
-  )
+  // Idempotente — considera instancia_id na chave de unicidade
+  const conditions = [
+    eq(componentPermissions.entidadeTipo, entidade_tipo),
+    eq(componentPermissions.entidadeId,   entidade_id),
+    eq(componentPermissions.componenteId, componente_id),
+    eq(componentPermissions.acao,         acao),
+    instancia_id
+      ? eq(componentPermissions.instanciaId, instancia_id)
+      : eq(componentPermissions.instanciaId, null as any),
+  ]
+  const existing = await db.select().from(componentPermissions).where(and(...conditions))
   if (existing.length > 0) return c.json(existing[0], 200)
 
   const [row] = await db.insert(componentPermissions).values({
@@ -848,6 +850,7 @@ app.post('/api/permissions', async (c) => {
     entidadeId:   entidade_id,
     componenteId: componente_id,
     acao,
+    instanciaId:  instancia_id ?? null,
     createdAt:    new Date().toISOString(),
   }).returning()
 
