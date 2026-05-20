@@ -52,6 +52,26 @@ export const mockFGARelations: FGARelations = {
   // ── Group Members ────────────────────────────────────────────
   // Populados dinamicamente via usuario_grupos no banco real.
   groupMembers: [],
+
+  // ── Instance Members ─────────────────────────────────────────
+  // Relações FGA user/group → instance para o cenário Docnix/Comgas.
+  // Espelha os dados inseridos em server/seed-docnix.ts (steps 11-12).
+  instanceMembers: [
+    // inst-vanessa: Fernando e Neide podem acessar
+    { entityType: 'user',  entityId: 'u-fernando',    instanceId: 'inst-vanessa',         role: 'viewer' },
+    { entityType: 'user',  entityId: 'u-neide',       instanceId: 'inst-vanessa',         role: 'viewer' },
+    // inst-ceo: Marcelo usa, grupo Analistas só visualiza
+    { entityType: 'user',  entityId: 'u-marcelo',     instanceId: 'inst-ceo',             role: 'member' },
+    { entityType: 'group', entityId: 'g-analistas',   instanceId: 'inst-ceo',             role: 'viewer' },
+    // inst-ws-vendas: grupo Vendedores usa, Fernando visualiza
+    { entityType: 'group', entityId: 'g-vendedores',  instanceId: 'inst-ws-vendas',       role: 'member' },
+    { entityType: 'user',  entityId: 'u-fernando',    instanceId: 'inst-ws-vendas',       role: 'viewer' },
+    // inst-ws-fornecedores: grupo Fornecedores usa
+    { entityType: 'group', entityId: 'g-fornecedores',instanceId: 'inst-ws-fornecedores', role: 'member' },
+    // inst-dash-ops: grupo Analistas visualiza, Marcelo usa
+    { entityType: 'group', entityId: 'g-analistas',   instanceId: 'inst-dash-ops',        role: 'viewer' },
+    { entityType: 'user',  entityId: 'u-marcelo',     instanceId: 'inst-dash-ops',        role: 'member' },
+  ],
 }
 
 // ── Personas de teste ─────────────────────────────────────────

@@ -284,6 +284,57 @@ export interface FGARelations {
 
   // Membros de grupos (user → group)
   groupMembers: Array<{ userId: string; groupId: string }>
+
+  // Membros de instâncias — relações FGA user/group → instance
+  instanceMembers?: Array<{
+    entityType: 'user' | 'group'
+    entityId:   string
+    instanceId: string
+    role:       'viewer' | 'member' | 'admin'
+  }>
+}
+
+// ── Instâncias de Componente ──────────────────────────────────
+
+/**
+ * Uma instância é uma cópia configurada de um componente dentro de uma conta.
+ * Ex: "Assistente Vanessa" = instância de "Assistente de IA" na conta Comgas.
+ *
+ * Tupla FGA: instance:<id> component component:<componenteId>
+ *            instance:<id> account  account:<accountId>
+ */
+export interface Instancia {
+  id:           string
+  componenteId: string
+  accountId:    string
+  nome:         string
+  descricao?:   string
+  status:       'Ativo' | 'Inativo'
+  createdAt:    string
+  // enriquecido pelo backend
+  qtdMembros?:  number
+}
+
+/**
+ * Membro de uma instância — pode ser usuário ou grupo.
+ *
+ * papel: 'viewer' → leitura/consulta
+ *        'member' → uso padrão
+ *        'admin'  → acesso completo + gerenciar membros da instância
+ *
+ * Tupla FGA: user:<entidadeId>  <papel> instance:<instanciaId>
+ *            group:<entidadeId> <papel> instance:<instanciaId>
+ */
+export interface InstanciaMembro {
+  id:           string
+  instanciaId:  string
+  entidadeTipo: 'user' | 'group'
+  entidadeId:   string
+  papel:        'viewer' | 'member' | 'admin'
+  assignedAt:   string
+  // enriquecido pelo backend
+  displayName?: string
+  email?:       string
 }
 
 /**

@@ -133,4 +133,27 @@ export const api = {
     request<any>('/api/permissions', { method: 'POST', body: JSON.stringify(data) }),
   removePermission: (data: { entidade_tipo: string; entidade_id: string; componente_id: string; acao: string }) =>
     request<any>('/api/permissions', { method: 'DELETE', body: JSON.stringify(data) }),
+
+  // Instâncias de Componente
+  getInstancias: (params?: { componenteId?: string; accountId?: string }) => {
+    const p = new URLSearchParams()
+    if (params?.componenteId) p.set('componenteId', params.componenteId)
+    if (params?.accountId)    p.set('accountId',    params.accountId)
+    const qs = p.toString()
+    return request<any[]>(`/api/instancias${qs ? `?${qs}` : ''}`)
+  },
+  getInstancia:    (id: string)             => request<any>(`/api/instancias/${id}`),
+  createInstancia: (data: any)              => request<any>('/api/instancias', { method: 'POST', body: JSON.stringify(data) }),
+  updateInstancia: (id: string, data: any)  => request<any>(`/api/instancias/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteInstancia: (id: string)             => request<{ ok: boolean }>(`/api/instancias/${id}`, { method: 'DELETE' }),
+
+  // Membros de instância
+  getInstanciaMembros:   (instanciaId: string) =>
+    request<any[]>(`/api/instancias/${instanciaId}/membros`),
+  addInstanciaMembro:    (instanciaId: string, data: { entidadeTipo: string; entidadeId: string; papel: string }) =>
+    request<any>(`/api/instancias/${instanciaId}/membros`, { method: 'POST', body: JSON.stringify(data) }),
+  updateInstanciaMembro: (instanciaId: string, membroId: string, papel: string) =>
+    request<any>(`/api/instancias/${instanciaId}/membros`, { method: 'POST', body: JSON.stringify({ entidadeTipo: '_update', entidadeId: membroId, papel }) }),
+  removeInstanciaMembro: (instanciaId: string, membroId: string) =>
+    request<any>(`/api/instancias/${instanciaId}/membros/${membroId}`, { method: 'DELETE' }),
 }

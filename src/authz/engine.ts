@@ -274,3 +274,66 @@ export function getAdminOrgId(userId: string, rel: FGARelations): string | null 
   const entry = rel.orgAdmins.find(r => r.userId === userId)
   return entry?.orgId ?? null
 }
+
+// ── Instâncias ────────────────────────────────────────────────
+
+/**
+ * Retorna o papel do usuário em uma instância específica.
+ * Considera membros diretos (user) e membros via grupos (group#member).
+ *
+ * FGA:
+ *   define viewer: [user, group#member] or member
+ *   define member: [user, group#member] or admin
+ *   define admin:  [user, group#member]
+ *
+ * Platform Admin tem papel 'admin' implícito em todas as instâncias.
+ */
+export function getInstanciaRole(
+  userId: string,
+  instanceId: string,
+  rel: FGARelations,
+): 'admin' | 'member' | 'viewer' | null {
+  if (isPlatformAdmin(userId, rel)) return 'admin'
+
+  const members = rel.instanceMembers ?? []
+
+  // Membro direto como usuário
+  const direct = members.find(
+    m => m.entityType === 'user' && m.entityId === userId && m.instanceId === instanceId
+  )
+  if (direct) return direct.role
+
+  // Membro via grupo
+  const userGroupIds = rel.groupMembers
+    .filter(g => g.userId === userId)
+    .map(g => g.groupId)
+
+  const viaGroup = members.find(
+    m => m.entityType === 'group' && userGroupIds.includes(m.entityId) && m.instanceId === instanceId
+  )
+  if (viaGroup) return viaGroup.role
+
+  return null
+}
+
+/**
+ * Pode gerenciar membros de uma instância (adicionar, editar papel, remover).
+ *
+ * FGA:
+ *   define can_manage_members: admin from instance
+ *                              or account_admin
+ *                              or org_admin from org
+ *                              or platform_admin
+ */
+export function canManageInstanciaMembros(
+  userId: string,
+  instanceId: string,
+  accountId: string,
+  orgId: string,
+  rel: FGARelations,
+): boolean {
+  if (isPlatformAdmin(userId, rel)) return true
+  if (isOrgAdmin(userId, orgId, rel)) return true
+  if (isAccountAdmin(userId, accountId, rel)) return true
+  return getInstanciaRole(userId, instanceId, rel) === 'admin'
+}

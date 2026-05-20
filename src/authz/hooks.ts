@@ -143,3 +143,27 @@ export function useAdminOrgId(): string | null {
   const { currentUser, relations } = useAuthz()
   return engine.getAdminOrgId(currentUser.id, relations)
 }
+
+// ── Instâncias ────────────────────────────────────────────────
+
+/**
+ * Retorna o papel do usuário em uma instância específica,
+ * ou null se não tiver acesso.
+ */
+export function useGetInstanciaRole(instanceId: string): 'admin' | 'member' | 'viewer' | null {
+  const { currentUser, relations } = useAuthz()
+  return engine.getInstanciaRole(currentUser.id, instanceId, relations)
+}
+
+/**
+ * Pode gerenciar membros de uma instância (adicionar, editar papel, remover).
+ * PoC: accountId e orgId com defaults do cenário Comgas/Docnix.
+ */
+export function useCanManageInstanciaMembros(
+  instanceId: string,
+  accountId = 'acc-comgas',
+  orgId = '1',
+): boolean {
+  const { currentUser, relations } = useAuthz()
+  return engine.canManageInstanciaMembros(currentUser.id, instanceId, accountId, orgId, relations)
+}
