@@ -11,7 +11,7 @@ export function Layout() {
       <Sidebar collapsed={collapsed} onCollapse={setCollapsed} />
       <div className="flex flex-col flex-1 min-w-0">
         <TopBar collapsed={collapsed} onExpand={() => setCollapsed(false)} />
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 overflow-auto min-h-0 flex flex-col">
           <Outlet />
         </main>
       </div>
