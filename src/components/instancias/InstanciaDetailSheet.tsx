@@ -465,6 +465,11 @@ export function InstanciaDetailSheet({
           entityId={membroPermissoes.entidadeId}
           entityNome={membroPermissoes.displayName ?? membroPermissoes.entidadeId}
           accountId={accountId}
+          papel={
+            membroPermissoes.papel === 'viewer' ? 'Viewer'
+            : membroPermissoes.papel === 'admin'  ? 'Admin'
+            : 'User'
+          }
           instanciaId={instancia.id}
           instanciaComponenteId={instancia.componenteId}
           instanciaNome={instancia.nome}
