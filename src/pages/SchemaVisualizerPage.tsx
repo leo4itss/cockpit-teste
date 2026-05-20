@@ -621,7 +621,7 @@ export default function SchemaVisualizerPage() {
   const [fgaEdges, , onFgaEdgesChange] = useEdgesState(FGA_EDGES)
 
   return (
-    <div className="flex flex-col h-full bg-[#111113]">
+    <div className="flex flex-col flex-1 min-h-0 bg-[#111113]">
 
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 shrink-0">
