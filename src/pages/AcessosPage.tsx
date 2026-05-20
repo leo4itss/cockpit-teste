@@ -15,8 +15,10 @@ import type { User, Grupo } from '@/types'
 
 import { CriarGrupoSheet } from '@/components/grupos/CriarGrupoSheet'
 import { GrupoDetailSheet } from '@/components/grupos/GrupoDetailSheet'
+import { InstanciaDetailSheet } from '@/components/instancias/InstanciaDetailSheet'
+import type { Instancia } from '@/types'
 
-type Aba = 'usuarios' | 'grupos'
+type Aba = 'usuarios' | 'grupos' | 'instancias'
 
 // PoC: orgId fixo — em produção viria de account.orgId
 const ORG_ID_POC = '1'
@@ -62,7 +64,7 @@ function PapelBadge({ papel }: { papel?: string }) {
 export function AcessosPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const abaParam = searchParams.get('aba') as Aba | null
-  const abaAtiva: Aba = abaParam === 'grupos' ? 'grupos' : 'usuarios'
+  const abaAtiva: Aba = abaParam === 'grupos' ? 'grupos' : abaParam === 'instancias' ? 'instancias' : 'usuarios'
 
   const rawAccountId    = useAdminAccountId()          // null quando a persona não é Account Admin
   const accountId       = rawAccountId ?? ''            // string vazia → sem conta resolvida
@@ -162,6 +164,51 @@ export function AcessosPage() {
     setSelectedUser(null)
   }
 
+  // ── Instâncias ──────────────────────────────────────────────
+  const [instancias, setInstancias]             = useState<Instancia[]>([])
+  const [loadingInstancias, setLoadingInstancias] = useState(true)
+  const [searchInstancias, setSearchInstancias]   = useState('')
+  const [showInstanciaDetail, setShowInstanciaDetail] = useState(false)
+  const [selectedInstancia, setSelectedInstancia]     = useState<Instancia | null>(null)
+
+  useEffect(() => {
+    if (!accountId) return
+    api.getInstancias({ accountId })
+      .then(data => { setInstancias(data); setLoadingInstancias(false) })
+      .catch(() => setLoadingInstancias(false))
+  }, [accountId])
+
+  // Mapa de componenteId → nome (para exibir na coluna Componente)
+  const [componenteNomes, setComponenteNomes] = useState<Record<string, string>>({})
+  useEffect(() => {
+    api.getComponentes()
+      .then(data => {
+        const map: Record<string, string> = {}
+        data.forEach((c: any) => { map[c.id] = c.nome })
+        setComponenteNomes(map)
+      })
+      .catch(() => {})
+  }, [])
+
+  const filteredInstancias = useMemo(() => {
+    const q = searchInstancias.toLowerCase()
+    return instancias.filter(i =>
+      i.nome.toLowerCase().includes(q) ||
+      (i.descricao ?? '').toLowerCase().includes(q) ||
+      (componenteNomes[i.componenteId] ?? '').toLowerCase().includes(q)
+    )
+  }, [instancias, searchInstancias, componenteNomes])
+
+  // Agrupa instâncias por componenteId para exibição agrupada
+  const instanciasPorComponente = useMemo(() => {
+    const map: Record<string, Instancia[]> = {}
+    filteredInstancias.forEach(inst => {
+      if (!map[inst.componenteId]) map[inst.componenteId] = []
+      map[inst.componenteId].push(inst)
+    })
+    return map
+  }, [filteredInstancias])
+
   // ── Grupos ──────────────────────────────────────────────────
   const [grupos, setGrupos]               = useState<Grupo[]>([])
   const [loadingGrupos, setLoadingGrupos] = useState(true)
@@ -196,10 +243,11 @@ export function AcessosPage() {
   }
 
   // ── Search unificado ────────────────────────────────────────
-  const searchQuery = abaAtiva === 'usuarios' ? searchUsers : searchGrupos
+  const searchQuery = abaAtiva === 'usuarios' ? searchUsers : abaAtiva === 'grupos' ? searchGrupos : searchInstancias
   function handleSearchChange(v: string) {
     if (abaAtiva === 'usuarios') setSearchUsers(v)
-    else setSearchGrupos(v)
+    else if (abaAtiva === 'grupos') setSearchGrupos(v)
+    else setSearchInstancias(v)
   }
 
   // ── Render ──────────────────────────────────────────────────
@@ -273,29 +321,33 @@ export function AcessosPage() {
                 <Plus className="w-4 h-4 mr-1.5" />Convidar usuário
               </Button>
             </div>
-          ) : (
+          ) : abaAtiva === 'grupos' ? (
             <Button onClick={() => setShowCriarGrupoSheet(true)}>
               <Plus className="w-4 h-4 mr-1.5" />Criar grupo
             </Button>
-          )}
+          ) : null}
         </div>
       </div>
 
       {/* Tabs */}
       <div className="px-8 border-b border-gray-200">
         <div className="flex">
-          {(['usuarios', 'grupos'] as const).map(aba => (
+          {([
+            { id: 'usuarios',   label: 'Usuários' },
+            { id: 'grupos',     label: 'Grupos' },
+            { id: 'instancias', label: 'Instâncias' },
+          ] as const).map(({ id, label }) => (
             <button
-              key={aba}
-              onClick={() => setAba(aba)}
+              key={id}
+              onClick={() => setAba(id)}
               className={cn(
                 'px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors',
-                abaAtiva === aba
+                abaAtiva === id
                   ? 'border-[#030712] text-[#030712]'
                   : 'border-transparent text-[#6b7280] hover:text-[#030712] hover:border-gray-300'
               )}
             >
-              {aba === 'usuarios' ? 'Usuários' : 'Grupos'}
+              {label}
             </button>
           ))}
         </div>
@@ -454,6 +506,84 @@ export function AcessosPage() {
         </div>
       )}
 
+      {/* ── Aba Instâncias ── */}
+      {abaAtiva === 'instancias' && (
+        <div className="px-8 pt-6 pb-8">
+          <p className="text-sm text-[#6b7280] mb-4">
+            Instâncias são contextos específicos de um componente dentro desta conta.
+            Cada instância tem sua própria lista de membros — o acesso a uma instância não é herdado automaticamente do acesso ao componente.
+          </p>
+
+          {loadingInstancias ? (
+            <div className="flex items-center justify-center py-16 text-sm text-gray-500">Carregando instâncias...</div>
+          ) : filteredInstancias.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 gap-2">
+              <p className="text-sm font-medium text-[#030712]">Nenhuma instância encontrada</p>
+              <p className="text-xs text-[#6b7280]">Esta conta ainda não possui instâncias configuradas.</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {Object.entries(instanciasPorComponente).map(([componenteId, insts]) => (
+                <div key={componenteId}>
+                  {/* Cabeçalho de grupo por componente */}
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                      {componenteNomes[componenteId] ?? componenteId}
+                    </span>
+                    <span className="text-xs text-gray-400">({insts.length} {insts.length === 1 ? 'instância' : 'instâncias'})</span>
+                    <div className="flex-1 h-px bg-gray-200 ml-1" />
+                  </div>
+
+                  <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-gray-200">
+                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40">Nome</th>
+                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[80px]">Membros</th>
+                          <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 w-[100px]">Status</th>
+                          <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 w-[80px]">Ações</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {insts.map(inst => (
+                          <tr
+                            key={inst.id}
+                            className="border-b border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer last:border-b-0"
+                            onClick={() => { setSelectedInstancia(inst); setShowInstanciaDetail(true) }}
+                          >
+                            <td className="px-4 py-3">
+                              <p className="text-sm font-medium text-[#030712]">{inst.nome}</p>
+                              {inst.descricao && (
+                                <p className="text-xs text-[#6b7280] mt-0.5 max-w-xs truncate">{inst.descricao}</p>
+                              )}
+                            </td>
+                            <td className="px-4 py-3 text-sm text-[#030712]">{inst.qtdMembros ?? 0}</td>
+                            <td className="px-4 py-3 text-center">
+                              {inst.status === 'Ativo'
+                                ? <Badge variant="success">Ativo</Badge>
+                                : <Badge variant="secondary">Inativo</Badge>}
+                            </td>
+                            <td className="px-4 py-3 text-center" onClick={e => e.stopPropagation()}>
+                              <button
+                                onClick={() => { setSelectedInstancia(inst); setShowInstanciaDetail(true) }}
+                                className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+                                title="Ver membros"
+                              >
+                                <Search className="w-4 h-4 text-gray-500" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Sheets — Usuários */}
       <CriarUsuarioSheet
         open={showCriarSheet}
@@ -492,6 +622,16 @@ export function AcessosPage() {
         open={showGrupoDetailSheet}
         onClose={() => setShowGrupoDetailSheet(false)}
         grupo={selectedGrupo}
+        accountId={accountId}
+      />
+
+      {/* Sheet — Instâncias */}
+      <InstanciaDetailSheet
+        open={showInstanciaDetail}
+        onClose={() => setShowInstanciaDetail(false)}
+        instancia={selectedInstancia}
+        componenteNome={selectedInstancia ? componenteNomes[selectedInstancia.componenteId] : undefined}
+        accountNome={accountNome ?? undefined}
         accountId={accountId}
       />
     </div>
