@@ -327,7 +327,7 @@ export function AtribuirPermissoesSheet({
 
   function handleClose() {
     setSearch(''); setOriginal({}); setDraft({}); setComponentes([])
-    setActiveCapabilities(new Set()); setSaveError(null)
+    setActiveCapabilities(new Set()); setSaveError(null); setInherited({})
     onClose()
   }
 
