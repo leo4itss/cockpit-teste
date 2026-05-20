@@ -45,16 +45,18 @@ async function main() {
   console.log('✅ Org Docnix (org-docnix)')
 
   // ── 2. Conta Comgas ────────────────────────────────────────────────────────
+  // org_id='1' → vincula à org principal (visível para Org Admin / Ana)
   await sql`
     INSERT INTO accounts (
       id, org_id, name, subdomain, provisioning_status,
       arquiteto_pas, is_default, status, created_at, admins
     ) VALUES (
-      'acc-comgas', 'org-docnix', 'Comgas', 'comgas', 'COMPLETED',
-      'Marcelo Gomes', true, 'Ativo', '01/01/2026', '[]'
+      'acc-comgas', '1', 'Comgas', 'comgas', 'COMPLETED',
+      'Marcelo Gomes', false, 'Ativo', '01/01/2026', '[]'
     )
     ON CONFLICT (id) DO UPDATE SET
       name   = EXCLUDED.name,
+      org_id = '1',
       status = EXCLUDED.status
   `
   console.log('✅ Conta Comgas (acc-comgas)')
@@ -265,6 +267,16 @@ async function main() {
     `
   }
   console.log(`✅ ${permissoes.length} permissões de grupo`)
+
+  // ── 10. Inativar todos os outros componentes ──────────────────────────────
+  // Garante que apenas os 3 componentes do cenário aparecem na listagem padrão.
+  // Os demais ficam com status 'Inativo' e só aparecem com o toggle "Exibir inativados".
+  await sql`
+    UPDATE componentes
+    SET status = 'Inativo'
+    WHERE id NOT IN ('comp-assistente-ia', 'comp-base-conhecimento', 'comp-analytics')
+  `
+  console.log('✅ Componentes fora do cenário inativados')
 
   // ── Resumo ─────────────────────────────────────────────────────────────────
   console.log('\n🎉 Seed Docnix/Comgas concluído!')
