@@ -278,6 +278,53 @@ async function main() {
   `
   console.log('✅ Componentes fora do cenário inativados')
 
+  // ── 11. Instâncias de Componente ─────────────────────────────────────────────
+  const instanciasData = [
+    { id: 'inst-vanessa',         compId: 'comp-assistente-ia',     nome: 'Assistente Vanessa',      desc: 'Assistente de IA dedicado à equipe de atendimento.' },
+    { id: 'inst-ceo',             compId: 'comp-assistente-ia',     nome: 'Assistente CEO',           desc: 'Assistente de IA para uso executivo.' },
+    { id: 'inst-ws-vendas',       compId: 'comp-base-conhecimento', nome: 'Workspace Vendas',         desc: 'Base de conhecimento para a equipe de vendas.' },
+    { id: 'inst-ws-fornecedores', compId: 'comp-base-conhecimento', nome: 'Workspace Fornecedores',  desc: 'Base de conhecimento para parceiros e fornecedores externos.' },
+    { id: 'inst-dash-ops',        compId: 'comp-analytics',         nome: 'Dashboard Operacional',   desc: 'Painel de métricas operacionais da Comgas.' },
+  ]
+  for (const inst of instanciasData) {
+    await sql`
+      INSERT INTO instancias (id, componente_id, account_id, nome, descricao, status, created_at)
+      VALUES (${inst.id}, ${inst.compId}, 'acc-comgas', ${inst.nome}, ${inst.desc},
+              'Ativo', to_char(current_date, 'DD/MM/YYYY'))
+      ON CONFLICT (id) DO UPDATE SET
+        nome      = EXCLUDED.nome,
+        descricao = EXCLUDED.descricao
+    `
+  }
+  console.log('✅ 5 instâncias criadas')
+
+  // ── 12. Membros de Instância ──────────────────────────────────────────────
+  const membrosInstancia = [
+    // inst-vanessa
+    { id: 'im-van-fernando', instId: 'inst-vanessa',         tipo: 'user',  entId: 'u-fernando', papel: 'viewer' },
+    { id: 'im-van-neide',    instId: 'inst-vanessa',         tipo: 'user',  entId: 'u-neide',    papel: 'viewer' },
+    // inst-ceo
+    { id: 'im-ceo-marcelo',  instId: 'inst-ceo',             tipo: 'user',  entId: 'u-marcelo',  papel: 'member' },
+    { id: 'im-ceo-aq',       instId: 'inst-ceo',             tipo: 'group', entId: 'g-analistas',papel: 'viewer' },
+    // inst-ws-vendas
+    { id: 'im-wsv-vend',     instId: 'inst-ws-vendas',       tipo: 'group', entId: 'g-vendedores',papel: 'member' },
+    { id: 'im-wsv-fernando', instId: 'inst-ws-vendas',       tipo: 'user',  entId: 'u-fernando', papel: 'viewer' },
+    // inst-ws-fornecedores
+    { id: 'im-wsf-forn',     instId: 'inst-ws-fornecedores', tipo: 'group', entId: 'g-fornecedores', papel: 'member' },
+    // inst-dash-ops
+    { id: 'im-dash-aq',      instId: 'inst-dash-ops',        tipo: 'group', entId: 'g-analistas',papel: 'viewer' },
+    { id: 'im-dash-marcelo', instId: 'inst-dash-ops',        tipo: 'user',  entId: 'u-marcelo',  papel: 'member' },
+  ]
+  for (const m of membrosInstancia) {
+    await sql`
+      INSERT INTO instancia_membros (id, instancia_id, entidade_tipo, entidade_id, papel, assigned_at)
+      VALUES (${m.id}, ${m.instId}, ${m.tipo}, ${m.entId}, ${m.papel},
+              to_char(current_date, 'DD/MM/YYYY'))
+      ON CONFLICT (id) DO NOTHING
+    `
+  }
+  console.log('✅ 9 membros de instância atribuídos')
+
   // ── Resumo ─────────────────────────────────────────────────────────────────
   console.log('\n🎉 Seed Docnix/Comgas concluído!')
   console.log('   Org:         Docnix (org-docnix)')
