@@ -195,9 +195,13 @@ export const componentPermissions = pgTable('component_permissions', {
   entidadeId:   text('entidade_id').notNull(),
   componenteId: text('componente_id').notNull(),
   acao:         text('acao').notNull(),
+  // null → permissão no componente inteiro (comportamento original)
+  // preenchido → permissão restrita a uma instância específica
+  instanciaId:  text('instancia_id'),
   createdAt:    text('created_at').notNull(),
 }, (t) => [
   index('idx_comp_perm_lookup').on(t.entidadeTipo, t.entidadeId, t.componenteId, t.acao),
+  index('idx_comp_perm_instancia').on(t.instanciaId),
 ])
 
 // ── Entitlements por Conta ───────────────────────────────────
