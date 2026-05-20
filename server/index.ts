@@ -864,20 +864,22 @@ app.post('/api/permissions', async (c) => {
  */
 app.delete('/api/permissions', async (c) => {
   const body = await c.req.json()
-  const { entidade_tipo, entidade_id, componente_id, acao } = body
+  const { entidade_tipo, entidade_id, componente_id, acao, instancia_id } = body
 
   if (!entidade_tipo || !entidade_id || !componente_id || !acao) {
     return c.json({ error: 'entidade_tipo, entidade_id, componente_id e acao são obrigatórios' }, 400)
   }
 
-  await db.delete(componentPermissions).where(
-    and(
-      eq(componentPermissions.entidadeTipo, entidade_tipo),
-      eq(componentPermissions.entidadeId,   entidade_id),
-      eq(componentPermissions.componenteId, componente_id),
-      eq(componentPermissions.acao,         acao),
-    )
-  )
+  const conditions = [
+    eq(componentPermissions.entidadeTipo, entidade_tipo),
+    eq(componentPermissions.entidadeId,   entidade_id),
+    eq(componentPermissions.componenteId, componente_id),
+    eq(componentPermissions.acao,         acao),
+    instancia_id
+      ? eq(componentPermissions.instanciaId, instancia_id)
+      : eq(componentPermissions.instanciaId, null as any),
+  ]
+  await db.delete(componentPermissions).where(and(...conditions))
 
   return c.json({ ok: true })
 })
