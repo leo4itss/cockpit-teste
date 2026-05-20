@@ -437,6 +437,7 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome 
           entityNome={grupo.nome}
           accountId={accountId}
           accountNome={accountNome}
+          papel={localPapel}
           onSuccess={handleAtribuirSuccess}
         />
       </NestedSheetBody>

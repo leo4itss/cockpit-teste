@@ -62,6 +62,30 @@ const CAPABILITY_MAP: Partial<Record<ComponenteTipo, string>> = {
   'analytics':        'analytics.use',
 }
 
+// ── Permissões padrão por papel ────────────────────────────────
+// Quando o grupo tem um papel definido e não tem permissões ainda,
+// essas ações são pré-selecionadas automaticamente.
+const DEFAULTS_BY_PAPEL: Record<string, Partial<Record<ComponenteTipo, string[]>>> = {
+  'Viewer': {
+    'assistente-ia':    ['can_use_assistant'],
+    'base-conhecimento':['pode_ler'],
+    'analytics':        ['can_view_dashboards'],
+    'default':          ['can_view'],
+  },
+  'User': {
+    'assistente-ia':    ['can_use_assistant', 'can_share_conversation_results', 'can_view_consulted_sources', 'can_upload_rag_sources'],
+    'base-conhecimento':['pode_ler', 'pode_criar_documento', 'pode_editar', 'pode_enviar_para_aprovacao'],
+    'analytics':        ['can_view_dashboards', 'can_export_reports'],
+    'default':          ['can_view', 'can_edit'],
+  },
+  'Admin': {
+    'assistente-ia':    ['can_use_assistant', 'can_share_conversation_results', 'can_view_consulted_sources', 'can_upload_rag_sources', 'can_create_assistant', 'can_configure_agents', 'can_manage_business_scenarios', 'can_manage_users'],
+    'base-conhecimento':['pode_ler', 'pode_editar', 'pode_criar_documento', 'pode_enviar_para_aprovacao', 'pode_aprovar', 'pode_publicar', 'pode_excluir'],
+    'analytics':        ['can_view_dashboards', 'can_export_reports', 'can_manage_analytics'],
+    'default':          ['can_view', 'can_edit', 'can_manage'],
+  },
+}
+
 interface Props {
   open:        boolean
   onClose:     () => void
@@ -70,6 +94,7 @@ interface Props {
   entityNome:  string
   accountId:   string
   accountNome?: string
+  papel?:      string   // papel do grupo — usado para pré-selecionar defaults
   onSuccess?:  () => void
 }
 
@@ -94,7 +119,7 @@ function ComponenteIcon({ tipo, locked }: { tipo: ComponenteTipo; locked?: boole
 // ── Componente principal ───────────────────────────────────────
 
 export function AtribuirPermissoesSheet({
-  open, onClose, entityType, entityId, entityNome, accountId, accountNome, onSuccess,
+  open, onClose, entityType, entityId, entityNome, accountId, accountNome, papel, onSuccess,
 }: Props) {
   const [componentes, setComponentes]       = useState<Componente[]>([])
   const [activeCapabilities, setActiveCapabilities] = useState<Set<string>>(new Set())
@@ -102,6 +127,7 @@ export function AtribuirPermissoesSheet({
   const [search, setSearch]                 = useState('')
   const [saving, setSaving]                 = useState(false)
   const [saveError, setSaveError]           = useState<string | null>(null)
+  const [defaultsAplicados, setDefaultsAplicados] = useState(false)
 
   // componenteId → string[] de ações ativas
   const [original, setOriginal] = useState<Record<string, string[]>>({})
@@ -112,6 +138,7 @@ export function AtribuirPermissoesSheet({
     let cancelled = false
     setLoading(true)
     setSearch('')
+    setDefaultsAplicados(false)
 
     const entidadeTipo = entityType === 'usuario' ? 'user' : 'group'
 
@@ -153,8 +180,24 @@ export function AtribuirPermissoesSheet({
           }
         })
 
+        // Pré-seleção por papel: aplica defaults quando não há permissões salvas
+        const hasExistingPerms = (perms as any[]).length > 0
+        const defaults = papel ? DEFAULTS_BY_PAPEL[papel] : null
+        const draftMap = JSON.parse(JSON.stringify(permMap)) as Record<string, string[]>
+
+        if (!hasExistingPerms && defaults) {
+          ativos.forEach(c => {
+            const tipo = inferirTipo(c.nome)
+            const acoesDefault = defaults[tipo] ?? []
+            // Só pré-seleciona ações que existem no catálogo daquele tipo
+            const acoesValidas = ACOES[tipo].map(a => a.acao)
+            draftMap[c.id] = acoesDefault.filter(a => acoesValidas.includes(a))
+          })
+          if (!cancelled) setDefaultsAplicados(true)
+        }
+
         setOriginal(permMap)
-        setDraft(JSON.parse(JSON.stringify(permMap)))
+        setDraft(draftMap)
       })
       .catch(() => {
         // Só cai aqui se getComponentes() falhar — o resto já tem .catch() individual
@@ -268,6 +311,17 @@ export function AtribuirPermissoesSheet({
               <p className="text-sm text-violet-800">
                 Você está atribuindo permissões ao <strong>grupo {entityNome}</strong>.
                 Todos os membros herdarão estas permissões automaticamente.
+              </p>
+            </div>
+          )}
+
+          {/* Banner de defaults aplicados por papel */}
+          {defaultsAplicados && papel && (
+            <div className="flex items-start gap-3 mx-6 mt-3 p-3.5 rounded-xl border border-blue-200 bg-blue-50">
+              <span className="text-base shrink-0 mt-0.5">✦</span>
+              <p className="text-sm text-blue-800">
+                Pré-selecionamos as permissões padrão para o papel{' '}
+                <strong>{papel}</strong>. Ajuste conforme necessário antes de salvar.
               </p>
             </div>
           )}
