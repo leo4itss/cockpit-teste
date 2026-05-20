@@ -381,6 +381,43 @@ app.delete('/api/users/:id', async (c) => {
   return c.json({ ok: true })
 })
 
+/**
+ * GET /api/users/:id/grupos?accountId=
+ * Retorna os grupos dos quais o usuário é membro.
+ * Se accountId fornecido, filtra grupos com escopo 'conta' daquela conta
+ * ou grupos com escopo 'org' (herdados). Na prática retorna todos os grupos
+ * do usuário — o front filtra conforme necessário.
+ */
+app.get('/api/users/:id/grupos', async (c) => {
+  const userId    = c.req.param('id')
+  const accountId = c.req.query('accountId')
+
+  // 1. Busca todas as associações do usuário a grupos
+  const memberships = await db
+    .select({ grupoId: usuarioGrupos.grupoId })
+    .from(usuarioGrupos)
+    .where(eq(usuarioGrupos.userId, userId))
+
+  const grupoIds = memberships.map(m => m.grupoId)
+  if (grupoIds.length === 0) return c.json([])
+
+  // 2. Busca os grupos correspondentes, opcionalmente filtrado por conta
+  const rows = await db
+    .select()
+    .from(grupos)
+    .where(
+      accountId
+        ? and(
+            inArray(grupos.id, grupoIds),
+            // inclui grupos da conta OU grupos org (escopo='org') — ambos afetam o usuário
+            eq(grupos.accountId, accountId),
+          )
+        : inArray(grupos.id, grupoIds)
+    )
+
+  return c.json(rows)
+})
+
 // ── Tipos de Licença ─────────────────────────────────────────
 
 app.get('/api/tipos-licenca', async (c) => {
