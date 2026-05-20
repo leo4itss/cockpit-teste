@@ -659,8 +659,8 @@ export default function SchemaVisualizerPage() {
         </div>
       </div>
 
-      {/* Canvas */}
-      <div className="flex-1 relative">
+      {/* Canvas — ReactFlow precisa de height explícita no container */}
+      <div className="flex-1 min-h-0 relative">
         {aba === 'db' ? (
           <ReactFlow
             nodes={dbNodes}
