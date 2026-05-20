@@ -75,8 +75,8 @@ const CATEGORY_COLORS: Record<string, { header: string; border: string }> = {
 
 // ── Nó de tabela (Schema DB) ──────────────────────────────────
 
-function TableNode({ data }: NodeProps) {
-  const d = data as TableNodeData
+function TableNode({ data }: { data: TableNodeData }) {
+  const d = data
   const { header, border } = CATEGORY_COLORS[d.category] ?? CATEGORY_COLORS.meta
 
   return (
