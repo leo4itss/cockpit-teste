@@ -9,6 +9,8 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+    // Força uma única cópia de React — necessário para @xyflow/react
+    dedupe: ['react', 'react-dom'],
   },
   server: {
     proxy: {
