@@ -378,6 +378,17 @@ export function AtribuirPermissoesSheet({
             </div>
           )}
 
+          {/* Banner de permissões herdadas via grupos */}
+          {!loading && entityType === 'usuario' && Object.keys(inherited).length > 0 && (
+            <div className="flex items-start gap-3 mx-6 mt-3 p-3.5 rounded-xl border border-emerald-200 bg-emerald-50">
+              <Users className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              <p className="text-sm text-emerald-800">
+                Algumas ações estão marcadas via <strong>grupo</strong> — são somente leitura.
+                Você pode adicionar permissões diretas adicionais ao usuário.
+              </p>
+            </div>
+          )}
+
           {/* Banner de entitlements bloqueados */}
           {!loading && bloqueadosCount > 0 && (
             <div className="flex items-start gap-3 mx-6 mt-5 p-3.5 rounded-xl border border-amber-200 bg-amber-50">
