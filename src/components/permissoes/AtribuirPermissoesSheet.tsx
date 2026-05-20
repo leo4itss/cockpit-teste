@@ -214,6 +214,36 @@ export function AtribuirPermissoesSheet({
 
         setOriginal(permMap)
         setDraft(draftMap)
+
+        // ── Permissões herdadas via grupos (só para usuários, fora do modo instância) ──
+        if (entityType === 'usuario' && accountId && !modoInstancia) {
+          api.getUserGrupos(entityId, accountId)
+            .then(async (userGrupos: any[]) => {
+              if (cancelled || userGrupos.length === 0) return
+              const grupoPerms = await Promise.all(
+                userGrupos.map((g: any) =>
+                  api.getPermissions({ entidade_tipo: 'group', entidade_id: g.id, instancia_id: null })
+                    .then((perms: any[]) => ({ grupo: g, perms }))
+                    .catch(() => ({ grupo: g, perms: [] }))
+                )
+              )
+              // Monta mapa: componenteId → { acao → grupoNome }
+              const inheritedMap: Record<string, Record<string, string>> = {}
+              for (const { grupo, perms } of grupoPerms) {
+                for (const p of perms) {
+                  const cid = p.componenteId ?? p.componente_id
+                  if (!cid) continue
+                  if (!inheritedMap[cid]) inheritedMap[cid] = {}
+                  // Só registra se ainda não tiver (primeiro grupo vence no label)
+                  if (!inheritedMap[cid][p.acao]) inheritedMap[cid][p.acao] = grupo.nome
+                }
+              }
+              if (!cancelled) setInherited(inheritedMap)
+            })
+            .catch(() => {/* silencia — herdadas são informativas */})
+        } else {
+          setInherited({})
+        }
       })
       .catch(() => {
         // Só cai aqui se getComponentes() falhar — o resto já tem .catch() individual
