@@ -301,6 +301,7 @@ export function InstanciaDetailSheet({
 
   function handleClose() {
     setMembros([]); setAllUsers([]); setAllGrupos([]); setShowAdd(false)
+    setShowPermissoes(false); setMembroPermissoes(null)
     onClose()
   }
 
