@@ -232,13 +232,16 @@ function AddMembroSection({
 export function InstanciaDetailSheet({
   open, onClose, instancia, componenteNome, accountNome, accountId = 'acc-comgas',
 }: Props) {
-  const [membros, setMembros]       = useState<InstanciaMembro[]>([])
-  const [loading, setLoading]       = useState(false)
-  const [allUsers, setAllUsers]     = useState<User[]>([])
-  const [allGrupos, setAllGrupos]   = useState<Grupo[]>([])
-  const [showAdd, setShowAdd]       = useState(false)
-  const [addingId, setAddingId]     = useState<string | null>(null)
-  const [removingId, setRemovingId] = useState<string | null>(null)
+  const [membros, setMembros]                   = useState<InstanciaMembro[]>([])
+  const [loading, setLoading]                   = useState(false)
+  const [allUsers, setAllUsers]                 = useState<User[]>([])
+  const [allGrupos, setAllGrupos]               = useState<Grupo[]>([])
+  const [showAdd, setShowAdd]                   = useState(false)
+  const [addingId, setAddingId]                 = useState<string | null>(null)
+  const [removingId, setRemovingId]             = useState<string | null>(null)
+  // Permissões granulares por membro
+  const [showPermissoes, setShowPermissoes]     = useState(false)
+  const [membroPermissoes, setMembroPermissoes] = useState<InstanciaMembro | null>(null)
 
   const canManage = useCanManageInstanciaMembros(instancia?.id ?? '', accountId)
 
