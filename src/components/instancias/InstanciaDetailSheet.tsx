@@ -406,7 +406,18 @@ export function InstanciaDetailSheet({
                       </td>
                       {canManage && (
                         <td className="pr-6 pl-3 py-3 text-right">
-                          <div className="invisible group-hover:visible">
+                          <div className="invisible group-hover:visible flex items-center justify-end gap-1">
+                            {/* Permissões granulares (apenas usuários) */}
+                            {membro.entidadeTipo === 'user' && (
+                              <button
+                                onClick={() => { setMembroPermissoes(membro); setShowPermissoes(true) }}
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-blue-600 hover:bg-blue-50 transition-colors"
+                                title="Permissões granulares"
+                              >
+                                <Shield className="w-3.5 h-3.5" />
+                                Permissões
+                              </button>
+                            )}
                             <button
                               onClick={() => handleRemove(membro)}
                               disabled={isRemoving || !!addingId}
