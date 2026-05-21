@@ -238,6 +238,18 @@ export const accounts: Account[] = [
     status: 'Criado',
     createdAt: '01/03/2026',
   },
+  // ── Comgas — fallback local para cenário Docnix ──────────────
+  {
+    id: 'acc-comgas',
+    orgId: 'org-docnix',
+    name: 'Comgas',
+    subdomain: 'comgas',
+    provisioningStatus: 'COMPLETED',
+    arquitetoPAS: 'Marcelo Gomes',
+    isDefault: false,
+    status: 'Ativo',
+    createdAt: '01/01/2026',
+  },
 ]
 
 export const solutions: Solution[] = [
