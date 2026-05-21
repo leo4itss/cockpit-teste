@@ -271,18 +271,40 @@ export function UsuarioDetailOrgSheet({
                 </p>
               ) : (
                 <div className="flex flex-col gap-2">
-                  {contasVinculadas.map(({ account, papel }) => (
-                    <div
-                      key={account.id}
-                      className="flex items-center justify-between px-3 py-2.5 bg-gray-50 rounded-lg border border-gray-100"
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <Building2 className="w-4 h-4 text-gray-400 shrink-0" />
-                        <span className="text-sm font-medium text-[#030712] truncate">{account.name}</span>
+                  {contasVinculadas.map(({ account, papel }) => {
+                    const isChanging = changingPapelId === account.id
+                    return (
+                      <div
+                        key={account.id}
+                        className="group flex items-center justify-between px-3 py-2.5 bg-gray-50 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors"
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <Building2 className="w-4 h-4 text-gray-400 shrink-0" />
+                          <span className="text-sm font-medium text-[#030712] truncate">{account.name}</span>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <PapelBadge papel={papel} />
+                          {/* Ação de promoção/rebaixamento — visível no hover */}
+                          <button
+                            onClick={() => handleTogglePapel(account.id, papel)}
+                            disabled={isChanging}
+                            title={papel === 'account_admin' ? 'Rebaixar a Member' : 'Promover a Account Admin'}
+                            className="invisible group-hover:visible inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors disabled:opacity-50 shrink-0"
+                            style={papel === 'account_admin'
+                              ? { color: '#b45309', background: '#fef3c7' }
+                              : { color: '#1d4ed8', background: '#eff6ff' }}
+                          >
+                            {isChanging
+                              ? <Loader2 className="w-3 h-3 animate-spin" />
+                              : papel === 'account_admin'
+                                ? <><ShieldMinus className="w-3 h-3" /> Rebaixar</>
+                                : <><ShieldCheck className="w-3 h-3" /> Promover</>
+                            }
+                          </button>
+                        </div>
                       </div>
-                      <PapelBadge papel={papel} />
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </section>
