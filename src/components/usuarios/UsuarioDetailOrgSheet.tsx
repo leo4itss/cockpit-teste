@@ -38,6 +38,7 @@ interface Props {
   contasVinculadas: ContaVinculada[]
   todasContas:      Account[]
   onVincularSuccess:(userId: string, conta: ContaVinculada) => void
+  onPapelChange?:   (userId: string, accountId: string, novoPapel: 'member' | 'account_admin') => void
 }
 
 // ── Avatar colorido ───────────────────────────────────────────
