@@ -24,10 +24,10 @@ import {
   UserMinus, Loader2, Building2, ChevronRight, Lock, Search,
   Sun, Moon,
 } from 'lucide-react'
-import { useSearchParams } from 'react-router-dom'
 import { api } from '@/api/client'
 import { useIsPlatformAdmin, useIsOrgAdmin } from '@/authz'
 import { useAdminAccountId } from '@/authz/hooks'
+import { useSessionState } from '@/hooks/useSessionState'
 import { InstanciaDetailSheet } from '@/components/instancias/InstanciaDetailSheet'
 import { AtribuirPermissoesSheet } from '@/components/permissoes/AtribuirPermissoesSheet'
 import { cn } from '@/lib/utils'
