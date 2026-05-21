@@ -751,8 +751,8 @@ function CanvasOrgInner() {
       .then((orgs: any[]) => {
         const ativas = orgs.filter((o: any) => o.status !== 'Inativo')
         setAllOrgs(ativas)
-        // Só define orgId se a URL ainda não tiver um (preserva navegação anterior)
-        if (ativas.length > 0 && !searchParams.get('org')) {
+        // Só define orgId se ainda não houver um salvo (preserva navegação anterior)
+        if (ativas.length > 0 && !orgId) {
           setOrgId(ativas[0].id)
         } else if (ativas.length === 0) {
           setLoadingOrg(false)
