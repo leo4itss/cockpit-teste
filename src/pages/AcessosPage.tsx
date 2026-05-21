@@ -546,9 +546,15 @@ export function AcessosPage() {
                                 <button onClick={() => handleEditUser(user)} className="flex items-center gap-2 w-full px-3 py-2 text-sm font-medium text-[#030712] hover:bg-gray-100 rounded-md transition-colors text-left">
                                   <FilePen className="w-4 h-4 shrink-0" />Editar usuário
                                 </button>
-                                <button onClick={() => handleInactivateUser(user)} className="flex items-center gap-2 w-full px-3 py-2 text-sm font-medium text-[#030712] hover:bg-gray-100 rounded-md transition-colors text-left">
-                                  <UserX className="w-4 h-4 shrink-0" />Inativar usuário
-                                </button>
+                                {user.status === 'Ativo' ? (
+                                  <button onClick={() => handleInactivateUser(user)} className="flex items-center gap-2 w-full px-3 py-2 text-sm font-medium text-[#030712] hover:bg-gray-100 rounded-md transition-colors text-left">
+                                    <UserX className="w-4 h-4 shrink-0" />Inativar usuário
+                                  </button>
+                                ) : (
+                                  <button onClick={() => handleActivateUser(user)} className="flex items-center gap-2 w-full px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-50 rounded-md transition-colors text-left">
+                                    <UserCheck className="w-4 h-4 shrink-0" />Ativar usuário
+                                  </button>
+                                )}
                               </div>
                             }
                           >
