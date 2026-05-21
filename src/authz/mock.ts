@@ -111,4 +111,10 @@ export const mockPersonas: Persona[] = [
     description: 'Carla — admin restrita à conta Santacruz (a2)',
     color: 'from-purple-400 to-violet-500',
   },
+  {
+    userId: 'usr-marcelo-c',
+    label: 'Org Admin (Docnix)',
+    description: 'Marcelo Ribeiro — admin da Org Docnix; gerencia conta Comgas com solução Atlas e Assistente Vanessa IA',
+    color: 'from-rose-400 to-pink-500',
+  },
 ]
