@@ -309,14 +309,30 @@ export function AcessosPage() {
       {/* Header */}
       <div className="flex items-start justify-between px-8 py-4 gap-6">
         <div className="min-w-0">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-violet-50 text-violet-600 border border-violet-200">Escopo: Conta</span>
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-orange-50 text-orange-600 border border-orange-200">Account Admin</span>
-            {accountNome && (
+            {isAccountAdmin && !isPlatformAdmin && !isOrgAdmin && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-orange-50 text-orange-600 border border-orange-200">Account Admin</span>
+            )}
+            {/* Seletor de conta para Platform Admin / Org Admin */}
+            {!rawAccountId && allAccounts.length > 0 ? (
+              <div className="relative">
+                <select
+                  value={accountId}
+                  onChange={e => setSelectedAccountId(e.target.value)}
+                  className="appearance-none pl-2 pr-6 py-0.5 text-[11px] font-medium border border-gray-200 rounded-full bg-gray-50 text-gray-700 outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
+                >
+                  {allAccounts.map(a => (
+                    <option key={a.id} value={a.id}>{a.name}</option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
+              </div>
+            ) : accountNome ? (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-50 text-gray-600 border border-gray-200">
                 Conta: <strong className="font-semibold">{accountNome}</strong>
               </span>
-            )}
+            ) : null}
           </div>
           <h1 className="text-2xl font-bold leading-8 text-[#030712]">Acessos e usuários</h1>
           <p className="text-sm text-[#6b7280] mt-1 max-w-[1080px]">
