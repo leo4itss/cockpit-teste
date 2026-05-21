@@ -755,3 +755,58 @@ export const grupos: Grupo[] = [
 export const accountMembrosIds: Record<string, string[]> = {
   'acc-comgas': ['usr-fernando', 'usr-marcelo-c', 'usr-neide', 'usr-leo'],
 }
+
+// ── Instâncias — fallback local para cenário Docnix/Comgas ─────
+// Espelha os dados de server/seed-docnix.ts (step 9).
+export const instancias: Instancia[] = [
+  {
+    id:           'inst-vanessa',
+    componenteId: 'comp-assistente-ia',
+    accountId:    'acc-comgas',
+    nome:         'Assistente Vanessa',
+    descricao:    'Assistente de IA dedicado à equipe de atendimento.',
+    status:       'Ativo',
+    createdAt:    '01/01/2026',
+    qtdMembros:   4,
+  },
+  {
+    id:           'inst-ceo',
+    componenteId: 'comp-assistente-ia',
+    accountId:    'acc-comgas',
+    nome:         'Assistente CEO',
+    descricao:    'Assistente de IA para uso executivo.',
+    status:       'Ativo',
+    createdAt:    '01/01/2026',
+    qtdMembros:   2,
+  },
+  {
+    id:           'inst-ws-vendas',
+    componenteId: 'comp-base-conhecimento',
+    accountId:    'acc-comgas',
+    nome:         'Workspace Vendas',
+    descricao:    'Base de conhecimento para a equipe de vendas.',
+    status:       'Ativo',
+    createdAt:    '01/01/2026',
+    qtdMembros:   2,
+  },
+  {
+    id:           'inst-ws-fornecedores',
+    componenteId: 'comp-base-conhecimento',
+    accountId:    'acc-comgas',
+    nome:         'Workspace Fornecedores',
+    descricao:    'Base de conhecimento para parceiros e fornecedores externos.',
+    status:       'Ativo',
+    createdAt:    '01/01/2026',
+    qtdMembros:   1,
+  },
+  {
+    id:           'inst-dash-ops',
+    componenteId: 'comp-analytics',
+    accountId:    'acc-comgas',
+    nome:         'Dashboard Operacional',
+    descricao:    'Painel de métricas operacionais da Comgas.',
+    status:       'Ativo',
+    createdAt:    '01/01/2026',
+    qtdMembros:   2,
+  },
+]
