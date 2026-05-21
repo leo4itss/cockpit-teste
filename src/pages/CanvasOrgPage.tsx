@@ -699,7 +699,9 @@ function OrgCanvas({
         <div className="rounded-xl px-4 py-3 backdrop-blur-sm"
           style={{ background: theme.legendBg, border: `1px solid ${theme.legendBorder}` }}>
           <p className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: theme.sectionLabel }}>Legenda</p>
-          <div className="space-y-1.5">
+
+          {/* Nós */}
+          <div className="space-y-1.5 mb-3">
             {[
               { c: '#f59e0b', l: 'Organização' },
               { c: '#3b82f6', l: 'Conta (clique p/ expandir)' },
@@ -712,6 +714,45 @@ function OrgCanvas({
                 <span className="text-[11px]" style={{ color: theme.legendText }}>{l}</span>
               </div>
             ))}
+          </div>
+
+          {/* Separador */}
+          <div className="mb-2.5" style={{ borderTop: `1px solid ${theme.legendBorder}` }} />
+
+          {/* Arestas */}
+          <div className="space-y-1.5">
+            {/* Hierarquia: sólida, sem seta */}
+            <div className="flex items-center gap-2">
+              <svg width="28" height="10" className="shrink-0">
+                <line x1="0" y1="5" x2="28" y2="5"
+                  stroke={theme.edgeConta} strokeWidth="1.5" />
+              </svg>
+              <span className="text-[11px]" style={{ color: theme.legendText }}>Hierarquia (org / conta)</span>
+            </div>
+            {/* Membro de grupo: animada, com seta */}
+            <div className="flex items-center gap-2">
+              <svg width="28" height="10" className="shrink-0">
+                <defs>
+                  <marker id="leg-arrow" markerWidth="6" markerHeight="6"
+                    refX="5" refY="3" orient="auto">
+                    <path d="M0,0 L0,6 L6,3 z" fill={theme.edgeGroup} />
+                  </marker>
+                </defs>
+                <line x1="0" y1="5" x2="22" y2="5"
+                  stroke={theme.edgeGroup} strokeWidth="1.5"
+                  markerEnd="url(#leg-arrow)" />
+              </svg>
+              <span className="text-[11px]" style={{ color: theme.legendText }}>Membro de grupo</span>
+            </div>
+            {/* Acesso à instância: tracejada */}
+            <div className="flex items-center gap-2">
+              <svg width="28" height="10" className="shrink-0">
+                <line x1="0" y1="5" x2="28" y2="5"
+                  stroke={theme.edgeInstUser} strokeWidth="1.5"
+                  strokeDasharray="5 3" />
+              </svg>
+              <span className="text-[11px]" style={{ color: theme.legendText }}>Acesso à instância</span>
+            </div>
           </div>
         </div>
       </Panel>
