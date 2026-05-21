@@ -76,6 +76,19 @@ export function GruposPage() {
     )
   }, [grupos, search])
 
+  // Deriva nome da org ou conta para exibição contextual
+  function getContexto(grupo: Grupo): { label: string; nome: string } | null {
+    if (grupo.escopo === 'conta' && grupo.accountId) {
+      const conta = contas.find(c => c.id === grupo.accountId)
+      return conta ? { label: 'Conta', nome: conta.name } : null
+    }
+    if (grupo.escopo === 'org' && grupo.orgId) {
+      const org = orgs.find(o => o.id === grupo.orgId)
+      return org ? { label: 'Org', nome: org.name } : null
+    }
+    return null
+  }
+
   function handleRowClick(grupo: Grupo) {
     setSelectedGrupo(grupo)
     setShowDetail(true)
