@@ -509,6 +509,7 @@ export const solutions: Solution[] = [
             valorMaximo: '500',
             definirPreco: false,
             precoAnual: '',
+            precoMes: '',
             descontoMensal: '',
           },
         ],
