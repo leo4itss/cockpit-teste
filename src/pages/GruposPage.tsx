@@ -7,6 +7,7 @@ import { CriarGrupoOrgSheet } from '@/components/grupos/CriarGrupoOrgSheet'
 import { GrupoDetailSheet } from '@/components/grupos/GrupoDetailSheet'
 import { api } from '@/api/client'
 import { useAuthz, useIsPlatformAdmin, useIsOrgAdmin, useIsAccountAdmin } from '@/authz/hooks'
+import { grupos as mockGrupos, accounts as mockAccounts, organizations as mockOrgs } from '@/data/mock'
 import type { Account, Grupo } from '@/types'
 
 // ── Badge de escopo ───────────────────────────────────────────
