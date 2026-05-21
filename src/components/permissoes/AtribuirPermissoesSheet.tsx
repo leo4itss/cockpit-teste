@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/Button'
 import { api } from '@/api/client'
 import { cn } from '@/lib/utils'
+import { accountEntitlements as mockEntitlements } from '@/data/mock'
 import type { Componente } from '@/types'
 
 // ── Tipos ──────────────────────────────────────────────────────
