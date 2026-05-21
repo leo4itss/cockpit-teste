@@ -14,6 +14,7 @@ import { UsuariosPage } from './pages/UsuariosPage'
 import { ContasPage } from './pages/ContasPage'
 import SchemaVisualizerPage from './pages/SchemaVisualizerPage'
 import CanvasPermissoesPage from './pages/CanvasPermissoesPage'
+import CanvasOrgPage from './pages/CanvasOrgPage'
 
 export default function App() {
   return (
