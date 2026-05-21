@@ -34,6 +34,8 @@ import {
   grupos    as mockGrupos,
   instancias as mockInstancias,
   accountMembrosIds,
+  grupoMembrosMap,
+  instanciaMembros as mockInstMembros,
 } from '@/data/mock'
 import { InstanciaDetailSheet } from '@/components/instancias/InstanciaDetailSheet'
 import { AtribuirPermissoesSheet } from '@/components/permissoes/AtribuirPermissoesSheet'
