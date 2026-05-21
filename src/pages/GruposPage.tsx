@@ -265,7 +265,9 @@ export function GruposPage() {
         open={showCriar}
         onClose={() => setShowCriar(false)}
         orgId={adminOrgId}
+        orgs={orgs}
         contas={contas}
+        isPlatformAdmin={isPlatformAdmin}
         onSuccess={grupo => setGrupos(prev => [...prev, grupo])}
       />
 
