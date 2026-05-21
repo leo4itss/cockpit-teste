@@ -778,7 +778,6 @@ function CanvasOrgInner() {
   useEffect(() => {
     if (!orgId) return
     setLoadingOrg(true)
-    setExpandedId(null)
     setAccountDataCache({})
     setSelected(null)
     // 'all' é o org virtual quando não há orgs reais
