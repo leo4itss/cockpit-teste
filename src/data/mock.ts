@@ -749,3 +749,9 @@ export const grupos: Grupo[] = [
     qtdMembros: 2,
   },
 ]
+
+// ── Membros por conta — fallback local ─────────────────────────
+// Mapeamento accountId → IDs dos usuários membros (espelha user_account_memberships).
+export const accountMembrosIds: Record<string, string[]> = {
+  'acc-comgas': ['usr-fernando', 'usr-marcelo-c', 'usr-neide', 'usr-leo'],
+}
