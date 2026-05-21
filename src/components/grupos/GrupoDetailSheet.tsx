@@ -259,7 +259,15 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
       setMembros(mems)
       setAllUsers(users)
       setLoadingMembros(false)
-    }).catch(() => setLoadingMembros(false))
+    }).catch(() => {
+      // Fallback mock quando Neon está hibernando
+      const membroIds = grupoMembrosMap[grupo.id] ?? []
+      setMembros(mockUsers.filter(u => membroIds.includes(u.id)))
+      // Pool de busca: todos os membros da conta
+      const contaIds = accountMembrosIds[accountId] ?? []
+      setAllUsers(mockUsers.filter(u => contaIds.includes(u.id)))
+      setLoadingMembros(false)
+    })
   }, [open, grupo?.id])
 
   // ── Adicionar membro ─────────────────────────────────────
