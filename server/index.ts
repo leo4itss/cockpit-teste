@@ -1178,4 +1178,21 @@ app.delete('/api/instancias/:id/membros/:membroId', async (c) => {
 
 serve({ fetch: app.fetch, port: 3001 }, () => {
   console.log('API server running on http://localhost:3001')
+
+  // ── Warm-up do Neon ──────────────────────────────────────────
+  // O Neon (free tier) hiberna após inatividade. Este ping garante que
+  // o banco já está acordado quando o primeiro usuário abre a aplicação,
+  // eliminando o delay de cold start (~5-10s) na primeira requisição.
+  db.select().from(organizations).limit(1)
+    .then(() => console.log('✅ Neon DB aquecido e pronto'))
+    .catch(() => {
+      // Falha silenciosa — o banco tentará reconectar na próxima query
+      console.warn('⚠️  Neon DB warm-up falhou — banco ainda acordando...')
+      // Tenta de novo após 5s
+      setTimeout(() => {
+        db.select().from(organizations).limit(1)
+          .then(() => console.log('✅ Neon DB aquecido (2ª tentativa)'))
+          .catch(() => console.warn('⚠️  Neon DB ainda não disponível'))
+      }, 5000)
+    })
 })
