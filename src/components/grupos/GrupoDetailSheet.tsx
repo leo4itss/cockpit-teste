@@ -27,6 +27,11 @@ import { AtribuirPermissoesSheet } from '@/components/permissoes/AtribuirPermiss
 import { api } from '@/api/client'
 import { cn } from '@/lib/utils'
 import type { User, Grupo } from '@/types'
+import {
+  users as mockUsers,
+  accountMembrosIds,
+  grupoMembrosMap,
+} from '@/data/mock'
 
 // ── Tipos ─────────────────────────────────────────────────────
 
