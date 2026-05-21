@@ -484,6 +484,39 @@ export const solutions: Solution[] = [
     titleLink02: 'Ver demo',
     marketplaceStatus: 'Disponível',
   },
+  // ── Atlas — fallback local para cenário Docnix ──────────────
+  {
+    id: 'sol-atlas-docnix',
+    orgId: 'org-docnix',
+    name: 'Atlas',
+    description: 'Plataforma conversacional para automação de fluxos com IA generativa. Funcionalidades: Chat (criação e gestão de conversas com assistentes de IA), Assistente Vanessa IA.',
+    type: 'IA Conversacional',
+    arquitetoPAS: 'Marcelo Gomes',
+    componenteIds: ['comp-assistente-ia'],
+    plans: [
+      {
+        id: 'plan-atlas-1',
+        name: 'Atlas Enterprise',
+        description: 'Plano completo com chat ilimitado e assistentes dedicados',
+        statusVersao: 'ativo',
+        createdAt: '01/01/2026',
+        licensings: [
+          {
+            tipoLicencaId: 'tl-1',
+            tipoLicencaNome: 'Usuário nominal',
+            tipoLicencaUnidade: 'usuários',
+            valorMinimo: '50',
+            valorMaximo: '500',
+            definirPreco: false,
+            precoAnual: '',
+            descontoMensal: '',
+          },
+        ],
+      },
+    ],
+    status: 'Ativo',
+    createdAt: '01/01/2026',
+  },
 ]
 
 export const contracts: Contract[] = [
