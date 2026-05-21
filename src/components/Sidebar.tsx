@@ -157,8 +157,9 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
             <>
               <SectionLabel label="Desenvolvedor" collapsed={collapsed} />
               <div className="flex flex-col gap-1">
-                <NavItem to="/canvas" icon={GitFork} label="Canvas" collapsed={collapsed} />
-                <NavItem to="/schema" icon={Network} label="Schema" collapsed={collapsed} />
+                <NavItem to="/canvas-org" icon={Globe2}  label="Canvas Org"  collapsed={collapsed} />
+                <NavItem to="/canvas"     icon={GitFork} label="Canvas"      collapsed={collapsed} />
+                <NavItem to="/schema"     icon={Network} label="Schema"      collapsed={collapsed} />
               </div>
             </>
           )}
