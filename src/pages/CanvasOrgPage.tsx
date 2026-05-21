@@ -35,7 +35,7 @@ import { useIsPlatformAdmin, useIsOrgAdmin } from '@/authz'
 import { useSessionState } from '@/hooks/useSessionState'
 import { InstanciaDetailSheet } from '@/components/instancias/InstanciaDetailSheet'
 import { AtribuirPermissoesSheet } from '@/components/permissoes/AtribuirPermissoesSheet'
-import { cn } from '@/lib/utils'
+// import { cn } from '@/lib/utils'
 import { VisualizerThemeContext, useNodeTheme, type VisualizerTheme } from '@/lib/visualizerTheme'
 import { useVisualizerTheme } from '@/hooks/useVisualizerTheme'
 
