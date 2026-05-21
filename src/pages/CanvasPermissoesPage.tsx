@@ -683,8 +683,8 @@ export default function CanvasPermissoesPage() {
   const [instanciaSheet, setInstSheet] = useState<any>(null)
   const [permissoesSheet,setPermSheet] = useState<any>(null)
 
-  const [nodes, setNodes, onNodesChange] = useNodesState([])
-  const [edges, setEdges, onEdgesChange] = useEdgesState([])
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
 
   // Carrega contas — Org Admin só vê contas da sua org
   useEffect(() => {
