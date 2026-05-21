@@ -150,7 +150,13 @@ export function AcessosPage() {
     // Busca apenas os membros desta conta (não todos os usuários do sistema)
     api.getAccountMembros(accountId)
       .then(data => { setUsers(data); setLoadingUsers(false) })
-      .catch(() => setLoadingUsers(false))
+      .catch(() => {
+        // Fallback: filtra mock local pelos membros conhecidos da conta
+        const ids = accountMembrosIds[accountId] ?? []
+        const fallback = mockUsers.filter(u => ids.includes(u.id))
+        setUsers(fallback)
+        setLoadingUsers(false)
+      })
   }, [accountId])
 
   const filteredUsers = useMemo(() => {
