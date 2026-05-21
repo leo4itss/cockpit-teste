@@ -183,6 +183,15 @@ export function UsuariosPage() {
     }))
   }
 
+  function handlePapelChange(userId: string, accountId: string, novoPapel: 'member' | 'account_admin') {
+    setUserAccountsMap(prev => ({
+      ...prev,
+      [userId]: (prev[userId] ?? []).map(cv =>
+        cv.account.id === accountId ? { ...cv, papel: novoPapel } : cv
+      ),
+    }))
+  }
+
   // ── Render ────────────────────────────────────────────────
 
   return (
