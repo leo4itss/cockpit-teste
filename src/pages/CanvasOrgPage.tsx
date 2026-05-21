@@ -772,10 +772,13 @@ function CanvasOrgInner() {
     setExpandedId(null)
     setAccountDataCache({})
     setSelected(null)
-    api.getAccounts()
+    // 'all' é o org virtual quando não há orgs reais
+    const req = orgId === 'all'
+      ? api.getAccounts()
+      : api.getAccounts(orgId)
+    req
       .then((accs: any[]) => {
-        const filtradas = accs.filter(a => !a.deletedAt && (isPlatformAdmin || a.orgId === orgId))
-        setAccounts(filtradas)
+        setAccounts(accs.filter((a: any) => !a.deletedAt))
       })
       .catch(() => {})
       .finally(() => setLoadingOrg(false))
