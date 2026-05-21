@@ -213,6 +213,12 @@ export function UsuariosPage() {
     setUsers(prev => prev.map(u => u.id === user.id ? updated : u))
   }
 
+  async function handleActivate(user: User) {
+    const updated: User = { ...user, status: 'Ativo' }
+    try { await api.updateUser(user.id, updated) } catch { /* silencioso */ }
+    setUsers(prev => prev.map(u => u.id === user.id ? updated : u))
+  }
+
   function handleVincularSuccess(userId: string, conta: ContaVinculada) {
     setUserAccountsMap(prev => ({
       ...prev,
