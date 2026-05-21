@@ -89,8 +89,8 @@ function PapelEditor({
   async function handleSave() {
     if (draft === papel) { setEditing(false); return }
     setSaving(true)
-    try { await onSave(draft); setEditing(false) }
-    finally { setSaving(false) }
+    try { await onSave(draft) }
+    finally { setSaving(false); setEditing(false) }
   }
 
   if (!editing) {
