@@ -544,4 +544,24 @@ export const users: User[] = [
     ultimoAcesso: '13/05/2026',
     createdAt: '01/03/2026',
   },
+  // Persona Org Admin (Docnix) — id='usr-marcelo-c' alinhado com mockFGARelations
+  // Também existe no banco como membro da conta Comgas (seed-docnix.ts)
+  {
+    id: 'usr-marcelo-c',
+    nomeCompleto: 'Marcelo Ribeiro',
+    usuario: 'marceloribeiro',
+    email: 'marcelo.ribeiro@comgas.com.br',
+    pais: 'Brasil',
+    telefone: '(11) 9 9200-3300',
+    area: 'Diretoria',
+    cargo: 'Org Admin',
+    papel: 'Org Admin',
+    etiquetas: '',
+    formatoData: 'DD/MM/YYYY',
+    formatoHora: '24h',
+    fusoHorario: 'America/Sao_Paulo',
+    status: 'Ativo',
+    ultimoAcesso: '21/05/2026',
+    createdAt: '01/01/2026',
+  },
 ]
