@@ -693,7 +693,7 @@ export default function CanvasPermissoesPage() {
     api.getAccounts().then(acc => {
       const ativos = (acc as any[]).filter(a => !a.deletedAt)
       setAllAccounts(ativos)
-      if (!accountId) setAccountId(defaultAccId ?? ativos[0]?.id ?? null)
+      if (!searchParams.get('account')) setAccountId(defaultAccId ?? ativos[0]?.id ?? '')
     }).catch(() => {})
   }, [])
 
