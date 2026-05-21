@@ -919,13 +919,16 @@ function CanvasOrgInner() {
         {/* Canvas + Painel */}
         <div className="flex flex-1 min-h-0">
           <div className="flex-1 min-w-0 min-h-0">
-            {loadingOrg ? (
+            {loadingOrg || !currentOrg ? (
               <div className="flex items-center justify-center h-full">
-                <Loader2 className="w-8 h-8 animate-spin" style={{ color: theme.panelMuted }} />
+                <div className="text-center">
+                  <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3" style={{ color: theme.panelMuted }} />
+                  <p className="text-sm" style={{ color: theme.panelMuted }}>Carregando organização…</p>
+                </div>
               </div>
-            ) : currentOrg && (
+            ) : (
               <OrgCanvas
-                org={{ ...currentOrg, qtdUsuarios: accounts.reduce((s, a) => s + (a.qtdMembros ?? 0), 0) }}
+                org={{ ...currentOrg, qtdUsuarios: accounts.reduce((s: number, a: any) => s + (a.qtdMembros ?? 0), 0) }}
                 accounts={accounts}
                 expandedId={expandedId}
                 loadingId={loadingId}
