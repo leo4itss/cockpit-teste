@@ -54,15 +54,24 @@ export function OrganizacaoDetailPage() {
   useEffect(() => {
     if (!id) return
 
-    // Carrega cada recurso de forma independente via Promise.allSettled:
-    // se o banco ainda está acordando (Neon cold start), as chamadas que
-    // falharem usam o mock local como fallback — a página nunca fica em branco.
+    // withTimeout: se a promise não resolver em `ms` ms, rejeita automaticamente.
+    // Garante que Neon cold start (até 30s) não deixe a página em branco:
+    // qualquer chamada que demorar mais de 4s cai no mock local como fallback.
+    function withTimeout<T>(promise: Promise<T>, ms = 4000): Promise<T> {
+      return Promise.race([
+        promise,
+        new Promise<T>((_, reject) =>
+          setTimeout(() => reject(new Error('timeout')), ms)
+        ),
+      ])
+    }
+
     Promise.allSettled([
-      api.getOrganization(id),
-      api.getAccounts(id),
-      api.getSolutions(id),
-      api.getContracts(id),
-      api.getTiposLicenca(),
+      withTimeout(api.getOrganization(id)),
+      withTimeout(api.getAccounts(id)),
+      withTimeout(api.getSolutions(id)),
+      withTimeout(api.getContracts(id)),
+      withTimeout(api.getTiposLicenca()),
     ]).then(([orgRes, accsRes, solsRes, contsRes, tiposRes]) => {
       const orgData = orgRes.status === 'fulfilled'
         ? orgRes.value
