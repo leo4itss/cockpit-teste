@@ -622,6 +622,12 @@ app.get('/api/grupos/:id', async (c) => {
  */
 app.post('/api/grupos', async (c) => {
   const body = await c.req.json()
+
+  // Validação: grupo org-scoped exige orgId; grupo conta-scoped exige accountId
+  const escopo = body.escopo ?? 'org'
+  if (escopo === 'org'   && !body.orgId)     return c.json({ error: 'orgId é obrigatório para grupos de escopo org' }, 400)
+  if (escopo === 'conta' && !body.accountId) return c.json({ error: 'accountId é obrigatório para grupos de escopo conta' }, 400)
+
   const id = body.id ?? crypto.randomUUID()
   const createdAt = new Date().toLocaleDateString('pt-BR')
 
