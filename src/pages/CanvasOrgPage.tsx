@@ -30,9 +30,9 @@ import {
   UserMinus, Loader2, ChevronDown, ChevronUp, Lock, Search,
   Sun, Moon, ChevronRight,
 } from 'lucide-react'
-import { useSearchParams } from 'react-router-dom'
 import { api } from '@/api/client'
 import { useIsPlatformAdmin, useIsOrgAdmin } from '@/authz'
+import { useSessionState } from '@/hooks/useSessionState'
 import { InstanciaDetailSheet } from '@/components/instancias/InstanciaDetailSheet'
 import { AtribuirPermissoesSheet } from '@/components/permissoes/AtribuirPermissoesSheet'
 import { cn } from '@/lib/utils'
