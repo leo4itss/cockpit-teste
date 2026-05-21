@@ -573,7 +573,7 @@ function UsuarioPanel({ userId, accountId, accountData, theme, onClose, onOpenPe
   )
 }
 
-function InstanciaPanel({ instanciaId, accountId, accountData, theme, onClose, onOpenInstancia }: {
+function InstanciaPanel({ instanciaId, accountId: _accountId, accountData, theme, onClose, onOpenInstancia }: {
   instanciaId: string; accountId: string; accountData: AccountData; theme: VisualizerTheme
   onClose: () => void; onOpenInstancia: (inst: any) => void
 }) {
