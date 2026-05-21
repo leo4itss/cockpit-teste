@@ -298,7 +298,12 @@ function ContaDetailSheet({ open, onClose, account }: ContaDetailProps) {
         setActiveCapabilities(data.map((e: any) => e.capability))
         setLoadingCaps(false)
       })
-      .catch(() => { if (!cancelled) setLoadingCaps(false) })
+      .catch(() => {
+        if (!cancelled) {
+          setActiveCapabilities(mockEntitlements[account.id] ?? [])
+          setLoadingCaps(false)
+        }
+      })
 
     return () => { cancelled = true }
   // eslint-disable-next-line react-hooks/exhaustive-deps
