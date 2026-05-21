@@ -301,13 +301,16 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
 
   async function handleSavePapel(novoPapel: string) {
     if (!grupo) return
-    await api.updateGrupo(grupo.id, {
-      nome:      grupo.nome,
-      descricao: grupo.descricao ?? null,
-      papel:     novoPapel,
-      status:    grupo.status,
-    })
+    // Optimistic update: atualiza localmente antes da confirmação da API
     setLocalPapel(novoPapel)
+    try {
+      await api.updateGrupo(grupo.id, {
+        nome:      grupo.nome,
+        descricao: grupo.descricao ?? null,
+        papel:     novoPapel,
+        status:    grupo.status,
+      })
+    } catch { /* silencioso — mudança já aplicada localmente */ }
   }
 
   // ── Atribuir permissões ──────────────────────────────────
