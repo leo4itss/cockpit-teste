@@ -233,7 +233,11 @@ export function AcessosPage() {
     if (!accountId) return
     api.getInstancias({ accountId })
       .then(data => { setInstancias(data); setLoadingInstancias(false) })
-      .catch(() => setLoadingInstancias(false))
+      .catch(() => {
+        // Fallback: filtra mock local pela conta
+        setInstancias(mockInstancias.filter(i => i.accountId === accountId))
+        setLoadingInstancias(false)
+      })
   }, [accountId])
 
   // Mapa de componenteId → nome (para exibir na coluna Componente)
