@@ -875,8 +875,6 @@ export const grupos: Grupo[] = [
     createdAt:  '01/01/2026',
     qtdMembros: 2,
   },
-]
-
   // ── Grupos da Apple (cenário Org Admin) ──────────────────────
   {
     id:         'grp-apple-dev',
