@@ -22,8 +22,7 @@ import type { Instancia } from '@/types'
 
 type Aba = 'usuarios' | 'grupos' | 'instancias'
 
-// PoC: orgId fixo — em produção viria de account.orgId
-const ORG_ID_POC = '1'
+// orgId fixo removido — agora derivado dinamicamente do usuário logado
 
 // ── Avatar com iniciais ───────────────────────────────────────
 
