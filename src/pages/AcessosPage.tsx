@@ -275,8 +275,8 @@ export function AcessosPage() {
 
   // ── Render ──────────────────────────────────────────────────
 
-  // Platform Admin / Org Admin sem conta selecionada → mostrar seletor
-  if (!rawAccountId && !selectedAccountId) {
+  // Org Admin / Platform Admin sem conta selecionada → mostrar seletor
+  if (!isAccountAdminOnly && !selectedAccountId) {
     return (
       <div className="flex flex-col items-center justify-center h-full py-24 gap-6">
         <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
