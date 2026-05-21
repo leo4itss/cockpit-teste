@@ -274,6 +274,8 @@ export function GruposPage() {
         onClose={() => setShowDetail(false)}
         grupo={selectedGrupo}
         accountId={selectedGrupo?.accountId ?? ''}
+        accountNome={selectedGrupo ? (getContexto(selectedGrupo)?.nome ?? undefined) : undefined}
+        contextoLabel={selectedGrupo ? (getContexto(selectedGrupo)?.label ?? undefined) : undefined}
       />
     </div>
   )
