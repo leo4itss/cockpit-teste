@@ -670,8 +670,13 @@ export default function CanvasPermissoesPage() {
   const defaultAccId     = useAdminAccountId()
   const { theme, mode, toggle } = useVisualizerTheme()
 
+  // accountId fica na URL para sobreviver à navegação entre abas
+  const [searchParams, setSearchParams] = useSearchParams()
+  const accountId = searchParams.get('account')
+  const setAccountId = (id: string) =>
+    setSearchParams(p => { p.set('account', id); return p }, { replace: true })
+
   const [allAccounts, setAllAccounts] = useState<any[]>([])
-  const [accountId,   setAccountId]   = useState<string | null>(null)
   const [graphData,   setGraphData]   = useState<GraphData | null>(null)
   const [loading,     setLoading]     = useState(false)
   const [refreshKey,  setRefreshKey]  = useState(0)
