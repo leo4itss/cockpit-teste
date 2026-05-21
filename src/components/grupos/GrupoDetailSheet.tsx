@@ -87,9 +87,9 @@ function PapelEditor({ papel, onSave }: PapelEditorProps) {
     setSaving(true)
     try {
       await onSave(draft)
-      setEditing(false)
     } finally {
       setSaving(false)
+      setEditing(false)
     }
   }
 
