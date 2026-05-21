@@ -371,6 +371,7 @@ export function UsuariosPage() {
         contasVinculadas={selectedUser ? (userAccountsMap[selectedUser.id] ?? []) : []}
         todasContas={accounts}
         onVincularSuccess={handleVincularSuccess}
+        onPapelChange={handlePapelChange}
       />
     </div>
   )
