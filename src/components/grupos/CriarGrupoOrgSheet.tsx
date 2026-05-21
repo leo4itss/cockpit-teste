@@ -24,11 +24,13 @@ import type { User, Account, Grupo } from '@/types'
 // ── Tipos ─────────────────────────────────────────────────────
 
 interface Props {
-  open:      boolean
-  onClose:   () => void
-  orgId:     string
-  contas:    Account[]
-  onSuccess: (grupo: Grupo) => void
+  open:             boolean
+  onClose:          () => void
+  orgId:            string        // orgId padrão (para Org Admin); ignorado quando isPlatformAdmin=true e escopo='org'
+  orgs:             any[]         // todas as orgs — usado pelo Platform Admin para escolher
+  contas:           Account[]     // todas as contas — agrupadas por org no dropdown
+  isPlatformAdmin?: boolean
+  onSuccess:        (grupo: Grupo) => void
 }
 
 // ── Helpers ───────────────────────────────────────────────────
