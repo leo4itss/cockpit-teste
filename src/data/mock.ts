@@ -755,6 +755,35 @@ export const accountMembrosIds: Record<string, string[]> = {
   'acc-comgas': ['usr-fernando', 'usr-marcelo-c', 'usr-neide', 'usr-leo'],
 }
 
+// ── Membros de grupo — fallback local ─────────────────────────
+// grupoId → User[] (espelha usuario_grupos do seed-docnix.ts step 7).
+export const grupoMembrosMap: Record<string, string[]> = {
+  'grp-comgas-aq':   ['usr-fernando', 'usr-marcelo-c', 'usr-neide'],  // Analistas de Qualidade
+  'grp-comgas-vend': ['usr-marcelo-c', 'usr-leo'],                    // Vendedores
+  'grp-comgas-forn': ['usr-neide', 'usr-leo'],                        // Fornecedores
+}
+
+// ── Membros de instância — fallback local ──────────────────────
+// Espelha instancia_membros do seed-docnix.ts (step 9) + seed-marcelo-docnix.ts (step 4).
+export const instanciaMembros: InstanciaMembro[] = [
+  // inst-vanessa: Fernando e Neide (viewer); grupos AQ (admin) e Vendedores (member)
+  { id: 'im-van-fernando', instanciaId: 'inst-vanessa', entidadeTipo: 'user',  entidadeId: 'usr-fernando',    papel: 'viewer', assignedAt: '01/01/2026', displayName: 'Fernando Costa',    email: 'fernando.costa@comgas.com.br' },
+  { id: 'im-van-neide',    instanciaId: 'inst-vanessa', entidadeTipo: 'user',  entidadeId: 'usr-neide',       papel: 'viewer', assignedAt: '01/01/2026', displayName: 'Neide Oliveira',    email: 'neide.oliveira@comgas.com.br' },
+  { id: 'im-van-aq',       instanciaId: 'inst-vanessa', entidadeTipo: 'group', entidadeId: 'grp-comgas-aq',   papel: 'admin',  assignedAt: '01/01/2026', displayName: 'Analistas de Qualidade' },
+  { id: 'im-van-vend',     instanciaId: 'inst-vanessa', entidadeTipo: 'group', entidadeId: 'grp-comgas-vend', papel: 'member', assignedAt: '01/01/2026', displayName: 'Vendedores' },
+  // inst-ceo: Marcelo (member); grupo AQ (viewer)
+  { id: 'im-ceo-marcelo',  instanciaId: 'inst-ceo',             entidadeTipo: 'user',  entidadeId: 'usr-marcelo-c',   papel: 'member', assignedAt: '01/01/2026', displayName: 'Marcelo Ribeiro',   email: 'marcelo.ribeiro@comgas.com.br' },
+  { id: 'im-ceo-aq',       instanciaId: 'inst-ceo',             entidadeTipo: 'group', entidadeId: 'grp-comgas-aq',   papel: 'viewer', assignedAt: '01/01/2026', displayName: 'Analistas de Qualidade' },
+  // inst-ws-vendas: grupo Vendedores (member); Fernando (viewer)
+  { id: 'im-wsv-vend',     instanciaId: 'inst-ws-vendas',       entidadeTipo: 'group', entidadeId: 'grp-comgas-vend', papel: 'member', assignedAt: '01/01/2026', displayName: 'Vendedores' },
+  { id: 'im-wsv-fernando', instanciaId: 'inst-ws-vendas',       entidadeTipo: 'user',  entidadeId: 'usr-fernando',    papel: 'viewer', assignedAt: '01/01/2026', displayName: 'Fernando Costa',    email: 'fernando.costa@comgas.com.br' },
+  // inst-ws-fornecedores: grupo Fornecedores (member)
+  { id: 'im-wsf-forn',     instanciaId: 'inst-ws-fornecedores', entidadeTipo: 'group', entidadeId: 'grp-comgas-forn', papel: 'member', assignedAt: '01/01/2026', displayName: 'Fornecedores' },
+  // inst-dash-ops: grupo AQ (viewer); Marcelo (member)
+  { id: 'im-dash-aq',      instanciaId: 'inst-dash-ops',        entidadeTipo: 'group', entidadeId: 'grp-comgas-aq',   papel: 'viewer', assignedAt: '01/01/2026', displayName: 'Analistas de Qualidade' },
+  { id: 'im-dash-marcelo', instanciaId: 'inst-dash-ops',        entidadeTipo: 'user',  entidadeId: 'usr-marcelo-c',   papel: 'member', assignedAt: '01/01/2026', displayName: 'Marcelo Ribeiro',   email: 'marcelo.ribeiro@comgas.com.br' },
+]
+
 // ── Instâncias — fallback local para cenário Docnix/Comgas ─────
 // Espelha os dados de server/seed-docnix.ts (step 9).
 export const instancias: Instancia[] = [
