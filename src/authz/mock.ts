@@ -60,11 +60,16 @@ export const mockFGARelations: FGARelations = {
 
   // ── Instance Members ─────────────────────────────────────────
   // Relações FGA user/group → instance para o cenário Docnix/Comgas.
-  // Espelha os dados inseridos em server/seed-docnix.ts (steps 11-12).
+  // Espelha os dados inseridos em server/seed-docnix.ts (steps 11-12)
+  // e server/seed-marcelo-docnix.ts (step 4).
   instanceMembers: [
-    // inst-vanessa: Fernando e Neide podem acessar
-    { entityType: 'user',  entityId: 'u-fernando',    instanceId: 'inst-vanessa',         role: 'viewer' },
-    { entityType: 'user',  entityId: 'u-neide',       instanceId: 'inst-vanessa',         role: 'viewer' },
+    // inst-vanessa: Fernando e Neide podem acessar (viewer)
+    //   + Analistas de Qualidade (admin: criar/editar/excluir conversas)
+    //   + Vendedores (member: criar/editar conversas)
+    { entityType: 'user',  entityId: 'u-fernando',      instanceId: 'inst-vanessa',         role: 'viewer' },
+    { entityType: 'user',  entityId: 'u-neide',         instanceId: 'inst-vanessa',         role: 'viewer' },
+    { entityType: 'group', entityId: 'grp-comgas-aq',   instanceId: 'inst-vanessa',         role: 'admin'  },
+    { entityType: 'group', entityId: 'grp-comgas-vend', instanceId: 'inst-vanessa',         role: 'member' },
     // inst-ceo: Marcelo usa, grupo Analistas só visualiza
     { entityType: 'user',  entityId: 'u-marcelo',     instanceId: 'inst-ceo',             role: 'member' },
     { entityType: 'group', entityId: 'g-analistas',   instanceId: 'inst-ceo',             role: 'viewer' },
