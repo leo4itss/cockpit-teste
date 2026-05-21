@@ -1,13 +1,6 @@
 /**
  * CanvasPermissoesPage — Canvas interativo de gestão por conta.
- *
- * Visualiza e permite gerenciar em um único lugar:
- *   • Usuários membros da conta
- *   • Grupos e seus membros
- *   • Instâncias de componentes e seus membros
- *
- * Clicar em qualquer nó abre um painel lateral com ações
- * equivalentes às abas de Grupos, Acessos e Instâncias.
+ * Tema: dark
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
@@ -64,6 +57,13 @@ const H_GAP    = 36
 const ROW_GAP  = 70
 const INST_GAP = 32
 
+// ── Cores dark ────────────────────────────────────────────────
+
+// card base
+const CARD = '#1e293b'       // bg dos nós
+const CARD_BORDER = '#334155' // borda padrão
+const SEL_RING = '#3b82f6'   // anel de seleção
+
 // ── Helpers visuais ───────────────────────────────────────────
 
 type CompTipo = 'assistente-ia' | 'base-conhecimento' | 'analytics' | 'default'
@@ -77,19 +77,18 @@ function inferTipo(nome?: string): CompTipo {
 }
 
 function CompIcon({ tipo, size = 16 }: { tipo: CompTipo; size?: number }) {
-  const cls = `shrink-0`
-  const s   = { width: size, height: size }
-  if (tipo === 'assistente-ia')     return <Bot      style={s} className={cn(cls, 'text-violet-400')} />
-  if (tipo === 'base-conhecimento') return <Database style={s} className={cn(cls, 'text-blue-400')} />
-  if (tipo === 'analytics')         return <Layers   style={s} className={cn(cls, 'text-emerald-400')} />
-  return                                   <Layers   style={s} className={cn(cls, 'text-gray-400')} />
+  const s = { width: size, height: size }
+  if (tipo === 'assistente-ia')     return <Bot      style={s} className="shrink-0 text-violet-400" />
+  if (tipo === 'base-conhecimento') return <Database style={s} className="shrink-0 text-blue-400" />
+  if (tipo === 'analytics')         return <Layers   style={s} className="shrink-0 text-emerald-400" />
+  return                                   <Layers   style={s} className="shrink-0 text-slate-400" />
 }
 
 function AvatarCircle({ nome, size = 28 }: { nome: string; size?: number }) {
   const ini = (nome ?? '?').split(' ').slice(0, 2).map(p => p[0] ?? '').join('').toUpperCase()
   return (
     <div
-      className="rounded-full bg-gradient-to-br from-blue-400 to-violet-500 text-white font-semibold flex items-center justify-center shrink-0"
+      className="rounded-full bg-gradient-to-br from-blue-500 to-violet-600 text-white font-semibold flex items-center justify-center shrink-0"
       style={{ width: size, height: size, fontSize: size * 0.36 }}
     >
       {ini}
@@ -97,28 +96,37 @@ function AvatarCircle({ nome, size = 28 }: { nome: string; size?: number }) {
   )
 }
 
+// badges papel dark
 const PAPEL_BADGE: Record<string, string> = {
-  Viewer: 'bg-gray-100 text-gray-600 border-gray-200',
-  User:   'bg-blue-50 text-blue-700 border-blue-200',
-  Admin:  'bg-orange-50 text-orange-700 border-orange-200',
-  '':     'bg-gray-50 text-gray-500 border-gray-100',
+  Viewer: 'bg-slate-700 text-slate-300 border-slate-600',
+  User:   'bg-blue-900/60 text-blue-300 border-blue-700',
+  Admin:  'bg-orange-900/50 text-orange-300 border-orange-700',
+  '':     'bg-slate-800 text-slate-400 border-slate-700',
 }
 
 // ── Nós customizados ──────────────────────────────────────────
 
 function ContaNode({ data }: { data: any }) {
   return (
-    <div className="rounded-2xl border-2 border-amber-400 bg-white shadow-lg"
-      style={{ width: AW, minHeight: AH }}>
-      <Handle type="source" position={Position.Bottom} className="!bg-amber-400 !w-2 !h-2" />
+    <div
+      className="rounded-2xl shadow-lg"
+      style={{
+        width: AW, minHeight: AH,
+        background: '#1a2236',
+        border: '2px solid #f59e0b',
+      }}
+    >
+      <Handle type="source" position={Position.Bottom}
+        style={{ background: '#f59e0b', width: 8, height: 8 }} />
       <div className="px-4 py-3 flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
-          <Building2 className="w-5 h-5 text-amber-500" />
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+          style={{ background: 'rgba(245,158,11,0.15)' }}>
+          <Building2 className="w-5 h-5 text-amber-400" />
         </div>
         <div className="min-w-0">
-          <p className="text-sm font-bold text-gray-900 leading-tight truncate">{data.nome}</p>
-          <p className="text-[10px] text-gray-400 mt-0.5">{data.subdomain}.itss.com.br</p>
-          <p className="text-[10px] text-amber-600 font-medium mt-1">{data.qtdMembros} membros</p>
+          <p className="text-sm font-bold text-white leading-tight truncate">{data.nome}</p>
+          <p className="text-[10px] text-slate-400 mt-0.5">{data.subdomain}.itss.com.br</p>
+          <p className="text-[10px] text-amber-400 font-medium mt-1">{data.qtdMembros} membros</p>
         </div>
       </div>
     </div>
@@ -126,37 +134,46 @@ function ContaNode({ data }: { data: any }) {
 }
 
 function GrupoNode({ data, selected }: { data: any; selected?: boolean }) {
-  const colors = {
-    Viewer: { bar: 'bg-gray-400',    ring: 'border-gray-300'  },
-    User:   { bar: 'bg-blue-500',    ring: 'border-blue-300'  },
-    Admin:  { bar: 'bg-orange-500',  ring: 'border-orange-300'},
-    '':     { bar: 'bg-gray-200',    ring: 'border-gray-200'  },
-  }[data.papel ?? ''] ?? { bar: 'bg-gray-200', ring: 'border-gray-200' }
+  const barColor = {
+    Viewer: '#6b7280',
+    User:   '#3b82f6',
+    Admin:  '#f97316',
+    '':     '#374151',
+  }[data.papel ?? ''] ?? '#374151'
 
   return (
-    <div className={cn(
-      'rounded-xl border bg-white shadow-md overflow-hidden transition-shadow',
-      selected ? 'border-blue-400 shadow-blue-100 shadow-lg ring-2 ring-blue-300 ring-offset-1' : 'border-gray-200',
-    )} style={{ width: GW, minHeight: GH }}>
-      <Handle type="target" position={Position.Top}    className="!bg-gray-300 !w-2 !h-2" />
-      <Handle type="source" position={Position.Bottom} className="!bg-gray-300 !w-2 !h-2" />
-      <Handle type="source" position={Position.Right}  className="!bg-gray-300 !w-2 !h-2" id="right" />
+    <div
+      className="rounded-xl shadow-md overflow-hidden transition-shadow"
+      style={{
+        width: GW, minHeight: GH,
+        background: CARD,
+        border: `1.5px solid ${selected ? SEL_RING : CARD_BORDER}`,
+        boxShadow: selected ? `0 0 0 2px ${SEL_RING}40, 0 4px 20px #0004` : '0 2px 8px #0003',
+      }}
+    >
+      <Handle type="target" position={Position.Top}
+        style={{ background: CARD_BORDER, width: 7, height: 7 }} />
+      <Handle type="source" position={Position.Bottom}
+        style={{ background: CARD_BORDER, width: 7, height: 7 }} />
+      <Handle type="source" position={Position.Right}
+        style={{ background: CARD_BORDER, width: 7, height: 7 }} id="right" />
 
-      <div className={cn('h-1', colors.bar)} />
+      <div style={{ height: 3, background: barColor }} />
       <div className="px-3 py-2.5">
         <div className="flex items-start gap-2">
-          <Shield className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+          <Shield className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-semibold text-gray-800 truncate leading-tight">{data.nome}</p>
+            <p className="text-[11px] font-semibold text-slate-100 truncate leading-tight">{data.nome}</p>
             <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
               {data.papel && (
-                <span className={cn('text-[9px] px-1.5 py-0.5 rounded-full border font-semibold', PAPEL_BADGE[data.papel] ?? PAPEL_BADGE[''])}>
+                <span className={cn('text-[9px] px-1.5 py-0.5 rounded-full border font-semibold',
+                  PAPEL_BADGE[data.papel] ?? PAPEL_BADGE[''])}>
                   {data.papel}
                 </span>
               )}
-              <span className="text-[9px] text-gray-400 capitalize">{data.escopo}</span>
+              <span className="text-[9px] text-slate-500 capitalize">{data.escopo}</span>
             </div>
-            <p className="text-[10px] text-gray-400 mt-1.5">
+            <p className="text-[10px] text-slate-500 mt-1.5">
               <Users className="w-2.5 h-2.5 inline mr-0.5" />
               {data.qtdMembros} {data.qtdMembros === 1 ? 'membro' : 'membros'}
             </p>
@@ -169,20 +186,27 @@ function GrupoNode({ data, selected }: { data: any; selected?: boolean }) {
 
 function UsuarioNode({ data, selected }: { data: any; selected?: boolean }) {
   return (
-    <div className={cn(
-      'rounded-xl border bg-white shadow-sm overflow-hidden transition-shadow',
-      selected ? 'border-blue-400 shadow-md ring-2 ring-blue-300 ring-offset-1' : 'border-gray-200',
-    )} style={{ width: UW, minHeight: UH }}>
-      <Handle type="target" position={Position.Top}   className="!bg-gray-300 !w-2 !h-2" />
-      <Handle type="source" position={Position.Right} className="!bg-gray-300 !w-2 !h-2" />
+    <div
+      className="rounded-xl overflow-hidden transition-shadow"
+      style={{
+        width: UW, minHeight: UH,
+        background: CARD,
+        border: `1.5px solid ${selected ? SEL_RING : CARD_BORDER}`,
+        boxShadow: selected ? `0 0 0 2px ${SEL_RING}40, 0 4px 16px #0004` : '0 1px 6px #0003',
+      }}
+    >
+      <Handle type="target" position={Position.Top}
+        style={{ background: CARD_BORDER, width: 7, height: 7 }} />
+      <Handle type="source" position={Position.Right}
+        style={{ background: CARD_BORDER, width: 7, height: 7 }} />
 
       <div className="px-3 py-2 flex items-center gap-2.5">
         <AvatarCircle nome={data.nomeCompleto} size={28} />
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-semibold text-gray-800 truncate leading-tight">{data.nomeCompleto}</p>
-          <p className="text-[10px] text-gray-400 truncate">{data.email}</p>
+          <p className="text-[11px] font-semibold text-slate-100 truncate leading-tight">{data.nomeCompleto}</p>
+          <p className="text-[10px] text-slate-400 truncate">{data.email}</p>
           {data.papelConta && (
-            <p className="text-[9px] text-blue-600 font-medium mt-0.5">
+            <p className="text-[9px] text-blue-400 font-medium mt-0.5">
               {data.papelConta === 'account_admin' ? '★ Admin' : 'membro'}
             </p>
           )}
@@ -195,20 +219,26 @@ function UsuarioNode({ data, selected }: { data: any; selected?: boolean }) {
 function InstanciaNode({ data, selected }: { data: any; selected?: boolean }) {
   const tipo = inferTipo(data.componenteNome)
   return (
-    <div className={cn(
-      'rounded-xl border-2 bg-white shadow-md overflow-hidden transition-shadow',
-      selected ? 'border-violet-500 shadow-lg ring-2 ring-violet-300 ring-offset-1' : 'border-violet-200',
-    )} style={{ width: IW, minHeight: IH }}>
-      <Handle type="target" position={Position.Left}  className="!bg-violet-300 !w-2 !h-2" />
+    <div
+      className="rounded-xl overflow-hidden transition-shadow"
+      style={{
+        width: IW, minHeight: IH,
+        background: '#1a1530',
+        border: `1.5px solid ${selected ? '#8b5cf6' : '#4c3a7a'}`,
+        boxShadow: selected ? '0 0 0 2px #8b5cf640, 0 4px 20px #0004' : '0 2px 10px #0003',
+      }}
+    >
+      <Handle type="target" position={Position.Left}
+        style={{ background: '#7c3aed', width: 7, height: 7 }} />
 
-      <div className="h-0.5 w-full bg-gradient-to-r from-violet-500 to-cyan-400" />
+      <div style={{ height: 2, background: 'linear-gradient(90deg, #8b5cf6, #22d3ee)' }} />
       <div className="px-3 py-2.5">
         <div className="flex items-start gap-2">
           <CompIcon tipo={tipo} size={15} />
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-semibold text-gray-800 truncate leading-tight">{data.nome}</p>
-            <p className="text-[10px] text-gray-400 truncate mt-0.5">{data.componenteNome}</p>
-            <p className="text-[10px] text-violet-500 mt-1">
+            <p className="text-[11px] font-semibold text-slate-100 truncate leading-tight">{data.nome}</p>
+            <p className="text-[10px] text-slate-400 truncate mt-0.5">{data.componenteNome}</p>
+            <p className="text-[10px] text-violet-400 mt-1">
               <Users className="w-2.5 h-2.5 inline mr-0.5" />
               {data.qtdMembros} {data.qtdMembros === 1 ? 'membro' : 'membros'}
             </p>
@@ -263,7 +293,7 @@ function buildGraph(data: GraphData, selectedNodeId: string | null): { nodes: No
       source: `conta-${account.id}`,
       target: id,
       type: 'smoothstep',
-      style: { stroke: '#d1d5db', strokeWidth: 1.5 },
+      style: { stroke: '#334155', strokeWidth: 1.5 },
     })
   })
 
@@ -284,7 +314,7 @@ function buildGraph(data: GraphData, selectedNodeId: string | null): { nodes: No
       selected: selectedNodeId === id,
     })
 
-    // Arestas usuário → grupo (se membro)
+    // Arestas usuário → grupo
     groups.forEach(g => {
       const mbs = grupoMembros[g.id] ?? []
       const inGroup = mbs.some((mb: any) => (mb.id ?? mb.userId) === userId)
@@ -322,7 +352,6 @@ function buildGraph(data: GraphData, selectedNodeId: string | null): { nodes: No
       selected: selectedNodeId === id,
     })
 
-    // Arestas usuário/grupo → instância
     mbs.forEach((mb: any) => {
       const srcId = mb.entidadeTipo === 'user'
         ? `usuario-${mb.entidadeId}`
@@ -334,13 +363,13 @@ function buildGraph(data: GraphData, selectedNodeId: string | null): { nodes: No
         target: id,
         type: 'smoothstep',
         style: {
-          stroke: mb.entidadeTipo === 'user' ? '#06b6d4' : '#8b5cf6',
+          stroke: mb.entidadeTipo === 'user' ? '#22d3ee' : '#a78bfa',
           strokeWidth: 1.5,
           strokeDasharray: '6 3',
         },
         label: mb.papel,
-        labelStyle: { fontSize: 9, fill: '#9ca3af' },
-        labelBgStyle: { fill: 'rgba(255,255,255,0.8)' },
+        labelStyle: { fontSize: 9, fill: '#64748b' },
+        labelBgStyle: { fill: 'rgba(15,23,42,0.8)' },
       })
     })
   })
@@ -350,17 +379,24 @@ function buildGraph(data: GraphData, selectedNodeId: string | null): { nodes: No
 
 // ── Painéis laterais ──────────────────────────────────────────
 
+const PANEL_BG   = 'bg-[#0f172a]'
+const PANEL_BDR  = 'border-[#1e293b]'
+const ROW_HOVER  = 'hover:bg-[#1e293b]'
+const INPUT_CLS  = 'bg-[#1e293b] border-[#334155] text-slate-200 placeholder:text-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/40'
+const SECTION_LBL = 'text-[10px] font-semibold text-slate-500 uppercase tracking-wider'
+
 function PainelHeader({ icon, title, subtitle, onClose }: {
   icon: React.ReactNode; title: string; subtitle?: string; onClose: () => void
 }) {
   return (
-    <div className="px-5 py-4 border-b border-gray-100 flex items-start gap-3 shrink-0">
+    <div className={cn('px-5 py-4 border-b flex items-start gap-3 shrink-0', PANEL_BDR)}>
       {icon}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-gray-900 truncate">{title}</p>
-        {subtitle && <p className="text-xs text-gray-400 mt-0.5 truncate">{subtitle}</p>}
+        <p className="text-sm font-semibold text-slate-100 truncate">{title}</p>
+        {subtitle && <p className="text-xs text-slate-500 mt-0.5 truncate">{subtitle}</p>}
       </div>
-      <button onClick={onClose} className="p-1 rounded text-gray-400 hover:text-gray-600 hover:bg-gray-100 shrink-0">
+      <button onClick={onClose}
+        className="p-1 rounded text-slate-500 hover:text-slate-300 hover:bg-slate-700/50 shrink-0 transition-colors">
         <X className="w-4 h-4" />
       </button>
     </div>
@@ -373,11 +409,11 @@ function GrupoPanel({ grupoId, graphData, accountId, onClose, onRefresh, onOpenP
   onClose: () => void; onRefresh: () => void
   onOpenPermissoes: (opts: any) => void
 }) {
-  const grupo  = graphData.groups.find(g => g.id === grupoId)
+  const grupo   = graphData.groups.find(g => g.id === grupoId)
   const membros = graphData.grupoMembros[grupoId] ?? []
-  const [search, setSearch]   = useState('')
-  const [adding, setAdding]   = useState(false)
-  const [removingId, setRem]  = useState<string | null>(null)
+  const [search, setSearch]  = useState('')
+  const [adding, setAdding]  = useState(false)
+  const [removingId, setRem] = useState<string | null>(null)
 
   const jaIds = useMemo(() => new Set(membros.map((m: any) => m.id ?? m.userId)), [membros])
 
@@ -409,80 +445,83 @@ function GrupoPanel({ grupoId, graphData, accountId, onClose, onRefresh, onOpenP
   return (
     <>
       <PainelHeader
-        icon={<div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0"><Shield className="w-5 h-5 text-blue-500" /></div>}
+        icon={
+          <div className="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">
+            <Shield className="w-5 h-5 text-blue-400" />
+          </div>
+        }
         title={grupo.nome}
         subtitle={`${grupo.escopo}${grupo.papel ? ' · ' + grupo.papel : ''}`}
         onClose={onClose}
       />
 
-      {/* Ação permissões */}
-      <div className="px-5 py-3 border-b border-gray-100 shrink-0">
+      <div className={cn('px-5 py-3 border-b shrink-0', PANEL_BDR)}>
         <button
           onClick={() => onOpenPermissoes({ entityType: 'grupo', entityId: grupoId, entityNome: grupo.nome, accountId, papel: grupo.papel })}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-violet-700 bg-violet-50 border border-violet-200 hover:bg-violet-100 transition-colors"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-violet-300 bg-violet-500/10 border border-violet-500/30 hover:bg-violet-500/20 transition-colors"
         >
           <Lock className="w-3.5 h-3.5" />
           Atribuir permissões ao grupo
         </button>
       </div>
 
-      {/* Membros */}
       <div className="flex-1 overflow-y-auto px-5 py-4">
-        <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-3">
-          Membros ({membros.length})
-        </p>
+        <p className={cn(SECTION_LBL, 'mb-3')}>Membros ({membros.length})</p>
 
         {/* Busca de adição */}
         <div className="relative mb-3">
-          <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-300 transition-all">
-            <Search className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+          <div className={cn('flex items-center gap-2 px-3 py-2 border rounded-lg transition-all', INPUT_CLS)}>
+            <Search className="w-3.5 h-3.5 text-slate-500 shrink-0" />
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Adicionar membro..."
-              className="flex-1 bg-transparent text-xs outline-none text-gray-700 placeholder:text-gray-400"
+              className="flex-1 bg-transparent text-xs outline-none"
             />
-            {search && <button onClick={() => setSearch('')} className="text-gray-300 hover:text-gray-500 text-sm leading-none">×</button>}
+            {search && (
+              <button onClick={() => setSearch('')} className="text-slate-600 hover:text-slate-400 text-sm leading-none">×</button>
+            )}
           </div>
           {sugestoes.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-hidden">
+            <div className="absolute top-full left-0 right-0 mt-1 bg-[#1e293b] border border-[#334155] rounded-lg shadow-xl z-10 overflow-hidden">
               {sugestoes.map((u: any) => (
                 <button key={u.id} onClick={() => handleAdd(u.id)} disabled={adding}
-                  className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-gray-50 transition-colors text-left">
+                  className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-[#273549] transition-colors text-left">
                   <AvatarCircle nome={u.nomeCompleto} size={24} />
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-medium text-gray-800 truncate">{u.nomeCompleto}</p>
-                    <p className="text-[10px] text-gray-400 truncate">{u.email}</p>
+                    <p className="text-xs font-medium text-slate-200 truncate">{u.nomeCompleto}</p>
+                    <p className="text-[10px] text-slate-500 truncate">{u.email}</p>
                   </div>
-                  {adding && <Loader2 className="w-3 h-3 animate-spin text-gray-400 shrink-0" />}
+                  {adding && <Loader2 className="w-3 h-3 animate-spin text-slate-500 shrink-0" />}
                 </button>
               ))}
             </div>
           )}
           {search.trim() && sugestoes.length === 0 && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-md px-3 py-2.5 z-10">
-              <p className="text-xs text-gray-400">Nenhum usuário encontrado.</p>
+            <div className="absolute top-full left-0 right-0 mt-1 bg-[#1e293b] border border-[#334155] rounded-lg shadow-lg px-3 py-2.5 z-10">
+              <p className="text-xs text-slate-500">Nenhum usuário encontrado.</p>
             </div>
           )}
         </div>
 
         <div className="space-y-0.5">
           {membros.length === 0
-            ? <p className="text-xs text-gray-400 text-center py-6">Nenhum membro ainda.</p>
+            ? <p className="text-xs text-slate-600 text-center py-6">Nenhum membro ainda.</p>
             : membros.map((m: any) => {
                 const uid  = m.id ?? m.userId
                 const nome = m.nomeCompleto ?? uid
                 return (
-                  <div key={uid} className="group flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                  <div key={uid}
+                    className={cn('group flex items-center gap-2.5 px-2 py-2 rounded-lg transition-colors', ROW_HOVER)}>
                     <AvatarCircle nome={nome} size={26} />
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-gray-800 truncate">{nome}</p>
-                      {m.email && <p className="text-[10px] text-gray-400 truncate">{m.email}</p>}
+                      <p className="text-xs font-medium text-slate-200 truncate">{nome}</p>
+                      {m.email && <p className="text-[10px] text-slate-500 truncate">{m.email}</p>}
                     </div>
                     <button
                       onClick={() => handleRemove(uid)}
                       disabled={!!removingId}
-                      className="invisible group-hover:visible p-1 rounded text-red-400 hover:bg-red-50 transition-colors shrink-0"
+                      className="invisible group-hover:visible p-1 rounded text-red-500 hover:bg-red-500/10 transition-colors shrink-0"
                       title="Remover do grupo"
                     >
                       {removingId === uid
@@ -529,18 +568,20 @@ function UsuarioPanel({ userId, graphData, accountId, onClose, onRefresh, onOpen
         onClose={onClose}
       />
 
-      <div className="px-5 py-3 border-b border-gray-100 shrink-0 space-y-2">
+      <div className={cn('px-5 py-3 border-b shrink-0 space-y-2', PANEL_BDR)}>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-500">Papel na conta:</span>
+          <span className="text-xs text-slate-500">Papel na conta:</span>
           <span className={cn('text-[10px] px-2 py-0.5 rounded-full border font-semibold',
-            membro.papel === 'account_admin' ? 'bg-orange-50 text-orange-700 border-orange-200' : 'bg-gray-100 text-gray-600 border-gray-200'
+            membro.papel === 'account_admin'
+              ? 'bg-orange-900/40 text-orange-300 border-orange-700'
+              : 'bg-slate-700 text-slate-300 border-slate-600'
           )}>
             {membro.papel === 'account_admin' ? '★ Account Admin' : 'Membro'}
           </span>
         </div>
         <button
           onClick={() => onOpenPermissoes({ entityType: 'usuario', entityId: userId, entityNome: nome, accountId })}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-violet-700 bg-violet-50 border border-violet-200 hover:bg-violet-100 transition-colors"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-violet-300 bg-violet-500/10 border border-violet-500/30 hover:bg-violet-500/20 transition-colors"
         >
           <Lock className="w-3.5 h-3.5" />
           Permissões diretas
@@ -550,18 +591,17 @@ function UsuarioPanel({ userId, graphData, accountId, onClose, onRefresh, onOpen
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
         {/* Grupos */}
         <div>
-          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
-            Grupos ({userGrupos.length})
-          </p>
+          <p className={cn(SECTION_LBL, 'mb-2')}>Grupos ({userGrupos.length})</p>
           {userGrupos.length === 0
-            ? <p className="text-xs text-gray-400">Não pertence a nenhum grupo desta conta.</p>
+            ? <p className="text-xs text-slate-600">Não pertence a nenhum grupo desta conta.</p>
             : <div className="space-y-1">
                 {userGrupos.map(g => (
-                  <div key={g.id} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50">
+                  <div key={g.id} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#1e293b]">
                     <Shield className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-                    <span className="text-xs text-gray-700 flex-1 truncate">{g.nome}</span>
+                    <span className="text-xs text-slate-300 flex-1 truncate">{g.nome}</span>
                     {g.papel && (
-                      <span className={cn('text-[9px] px-1.5 py-0.5 rounded-full border font-semibold', PAPEL_BADGE[g.papel] ?? PAPEL_BADGE[''])}>
+                      <span className={cn('text-[9px] px-1.5 py-0.5 rounded-full border font-semibold',
+                        PAPEL_BADGE[g.papel] ?? PAPEL_BADGE[''])}>
                         {g.papel}
                       </span>
                     )}
@@ -573,20 +613,18 @@ function UsuarioPanel({ userId, graphData, accountId, onClose, onRefresh, onOpen
 
         {/* Instâncias com acesso direto */}
         <div>
-          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
-            Instâncias com acesso direto ({userInstancias.length})
-          </p>
+          <p className={cn(SECTION_LBL, 'mb-2')}>Instâncias com acesso direto ({userInstancias.length})</p>
           {userInstancias.length === 0
-            ? <p className="text-xs text-gray-400">Sem acesso direto a instâncias.</p>
+            ? <p className="text-xs text-slate-600">Sem acesso direto a instâncias.</p>
             : <div className="space-y-1">
                 {userInstancias.map(inst => {
-                  const mb      = (graphData.instMembros[inst.id] ?? []).find((m: any) => m.entidadeId === userId)
+                  const mb       = (graphData.instMembros[inst.id] ?? []).find((m: any) => m.entidadeId === userId)
                   const compNome = graphData.components.find(c => c.id === inst.componenteId)?.nome
                   return (
-                    <div key={inst.id} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-violet-50/60">
+                    <div key={inst.id} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-violet-500/5 border border-violet-500/20">
                       <CompIcon tipo={inferTipo(compNome)} size={13} />
-                      <span className="text-xs text-gray-700 flex-1 truncate">{inst.nome}</span>
-                      {mb?.papel && <span className="text-[9px] text-violet-600 font-semibold">{mb.papel}</span>}
+                      <span className="text-xs text-slate-300 flex-1 truncate">{inst.nome}</span>
+                      {mb?.papel && <span className="text-[9px] text-violet-400 font-semibold">{mb.papel}</span>}
                     </div>
                   )
                 })}
@@ -599,7 +637,7 @@ function UsuarioPanel({ userId, graphData, accountId, onClose, onRefresh, onOpen
 }
 
 // Painel de Instância
-function InstanciaPanel({ instanciaId, graphData, accountId, onClose, onOpenInstancia }: {
+function InstanciaPanel({ instanciaId, graphData, onClose, onOpenInstancia }: {
   instanciaId: string; graphData: GraphData; accountId: string
   onClose: () => void; onOpenInstancia: (inst: any) => void
 }) {
@@ -613,13 +651,17 @@ function InstanciaPanel({ instanciaId, graphData, accountId, onClose, onOpenInst
   return (
     <>
       <PainelHeader
-        icon={<div className="w-9 h-9 rounded-xl bg-violet-50 flex items-center justify-center shrink-0"><CompIcon tipo={tipo} size={18} /></div>}
+        icon={
+          <div className="w-9 h-9 rounded-xl bg-violet-500/10 flex items-center justify-center shrink-0">
+            <CompIcon tipo={tipo} size={18} />
+          </div>
+        }
         title={inst.nome}
         subtitle={comp?.nome ?? inst.componenteId}
         onClose={onClose}
       />
 
-      <div className="px-5 py-3 border-b border-gray-100 shrink-0">
+      <div className={cn('px-5 py-3 border-b shrink-0', PANEL_BDR)}>
         <button
           onClick={() => onOpenInstancia(inst)}
           className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-white bg-violet-600 hover:bg-violet-700 transition-colors"
@@ -631,23 +673,25 @@ function InstanciaPanel({ instanciaId, graphData, accountId, onClose, onOpenInst
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
-        <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-3">
-          Membros ({membros.length})
-        </p>
+        <p className={cn(SECTION_LBL, 'mb-3')}>Membros ({membros.length})</p>
         {membros.length === 0
-          ? <p className="text-xs text-gray-400 text-center py-6">Nenhum membro ainda.</p>
+          ? <p className="text-xs text-slate-600 text-center py-6">Nenhum membro ainda.</p>
           : <div className="space-y-0.5">
               {membros.map((mb: any) => {
                 const isGroup = mb.entidadeTipo === 'group'
                 const nome    = mb.displayName ?? mb.entidadeId
                 return (
-                  <div key={mb.id} className="flex items-center gap-2.5 px-2 py-2 rounded-lg bg-gray-50">
+                  <div key={mb.id} className="flex items-center gap-2.5 px-2 py-2 rounded-lg bg-[#1e293b]">
                     {isGroup
-                      ? <div className="w-6 h-6 rounded-full bg-violet-100 flex items-center justify-center shrink-0"><Shield className="w-3.5 h-3.5 text-violet-500" /></div>
+                      ? <div className="w-6 h-6 rounded-full bg-violet-500/20 flex items-center justify-center shrink-0">
+                          <Shield className="w-3.5 h-3.5 text-violet-400" />
+                        </div>
                       : <AvatarCircle nome={nome} size={24} />}
-                    <span className="text-xs text-gray-700 flex-1 truncate">{nome}</span>
-                    {isGroup && <span className="text-[9px] bg-violet-50 text-violet-600 border border-violet-200 rounded px-1 py-0.5">grupo</span>}
-                    <span className="text-[9px] text-gray-500 font-medium">{mb.papel}</span>
+                    <span className="text-xs text-slate-300 flex-1 truncate">{nome}</span>
+                    {isGroup && (
+                      <span className="text-[9px] bg-violet-500/10 text-violet-400 border border-violet-500/30 rounded px-1 py-0.5">grupo</span>
+                    )}
+                    <span className="text-[9px] text-slate-500 font-medium">{mb.papel}</span>
                   </div>
                 )
               })}
@@ -666,7 +710,7 @@ function DetailPanel({ selected, graphData, accountId, onClose, onRefresh, onOpe
   onOpenInstancia: (inst: any) => void; onOpenPermissoes: (opts: any) => void
 }) {
   return (
-    <div className="w-[360px] shrink-0 border-l border-gray-200 bg-white flex flex-col overflow-hidden">
+    <div className={cn('w-[360px] shrink-0 border-l flex flex-col overflow-hidden', PANEL_BG, PANEL_BDR)}>
       {selected.type === 'grupo' && (
         <GrupoPanel grupoId={selected.id} graphData={graphData} accountId={accountId}
           onClose={onClose} onRefresh={onRefresh} onOpenPermissoes={onOpenPermissoes} />
@@ -690,15 +734,15 @@ export default function CanvasPermissoesPage() {
   const isOrgAdmin      = useIsOrgAdmin()
   const defaultAccId    = useAdminAccountId()
 
-  const [allAccounts, setAllAccounts]   = useState<any[]>([])
-  const [accountId,   setAccountId]     = useState<string | null>(null)
-  const [graphData,   setGraphData]     = useState<GraphData | null>(null)
-  const [loading,     setLoading]       = useState(false)
-  const [refreshKey,  setRefreshKey]    = useState(0)
+  const [allAccounts, setAllAccounts] = useState<any[]>([])
+  const [accountId,   setAccountId]   = useState<string | null>(null)
+  const [graphData,   setGraphData]   = useState<GraphData | null>(null)
+  const [loading,     setLoading]     = useState(false)
+  const [refreshKey,  setRefreshKey]  = useState(0)
 
-  const [selected, setSelected]           = useState<SelectedEntity | null>(null)
-  const [instanciaSheet, setInstSheet]    = useState<any>(null)
-  const [permissoesSheet, setPermSheet]   = useState<any>(null)
+  const [selected,      setSelected]   = useState<SelectedEntity | null>(null)
+  const [instanciaSheet, setInstSheet] = useState<any>(null)
+  const [permissoesSheet, setPermSheet] = useState<any>(null)
 
   const [nodes, setNodes, onNodesChange] = useNodesState([])
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
@@ -794,19 +838,18 @@ export default function CanvasPermissoesPage() {
   const selectedAccount = allAccounts.find(a => a.id === accountId)
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 bg-white">
-      {/* Header */}
-      <div className="flex items-center gap-4 px-6 py-3 border-b border-gray-100 shrink-0">
+    <div className="flex flex-col flex-1 min-h-0 bg-[#0a0f1a]">
+      {/* Header dark */}
+      <div className="flex items-center gap-4 px-6 py-3 border-b border-[#1e293b] bg-[#0f172a] shrink-0">
         <div>
-          <h1 className="text-base font-semibold text-gray-900">Canvas de Permissões</h1>
-          <p className="text-xs text-gray-500">Visualize e gerencie grupos, usuários e instâncias de uma conta</p>
+          <h1 className="text-base font-semibold text-slate-100">Canvas de Permissões</h1>
+          <p className="text-xs text-slate-500">Visualize e gerencie grupos, usuários e instâncias de uma conta</p>
         </div>
         <div className="ml-auto flex items-center gap-3">
-          {/* Seletor de conta */}
           <select
             value={accountId ?? ''}
             onChange={e => { setAccountId(e.target.value); setSelected(null) }}
-            className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 bg-white outline-none focus:ring-2 focus:ring-blue-400 min-w-[220px] text-gray-700"
+            className="text-sm border border-[#334155] rounded-lg px-3 py-1.5 bg-[#1e293b] text-slate-200 outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 min-w-[220px] transition-colors"
           >
             <option value="" disabled>Selecionar conta…</option>
             {allAccounts.map(a => (
@@ -821,17 +864,17 @@ export default function CanvasPermissoesPage() {
         {/* ReactFlow */}
         <div className="flex-1 min-w-0 min-h-0">
           {!accountId ? (
-            <div className="flex items-center justify-center h-full bg-gray-50">
+            <div className="flex items-center justify-center h-full bg-[#0a0f1a]">
               <div className="text-center">
-                <Building2 className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-                <p className="text-sm font-medium text-gray-400">Selecione uma conta para visualizar o canvas</p>
+                <Building2 className="w-12 h-12 text-slate-700 mx-auto mb-3" />
+                <p className="text-sm font-medium text-slate-600">Selecione uma conta para visualizar o canvas</p>
               </div>
             </div>
           ) : loading ? (
-            <div className="flex items-center justify-center h-full bg-gray-50">
+            <div className="flex items-center justify-center h-full bg-[#0a0f1a]">
               <div className="text-center">
                 <Loader2 className="w-8 h-8 text-blue-400 mx-auto mb-3 animate-spin" />
-                <p className="text-sm text-gray-400">Carregando canvas…</p>
+                <p className="text-sm text-slate-500">Carregando canvas…</p>
               </div>
             </div>
           ) : (
@@ -843,13 +886,20 @@ export default function CanvasPermissoesPage() {
               nodeTypes={nodeTypes}
               onNodeClick={onNodeClick}
               onPaneClick={onPaneClick}
+              colorMode="dark"
               fitView
               fitViewOptions={{ padding: 0.18 }}
               minZoom={0.25}
               maxZoom={1.8}
               proOptions={{ hideAttribution: true }}
             >
-              <Background color="#e5e7eb" variant={BackgroundVariant.Dots} gap={22} size={1} />
+              <Background
+                color="#1e293b"
+                variant={BackgroundVariant.Dots}
+                gap={24}
+                size={1.5}
+                style={{ background: '#0a0f1a' }}
+              />
               <Controls />
               <MiniMap
                 nodeColor={n => {
@@ -858,14 +908,17 @@ export default function CanvasPermissoesPage() {
                   if (n.type === 'usuario')  return '#10b981'
                   return '#8b5cf6'
                 }}
-                maskColor="rgba(255,255,255,0.7)"
-                className="!bg-white !border-gray-200 !rounded-xl"
+                maskColor="rgba(10,15,26,0.75)"
+                style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: 12 }}
               />
 
               {/* Legenda */}
               <Panel position="bottom-left">
-                <div className="bg-white/95 border border-gray-200 rounded-xl px-4 py-3 shadow-sm backdrop-blur-sm">
-                  <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Legenda</p>
+                <div
+                  className="rounded-xl px-4 py-3 backdrop-blur-sm"
+                  style={{ background: 'rgba(15,23,42,0.92)', border: '1px solid #1e293b' }}
+                >
+                  <p className={cn(SECTION_LBL, 'mb-2')}>Legenda</p>
                   <div className="space-y-1.5">
                     {[
                       { c: 'bg-amber-400',   l: 'Conta (âncora)' },
@@ -875,18 +928,18 @@ export default function CanvasPermissoesPage() {
                     ].map(({ c, l }) => (
                       <div key={l} className="flex items-center gap-2">
                         <span className={cn('w-2.5 h-2.5 rounded-full shrink-0', c)} />
-                        <span className="text-[11px] text-gray-600">{l}</span>
+                        <span className="text-[11px] text-slate-400">{l}</span>
                       </div>
                     ))}
                   </div>
-                  <div className="border-t border-gray-100 mt-2.5 pt-2.5 space-y-1.5">
+                  <div className="border-t border-[#1e293b] mt-2.5 pt-2.5 space-y-1.5">
                     <div className="flex items-center gap-2">
-                      <span className="w-5 border-t-2 border-blue-400" />
-                      <span className="text-[10px] text-gray-400">membro de grupo</span>
+                      <span className="w-5 border-t-2 border-blue-500" />
+                      <span className="text-[10px] text-slate-500">membro de grupo</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="w-5 border-t-2 border-dashed border-violet-400" />
-                      <span className="text-[10px] text-gray-400">acesso à instância</span>
+                      <span className="w-5 border-t-2 border-dashed border-violet-500" />
+                      <span className="text-[10px] text-slate-500">acesso à instância</span>
                     </div>
                   </div>
                 </div>
@@ -895,7 +948,7 @@ export default function CanvasPermissoesPage() {
           )}
         </div>
 
-        {/* Painel lateral */}
+        {/* Painel lateral dark */}
         {selected && graphData && (
           <DetailPanel
             selected={selected}
