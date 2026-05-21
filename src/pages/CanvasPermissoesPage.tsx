@@ -700,7 +700,12 @@ export default function CanvasPermissoesPage() {
       const ativos = (acc as any[]).filter(a => !a.deletedAt)
       setAllAccounts(ativos)
       if (!accountId) setAccountId(defaultAccId ?? ativos[0]?.id ?? null)
-    }).catch(() => {})
+    }).catch(() => {
+      // Fallback mock: filtra contas pelo orgId do usuário
+      const fallback = mockAccounts.filter(a => !orgFilter || a.orgId === orgFilter)
+      setAllAccounts(fallback)
+      if (!accountId) setAccountId(defaultAccId ?? fallback[0]?.id ?? null)
+    })
   }, [])
 
   // Carrega dados da conta
