@@ -272,7 +272,25 @@ export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, isPlatf
               </button>
             </div>
 
-            {/* Select de conta — aparece ao escolher "Conta específica" */}
+            {/* Seletor de org — só para Platform Admin com escopo='org' */}
+            {escopo === 'org' && isPlatformAdmin && (
+              <div className="relative mt-1">
+                <select
+                  value={orgSelecionada}
+                  onChange={e => setOrgSelecionada(e.target.value)}
+                  disabled={saving || orgs.length === 0}
+                  className="w-full appearance-none pl-3 pr-8 py-2.5 text-sm border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-colors disabled:bg-gray-50 text-[#030712]"
+                >
+                  <option value="">Selecione a organização...</option>
+                  {orgs.filter(o => o.status !== 'Inativo').map((o: any) => (
+                    <option key={o.id} value={o.id}>{o.name}</option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+              </div>
+            )}
+
+            {/* Select de conta — contas agrupadas por org */}
             {escopo === 'conta' && (
               <div className="relative mt-1">
                 <select
@@ -282,9 +300,20 @@ export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, isPlatf
                   className="w-full appearance-none pl-3 pr-8 py-2.5 text-sm border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-colors disabled:bg-gray-50 text-[#030712]"
                 >
                   <option value="">Selecione a conta...</option>
-                  {contas.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
+                  {isPlatformAdmin
+                    /* Platform Admin: agrupa por org */
+                    ? contasPorOrg.map(grupo => (
+                        <optgroup key={grupo.orgNome} label={grupo.orgNome}>
+                          {grupo.contas.map(c => (
+                            <option key={c.id} value={c.id}>{c.name}</option>
+                          ))}
+                        </optgroup>
+                      ))
+                    /* Org Admin: lista plana (só vê contas da sua org) */
+                    : contas.map(c => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                      ))
+                  }
                 </select>
                 <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
               </div>
