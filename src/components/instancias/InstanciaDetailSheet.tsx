@@ -26,6 +26,12 @@ import { api } from '@/api/client'
 import { useCanManageInstanciaMembros } from '@/authz/hooks'
 import { cn } from '@/lib/utils'
 import type { Instancia, InstanciaMembro, User, Grupo } from '@/types'
+import {
+  users          as mockUsers,
+  grupos         as mockGrupos,
+  accountMembrosIds,
+  instanciaMembros as mockInstMembros,
+} from '@/data/mock'
 
 // ── Tipos internos ────────────────────────────────────────────
 
