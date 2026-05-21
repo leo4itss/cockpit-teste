@@ -569,24 +569,39 @@ function ContaDetailSheet({ open, onClose, account }: ContaDetailProps) {
 export function ContasPage() {
   const { currentUser, relations } = useAuthz()
   const isPlatformAdmin = useIsPlatformAdmin()
-  // Platform Admin vê todas as contas (sem filtro de org).
-  // Org Admin filtra pela sua organização.
+
   const orgAdminEntry = relations.orgAdmins.find(a => a.userId === currentUser.id)
   const adminOrgId    = isPlatformAdmin ? undefined : (orgAdminEntry?.orgId ?? undefined)
 
-  const [accounts, setAccounts]     = useState<Account[]>([])
-  const [userCountMap, setUserCountMap] = useState<Record<string, number>>({})
-  const [loading, setLoading]       = useState(true)
-  const [search, setSearch]         = useState('')
+  // ── Seletor de org (Platform Admin) ──────────────────────
+  const [selectedOrgId, setSelectedOrgId] = useSessionState<string>('contas-orgId', '')
+  const [allOrgs, setAllOrgs]             = useState<any[]>([])
 
-  const [showDetail, setShowDetail]         = useState(false)
+  useEffect(() => {
+    if (!isPlatformAdmin) return
+    api.getOrganizations()
+      .then((orgs: any[]) => setAllOrgs(orgs.filter(o => o.status !== 'Inativo')))
+      .catch(() => {})
+  }, [isPlatformAdmin])
+
+  // orgId efetivo: Platform Admin usa o seletor; Org Admin usa o seu
+  const effectiveOrgId = isPlatformAdmin ? selectedOrgId : (adminOrgId ?? '')
+
+  const [accounts, setAccounts]         = useState<Account[]>([])
+  const [userCountMap, setUserCountMap] = useState<Record<string, number>>({})
+  const [loading, setLoading]           = useState(true)
+  const [search, setSearch]             = useState('')
+
+  const [showDetail, setShowDetail]           = useState(false)
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null)
 
   // ── Fetch ─────────────────────────────────────────────────
 
   useEffect(() => {
+    // Platform Admin sem org selecionada → não carrega nada
+    if (isPlatformAdmin && !selectedOrgId) { setAccounts([]); setLoading(false); return }
     setLoading(true)
-    api.getAccounts(adminOrgId)
+    api.getAccounts(effectiveOrgId || undefined)
       .then(async (fetchedAccounts: Account[]) => {
         setAccounts(fetchedAccounts)
         const counts = await Promise.all(
@@ -602,7 +617,7 @@ export function ContasPage() {
         setLoading(false)
       })
       .catch(() => setLoading(false))
-  }, [adminOrgId])
+  }, [effectiveOrgId, isPlatformAdmin, selectedOrgId])
 
   // ── Filtro ────────────────────────────────────────────────
 
