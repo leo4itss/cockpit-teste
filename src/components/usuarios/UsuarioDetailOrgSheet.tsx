@@ -161,9 +161,10 @@ function VincularContaDialog({ open, onClose, user, disponiveis, onVincular }: V
 // ── Componente principal ──────────────────────────────────────
 
 export function UsuarioDetailOrgSheet({
-  open, onClose, user, contasVinculadas, todasContas, onVincularSuccess,
+  open, onClose, user, contasVinculadas, todasContas, onVincularSuccess, onPapelChange,
 }: Props) {
   const [showVincularDialog, setShowVincularDialog] = useState(false)
+  const [changingPapelId, setChangingPapelId]       = useState<string | null>(null)  // accountId em progresso
 
   // Contas ainda não vinculadas ao usuário
   const vinculadasIds = new Set(contasVinculadas.map(c => c.account.id))
