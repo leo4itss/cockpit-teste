@@ -130,7 +130,37 @@ export function UsuariosPage() {
       setUserGruposCount(gMap)
 
       setLoading(false)
-    }).catch(() => setLoading(false))
+    }).catch(() => {
+      // Fallback mock para quando o Neon está hibernando
+      const fallbackAccounts = mockAccounts.filter(a => a.orgId === adminOrgId)
+      const memberIds = fallbackAccounts.flatMap(a => accountMembrosIds[a.id] ?? [])
+      const fallbackUsers = mockUsers.filter(u => memberIds.includes(u.id))
+
+      const accMap: Record<string, ContaVinculada[]> = {}
+      fallbackAccounts.forEach(acc => {
+        const ids = accountMembrosIds[acc.id] ?? []
+        ids.forEach(uid => {
+          if (!accMap[uid]) accMap[uid] = []
+          accMap[uid].push({ account: acc, papel: 'member' })
+        })
+      })
+
+      const fallbackGrupos = mockGrupos.filter(g =>
+        fallbackAccounts.some(a => a.id === g.accountId) || g.orgId === adminOrgId
+      )
+      const gMap: Record<string, number> = {}
+      fallbackGrupos.forEach(g => {
+        ;(grupoMembrosMap[g.id] ?? []).forEach(uid => {
+          gMap[uid] = (gMap[uid] ?? 0) + 1
+        })
+      })
+
+      setUsers(fallbackUsers)
+      setAccounts(fallbackAccounts)
+      setUserAccountsMap(accMap)
+      setUserGruposCount(gMap)
+      setLoading(false)
+    })
   }, [adminOrgId])
 
   // ── Derivados ─────────────────────────────────────────────
