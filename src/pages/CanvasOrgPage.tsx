@@ -740,18 +740,28 @@ function CanvasOrgInner() {
 
   // Carrega orgs
   useEffect(() => {
-    api.getOrganizacoes?.()
+    api.getOrganizations()
       .then((orgs: any[]) => {
-        const ativas = orgs.filter(o => o.status !== 'Inativo')
+        const ativas = orgs.filter((o: any) => o.status !== 'Inativo')
         setAllOrgs(ativas)
-        if (ativas.length > 0) setOrgId(ativas[0].id)
+        if (ativas.length > 0) {
+          setOrgId(ativas[0].id)
+        } else {
+          setLoadingOrg(false)
+        }
       })
       .catch(() => {
-        // fallback: tenta carregar contas direto
-        api.getAccounts().then((accs: any[]) => {
-          const ativos = accs.filter(a => !a.deletedAt)
-          setAccounts(ativos)
-        }).catch(() => {})
+        // Fallback: carrega todas as contas diretamente
+        api.getAccounts()
+          .then((accs: any[]) => {
+            const ativos = accs.filter((a: any) => !a.deletedAt)
+            const virtualOrg = { id: 'all', name: 'Plataforma', razaoSocial: '' }
+            setAllOrgs([virtualOrg])
+            setOrgId('all')
+            setAccounts(ativos)
+          })
+          .catch(() => {})
+          .finally(() => setLoadingOrg(false))
       })
   }, [])
 
