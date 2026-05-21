@@ -1,4 +1,4 @@
-import type { Organization, Account, Solution, Contract, User, TipoLicenca, Componente, Grupo } from '../types'
+import type { Organization, Account, Solution, Contract, User, TipoLicenca, Componente, Grupo, Instancia } from '../types'
 
 // ── Tipos de Licença ──────────────────────────────────────────
 // Dados iniciais — refletidos no seed do banco.
