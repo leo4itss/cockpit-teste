@@ -138,49 +138,63 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
       <div className="flex flex-col flex-1 min-h-0 overflow-y-auto">
         <div className="p-2 flex flex-col shrink-0">
 
-          {/* ── Grupo: principal ── */}
+          {/* ── Principal (sem seção) ── */}
           <div className="flex flex-col gap-1">
             {showOrganizacoes && (
               <NavItem to="/organizacoes" icon={Building2} label="Organizações" collapsed={collapsed} />
             )}
-            <NavItem to="/acessos" icon={Users} label="Acessos" collapsed={collapsed} />
-            {showGrupos && (
-              <NavItem to="/grupos" icon={Shield} label="Grupos" collapsed={collapsed} />
-            )}
-            {showComponentes && (
-              <NavItem to="/componentes" icon={Puzzle} label="Componentes" collapsed={collapsed} />
-            )}
           </div>
 
-          {/* ── Visualização (Platform Admin: Canvas Org + Canvas + Schema; Org Admin: Canvas) ── */}
-          {(isPlatformAdmin || (isOrgAdmin && !isPlatformAdmin)) && (
+          {/* ── Organização ── */}
+          {(showUsuarios || showGrupos || showContas) && (
             <>
-              <SectionLabel label="Visualização" collapsed={collapsed} />
+              <SectionLabel label="Organização" collapsed={collapsed} />
               <div className="flex flex-col gap-1">
-                {isPlatformAdmin && (
-                  <>
-                    <NavItem to="/canvas-org" icon={Globe2}  label="Canvas Org"  collapsed={collapsed} />
-                    <NavItem to="/canvas"     icon={GitFork} label="Canvas"      collapsed={collapsed} />
-                    <NavItem to="/schema"     icon={Network} label="Schema"      collapsed={collapsed} />
-                  </>
+                {showUsuarios && (
+                  <NavItem to="/usuarios" icon={BookUser} label="Usuários"      collapsed={collapsed} />
                 )}
-                {isOrgAdmin && !isPlatformAdmin && (
-                  <NavItem to="/canvas" icon={GitFork} label="Canvas" collapsed={collapsed} />
+                {showGrupos && (
+                  <NavItem to="/grupos"   icon={Shield}   label="Grupos"        collapsed={collapsed} />
+                )}
+                {showContas && (
+                  <NavItem to="/contas"   icon={Landmark} label="Contas"        collapsed={collapsed} />
                 )}
               </div>
             </>
           )}
 
-          {/* ── Organização (Platform Admin + Org Admin) ── */}
-          {(showUsuarios || showContas) && (
+          {/* ── Plataforma ── */}
+          {showComponentes && (
             <>
-              <SectionLabel label="Organização" collapsed={collapsed} />
+              <SectionLabel label="Plataforma" collapsed={collapsed} />
               <div className="flex flex-col gap-1">
-                {showUsuarios && (
-                  <NavItem to="/usuarios" icon={BookUser} label="Usuários" collapsed={collapsed} />
+                <NavItem to="/componentes" icon={Puzzle} label="Componentes" collapsed={collapsed} />
+              </div>
+            </>
+          )}
+
+          {/* ── Conta ── */}
+          <>
+            <SectionLabel label="Conta" collapsed={collapsed} />
+            <div className="flex flex-col gap-1">
+              <NavItem to="/acessos" icon={Users} label="Acessos" collapsed={collapsed} />
+            </div>
+          </>
+
+          {/* ── Visualização ── */}
+          {(isPlatformAdmin || isOrgAdmin) && (
+            <>
+              <SectionLabel label="Visualização" collapsed={collapsed} />
+              <div className="flex flex-col gap-1">
+                {isPlatformAdmin && (
+                  <>
+                    <NavItem to="/canvas-org" icon={Globe2}  label="Canvas Org" collapsed={collapsed} />
+                    <NavItem to="/canvas"     icon={GitFork} label="Canvas"     collapsed={collapsed} />
+                    <NavItem to="/schema"     icon={Network} label="Schema"     collapsed={collapsed} />
+                  </>
                 )}
-                {showContas && (
-                  <NavItem to="/contas" icon={Landmark} label="Contas" collapsed={collapsed} />
+                {isOrgAdmin && !isPlatformAdmin && (
+                  <NavItem to="/canvas" icon={GitFork} label="Canvas" collapsed={collapsed} />
                 )}
               </div>
             </>
