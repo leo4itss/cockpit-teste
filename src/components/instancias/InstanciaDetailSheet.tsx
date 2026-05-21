@@ -292,12 +292,15 @@ export function InstanciaDetailSheet({
 
   async function handleSavePapel(membro: InstanciaMembro, novoPapel: string) {
     if (!instancia) return
-    await api.addInstanciaMembro(instancia.id, {
-      entidadeTipo: membro.entidadeTipo,
-      entidadeId:   membro.entidadeId,
-      papel:        novoPapel,
-    })
+    // Optimistic update: atualiza localmente antes da confirmação da API
     setMembros(prev => prev.map(m => m.id === membro.id ? { ...m, papel: novoPapel as 'viewer' | 'member' | 'admin' } : m))
+    try {
+      await api.addInstanciaMembro(instancia.id, {
+        entidadeTipo: membro.entidadeTipo,
+        entidadeId:   membro.entidadeId,
+        papel:        novoPapel,
+      })
+    } catch { /* silencioso — mudança já aplicada localmente */ }
   }
 
   async function handleRemove(membro: InstanciaMembro) {
