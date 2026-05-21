@@ -59,9 +59,11 @@ export function GruposPage() {
     Promise.all([
       api.getGrupos(queryOrgId ? { orgId: queryOrgId } : undefined),
       api.getAccounts(queryOrgId),
-    ]).then(([fetchedGrupos, fetchedContas]) => {
+      api.getOrganizations(),
+    ]).then(([fetchedGrupos, fetchedContas, fetchedOrgs]) => {
       setGrupos(fetchedGrupos)
       setContas(fetchedContas)
+      setOrgs(fetchedOrgs)
       setLoading(false)
     }).catch(() => setLoading(false))
   }, [queryOrgId])
