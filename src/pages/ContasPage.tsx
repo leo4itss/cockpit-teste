@@ -332,15 +332,22 @@ function ContaDetailSheet({ open, onClose, account }: ContaDetailProps) {
   async function handleToggleCapability(capId: string) {
     if (!account || togglingCap) return
     const isActive = activeCapabilities.includes(capId)
+    // Optimistic update — reflete imediatamente na UI
+    setActiveCapabilities(prev =>
+      isActive ? prev.filter(c => c !== capId) : [...prev, capId]
+    )
     setTogglingCap(capId)
     try {
       if (isActive) {
         await api.removeEntitlement(account.id, capId)
-        setActiveCapabilities(prev => prev.filter(c => c !== capId))
       } else {
         await api.addEntitlement(account.id, capId)
-        setActiveCapabilities(prev => [...prev, capId])
       }
+    } catch {
+      // Reverte em caso de falha
+      setActiveCapabilities(prev =>
+        isActive ? [...prev, capId] : prev.filter(c => c !== capId)
+      )
     } finally {
       setTogglingCap(null)
     }
