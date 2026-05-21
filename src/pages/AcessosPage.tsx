@@ -275,7 +275,15 @@ export function AcessosPage() {
     if (!orgIdForGrupos && !accountId) return
     api.getGrupos({ orgId: orgIdForGrupos, accountId })
       .then(data => { setGrupos(data); setLoadingGrupos(false) })
-      .catch(() => setLoadingGrupos(false))
+      .catch(() => {
+        // Fallback: filtra mock local pelo accountId ou orgId
+        const fallback = mockGrupos.filter(g =>
+          (accountId && g.accountId === accountId) ||
+          (orgIdForGrupos && g.orgId === orgIdForGrupos)
+        )
+        setGrupos(fallback)
+        setLoadingGrupos(false)
+      })
   }, [accountId, effectiveOrgId, allAccounts])
 
   const filteredGrupos = useMemo(() => {
