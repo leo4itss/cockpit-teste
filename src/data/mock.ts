@@ -654,3 +654,42 @@ export const users: User[] = [
     createdAt: '01/01/2026',
   },
 ]
+
+// ── Grupos — fallback local para cenário Docnix/Comgas ─────────
+// Espelha os dados inseridos em server/seed-docnix.ts (step 6).
+// Usado como fallback quando a API está indisponível (Neon cold start).
+export const grupos: Grupo[] = [
+  {
+    id:         'grp-comgas-aq',
+    nome:       'Analistas de Qualidade',
+    descricao:  'Equipe responsável pela análise e controle de qualidade. Acesso ao assistente de IA e à base de conhecimento.',
+    escopo:     'conta',
+    accountId:  'acc-comgas',
+    papel:      'User',
+    status:     'Ativo',
+    createdAt:  '01/01/2026',
+    qtdMembros: 3,
+  },
+  {
+    id:         'grp-comgas-vend',
+    nome:       'Vendedores',
+    descricao:  'Equipe comercial. Utiliza o assistente de IA para apoio às vendas e acompanha métricas no Analytics.',
+    escopo:     'conta',
+    accountId:  'acc-comgas',
+    papel:      'User',
+    status:     'Ativo',
+    createdAt:  '01/01/2026',
+    qtdMembros: 2,
+  },
+  {
+    id:         'grp-comgas-forn',
+    nome:       'Fornecedores',
+    descricao:  'Parceiros e fornecedores externos. Acesso restrito à leitura da base de conhecimento.',
+    escopo:     'conta',
+    accountId:  'acc-comgas',
+    papel:      'Viewer',
+    status:     'Ativo',
+    createdAt:  '01/01/2026',
+    qtdMembros: 2,
+  },
+]
