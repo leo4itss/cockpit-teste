@@ -155,6 +155,31 @@ export const organizations: Organization[] = [
     createdAt: '01/03/2026',
     contacts: [],
   },
+  // ── Org Docnix — fallback local para cenário de apresentação ──────────────
+  {
+    id: 'org-docnix',
+    name: 'Docnix',
+    docType: 'CNPJ',
+    docNumber: '12.345.678/0001-90',
+    domain: 'docnix.com.br',
+    businessSegment: 'Tecnologia',
+    activitySector: 'Tecnologia da Informação',
+    razaoSocial: 'Docnix Soluções Digitais Ltda',
+    qtdContas: 1,
+    qtdSolucoes: 1,
+    qtdContratos: 1,
+    country: 'Brasil',
+    state: 'SP',
+    city: 'São Paulo',
+    zipCode: '01310-100',
+    address: 'Av. Paulista, 1000',
+    complement: 'Conjunto 42',
+    officialSite: 'https://docnix.com.br',
+    arquitetoPAS: 'Marcelo Gomes',
+    status: 'Ativo',
+    createdAt: '01/01/2026',
+    contacts: [],
+  },
 ]
 
 export const accounts: Account[] = [
