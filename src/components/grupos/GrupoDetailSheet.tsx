@@ -31,11 +31,12 @@ import type { User, Grupo } from '@/types'
 // ── Tipos ─────────────────────────────────────────────────────
 
 interface Props {
-  open:         boolean
-  onClose:      () => void
-  grupo:        Grupo | null
-  accountId:    string
-  accountNome?: string
+  open:           boolean
+  onClose:        () => void
+  grupo:          Grupo | null
+  accountId:      string
+  accountNome?:   string   // nome da conta (escopo='conta') ou da org (escopo='org')
+  contextoLabel?: string   // 'Conta' | 'Org'
 }
 
 // ── Helpers ───────────────────────────────────────────────────
