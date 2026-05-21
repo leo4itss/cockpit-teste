@@ -63,17 +63,6 @@ const PAPEIS_OPCOES = [
   { value: 'Admin',  label: 'Administrador', desc: 'Acesso completo',       cls: 'bg-orange-50 text-orange-700 border-orange-200' },
 ]
 
-// Badge estático — usado quando não está editando
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function PapelBadge({ papel }: { papel?: string }) {
-  const opt = PAPEIS_OPCOES.find(p => p.value === papel)
-  if (!opt) return null
-  return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${opt.cls}`}>
-      {opt.label}
-    </span>
-  )
-}
 
 // Editor inline de papel — dropdown com confirm/cancel
 interface PapelEditorProps {
