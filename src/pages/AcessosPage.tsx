@@ -270,21 +270,36 @@ export function AcessosPage() {
 
   // ── Render ──────────────────────────────────────────────────
 
-  // Quando não há conta vinculada à persona atual (Platform Admin, PAS Architect…)
-  if (!rawAccountId) {
+  // Platform Admin / Org Admin sem conta selecionada → mostrar seletor
+  if (!rawAccountId && !selectedAccountId) {
     return (
-      <div className="flex flex-col items-center justify-center h-full py-24 gap-4">
+      <div className="flex flex-col items-center justify-center h-full py-24 gap-6">
         <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
           <Building2 className="w-6 h-6 text-gray-400" />
         </div>
         <div className="text-center max-w-sm">
-          <p className="text-sm font-semibold text-gray-800">Nenhuma conta vinculada</p>
+          <p className="text-sm font-semibold text-gray-800">Selecione uma conta</p>
           <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-            {isPlatformAdmin || isOrgAdmin
-              ? 'Você está como Platform Admin ou Org Admin. Esta página exibe acessos de uma conta específica — navegue até uma conta em Contas para acessá-la diretamente.'
-              : 'Esta página está disponível apenas para Account Admins vinculados a uma conta.'}
+            Esta página exibe acessos de uma conta específica. Escolha a conta que deseja visualizar.
           </p>
         </div>
+        {allAccounts.length > 0 ? (
+          <div className="relative w-64">
+            <select
+              defaultValue=""
+              onChange={e => setSelectedAccountId(e.target.value)}
+              className="w-full appearance-none pl-3 pr-8 py-2.5 text-sm border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-[#030712]"
+            >
+              <option value="" disabled>Selecione uma conta...</option>
+              {allAccounts.map(a => (
+                <option key={a.id} value={a.id}>{a.name}</option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+          </div>
+        ) : (
+          <p className="text-xs text-gray-400">Carregando contas...</p>
+        )}
       </div>
     )
   }
