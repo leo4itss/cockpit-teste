@@ -231,7 +231,7 @@ function AddMembroSection({ allUsers, membros, onAdd, disabled }: AddMembroProps
 
 // ── Componente principal ──────────────────────────────────────
 
-export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome, contextoLabel }: Props) {
+export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome, contextoLabel, onUpdate }: Props) {
   const [membros, setMembros]           = useState<User[]>([])
   const [loadingMembros, setLoadingMembros] = useState(false)
   const [allUsers, setAllUsers]         = useState<User[]>([])
