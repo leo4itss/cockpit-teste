@@ -66,7 +66,21 @@ export function GruposPage() {
       setContas(fetchedContas)
       setOrgs(fetchedOrgs)
       setLoading(false)
-    }).catch(() => setLoading(false))
+    }).catch(() => {
+      // Fallback mock: filtra grupos, contas e orgs pelo orgId do usuário
+      const orgAccountIds = mockAccounts
+        .filter(a => !queryOrgId || a.orgId === queryOrgId)
+        .map(a => a.id)
+      const fallbackGrupos = mockGrupos.filter(g =>
+        !queryOrgId ||
+        g.orgId === queryOrgId ||
+        (g.accountId && orgAccountIds.includes(g.accountId))
+      )
+      setGrupos(fallbackGrupos)
+      setContas(mockAccounts.filter(a => !queryOrgId || a.orgId === queryOrgId))
+      setOrgs(mockOrgs)
+      setLoading(false)
+    })
   }, [queryOrgId])
 
   const filtered = useMemo(() => {
