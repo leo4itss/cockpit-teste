@@ -638,14 +638,58 @@ export function ContasPage() {
 
   // ── Render ────────────────────────────────────────────────
 
+  // Platform Admin sem org selecionada → tela de seleção
+  if (isPlatformAdmin && !selectedOrgId) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full py-24 gap-6">
+        <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+          <Building2 className="w-6 h-6 text-gray-400" />
+        </div>
+        <div className="text-center max-w-sm">
+          <p className="text-sm font-semibold text-gray-800">Selecione uma organização</p>
+          <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+            Esta página exibe as contas de uma organização específica. Escolha a organização que deseja visualizar.
+          </p>
+        </div>
+        <div className="relative w-72">
+          <select
+            value={selectedOrgId}
+            onChange={e => setSelectedOrgId(e.target.value)}
+            className="w-full appearance-none pl-3 pr-8 py-2.5 text-sm border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-[#030712]"
+          >
+            <option value="">Selecione a organização...</option>
+            {allOrgs.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
+          </select>
+          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div>
       {/* Header */}
       <div className="flex items-start justify-between px-8 py-4 gap-6">
         <div className="min-w-0">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-600 border border-blue-200">Escopo: Organização</span>
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-green-50 text-green-700 border border-green-200">Org Admin</span>
+            {isPlatformAdmin
+              ? <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-orange-50 text-orange-600 border border-orange-200">Platform Admin</span>
+              : <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-green-50 text-green-700 border border-green-200">Org Admin</span>
+            }
+            {/* Seletor de org — Platform Admin */}
+            {isPlatformAdmin && allOrgs.length > 0 && (
+              <div className="relative">
+                <select
+                  value={selectedOrgId}
+                  onChange={e => setSelectedOrgId(e.target.value)}
+                  className="appearance-none pl-2 pr-6 py-0.5 text-[11px] font-medium border border-gray-200 rounded-full bg-gray-50 text-gray-700 outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
+                >
+                  {allOrgs.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
+                </select>
+                <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
+              </div>
+            )}
           </div>
           <h1 className="text-2xl font-bold leading-8 text-[#030712]">Contas</h1>
           <p className="text-sm text-[#6b7280] mt-1 max-w-[1080px]">
