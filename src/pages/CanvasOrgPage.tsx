@@ -726,12 +726,20 @@ function CanvasOrgInner() {
   const isOrgAdmin      = useIsOrgAdmin()
   const { theme, mode, toggle } = useVisualizerTheme()
 
+  // orgId e expandedId ficam na URL para sobreviver à navegação entre abas
+  const [searchParams, setSearchParams] = useSearchParams()
+  const orgId      = searchParams.get('org')
+  const expandedId = searchParams.get('expanded')
+
+  const setOrgId = (id: string) =>
+    setSearchParams(p => { p.set('org', id); p.delete('expanded'); return p }, { replace: true })
+
+  const setExpandedId = (id: string | null) =>
+    setSearchParams(p => { if (id) p.set('expanded', id); else p.delete('expanded'); return p }, { replace: true })
+
   const [allOrgs,    setAllOrgs]   = useState<any[]>([])
-  const [orgId,      setOrgId]     = useState<string | null>(null)
   const [accounts,   setAccounts]  = useState<any[]>([])
   const [loadingOrg, setLoadingOrg]= useState(true)
-
-  const [expandedId,       setExpandedId]       = useState<string | null>(null)
   const [loadingId,        setLoadingId]         = useState<string | null>(null)
   const [accountDataCache, setAccountDataCache]  = useState<Record<string, AccountData>>({})
 
