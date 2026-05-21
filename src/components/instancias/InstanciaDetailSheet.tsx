@@ -472,7 +472,7 @@ export function InstanciaDetailSheet({
         <AtribuirPermissoesSheet
           open={showPermissoes}
           onClose={() => { setShowPermissoes(false); setMembroPermissoes(null) }}
-          entityType="usuario"
+          entityType={membroPermissoes.entidadeTipo === 'user' ? 'usuario' : 'grupo'}
           entityId={membroPermissoes.entidadeId}
           entityNome={membroPermissoes.displayName ?? membroPermissoes.entidadeId}
           accountId={accountId}
