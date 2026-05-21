@@ -774,7 +774,7 @@ export default function CanvasPermissoesPage() {
             {/* Seletor de conta */}
             <select
               value={accountId ?? ''}
-              onChange={e => { setAccountId(e.target.value); setSelected(null) }}
+              onChange={e => { setAccountId(e.target.value); setSelected(null); setRefreshKey(0) }}
               className="text-sm rounded-lg px-3 py-1.5 outline-none min-w-[220px] transition-colors"
               style={{ background: theme.selectBg, border: `1px solid ${theme.selectBorder}`, color: theme.selectText }}
             >
