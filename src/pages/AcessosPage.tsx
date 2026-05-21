@@ -146,10 +146,12 @@ export function AcessosPage() {
   const [selectedUser, setSelectedUser]           = useState<User | null>(null)
 
   useEffect(() => {
-    api.getUsers()
+    if (!accountId) return
+    // Busca apenas os membros desta conta (não todos os usuários do sistema)
+    api.getAccountMembros(accountId)
       .then(data => { setUsers(data); setLoadingUsers(false) })
       .catch(() => setLoadingUsers(false))
-  }, [])
+  }, [accountId])
 
   const filteredUsers = useMemo(() => {
     const q = searchUsers.toLowerCase()
