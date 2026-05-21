@@ -175,6 +175,10 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
                 {showContas && (
                   <NavItem to="/contas" icon={Landmark} label="Contas" collapsed={collapsed} />
                 )}
+                {/* Canvas visível para Org Admin (sem acesso a "Desenvolvedor") */}
+                {isOrgAdmin && !isPlatformAdmin && (
+                  <NavItem to="/canvas" icon={GitMerge} label="Canvas" collapsed={collapsed} />
+                )}
               </div>
             </>
           )}
