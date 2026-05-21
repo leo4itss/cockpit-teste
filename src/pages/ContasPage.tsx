@@ -343,12 +343,7 @@ function ContaDetailSheet({ open, onClose, account }: ContaDetailProps) {
       } else {
         await api.addEntitlement(account.id, capId)
       }
-    } catch {
-      // Reverte em caso de falha
-      setActiveCapabilities(prev =>
-        isActive ? [...prev, capId] : prev.filter(c => c !== capId)
-      )
-    } finally {
+    } catch { /* silencioso */ } finally {
       setTogglingCap(null)
     }
   }
