@@ -161,9 +161,14 @@ export function useGetInstanciaRole(instanceId: string): 'admin' | 'member' | 'v
  */
 export function useCanManageInstanciaMembros(
   instanceId: string,
-  accountId = 'acc-comgas',
-  orgId = '1',
+  accountId = '',
+  orgId?: string,
 ): boolean {
   const { currentUser, relations } = useAuthz()
-  return engine.canManageInstanciaMembros(currentUser.id, instanceId, accountId, orgId, relations)
+  // Se orgId não for passado, deriva do papel de Org Admin do usuário logado.
+  // Evita o hardcode '1' que excluía orgs como 'org-docnix'.
+  const effectiveOrgId = orgId
+    ?? relations.orgAdmins.find(a => a.userId === currentUser.id)?.orgId
+    ?? ''
+  return engine.canManageInstanciaMembros(currentUser.id, instanceId, accountId, effectiveOrgId, relations)
 }
