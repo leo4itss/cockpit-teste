@@ -13,7 +13,6 @@ import {
   NestedSheet,
   NestedSheetHeader,
   NestedSheetTitle,
-  NestedSheetDescription,
   NestedSheetBody,
   NestedSheetFooter,
 } from '@/components/ui/nested-sheet'
