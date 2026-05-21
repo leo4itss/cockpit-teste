@@ -650,7 +650,7 @@ export default function SchemaVisualizerPage() {
               />
               <Controls />
               <MiniMap
-                nodeColor={n => (n.data as FGANodeData).color as string}
+                nodeColor={n => ((n.data as unknown) as FGANodeData).color as string}
                 maskColor={theme.minimapMask}
                 style={{ background: theme.minimapBg, border: `1px solid ${theme.minimapBorder}`, borderRadius: 12 }}
               />
