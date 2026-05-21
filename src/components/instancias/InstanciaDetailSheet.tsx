@@ -318,7 +318,8 @@ export function InstanciaDetailSheet({
   }
 
   function handleClose() {
-    setMembros([]); setAllUsers([]); setAllGrupos([]); setShowAdd(false)
+    // Não limpa `membros` para preservar edições locais ao reabrir a mesma instância
+    setShowAdd(false)
     setShowPermissoes(false); setMembroPermissoes(null)
     onClose()
   }
