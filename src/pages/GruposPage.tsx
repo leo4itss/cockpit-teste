@@ -176,12 +176,25 @@ export function GruposPage() {
                     className="group border-b border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer last:border-b-0"
                     onClick={() => handleRowClick(grupo)}
                   >
-                    {/* Nome + descrição */}
+                    {/* Nome + descrição + contexto org/conta */}
                     <td className="px-4 py-3">
                       <p className="text-sm font-medium text-[#030712]">{grupo.nome}</p>
                       {grupo.descricao && (
                         <p className="text-xs text-[#6b7280] mt-0.5 max-w-sm truncate">{grupo.descricao}</p>
                       )}
+                      {(() => {
+                        const ctx = getContexto(grupo)
+                        if (!ctx) return null
+                        const isOrg = grupo.escopo === 'org'
+                        return (
+                          <span className="inline-flex items-center gap-1 mt-1 text-[11px] text-[#9ca3af]">
+                            {isOrg
+                              ? <Building  className="w-2.5 h-2.5 shrink-0" />
+                              : <Building2 className="w-2.5 h-2.5 shrink-0" />}
+                            {ctx.nome}
+                          </span>
+                        )
+                      })()}
                     </td>
 
                     {/* Membros */}
