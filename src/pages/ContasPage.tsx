@@ -2,12 +2,13 @@ import { useState, useMemo, useEffect } from 'react'
 import {
   Search, Ellipsis, Eye,
   ShieldCheck, UserMinus, Loader2, Building2,
-  Bot, Database, Layers, CheckCircle2, XCircle,
+  Bot, Database, Layers, CheckCircle2, XCircle, ChevronDown,
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Popover } from '@/components/ui/Popover'
 import { Dialog } from '@/components/ui/Dialog'
+import { useSessionState } from '@/hooks/useSessionState'
 import {
   NestedSheet,
   NestedSheetHeader,
