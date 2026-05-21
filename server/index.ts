@@ -33,9 +33,14 @@ app.get('/api/organizations', async (c) => {
 })
 
 app.get('/api/organizations/:id', async (c) => {
-  const [row] = await db.select().from(organizations).where(eq(organizations.id, c.req.param('id')))
-  if (!row) return c.json({ error: 'Not found' }, 404)
-  return c.json(row)
+  try {
+    const [row] = await db.select().from(organizations).where(eq(organizations.id, c.req.param('id')))
+    if (!row) return c.json({ error: 'Not found' }, 404)
+    return c.json(row)
+  } catch (err: any) {
+    console.error('[GET /api/organizations/:id] ERROR:', err.message, err.stack)
+    return c.json({ error: err.message }, 500)
+  }
 })
 
 app.post('/api/organizations', async (c) => {
