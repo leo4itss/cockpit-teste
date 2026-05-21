@@ -54,51 +54,29 @@ export function OrganizacaoDetailPage() {
   useEffect(() => {
     if (!id) return
 
-    // withTimeout: se a promise não resolver em `ms` ms, rejeita automaticamente.
-    // Garante que Neon cold start (até 30s) não deixe a página em branco:
-    // qualquer chamada que demorar mais de 4s cai no mock local como fallback.
-    function withTimeout<T>(promise: Promise<T>, ms = 4000): Promise<T> {
-      return Promise.race([
-        promise,
-        new Promise<T>((_, reject) =>
-          setTimeout(() => reject(new Error('timeout')), ms)
-        ),
-      ])
-    }
+    // ── Passo 1: exibe mock local IMEDIATAMENTE (loading=false instantâneo) ──
+    // A página nunca fica em branco — o usuário vê dados reais ou de demonstração
+    // em menos de 1ms, e os dados reais substituem quando a API responder.
+    setOrg(mockOrgs.find(o => o.id === id) ?? null)
+    setAccounts(mockAccounts.filter(a => a.orgId === id))
+    setSolutions(mockSolutions.filter(s => s.orgId === id))
+    setContracts(mockContracts.filter(c => c.orgId === id))
+    setTiposLicenca(mockTiposLicenca)
+    setLoading(false)
 
+    // ── Passo 2: tenta API em background; atualiza silenciosamente se vier ──
     Promise.allSettled([
-      withTimeout(api.getOrganization(id)),
-      withTimeout(api.getAccounts(id)),
-      withTimeout(api.getSolutions(id)),
-      withTimeout(api.getContracts(id)),
-      withTimeout(api.getTiposLicenca()),
+      api.getOrganization(id),
+      api.getAccounts(id),
+      api.getSolutions(id),
+      api.getContracts(id),
+      api.getTiposLicenca(),
     ]).then(([orgRes, accsRes, solsRes, contsRes, tiposRes]) => {
-      const orgData = orgRes.status === 'fulfilled'
-        ? orgRes.value
-        : (mockOrgs.find(o => o.id === id) ?? null)
-
-      const accs = accsRes.status === 'fulfilled'
-        ? accsRes.value
-        : mockAccounts.filter(a => a.orgId === id)
-
-      const sols = solsRes.status === 'fulfilled'
-        ? solsRes.value
-        : mockSolutions.filter(s => s.orgId === id)
-
-      const conts = contsRes.status === 'fulfilled'
-        ? contsRes.value
-        : mockContracts.filter(c => c.orgId === id)
-
-      const tipos = tiposRes.status === 'fulfilled'
-        ? tiposRes.value
-        : mockTiposLicenca
-
-      setOrg(orgData)
-      setAccounts(accs)
-      setSolutions(sols)
-      setContracts(conts)
-      setTiposLicenca(tipos)
-      setLoading(false)
+      if (orgRes.status   === 'fulfilled' && orgRes.value)   setOrg(orgRes.value)
+      if (accsRes.status  === 'fulfilled')                   setAccounts(accsRes.value)
+      if (solsRes.status  === 'fulfilled')                   setSolutions(solsRes.value)
+      if (contsRes.status === 'fulfilled')                   setContracts(contsRes.value)
+      if (tiposRes.status === 'fulfilled')                   setTiposLicenca(tiposRes.value)
     })
   }, [id])
 
