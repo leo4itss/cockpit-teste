@@ -752,14 +752,26 @@ export default function CanvasPermissoesPage() {
         const gruposMock  = mockGrupos.filter(g => g.accountId === accountId)
         const instsMock   = mockInstancias.filter(i => i.accountId === accountId)
         if (accMock) {
+          const grupoMembros = Object.fromEntries(
+            gruposMock.map(g => [
+              g.id,
+              mockUsers.filter(u => (grupoMembrosMap[g.id] ?? []).includes(u.id)),
+            ])
+          )
+          const instMembros = Object.fromEntries(
+            instsMock.map(i => [
+              i.id,
+              mockInstMembros.filter(m => m.instanciaId === i.id),
+            ])
+          )
           setGraphData({
             account: accMock,
             accountMembros: membrosMock,
             groups:    gruposMock,
             instances: instsMock,
             components: [],
-            grupoMembros: {},
-            instMembros:  {},
+            grupoMembros,
+            instMembros,
             allUsers: membrosMock,
           })
         }
