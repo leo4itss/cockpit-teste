@@ -43,6 +43,7 @@ export function GruposPage() {
 
   const [grupos, setGrupos]   = useState<Grupo[]>([])
   const [contas, setContas]   = useState<Account[]>([])
+  const [orgs,   setOrgs]     = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch]   = useState('')
 
