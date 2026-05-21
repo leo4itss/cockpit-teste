@@ -165,7 +165,7 @@ export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, isPlatf
 
   function handleClose() {
     setNome(''); setDescricao(''); setPapel('User'); setEscopo('org')
-    setContaSelecionada(''); setSearchMembro('')
+    setOrgSelecionada(''); setContaSelecionada(''); setSearchMembro('')
     setMembros([]); setError(null)
     onClose()
   }
