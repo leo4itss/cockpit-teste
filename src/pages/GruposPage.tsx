@@ -40,7 +40,7 @@ export function GruposPage() {
   const isPlatformAdmin = useIsPlatformAdmin()
   const isOrgAdmin      = useIsOrgAdmin()
   const isAccountAdmin  = useIsAccountAdmin()
-  const adminOrgId = relations.orgAdmins.find(a => a.userId === currentUser.id)?.orgId ?? '1'
+  const adminOrgId = relations.orgAdmins.find(a => a.userId === currentUser.id)?.orgId ?? ''
 
   const [grupos, setGrupos]   = useState<Grupo[]>([])
   const [contas, setContas]   = useState<Account[]>([])
