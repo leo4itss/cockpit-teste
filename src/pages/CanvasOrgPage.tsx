@@ -763,8 +763,8 @@ function OrgCanvas({
 // ── Página principal ──────────────────────────────────────────
 
 function CanvasOrgInner() {
-  const _isPlatformAdmin = useIsPlatformAdmin()
-  const _isOrgAdmin      = useIsOrgAdmin()
+  useIsPlatformAdmin()
+  useIsOrgAdmin()
   const { theme, mode, toggle } = useVisualizerTheme()
 
   // orgId e expandedId persistem no sessionStorage para sobreviver à navegação entre abas
