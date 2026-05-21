@@ -54,34 +54,42 @@ export function OrganizacaoDetailPage() {
   useEffect(() => {
     if (!id) return
 
-    // Separa as chamadas críticas (org + dados relacionados) das auxiliares
-    // (tipos-licenca e componentes) para que a falha de uma não derrube tudo.
-    // Em previews antigos que não têm esses endpoints, a org ainda carrega.
-    Promise.all([
+    // Carrega cada recurso de forma independente via Promise.allSettled:
+    // se o banco ainda está acordando (Neon cold start), as chamadas que
+    // falharem usam o mock local como fallback — a página nunca fica em branco.
+    Promise.allSettled([
       api.getOrganization(id),
       api.getAccounts(id),
       api.getSolutions(id),
       api.getContracts(id),
-    ]).then(async ([orgData, accs, sols, conts]) => {
+      api.getTiposLicenca(),
+    ]).then(([orgRes, accsRes, solsRes, contsRes, tiposRes]) => {
+      const orgData = orgRes.status === 'fulfilled'
+        ? orgRes.value
+        : (mockOrgs.find(o => o.id === id) ?? null)
+
+      const accs = accsRes.status === 'fulfilled'
+        ? accsRes.value
+        : mockAccounts.filter(a => a.orgId === id)
+
+      const sols = solsRes.status === 'fulfilled'
+        ? solsRes.value
+        : mockSolutions.filter(s => s.orgId === id)
+
+      const conts = contsRes.status === 'fulfilled'
+        ? contsRes.value
+        : mockContracts.filter(c => c.orgId === id)
+
+      const tipos = tiposRes.status === 'fulfilled'
+        ? tiposRes.value
+        : mockTiposLicenca
+
       setOrg(orgData)
       setAccounts(accs)
       setSolutions(sols)
       setContracts(conts)
-
-      // Carrega auxiliares de forma independente — falha silenciosa
-      const tipos = await api.getTiposLicenca().catch(() => mockTiposLicenca)
       setTiposLicenca(tipos)
       setLoading(false)
-    }).catch(() => {
-      // API indisponível — usa mock data como fallback
-      const mockOrg = mockOrgs.find(o => o.id === id) ?? null
-      setOrg(mockOrg)
-      setAccounts(mockAccounts.filter(a => a.orgId === id))
-      setSolutions(mockSolutions.filter(s => s.orgId === id))
-      setContracts(mockContracts.filter(c => c.orgId === id))
-      setTiposLicenca(mockTiposLicenca)
-      setLoading(false)
-      toast('Não foi possível carregar os contratos.\nTente novamente em alguns instantes.', 'error')
     })
   }, [id])
 
