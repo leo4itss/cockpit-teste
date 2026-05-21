@@ -68,11 +68,27 @@ export function AcessosPage() {
   const abaParam = searchParams.get('aba') as Aba | null
   const abaAtiva: Aba = abaParam === 'grupos' ? 'grupos' : abaParam === 'instancias' ? 'instancias' : 'usuarios'
 
-  const rawAccountId    = useAdminAccountId()          // null quando a persona não é Account Admin
-  const accountId       = rawAccountId ?? ''            // string vazia → sem conta resolvida
+  const rawAccountId    = useAdminAccountId()          // accountId fixo do Account Admin (null para outros)
   const isPlatformAdmin = useIsPlatformAdmin()
   const isOrgAdmin      = useIsOrgAdmin()
   const isAccountAdmin  = useIsAccountAdmin()
+  const adminOrgId      = useAdminOrgId()              // orgId do Org Admin (para filtrar contas)
+
+  // Para Platform Admin / Org Admin: seletor de conta persistido em sessionStorage
+  const [selectedAccountId, setSelectedAccountId] = useSessionState<string>('acessos-accountId', '')
+  const [allAccounts, setAllAccounts]             = useState<any[]>([])
+
+  // Carrega contas disponíveis para o seletor (só quando não é Account Admin puro)
+  useEffect(() => {
+    if (rawAccountId) return  // Account Admin já tem conta fixada
+    const orgFilter = (!isPlatformAdmin && isOrgAdmin && adminOrgId) ? adminOrgId : undefined
+    api.getAccounts(orgFilter)
+      .then((accs: any[]) => setAllAccounts(accs.filter(a => !a.deletedAt)))
+      .catch(() => {})
+  }, [rawAccountId, isPlatformAdmin, isOrgAdmin, adminOrgId])
+
+  // accountId efetivo: fixo para Account Admin, ou o selecionado para Platform/Org Admin
+  const accountId = rawAccountId ?? selectedAccountId
 
   // Nome da conta — carregado para exibir o contexto da conta no header
   const [accountNome, setAccountNome] = useState<string | null>(null)
