@@ -665,9 +665,10 @@ function DetailPanel({ selected, graphData, accountId, theme, onClose, onRefresh
 // ── Página principal ──────────────────────────────────────────
 
 export default function CanvasPermissoesPage() {
-  const _isPlatformAdmin = useIsPlatformAdmin()
-  const _isOrgAdmin      = useIsOrgAdmin()
-  const defaultAccId     = useAdminAccountId()
+  const isPlatformAdmin = useIsPlatformAdmin()
+  const isOrgAdmin      = useIsOrgAdmin()
+  const defaultAccId    = useAdminAccountId()
+  const adminOrgId      = useAdminOrgId()           // orgId do Org Admin (null para Platform Admin)
   const { theme, mode, toggle } = useVisualizerTheme()
 
   // accountId persiste em sessionStorage — sobrevive à navegação entre abas
