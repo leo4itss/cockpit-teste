@@ -319,8 +319,8 @@ export function AcessosPage() {
             {isAccountAdmin && !isPlatformAdmin && !isOrgAdmin && (
               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-orange-50 text-orange-600 border border-orange-200">Account Admin</span>
             )}
-            {/* Seletor de conta para Platform Admin / Org Admin */}
-            {!rawAccountId && allAccounts.length > 0 ? (
+            {/* Seletor de conta para Org Admin / Platform Admin */}
+            {!isAccountAdminOnly && allAccounts.length > 0 ? (
               <div className="relative">
                 <select
                   value={accountId}
