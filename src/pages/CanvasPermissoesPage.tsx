@@ -26,7 +26,7 @@ import {
 } from 'lucide-react'
 import { api } from '@/api/client'
 import { useIsPlatformAdmin, useIsOrgAdmin } from '@/authz'
-import { useAdminAccountId } from '@/authz/hooks'
+import { useAdminAccountId, useAdminOrgId } from '@/authz/hooks'
 import { useSessionState } from '@/hooks/useSessionState'
 import { InstanciaDetailSheet } from '@/components/instancias/InstanciaDetailSheet'
 import { AtribuirPermissoesSheet } from '@/components/permissoes/AtribuirPermissoesSheet'
