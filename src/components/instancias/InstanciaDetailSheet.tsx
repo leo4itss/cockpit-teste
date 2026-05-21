@@ -265,7 +265,14 @@ export function InstanciaDetailSheet({
       setAllUsers(users)
       setAllGrupos(grupos)
       setLoading(false)
-    }).catch(() => setLoading(false))
+    }).catch(() => {
+      // Fallback mock quando Neon está hibernando
+      setMembros(mockInstMembros.filter(m => m.instanciaId === instancia.id))
+      const contaIds = accountMembrosIds[accountId] ?? []
+      setAllUsers(mockUsers.filter(u => contaIds.includes(u.id)))
+      setAllGrupos(mockGrupos.filter(g => g.accountId === accountId))
+      setLoading(false)
+    })
   }, [open, instancia?.id, accountId])
 
   async function handleAdd(entidadeTipo: 'user' | 'group', entidadeId: string, displayName: string, papel: string) {
