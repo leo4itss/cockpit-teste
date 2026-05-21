@@ -20,6 +20,7 @@ import {
 import { api } from '@/api/client'
 import { useAuthz, useIsPlatformAdmin } from '@/authz/hooks'
 import { cn } from '@/lib/utils'
+import { accountEntitlements as mockEntitlements } from '@/data/mock'
 import type { Account, User } from '@/types'
 
 // ── Tipos locais ──────────────────────────────────────────────
