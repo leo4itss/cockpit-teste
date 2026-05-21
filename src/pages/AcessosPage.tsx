@@ -773,6 +773,7 @@ export function AcessosPage() {
         onClose={() => setShowGrupoDetailSheet(false)}
         grupo={selectedGrupo}
         accountId={accountId}
+        onUpdate={updated => setGrupos(prev => prev.map(g => g.id === updated.id ? updated : g))}
       />
 
       {/* Sheet — Instâncias */}
