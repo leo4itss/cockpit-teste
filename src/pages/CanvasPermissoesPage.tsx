@@ -741,8 +741,28 @@ export default function CanvasPermissoesPage() {
           instMembros:  Object.fromEntries(imEntries),
           allUsers: allUsers as any[],
         })
-      } catch (e) { console.error(e) }
-      finally    { setLoading(false) }
+      } catch (e) {
+        console.error(e)
+        // Fallback mock para quando o Neon está hibernando
+        const accMock     = mockAccounts.find(a => a.id === accountId) ?? null
+        const membroIds   = accountMembrosIds[accountId!] ?? []
+        const membrosMock = mockUsers.filter(u => membroIds.includes(u.id))
+        const gruposMock  = mockGrupos.filter(g => g.accountId === accountId)
+        const instsMock   = mockInstancias.filter(i => i.accountId === accountId)
+        if (accMock) {
+          setGraphData({
+            account: accMock,
+            accountMembros: membrosMock,
+            groups:    gruposMock,
+            instances: instsMock,
+            components: [],
+            grupoMembros: {},
+            instMembros:  {},
+            allUsers: membrosMock,
+          })
+        }
+      }
+      finally { setLoading(false) }
     }
     load()
   }, [accountId, refreshKey])
