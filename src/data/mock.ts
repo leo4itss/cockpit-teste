@@ -1076,3 +1076,11 @@ export const instancias: Instancia[] = [
     qtdMembros:   2,
   },
 ]
+
+// ── Entitlements (capacidades ativas por conta) — fallback local ──
+// accountId → capability[]
+export const accountEntitlements: Record<string, string[]> = {
+  'acc-comgas': ['assistant.use', 'knowledge_base.use'],
+  'a1':         ['assistant.use', 'knowledge_base.use', 'analytics.use'],
+  'a2':         ['assistant.use'],
+}
