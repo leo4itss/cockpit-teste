@@ -267,10 +267,15 @@ export function AcessosPage() {
   const [selectedGrupo, setSelectedGrupo]                   = useState<Grupo | null>(null)
 
   useEffect(() => {
-    api.getGrupos({ orgId: ORG_ID_POC, accountId })
+    // Para Account Admin puro, derivamos o orgId da conta selecionada (allAccounts)
+    const orgIdForGrupos = effectiveOrgId
+      || allAccounts.find(a => a.id === accountId)?.orgId
+      || ''
+    if (!orgIdForGrupos && !accountId) return
+    api.getGrupos({ orgId: orgIdForGrupos, accountId })
       .then(data => { setGrupos(data); setLoadingGrupos(false) })
       .catch(() => setLoadingGrupos(false))
-  }, [accountId])
+  }, [accountId, effectiveOrgId, allAccounts])
 
   const filteredGrupos = useMemo(() => {
     const q = searchGrupos.toLowerCase()
