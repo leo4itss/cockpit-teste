@@ -764,7 +764,7 @@ function CanvasOrgInner() {
             const ativos = accs.filter((a: any) => !a.deletedAt)
             const virtualOrg = { id: 'all', name: 'Plataforma', razaoSocial: '' }
             setAllOrgs([virtualOrg])
-            if (!searchParams.get('org')) setOrgId('all')
+            if (!orgId) setOrgIdRaw('all')
             setAccounts(ativos)
           })
           .catch(() => {})
