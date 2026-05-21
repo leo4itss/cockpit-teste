@@ -747,26 +747,26 @@ function CanvasOrgInner() {
   const [instanciaSheet, setInstSheet]  = useState<{ inst: any; accountId: string } | null>(null)
   const [permissoesSheet,setPermSheet]  = useState<any>(null)
 
-  // Carrega orgs
+  // Carrega orgs (roda uma vez; preserva orgId da URL se já existir)
   useEffect(() => {
     api.getOrganizations()
       .then((orgs: any[]) => {
         const ativas = orgs.filter((o: any) => o.status !== 'Inativo')
         setAllOrgs(ativas)
-        if (ativas.length > 0) {
+        // Só define orgId se a URL ainda não tiver um (preserva navegação anterior)
+        if (ativas.length > 0 && !searchParams.get('org')) {
           setOrgId(ativas[0].id)
-        } else {
+        } else if (ativas.length === 0) {
           setLoadingOrg(false)
         }
       })
       .catch(() => {
-        // Fallback: carrega todas as contas diretamente
         api.getAccounts()
           .then((accs: any[]) => {
             const ativos = accs.filter((a: any) => !a.deletedAt)
             const virtualOrg = { id: 'all', name: 'Plataforma', razaoSocial: '' }
             setAllOrgs([virtualOrg])
-            setOrgId('all')
+            if (!searchParams.get('org')) setOrgId('all')
             setAccounts(ativos)
           })
           .catch(() => {})
