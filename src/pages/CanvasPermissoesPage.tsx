@@ -28,6 +28,13 @@ import { api } from '@/api/client'
 import { useIsPlatformAdmin, useIsOrgAdmin } from '@/authz'
 import { useAdminAccountId, useAdminOrgId } from '@/authz/hooks'
 import { useSessionState } from '@/hooks/useSessionState'
+import {
+  accounts  as mockAccounts,
+  users     as mockUsers,
+  grupos    as mockGrupos,
+  instancias as mockInstancias,
+  accountMembrosIds,
+} from '@/data/mock'
 import { InstanciaDetailSheet } from '@/components/instancias/InstanciaDetailSheet'
 import { AtribuirPermissoesSheet } from '@/components/permissoes/AtribuirPermissoesSheet'
 // import { cn } from '@/lib/utils'
