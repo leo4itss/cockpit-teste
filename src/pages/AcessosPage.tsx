@@ -214,6 +214,16 @@ export function AcessosPage() {
     }
   }
 
+  async function handleActivateUser(user: User) {
+    const ativado: User = { ...user, status: 'Ativo' }
+    try {
+      const saved = await api.updateUser(user.id, ativado)
+      setUsers(p => p.map(u => u.id === saved.id ? saved : u))
+    } catch {
+      setUsers(p => p.map(u => u.id === user.id ? ativado : u))
+    }
+  }
+
   async function handleDeleteUser() {
     if (!selectedUser) return
     try { await api.deleteUser(selectedUser.id) } catch { /* silencioso */ }
