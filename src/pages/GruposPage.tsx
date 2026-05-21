@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import { Plus, Search, Ellipsis, Eye, Trash2 } from 'lucide-react'
+import { Plus, Search, Ellipsis, Eye, Trash2, Building2, Building } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Popover } from '@/components/ui/Popover'
