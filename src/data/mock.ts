@@ -965,6 +965,19 @@ export const instanciaMembros: InstanciaMembro[] = [
   // inst-dash-ops: grupo AQ (viewer); Marcelo (member)
   { id: 'im-dash-aq',      instanciaId: 'inst-dash-ops',        entidadeTipo: 'group', entidadeId: 'grp-comgas-aq',   papel: 'viewer', assignedAt: '01/01/2026', displayName: 'Analistas de Qualidade' },
   { id: 'im-dash-marcelo', instanciaId: 'inst-dash-ops',        entidadeTipo: 'user',  entidadeId: 'usr-marcelo-c',   papel: 'member', assignedAt: '01/01/2026', displayName: 'Marcelo Ribeiro',   email: 'marcelo.ribeiro@comgas.com.br' },
+  // ── Apple — inst-apple-assist: grupo Designers (admin); Pedro e Rafael (member) ──
+  { id: 'im-apass-design', instanciaId: 'inst-apple-assist', entidadeTipo: 'group', entidadeId: 'grp-apple-design', papel: 'admin',  assignedAt: '01/02/2026', displayName: 'Designers' },
+  { id: 'im-apass-pedro',  instanciaId: 'inst-apple-assist', entidadeTipo: 'user',  entidadeId: 'usr-pedro',        papel: 'member', assignedAt: '01/02/2026', displayName: 'Pedro Alves',  email: 'pedro.alves@appletecgo.com.br' },
+  { id: 'im-apass-rafael', instanciaId: 'inst-apple-assist', entidadeTipo: 'user',  entidadeId: 'usr-rafael',       papel: 'viewer', assignedAt: '01/02/2026', displayName: 'Rafael Torres', email: 'rafael.torres@appletecgo.com.br' },
+  // ── Apple — inst-apple-kb: grupo Desenvolvedores (member) ─────
+  { id: 'im-akb-dev',      instanciaId: 'inst-apple-kb',     entidadeTipo: 'group', entidadeId: 'grp-apple-dev',    papel: 'member', assignedAt: '01/02/2026', displayName: 'Desenvolvedores' },
+  { id: 'im-akb-sofia',    instanciaId: 'inst-apple-kb',     entidadeTipo: 'user',  entidadeId: 'usr-sofia',        papel: 'viewer', assignedAt: '01/02/2026', displayName: 'Sofia Mendes',  email: 'sofia.mendes@appletecgo.com.br' },
+  // ── Santacruz — inst-santa-assist: grupo Farmacêuticos (member) ──
+  { id: 'im-sast-farma',   instanciaId: 'inst-santa-assist', entidadeTipo: 'group', entidadeId: 'grp-santa-farma',  papel: 'member', assignedAt: '01/02/2026', displayName: 'Farmacêuticos' },
+  { id: 'im-sast-thiago',  instanciaId: 'inst-santa-assist', entidadeTipo: 'user',  entidadeId: 'usr-thiago',       papel: 'viewer', assignedAt: '01/02/2026', displayName: 'Thiago Martins', email: 'thiago.martins@santacruz.com.br' },
+  // ── Santacruz — inst-santa-dash: grupo Vendas (member); Lucas (viewer) ──
+  { id: 'im-sdash-vendas', instanciaId: 'inst-santa-dash',   entidadeTipo: 'group', entidadeId: 'grp-santa-vendas', papel: 'member', assignedAt: '01/02/2026', displayName: 'Equipe de Vendas' },
+  { id: 'im-sdash-lucas',  instanciaId: 'inst-santa-dash',   entidadeTipo: 'user',  entidadeId: 'usr-lucas',        papel: 'viewer', assignedAt: '01/02/2026', displayName: 'Lucas Oliveira', email: 'lucas.oliveira@santacruz.com.br' },
 ]
 
 // ── Instâncias — fallback local para cenário Docnix/Comgas ─────
