@@ -882,13 +882,7 @@ function CanvasOrgInner() {
 
   const onPaneClick = useCallback(() => setSelected(null), [])
 
-  const currentOrg = allOrgs.find(o => o.id === orgId) ?? (accounts.length > 0 ? { id: 'virtual', name: 'Plataforma', razaoSocial: '', qtdUsuarios: '…' } : null)
-
-  if (!currentOrg && !loadingOrg) return (
-    <div className="flex items-center justify-center flex-1" style={{ background: theme.canvasBg }}>
-      <Loader2 className="w-8 h-8 animate-spin" style={{ color: theme.panelMuted }} />
-    </div>
-  )
+  const currentOrg = allOrgs.find(o => o.id === orgId) ?? null
 
   return (
     <VisualizerThemeContext.Provider value={theme}>
