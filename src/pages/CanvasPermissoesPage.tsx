@@ -477,7 +477,7 @@ function GrupoPanel({ grupoId, graphData, accountId, theme, onClose, onRefresh, 
 }
 
 // Painel de Usuário
-function UsuarioPanel({ userId, graphData, accountId, theme, onClose, onRefresh, onOpenPermissoes }: {
+function UsuarioPanel({ userId, graphData, accountId, theme, onClose, onRefresh: _onRefresh, onOpenPermissoes }: {
   userId: string; graphData: GraphData; accountId: string; theme: VisualizerTheme
   onClose: () => void; onRefresh: () => void; onOpenPermissoes: (opts: any) => void
 }) {
