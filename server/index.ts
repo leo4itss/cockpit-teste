@@ -586,13 +586,22 @@ app.post('/api/componentes/validate-metadata', async (c) => {
 app.get('/api/grupos', async (c) => {
   const { orgId, accountId } = c.req.query()
   try {
-    // Busca todos os grupos (filtro aplicado em memória para simplicidade no PoC)
-    const rows = await db.select().from(grupos)
+    // Busca todos os grupos e todas as contas (filtro em memória — PoC)
+    const [rows, allAccounts] = await Promise.all([
+      db.select().from(grupos),
+      db.select().from(accounts),
+    ])
 
     const filtered = rows.filter((g: any) => {
       if (orgId && accountId) return g.orgId === orgId || g.accountId === accountId
-      if (orgId)              return g.orgId === orgId
-      if (accountId)          return g.accountId === accountId
+      if (orgId) {
+        // Inclui grupos escopo=org E grupos escopo=conta de contas pertencentes à org
+        const orgAccountIds = allAccounts
+          .filter((a: any) => a.orgId === orgId)
+          .map((a: any) => a.id)
+        return g.orgId === orgId || orgAccountIds.includes(g.accountId)
+      }
+      if (accountId) return g.accountId === accountId
       return true
     })
 
