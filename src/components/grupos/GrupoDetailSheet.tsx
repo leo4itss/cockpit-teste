@@ -302,8 +302,9 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
 
   async function handleSavePapel(novoPapel: string) {
     if (!grupo) return
-    // Optimistic update: atualiza localmente antes da confirmação da API
+    // Optimistic update: atualiza localmente e propaga para a lista pai
     setLocalPapel(novoPapel)
+    onUpdate?.({ ...grupo, papel: novoPapel })
     try {
       await api.updateGrupo(grupo.id, {
         nome:      grupo.nome,
