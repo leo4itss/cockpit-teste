@@ -538,6 +538,25 @@ export const contracts: Contract[] = [
     renovacao: 'Anual',
     status: 'Ativo',
   },
+  // ── Atlas ↔ Comgas — fallback local para cenário Docnix ──────────────
+  {
+    id: 'ctr-atlas-comgas',
+    orgId: 'org-docnix',
+    contratante: 'Comgas S.A.',
+    objetos: [
+      {
+        solucao: 'Atlas',
+        orgContratada: 'Docnix',
+        plano: 'Atlas Enterprise',
+        licenciamento: '50 Usuários nominais',
+        qtdContratada: 50,
+      },
+    ],
+    dataInicio: '01/01/2026',
+    dataTermino: '31/12/2026',
+    renovacao: 'Anual',
+    status: 'Ativo',
+  },
 ]
 
 export const users: User[] = [
