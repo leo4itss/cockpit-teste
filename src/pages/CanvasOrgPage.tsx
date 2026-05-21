@@ -792,17 +792,9 @@ function CanvasOrgInner() {
       .finally(() => setLoadingOrg(false))
   }, [orgId])
 
-  // Expande/recolhe conta
-  async function toggleAccount(accountId: string) {
-    if (expandedId === accountId) {
-      setExpandedId(null)
-      setSelected(null)
-      return
-    }
-    setExpandedId(accountId)
-    setSelected(null)
+  // Carrega dados de uma conta (compartilhado entre toggleAccount e restauração via URL)
+  async function loadAccountData(accountId: string) {
     if (accountDataCache[accountId]) return // já em cache
-
     setLoadingId(accountId)
     try {
       const [membros, grupos, instances, components] = await Promise.all([
@@ -820,7 +812,6 @@ function CanvasOrgInner() {
         )),
       ])
       const allUsers = await api.getUsers().catch(() => [])
-
       setAccountDataCache(prev => ({
         ...prev,
         [accountId]: {
@@ -835,6 +826,25 @@ function CanvasOrgInner() {
       }))
     } catch (e) { console.error(e) }
     finally     { setLoadingId(null) }
+  }
+
+  // Restaura conta expandida da URL ao retornar para a página
+  useEffect(() => {
+    if (!expandedId || accountDataCache[expandedId] || loadingId) return
+    if (!accounts.some(a => a.id === expandedId)) return
+    loadAccountData(expandedId)
+  }, [accounts, expandedId])
+
+  // Expande/recolhe conta
+  async function toggleAccount(accountId: string) {
+    if (expandedId === accountId) {
+      setExpandedId(null)
+      setSelected(null)
+      return
+    }
+    setExpandedId(accountId)
+    setSelected(null)
+    loadAccountData(accountId)
   }
 
   // Recarrega dados de uma conta (após add/remove membro)
