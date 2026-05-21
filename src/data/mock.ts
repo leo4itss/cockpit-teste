@@ -934,9 +934,16 @@ export const accountMembrosIds: Record<string, string[]> = {
 // ── Membros de grupo — fallback local ─────────────────────────
 // grupoId → User[] (espelha usuario_grupos do seed-docnix.ts step 7).
 export const grupoMembrosMap: Record<string, string[]> = {
-  'grp-comgas-aq':   ['usr-fernando', 'usr-marcelo-c', 'usr-neide'],  // Analistas de Qualidade
-  'grp-comgas-vend': ['usr-marcelo-c', 'usr-leo'],                    // Vendedores
-  'grp-comgas-forn': ['usr-neide', 'usr-leo'],                        // Fornecedores
+  // Comgas (Docnix)
+  'grp-comgas-aq':    ['usr-fernando', 'usr-marcelo-c', 'usr-neide'],
+  'grp-comgas-vend':  ['usr-marcelo-c', 'usr-leo'],
+  'grp-comgas-forn':  ['usr-neide', 'usr-leo'],
+  // Apple (Org Admin)
+  'grp-apple-dev':    ['usr-pedro', 'usr-rafael'],
+  'grp-apple-design': ['usr-sofia', 'usr-julia'],
+  // Santacruz (Account Admin)
+  'grp-santa-farma':  ['usr-lucas', 'usr-beatriz'],
+  'grp-santa-vendas': ['usr-beatriz', 'usr-thiago'],
 }
 
 // ── Membros de instância — fallback local ──────────────────────
