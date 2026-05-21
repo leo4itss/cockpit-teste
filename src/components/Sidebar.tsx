@@ -152,11 +152,12 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
             )}
           </div>
 
-          {/* ── Schema Visualizer (Platform Admin only) ── */}
+          {/* ── Canvas + Schema (Platform Admin only) ── */}
           {isPlatformAdmin && (
             <>
               <SectionLabel label="Desenvolvedor" collapsed={collapsed} />
               <div className="flex flex-col gap-1">
+                <NavItem to="/canvas" icon={GitFork} label="Canvas" collapsed={collapsed} />
                 <NavItem to="/schema" icon={Network} label="Schema" collapsed={collapsed} />
               </div>
             </>
