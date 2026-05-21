@@ -24,8 +24,12 @@ export const mockFGARelations: FGARelations = {
   // Ana (id='2'): org_admin da Org '1' (Apple).
   // → pode gerenciar contas, usuários, grupos e contratos da Apple.
   // → também é account_admin da conta 'a1' (herdado do papel de Org Admin no PoC).
+  // Marcelo Ribeiro (id='usr-marcelo-c'): org_admin da Org 'org-docnix' (Docnix).
+  // → gerencia a conta Comgas (acc-comgas) com usuários Fernando, Neide, Leo.
+  // → solução Atlas com funcionalidade Chat e Assistente Vanessa IA.
   orgAdmins: [
-    { userId: '2', orgId: '1' },
+    { userId: '2',            orgId: '1'          },
+    { userId: 'usr-marcelo-c', orgId: 'org-docnix' },
   ],
 
   // ── PAS Architect ────────────────────────────────────────────
