@@ -153,7 +153,9 @@ export function AtribuirPermissoesSheet({
     const modoInstancia = !!instanciaId
 
     const entitlementsFetch: Promise<any[]> = accountId
-      ? api.getEntitlements(accountId).catch(() => [])
+      ? api.getEntitlements(accountId).catch(() =>
+          (mockEntitlements[accountId] ?? []).map(cap => ({ capability: cap }))
+        )
       : Promise.resolve([])
 
     Promise.all([
