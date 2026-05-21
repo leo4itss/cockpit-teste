@@ -686,9 +686,10 @@ export default function CanvasPermissoesPage() {
   const [nodes, setNodes, onNodesChange] = useNodesState([])
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
 
-  // Carrega contas
+  // Carrega contas — Org Admin só vê contas da sua org
   useEffect(() => {
-    api.getAccounts().then(acc => {
+    const orgFilter = (!isPlatformAdmin && isOrgAdmin && adminOrgId) ? adminOrgId : undefined
+    api.getAccounts(orgFilter).then(acc => {
       const ativos = (acc as any[]).filter(a => !a.deletedAt)
       setAllAccounts(ativos)
       if (!accountId) setAccountId(defaultAccId ?? ativos[0]?.id ?? null)
