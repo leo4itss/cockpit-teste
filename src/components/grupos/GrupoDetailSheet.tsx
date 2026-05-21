@@ -64,6 +64,7 @@ const PAPEIS_OPCOES = [
 ]
 
 // Badge estático — usado quando não está editando
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function PapelBadge({ papel }: { papel?: string }) {
   const opt = PAPEIS_OPCOES.find(p => p.value === papel)
   if (!opt) return null
