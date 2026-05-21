@@ -927,6 +927,8 @@ export const grupos: Grupo[] = [
 // Mapeamento accountId → IDs dos usuários membros (espelha user_account_memberships).
 export const accountMembrosIds: Record<string, string[]> = {
   'acc-comgas': ['usr-fernando', 'usr-marcelo-c', 'usr-neide', 'usr-leo'],
+  'a1':         ['2', 'usr-pedro', 'usr-sofia', 'usr-rafael', 'usr-julia'],  // Apple: Ana + 4 membros
+  'a2':         ['4', 'usr-lucas', 'usr-beatriz', 'usr-thiago'],             // Santacruz: Carla + 3 membros
 }
 
 // ── Membros de grupo — fallback local ─────────────────────────
