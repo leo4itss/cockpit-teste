@@ -326,13 +326,24 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
   return (
     <NestedSheet open={open} onClose={handleClose} width="w-[600px]">
       <NestedSheetHeader onClose={handleClose}>
-        <div className="flex items-center gap-2 mb-1">
+        <div className="flex items-center gap-2 mb-1 flex-wrap">
           <EscopoBadge escopo={grupo.escopo} />
           <PapelEditor papel={localPapel} onSave={handleSavePapel} />
         </div>
         <NestedSheetTitle>{grupo.nome}</NestedSheetTitle>
         {grupo.descricao && (
           <NestedSheetDescription>{grupo.descricao}</NestedSheetDescription>
+        )}
+        {accountNome && (
+          <div className="flex items-center gap-1.5 mt-2">
+            {contextoLabel === 'Org'
+              ? <Building  className="w-3 h-3 text-[#9ca3af] shrink-0" />
+              : <Building2 className="w-3 h-3 text-[#9ca3af] shrink-0" />}
+            <span className="text-xs text-[#6b7280]">
+              <span className="text-[#9ca3af]">{contextoLabel ?? 'Conta'}:</span>{' '}
+              <span className="font-medium text-[#374151]">{accountNome}</span>
+            </span>
+          </div>
         )}
       </NestedSheetHeader>
 
