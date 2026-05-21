@@ -495,11 +495,9 @@ export const solutions: Solution[] = [
     componenteIds: ['comp-assistente-ia'],
     plans: [
       {
-        id: 'plan-atlas-1',
         name: 'Atlas Enterprise',
         description: 'Plano completo com chat ilimitado e assistentes dedicados',
         statusVersao: 'ativo',
-        createdAt: '01/01/2026',
         licensings: [
           {
             tipoLicencaId: 'tl-1',
