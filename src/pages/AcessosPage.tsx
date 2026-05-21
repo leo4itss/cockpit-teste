@@ -114,6 +114,13 @@ export function AcessosPage() {
   // accountId efetivo
   const accountId = isAccountAdminOnly ? (rawAccountId ?? '') : selectedAccountId
 
+  // orgId efetivo — derivado do papel do usuário logado
+  const effectiveOrgId = isPlatformAdmin
+    ? selectedOrgId
+    : isOrgAdmin
+      ? (adminOrgId ?? '')
+      : ''   // Account Admin: orgId vem da conta (ver busca de grupos abaixo)
+
   // Nome da conta — para o header (Account Admin puro)
   const [accountNome, setAccountNome] = useState<string | null>(null)
   useEffect(() => {
