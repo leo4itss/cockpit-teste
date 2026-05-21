@@ -251,8 +251,10 @@ export function InstanciaDetailSheet({
 
   const canManage = useCanManageInstanciaMembros(instancia?.id ?? '', accountId)
 
+  // Só rebusca quando a instância ou conta muda — não ao abrir/fechar.
+  // Isso preserva edições locais (ex.: mudança de papel) ao fechar e reabrir a mesma instância.
   useEffect(() => {
-    if (!open || !instancia) return
+    if (!instancia) return
     setLoading(true)
     setShowAdd(false)
 
@@ -273,7 +275,7 @@ export function InstanciaDetailSheet({
       setAllGrupos(mockGrupos.filter(g => g.accountId === accountId))
       setLoading(false)
     })
-  }, [open, instancia?.id, accountId])
+  }, [instancia?.id, accountId])
 
   async function handleAdd(entidadeTipo: 'user' | 'group', entidadeId: string, displayName: string, papel: string) {
     if (!instancia) return
