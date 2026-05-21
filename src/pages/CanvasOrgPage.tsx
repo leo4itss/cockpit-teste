@@ -728,7 +728,7 @@ function CanvasOrgInner() {
   const [allOrgs,    setAllOrgs]   = useState<any[]>([])
   const [orgId,      setOrgId]     = useState<string | null>(null)
   const [accounts,   setAccounts]  = useState<any[]>([])
-  const [loadingOrg, setLoadingOrg]= useState(false)
+  const [loadingOrg, setLoadingOrg]= useState(true)
 
   const [expandedId,       setExpandedId]       = useState<string | null>(null)
   const [loadingId,        setLoadingId]         = useState<string | null>(null)
