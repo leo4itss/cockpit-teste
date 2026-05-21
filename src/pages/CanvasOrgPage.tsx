@@ -726,16 +726,14 @@ function CanvasOrgInner() {
   const isOrgAdmin      = useIsOrgAdmin()
   const { theme, mode, toggle } = useVisualizerTheme()
 
-  // orgId e expandedId ficam na URL para sobreviver à navegação entre abas
-  const [searchParams, setSearchParams] = useSearchParams()
-  const orgId      = searchParams.get('org')
-  const expandedId = searchParams.get('expanded')
+  // orgId e expandedId persistem no sessionStorage para sobreviver à navegação entre abas
+  const [orgId,      setOrgIdRaw]      = useSessionState<string | null>('canvas-org-orgId', null)
+  const [expandedId, setExpandedId]    = useSessionState<string | null>('canvas-org-expandedId', null)
 
-  const setOrgId = (id: string) =>
-    setSearchParams(p => { p.set('org', id); p.delete('expanded'); return p }, { replace: true })
-
-  const setExpandedId = (id: string | null) =>
-    setSearchParams(p => { if (id) p.set('expanded', id); else p.delete('expanded'); return p }, { replace: true })
+  const setOrgId = useCallback((id: string) => {
+    setOrgIdRaw(id)
+    setExpandedId(null)
+  }, [setOrgIdRaw, setExpandedId])
 
   const [allOrgs,    setAllOrgs]   = useState<any[]>([])
   const [accounts,   setAccounts]  = useState<any[]>([])
