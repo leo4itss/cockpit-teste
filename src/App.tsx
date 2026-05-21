@@ -13,6 +13,7 @@ import { GruposPage } from './pages/GruposPage'
 import { UsuariosPage } from './pages/UsuariosPage'
 import { ContasPage } from './pages/ContasPage'
 import SchemaVisualizerPage from './pages/SchemaVisualizerPage'
+import CanvasPermissoesPage from './pages/CanvasPermissoesPage'
 
 export default function App() {
   return (
