@@ -364,13 +364,23 @@ export function UsuariosPage() {
                         <Popover
                           content={
                             <div className="flex flex-col gap-1 min-w-[160px]">
-                              <button
-                                onClick={() => handleInactivate(user)}
-                                className="flex items-center gap-2 w-full px-3 py-2 text-sm font-medium text-[#030712] hover:bg-gray-100 rounded-md transition-colors text-left"
-                              >
-                                <UserX className="w-4 h-4 shrink-0" />
-                                Inativar usuário
-                              </button>
+                              {user.status === 'Ativo' ? (
+                                <button
+                                  onClick={() => handleInactivate(user)}
+                                  className="flex items-center gap-2 w-full px-3 py-2 text-sm font-medium text-[#030712] hover:bg-gray-100 rounded-md transition-colors text-left"
+                                >
+                                  <UserX className="w-4 h-4 shrink-0" />
+                                  Inativar usuário
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => handleActivate(user)}
+                                  className="flex items-center gap-2 w-full px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-50 rounded-md transition-colors text-left"
+                                >
+                                  <UserCheck className="w-4 h-4 shrink-0" />
+                                  Ativar usuário
+                                </button>
+                              )}
                             </div>
                           }
                         >
