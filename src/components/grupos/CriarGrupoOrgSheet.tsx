@@ -71,17 +71,31 @@ const PAPEIS = [
   { value: 'Admin',  label: 'Administrador', desc: 'Acesso completo à gestão' },
 ]
 
-export function CriarGrupoOrgSheet({ open, onClose, orgId, contas, onSuccess }: Props) {
+export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, isPlatformAdmin, onSuccess }: Props) {
   const [nome, setNome]                         = useState('')
   const [descricao, setDescricao]               = useState('')
   const [papel, setPapel]                       = useState('User')
   const [escopo, setEscopo]                     = useState<'org' | 'conta'>('org')
+  const [orgSelecionada, setOrgSelecionada]     = useState('')   // só usado quando isPlatformAdmin + escopo='org'
   const [contaSelecionada, setContaSelecionada] = useState('')
   const [searchMembro, setSearchMembro]         = useState('')
   const [allUsers, setAllUsers]                 = useState<User[]>([])
   const [membros, setMembros]                   = useState<User[]>([])
   const [saving, setSaving]                     = useState(false)
   const [error, setError]                       = useState<string | null>(null)
+
+  // Contas agrupadas por org (para o optgroup do select)
+  const contasPorOrg = useMemo(() => {
+    const map: Record<string, { orgNome: string; contas: Account[] }> = {}
+    for (const c of contas) {
+      if (!map[c.orgId]) {
+        const org = orgs.find(o => o.id === c.orgId)
+        map[c.orgId] = { orgNome: org?.name ?? c.orgId, contas: [] }
+      }
+      map[c.orgId].contas.push(c)
+    }
+    return Object.values(map)
+  }, [contas, orgs])
 
   useEffect(() => {
     if (!open) return
