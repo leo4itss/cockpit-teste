@@ -3,8 +3,9 @@
  *
  * IDs alinhados com src/data/mock.ts e server/seed.ts:
  *   Orgs:     '1'=Apple  '2'=Santacruz  '3'=Margatastiltda  '4'=Nadapedra  '5'=Agropocereal
- *   Accounts: 'a1'=Apple 'a2'=Santacruz 'a3'=Margatastiltda ...
- *   Users:    '1'=Leonardo  '2'=Ana  '3'=Marcelo  '4'=Carla
+ *             'org-docnix'=Docnix
+ *   Accounts: 'a1'=Apple 'a2'=Santacruz 'a3'=Margatastiltda ... 'acc-comgas'=Comgas (Docnix)
+ *   Users:    '1'=Leonardo  '2'=Ana  '3'=Marcelo  '4'=Carla  'usr-marcelo-c'=Marcelo Ribeiro
  *
  * Não existe em produção — apenas para demonstração do PoC.
  */
