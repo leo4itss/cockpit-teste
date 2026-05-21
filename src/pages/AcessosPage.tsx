@@ -77,32 +77,52 @@ export function AcessosPage() {
   // Account Admin puro: não é nem Org Admin nem Platform Admin
   const isAccountAdminOnly = isAccountAdmin && !isOrgAdmin && !isPlatformAdmin
 
-  // Para Platform Admin / Org Admin: seletor de conta persistido em sessionStorage
+  // Seletor persistido em sessionStorage
+  const [selectedOrgId,     setSelectedOrgId]     = useSessionState<string>('acessos-orgId', '')
   const [selectedAccountId, setSelectedAccountId] = useSessionState<string>('acessos-accountId', '')
-  const [allAccounts, setAllAccounts]             = useState<any[]>([])
 
-  // Carrega contas disponíveis para o seletor (Org Admin e Platform Admin sempre usam seletor)
+  const [allOrgs,     setAllOrgs]     = useState<any[]>([])
+  const [allAccounts, setAllAccounts] = useState<any[]>([])
+
+  // Platform Admin: carrega todas as orgs
   useEffect(() => {
-    if (isAccountAdminOnly) return  // Account Admin puro tem conta fixada
-    const orgFilter = (!isPlatformAdmin && isOrgAdmin && adminOrgId) ? adminOrgId : undefined
-    api.getAccounts(orgFilter)
-      .then((accs: any[]) => setAllAccounts(accs.filter(a => !a.deletedAt)))
+    if (!isPlatformAdmin) return
+    api.getOrganizations()
+      .then((orgs: any[]) => setAllOrgs(orgs.filter(o => o.status !== 'Inativo')))
       .catch(() => {})
-  }, [isAccountAdminOnly, isPlatformAdmin, isOrgAdmin, adminOrgId])
+  }, [isPlatformAdmin])
 
-  // accountId efetivo:
-  //   Account Admin puro → conta fixada via rawAccountId
-  //   Org Admin / Platform Admin → conta escolhida no seletor
+  // Carrega contas:
+  //   Platform Admin → filtra pela org selecionada (quando há uma)
+  //   Org Admin      → sempre filtra pela sua org
+  useEffect(() => {
+    if (isAccountAdminOnly) return
+    const orgFilter = isPlatformAdmin
+      ? (selectedOrgId || undefined)
+      : (isOrgAdmin && adminOrgId ? adminOrgId : undefined)
+    if (isPlatformAdmin && !selectedOrgId) { setAllAccounts([]); return }
+    api.getAccounts(orgFilter)
+      .then((accs: any[]) => {
+        setAllAccounts(accs.filter(a => !a.deletedAt))
+        // se a conta selecionada não pertence mais à org escolhida, limpa
+        if (selectedAccountId && !accs.find(a => a.id === selectedAccountId)) {
+          setSelectedAccountId('')
+        }
+      })
+      .catch(() => {})
+  }, [isAccountAdminOnly, isPlatformAdmin, isOrgAdmin, adminOrgId, selectedOrgId])
+
+  // accountId efetivo
   const accountId = isAccountAdminOnly ? (rawAccountId ?? '') : selectedAccountId
 
-  // Nome da conta — carregado para exibir o contexto da conta no header
+  // Nome da conta — para o header (Account Admin puro)
   const [accountNome, setAccountNome] = useState<string | null>(null)
   useEffect(() => {
-    if (!accountId) return
+    if (!isAccountAdminOnly || !accountId) return
     api.getAccount(accountId)
       .then((acc: any) => setAccountNome(acc?.name ?? null))
       .catch(() => setAccountNome(null))
-  }, [accountId])
+  }, [isAccountAdminOnly, accountId])
 
   function setAba(aba: Aba) {
     setSearchParams({ aba }, { replace: true })
