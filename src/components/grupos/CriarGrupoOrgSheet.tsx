@@ -124,9 +124,12 @@ export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, isPlatf
     setMembros(prev => prev.filter(m => m.id !== userId))
   }
 
+  // orgId efetivo: Platform Admin escolhe; demais usam o orgId recebido via prop
+  const orgIdEfetivo = isPlatformAdmin ? orgSelecionada : orgId
+
   const canSave =
     nome.trim().length > 0 &&
-    (escopo === 'org' || contaSelecionada !== '')
+    (escopo === 'conta' ? contaSelecionada !== '' : orgIdEfetivo !== '')
 
   async function handleSave() {
     if (!canSave) return
@@ -141,7 +144,7 @@ export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, isPlatf
         descricao: descricao.trim() || null,
         papel,
         escopo,
-        orgId:     escopo === 'org'   ? orgId             : null,
+        orgId:     escopo === 'org'   ? orgIdEfetivo      : null,
         accountId: escopo === 'conta' ? contaSelecionada  : null,
         status:    'Ativo',
         createdAt: now,
