@@ -165,7 +165,7 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
                   </>
                 )}
                 {isOrgAdmin && !isPlatformAdmin && (
-                  <NavItem to="/canvas" icon={GitMerge} label="Canvas" collapsed={collapsed} />
+                  <NavItem to="/canvas" icon={GitFork} label="Canvas" collapsed={collapsed} />
                 )}
               </div>
             </>
