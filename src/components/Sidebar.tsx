@@ -152,19 +152,26 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
             )}
           </div>
 
-          {/* ── Canvas + Schema (Platform Admin only) ── */}
-          {isPlatformAdmin && (
+          {/* ── Visualização (Platform Admin: Canvas Org + Canvas + Schema; Org Admin: Canvas) ── */}
+          {(isPlatformAdmin || (isOrgAdmin && !isPlatformAdmin)) && (
             <>
               <SectionLabel label="Visualização" collapsed={collapsed} />
               <div className="flex flex-col gap-1">
-                <NavItem to="/canvas-org" icon={Globe2}  label="Canvas Org"  collapsed={collapsed} />
-                <NavItem to="/canvas"     icon={GitFork} label="Canvas"      collapsed={collapsed} />
-                <NavItem to="/schema"     icon={Network} label="Schema"      collapsed={collapsed} />
+                {isPlatformAdmin && (
+                  <>
+                    <NavItem to="/canvas-org" icon={Globe2}  label="Canvas Org"  collapsed={collapsed} />
+                    <NavItem to="/canvas"     icon={GitFork} label="Canvas"      collapsed={collapsed} />
+                    <NavItem to="/schema"     icon={Network} label="Schema"      collapsed={collapsed} />
+                  </>
+                )}
+                {isOrgAdmin && !isPlatformAdmin && (
+                  <NavItem to="/canvas" icon={GitMerge} label="Canvas" collapsed={collapsed} />
+                )}
               </div>
             </>
           )}
 
-          {/* ── Grupo: organização (Platform Admin + Org Admin) ── */}
+          {/* ── Organização (Platform Admin + Org Admin) ── */}
           {(showUsuarios || showContas) && (
             <>
               <SectionLabel label="Organização" collapsed={collapsed} />
@@ -174,10 +181,6 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
                 )}
                 {showContas && (
                   <NavItem to="/contas" icon={Landmark} label="Contas" collapsed={collapsed} />
-                )}
-                {/* Canvas visível para Org Admin (sem acesso a "Desenvolvedor") */}
-                {isOrgAdmin && !isPlatformAdmin && (
-                  <NavItem to="/canvas" icon={GitMerge} label="Canvas" collapsed={collapsed} />
                 )}
               </div>
             </>
