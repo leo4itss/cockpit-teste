@@ -180,6 +180,20 @@ export function UsuarioDetailOrgSheet({
     onVincularSuccess(user.id, { account, papel: 'member' })
   }
 
+  async function handleTogglePapel(accountId: string, papelAtual: 'member' | 'account_admin') {
+    if (!user) return
+    const novoPapel: 'member' | 'account_admin' = papelAtual === 'account_admin' ? 'member' : 'account_admin'
+    const label = novoPapel === 'account_admin' ? 'promover a Account Admin' : 'rebaixar a Member'
+    if (!confirm(`Deseja ${label} este usuário na conta selecionada?`)) return
+    setChangingPapelId(accountId)
+    try {
+      await api.addAccountMembro(accountId, { userId: user.id, papel: novoPapel })
+      onPapelChange?.(user.id, accountId, novoPapel)
+    } finally {
+      setChangingPapelId(null)
+    }
+  }
+
   if (!user) return null
 
   return (
