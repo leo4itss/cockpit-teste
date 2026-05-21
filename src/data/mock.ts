@@ -877,6 +877,54 @@ export const grupos: Grupo[] = [
   },
 ]
 
+  // ── Grupos da Apple (cenário Org Admin) ──────────────────────
+  {
+    id:         'grp-apple-dev',
+    nome:       'Desenvolvedores',
+    descricao:  'Equipe de desenvolvimento de produto. Acesso ao Assistente de Design e à base de conhecimento técnica.',
+    escopo:     'conta',
+    accountId:  'a1',
+    papel:      'User',
+    status:     'Ativo',
+    createdAt:  '01/02/2026',
+    qtdMembros: 2,
+  },
+  {
+    id:         'grp-apple-design',
+    nome:       'Designers',
+    descricao:  'Equipe de UX e design. Acesso completo ao Assistente de Design.',
+    escopo:     'conta',
+    accountId:  'a1',
+    papel:      'User',
+    status:     'Ativo',
+    createdAt:  '01/02/2026',
+    qtdMembros: 2,
+  },
+  // ── Grupos da Santacruz (cenário Account Admin) ───────────────
+  {
+    id:         'grp-santa-farma',
+    nome:       'Farmacêuticos',
+    descricao:  'Profissionais de farmácia. Acesso ao assistente de IA para consultas técnicas.',
+    escopo:     'conta',
+    accountId:  'a2',
+    papel:      'User',
+    status:     'Ativo',
+    createdAt:  '01/02/2026',
+    qtdMembros: 2,
+  },
+  {
+    id:         'grp-santa-vendas',
+    nome:       'Equipe de Vendas',
+    descricao:  'Time comercial. Utiliza o dashboard de analytics para acompanhamento de metas.',
+    escopo:     'conta',
+    accountId:  'a2',
+    papel:      'User',
+    status:     'Ativo',
+    createdAt:  '01/02/2026',
+    qtdMembros: 2,
+  },
+]
+
 // ── Membros por conta — fallback local ─────────────────────────
 // Mapeamento accountId → IDs dos usuários membros (espelha user_account_memberships).
 export const accountMembrosIds: Record<string, string[]> = {
