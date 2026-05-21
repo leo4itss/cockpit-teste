@@ -13,6 +13,13 @@ import { api } from '@/api/client'
 import { useAuthz, useIsPlatformAdmin, useIsOrgAdmin } from '@/authz/hooks'
 import { cn } from '@/lib/utils'
 import type { User, Account } from '@/types'
+import {
+  users     as mockUsers,
+  accounts  as mockAccounts,
+  grupos    as mockGrupos,
+  accountMembrosIds,
+  grupoMembrosMap,
+} from '@/data/mock'
 
 // ── Avatar colorido ───────────────────────────────────────────
 
