@@ -623,7 +623,7 @@ export default function SchemaVisualizerPage() {
               <Controls />
               <MiniMap
                 nodeColor={n => {
-                  const cat = (n.data as TableNodeData).category
+                  const cat = ((n.data as unknown) as TableNodeData).category
                   return cat === 'core' ? '#059669' : cat === 'access' ? '#2563eb' : cat === 'permission' ? '#7c3aed' : '#475569'
                 }}
                 maskColor={theme.minimapMask}
