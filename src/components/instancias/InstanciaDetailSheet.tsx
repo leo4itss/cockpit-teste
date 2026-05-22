@@ -273,7 +273,11 @@ export function InstanciaDetailSheet({
       setMembros(mockInstMembros.filter(m => m.instanciaId === instancia.id))
       const contaIds = accountMembrosIds[accountId] ?? []
       setAllUsers(mockUsers.filter(u => contaIds.includes(u.id)))
-      setAllGrupos(mockGrupos.filter(g => g.accountId === accountId))
+      // Inclui grupos da conta E grupos org-scoped da org à qual a conta pertence
+      const orgIdDaConta = mockAccounts.find(a => a.id === accountId)?.orgId
+      setAllGrupos(mockGrupos.filter(g =>
+        g.accountId === accountId || (orgIdDaConta && g.orgId === orgIdDaConta)
+      ))
       setLoading(false)
     })
   }, [instancia?.id, accountId])
