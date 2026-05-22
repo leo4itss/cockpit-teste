@@ -29,6 +29,7 @@ import type { Instancia, InstanciaMembro, User, Grupo } from '@/types'
 import {
   users          as mockUsers,
   grupos         as mockGrupos,
+  accounts       as mockAccounts,
   accountMembrosIds,
   instanciaMembros as mockInstMembros,
 } from '@/data/mock'
