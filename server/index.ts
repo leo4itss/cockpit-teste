@@ -601,7 +601,12 @@ app.get('/api/grupos', async (c) => {
           .map((a: any) => a.id)
         return g.orgId === orgId || orgAccountIds.includes(g.accountId)
       }
-      if (accountId) return g.accountId === accountId
+      if (accountId) {
+        // Inclui grupos da conta E grupos org-scoped da org à qual a conta pertence
+        const account = allAccounts.find((a: any) => a.id === accountId)
+        const orgIdDaConta = account?.orgId
+        return g.accountId === accountId || (orgIdDaConta && g.orgId === orgIdDaConta)
+      }
       return true
     })
 
