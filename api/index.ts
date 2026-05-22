@@ -448,7 +448,11 @@ app.get('/grupos', async (c) => {
       const orgAccountIds = allAccounts.filter((a: any) => a.orgId === orgId).map((a: any) => a.id)
       return g.orgId === orgId || orgAccountIds.includes(g.accountId)
     }
-    if (accountId) return g.accountId === accountId
+    if (accountId) {
+      const account = allAccounts.find((a: any) => a.id === accountId)
+      const orgIdDaConta = account?.orgId
+      return g.accountId === accountId || (orgIdDaConta && g.orgId === orgIdDaConta)
+    }
     return true
   })
   const membros = await db.select().from(usuarioGrupos)
