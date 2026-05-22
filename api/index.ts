@@ -421,4 +421,305 @@ app.post('/componentes/validate-metadata', async (c) => {
   }
 })
 
+// ── Users/:id/grupos ─────────────────────────────────────────
+app.get('/users/:id/grupos', async (c) => {
+  const userId    = c.req.param('id')
+  const accountId = c.req.query('accountId')
+  const links = await db.select().from(usuarioGrupos).where(eq(usuarioGrupos.userId, userId))
+  const grupoIds = links.map((l: any) => l.grupoId)
+  if (!grupoIds.length) return c.json([])
+  const rows = await db.select().from(grupos).where(inArray(grupos.id, grupoIds))
+  const filtered = accountId
+    ? rows.filter((g: any) => g.accountId === accountId || g.accountId === null)
+    : rows
+  return c.json(filtered)
+})
+
+// ── Grupos ────────────────────────────────────────────────────
+app.get('/grupos', async (c) => {
+  const { orgId, accountId } = c.req.query()
+  const [rows, allAccounts] = await Promise.all([
+    db.select().from(grupos),
+    db.select().from(accounts),
+  ])
+  const filtered = rows.filter((g: any) => {
+    if (orgId && accountId) return g.orgId === orgId || g.accountId === accountId
+    if (orgId) {
+      const orgAccountIds = allAccounts.filter((a: any) => a.orgId === orgId).map((a: any) => a.id)
+      return g.orgId === orgId || orgAccountIds.includes(g.accountId)
+    }
+    if (accountId) return g.accountId === accountId
+    return true
+  })
+  const membros = await db.select().from(usuarioGrupos)
+  const result = filtered.map((g: any) => ({
+    ...g,
+    qtdMembros: membros.filter((m: any) => m.grupoId === g.id).length,
+  }))
+  return c.json(result)
+})
+
+app.get('/grupos/:id', async (c) => {
+  const [row] = await db.select().from(grupos).where(eq(grupos.id, c.req.param('id')))
+  if (!row) return c.json({ error: 'Not found' }, 404)
+  const membros = await db.select().from(usuarioGrupos).where(eq(usuarioGrupos.grupoId, row.id))
+  return c.json({ ...row, qtdMembros: membros.length })
+})
+
+app.post('/grupos', async (c) => {
+  const body  = await c.req.json()
+  const escopo = body.escopo ?? 'org'
+  if (escopo === 'org'   && !body.orgId)     return c.json({ error: 'orgId obrigatório' }, 400)
+  if (escopo === 'conta' && !body.accountId) return c.json({ error: 'accountId obrigatório' }, 400)
+  const [row] = await db.insert(grupos).values({
+    id:        body.id ?? crypto.randomUUID(),
+    nome:      body.nome,
+    descricao: body.descricao ?? null,
+    papel:     body.papel ?? '',
+    escopo,
+    orgId:     body.orgId ?? null,
+    accountId: body.accountId ?? null,
+    status:    'Ativo',
+    createdAt: new Date().toLocaleDateString('pt-BR'),
+  }).returning()
+  return c.json(row, 201)
+})
+
+app.put('/grupos/:id', async (c) => {
+  const body = await c.req.json()
+  const [row] = await db.update(grupos)
+    .set({ nome: body.nome, descricao: body.descricao, papel: body.papel, status: body.status })
+    .where(eq(grupos.id, c.req.param('id')))
+    .returning()
+  if (!row) return c.json({ error: 'Not found' }, 404)
+  return c.json(row)
+})
+
+app.delete('/grupos/:id', async (c) => {
+  const id = c.req.param('id')
+  await db.delete(usuarioGrupos).where(eq(usuarioGrupos.grupoId, id))
+  const [row] = await db.delete(grupos).where(eq(grupos.id, id)).returning()
+  if (!row) return c.json({ error: 'Not found' }, 404)
+  return c.json({ ok: true })
+})
+
+app.get('/grupos/:id/membros', async (c) => {
+  const grupoId = c.req.param('id')
+  const links = await db.select().from(usuarioGrupos).where(eq(usuarioGrupos.grupoId, grupoId))
+  if (!links.length) return c.json([])
+  const userIds  = links.map((l: any) => l.userId)
+  const allUsers = await db.select().from(users)
+  return c.json(allUsers.filter((u: any) => userIds.includes(u.id)))
+})
+
+app.post('/grupos/:id/membros', async (c) => {
+  const grupoId = c.req.param('id')
+  const { userId } = await c.req.json()
+  const existing = await db.select().from(usuarioGrupos)
+    .where(and(eq(usuarioGrupos.grupoId, grupoId), eq(usuarioGrupos.userId, userId)))
+  if (existing.length > 0) return c.json(existing[0])
+  const [row] = await db.insert(usuarioGrupos).values({
+    id: crypto.randomUUID(), userId, grupoId,
+    assignedAt: new Date().toLocaleDateString('pt-BR'),
+  }).returning()
+  return c.json(row, 201)
+})
+
+app.delete('/grupos/:id/membros/:userId', async (c) => {
+  await db.delete(usuarioGrupos).where(
+    and(eq(usuarioGrupos.grupoId, c.req.param('id')), eq(usuarioGrupos.userId, c.req.param('userId')))
+  )
+  return c.json({ ok: true })
+})
+
+// ── Accounts — membros e entitlements ─────────────────────────
+app.get('/accounts/:id/membros', async (c) => {
+  const accountId = c.req.param('id')
+  const links = await db.select().from(userAccountMemberships).where(eq(userAccountMemberships.accountId, accountId))
+  if (!links.length) return c.json([])
+  const userIds  = links.map((l: any) => l.userId)
+  const allUsers = await db.select().from(users)
+  return c.json(allUsers.filter((u: any) => userIds.includes(u.id)).map((u: any) => ({
+    ...u,
+    papel: links.find((l: any) => l.userId === u.id)?.papel ?? 'member',
+  })))
+})
+
+app.post('/accounts/:id/membros', async (c) => {
+  const accountId = c.req.param('id')
+  const { userId, papel = 'member' } = await c.req.json()
+  const existing = await db.select().from(userAccountMemberships)
+    .where(and(eq(userAccountMemberships.accountId, accountId), eq(userAccountMemberships.userId, userId)))
+  if (existing.length > 0) {
+    const [row] = await db.update(userAccountMemberships).set({ papel })
+      .where(eq(userAccountMemberships.id, existing[0].id)).returning()
+    return c.json(row)
+  }
+  const [row] = await db.insert(userAccountMemberships).values({
+    id: crypto.randomUUID(), userId, accountId, papel,
+    assignedAt: new Date().toLocaleDateString('pt-BR'),
+  }).returning()
+  return c.json(row, 201)
+})
+
+app.delete('/accounts/:id/membros/:userId', async (c) => {
+  await db.delete(userAccountMemberships).where(
+    and(eq(userAccountMemberships.accountId, c.req.param('id')), eq(userAccountMemberships.userId, c.req.param('userId')))
+  )
+  return c.json({ ok: true })
+})
+
+app.get('/accounts/:id/entitlements', async (c) => {
+  return c.json(await db.select().from(accountEntitlements).where(eq(accountEntitlements.accountId, c.req.param('id'))))
+})
+
+app.post('/accounts/:id/entitlements', async (c) => {
+  const accountId = c.req.param('id')
+  const { capability } = await c.req.json()
+  if (!capability) return c.json({ error: 'capability obrigatório' }, 400)
+  const [existing] = await db.select().from(accountEntitlements)
+    .where(and(eq(accountEntitlements.accountId, accountId), eq(accountEntitlements.capability, capability)))
+  if (existing) return c.json(existing, 200)
+  const [row] = await db.insert(accountEntitlements).values({
+    id: crypto.randomUUID(), accountId, capability, enabledAt: new Date().toISOString(),
+  }).returning()
+  return c.json(row, 201)
+})
+
+app.delete('/accounts/:id/entitlements/:capability', async (c) => {
+  await db.delete(accountEntitlements).where(
+    and(eq(accountEntitlements.accountId, c.req.param('id')), eq(accountEntitlements.capability, c.req.param('capability')))
+  )
+  return c.json({ ok: true })
+})
+
+// ── Permissions ───────────────────────────────────────────────
+app.get('/permissions', async (c) => {
+  const { entidade_tipo, entidade_id, componente_id, instancia_id } = c.req.query()
+  const conditions: any[] = []
+  if (entidade_tipo) conditions.push(eq(componentPermissions.entidadeTipo, entidade_tipo))
+  if (entidade_id)   conditions.push(eq(componentPermissions.entidadeId,   entidade_id))
+  if (componente_id) conditions.push(eq(componentPermissions.componenteId, componente_id))
+  if (instancia_id && instancia_id !== 'null') conditions.push(eq(componentPermissions.instanciaId, instancia_id))
+  if (instancia_id === 'null') conditions.push(isNull(componentPermissions.instanciaId))
+  const rows = conditions.length > 0
+    ? await db.select().from(componentPermissions).where(and(...conditions))
+    : await db.select().from(componentPermissions)
+  return c.json(rows)
+})
+
+app.post('/permissions', async (c) => {
+  const { entidade_tipo, entidade_id, componente_id, acao, instancia_id } = await c.req.json()
+  if (!entidade_tipo || !entidade_id || !componente_id || !acao)
+    return c.json({ error: 'entidade_tipo, entidade_id, componente_id e acao são obrigatórios' }, 400)
+  const conditions: any[] = [
+    eq(componentPermissions.entidadeTipo, entidade_tipo),
+    eq(componentPermissions.entidadeId,   entidade_id),
+    eq(componentPermissions.componenteId, componente_id),
+    eq(componentPermissions.acao,         acao),
+    instancia_id ? eq(componentPermissions.instanciaId, instancia_id) : isNull(componentPermissions.instanciaId),
+  ]
+  const existing = await db.select().from(componentPermissions).where(and(...conditions))
+  if (existing.length > 0) return c.json(existing[0], 200)
+  const [row] = await db.insert(componentPermissions).values({
+    id: crypto.randomUUID(), entidadeTipo: entidade_tipo, entidadeId: entidade_id,
+    componenteId: componente_id, acao, instanciaId: instancia_id ?? null,
+    createdAt: new Date().toISOString(),
+  }).returning()
+  return c.json(row, 201)
+})
+
+app.delete('/permissions', async (c) => {
+  const { entidade_tipo, entidade_id, componente_id, acao, instancia_id } = await c.req.json()
+  if (!entidade_tipo || !entidade_id || !componente_id || !acao)
+    return c.json({ error: 'entidade_tipo, entidade_id, componente_id e acao são obrigatórios' }, 400)
+  const conditions: any[] = [
+    eq(componentPermissions.entidadeTipo, entidade_tipo),
+    eq(componentPermissions.entidadeId,   entidade_id),
+    eq(componentPermissions.componenteId, componente_id),
+    eq(componentPermissions.acao,         acao),
+    instancia_id ? eq(componentPermissions.instanciaId, instancia_id) : isNull(componentPermissions.instanciaId),
+  ]
+  await db.delete(componentPermissions).where(and(...conditions))
+  return c.json({ ok: true })
+})
+
+// ── Instâncias ────────────────────────────────────────────────
+app.get('/instancias', async (c) => {
+  const { componenteId, accountId } = c.req.query()
+  let rows = await db.select().from(instancias)
+  if (componenteId) rows = rows.filter((r: any) => r.componenteId === componenteId)
+  if (accountId)    rows = rows.filter((r: any) => r.accountId    === accountId)
+  const allMembros = await db.select().from(instanciaMembros)
+  return c.json(rows.map((inst: any) => ({
+    ...inst,
+    qtdMembros: allMembros.filter((m: any) => m.instanciaId === inst.id).length,
+  })))
+})
+
+app.get('/instancias/:id', async (c) => {
+  const [row] = await db.select().from(instancias).where(eq(instancias.id, c.req.param('id')))
+  if (!row) return c.json({ error: 'Not found' }, 404)
+  return c.json(row)
+})
+
+app.post('/instancias', async (c) => {
+  const { componenteId, accountId, nome, descricao } = await c.req.json()
+  if (!componenteId || !accountId || !nome) return c.json({ error: 'componenteId, accountId e nome obrigatórios' }, 400)
+  const [row] = await db.insert(instancias).values({
+    id: crypto.randomUUID(), componenteId, accountId, nome,
+    descricao: descricao ?? null, status: 'Ativo',
+    createdAt: new Date().toLocaleDateString('pt-BR'),
+  }).returning()
+  return c.json(row, 201)
+})
+
+app.put('/instancias/:id', async (c) => {
+  const [row] = await db.update(instancias).set(await c.req.json()).where(eq(instancias.id, c.req.param('id'))).returning()
+  return c.json(row)
+})
+
+app.delete('/instancias/:id', async (c) => {
+  await db.delete(instancias).where(eq(instancias.id, c.req.param('id')))
+  return c.json({ ok: true })
+})
+
+app.get('/instancias/:id/membros', async (c) => {
+  const instanciaId = c.req.param('id')
+  const membros = await db.select().from(instanciaMembros).where(eq(instanciaMembros.instanciaId, instanciaId))
+  if (!membros.length) return c.json([])
+  const [allUsers, allGrupos] = await Promise.all([db.select().from(users), db.select().from(grupos)])
+  return c.json(membros.map((m: any) => {
+    if (m.entidadeTipo === 'user') {
+      const u = allUsers.find((u: any) => u.id === m.entidadeId)
+      return { ...m, displayName: u?.nomeCompleto ?? m.entidadeId, email: u?.email }
+    }
+    const g = allGrupos.find((g: any) => g.id === m.entidadeId)
+    return { ...m, displayName: g?.nome ?? m.entidadeId }
+  }))
+})
+
+app.post('/instancias/:id/membros', async (c) => {
+  const instanciaId = c.req.param('id')
+  const { entidadeTipo, entidadeId, papel } = await c.req.json()
+  if (!entidadeTipo || !entidadeId || !papel) return c.json({ error: 'entidadeTipo, entidadeId e papel obrigatórios' }, 400)
+  const existing = await db.select().from(instanciaMembros).where(
+    and(eq(instanciaMembros.instanciaId, instanciaId), eq(instanciaMembros.entidadeTipo, entidadeTipo), eq(instanciaMembros.entidadeId, entidadeId))
+  )
+  if (existing.length > 0) {
+    const [row] = await db.update(instanciaMembros).set({ papel }).where(eq(instanciaMembros.id, existing[0].id)).returning()
+    return c.json(row)
+  }
+  const [row] = await db.insert(instanciaMembros).values({
+    id: crypto.randomUUID(), instanciaId, entidadeTipo, entidadeId, papel,
+    assignedAt: new Date().toLocaleDateString('pt-BR'),
+  }).returning()
+  return c.json(row, 201)
+})
+
+app.delete('/instancias/:id/membros/:membroId', async (c) => {
+  await db.delete(instanciaMembros).where(eq(instanciaMembros.id, c.req.param('membroId')))
+  return c.json({ ok: true })
+})
+
 export default handle(app)
