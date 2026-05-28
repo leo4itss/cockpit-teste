@@ -13,6 +13,7 @@
 import { useContext } from 'react'
 import { AuthContext } from '@/context/AuthContext'
 import * as engine from './engine'
+import { getInstanciaAtribuicoes, canActWithAtribuicao } from './engine'
 
 // ── Hook base ─────────────────────────────────────────────────
 
