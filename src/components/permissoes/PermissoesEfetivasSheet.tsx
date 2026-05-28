@@ -124,6 +124,7 @@ export function PermissoesEfetivasSheet({
       })
       .catch(() => setError('Não foi possível carregar as permissões efetivas.'))
       .finally(() => setLoading(false))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, userId, instanciaId, componenteId])
 
   return (
