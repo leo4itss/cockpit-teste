@@ -166,4 +166,60 @@ export const api = {
     request<any>(`/api/instancias/${instanciaId}/membros`, { method: 'POST', body: JSON.stringify({ entidadeTipo: '_update', entidadeId: membroId, papel }) }),
   removeInstanciaMembro: (instanciaId: string, membroId: string) =>
     request<any>(`/api/instancias/${instanciaId}/membros/${membroId}`, { method: 'DELETE' }),
+
+  // Atribuições por Componente
+  getAtribuicoes: (componenteId: string) =>
+    request<any[]>(`/api/componentes/${componenteId}/atribuicoes`),
+  createAtribuicao: (componenteId: string, data: any) =>
+    request<any>(`/api/componentes/${componenteId}/atribuicoes`, { method: 'POST', body: JSON.stringify(data) }),
+  updateAtribuicao: (componenteId: string, atribuicaoId: string, data: any) =>
+    request<any>(`/api/componentes/${componenteId}/atribuicoes/${atribuicaoId}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteAtribuicao: (componenteId: string, atribuicaoId: string) =>
+    request<void>(`/api/componentes/${componenteId}/atribuicoes/${atribuicaoId}`, { method: 'DELETE' }),
+
+  // Fases por Instância
+  getFases: (instanciaId: string) =>
+    request<any[]>(`/api/instancias/${instanciaId}/fases`),
+  createFase: (instanciaId: string, data: any) =>
+    request<any>(`/api/instancias/${instanciaId}/fases`, { method: 'POST', body: JSON.stringify(data) }),
+  updateFase: (instanciaId: string, faseId: string, data: any) =>
+    request<any>(`/api/instancias/${instanciaId}/fases/${faseId}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteFase: (instanciaId: string, faseId: string) =>
+    request<void>(`/api/instancias/${instanciaId}/fases/${faseId}`, { method: 'DELETE' }),
+
+  // Responsáveis por Fase
+  getFaseResponsaveis: (instanciaId: string, faseId: string) =>
+    request<any[]>(`/api/instancias/${instanciaId}/fases/${faseId}/responsaveis`),
+  createFaseResponsavel: (instanciaId: string, faseId: string, data: any) =>
+    request<any>(`/api/instancias/${instanciaId}/fases/${faseId}/responsaveis`, { method: 'POST', body: JSON.stringify(data) }),
+  deleteFaseResponsavel: (instanciaId: string, faseId: string, responsavelId: string) =>
+    request<void>(`/api/instancias/${instanciaId}/fases/${faseId}/responsaveis/${responsavelId}`, { method: 'DELETE' }),
+
+  // Slots de Perfil por Instância
+  getPerfilSlots: (instanciaId: string) =>
+    request<any[]>(`/api/instancias/${instanciaId}/perfil-slots`),
+  createPerfilSlot: (instanciaId: string, data: any) =>
+    request<any>(`/api/instancias/${instanciaId}/perfil-slots`, { method: 'POST', body: JSON.stringify(data) }),
+  updatePerfilSlot: (instanciaId: string, slotId: string, data: any) =>
+    request<any>(`/api/instancias/${instanciaId}/perfil-slots/${slotId}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deletePerfilSlot: (instanciaId: string, slotId: string) =>
+    request<void>(`/api/instancias/${instanciaId}/perfil-slots/${slotId}`, { method: 'DELETE' }),
+
+  // Atribuições de Membro de Instância
+  getMembroAtribuicoes: (instanciaId: string, membroId: string) =>
+    request<any[]>(`/api/instancias/${instanciaId}/membros/${membroId}/atribuicoes`),
+  addMembroAtribuicao: (instanciaId: string, membroId: string, atribuicaoId: string) =>
+    request<any>(`/api/instancias/${instanciaId}/membros/${membroId}/atribuicoes`, { method: 'POST', body: JSON.stringify({ atribuicaoId }) }),
+  removeMembroAtribuicao: (instanciaId: string, membroId: string, atribuicaoId: string) =>
+    request<void>(`/api/instancias/${instanciaId}/membros/${membroId}/atribuicoes/${atribuicaoId}`, { method: 'DELETE' }),
+
+  // Permissões Efetivas
+  getPermissoesEfetivas: (instanciaId: string, userId: string) =>
+    request<{ atribuicoes: string[]; fontes: { atribuicaoId: string; fonte: string; entidadeId: string }[] }>(
+      `/api/instancias/${instanciaId}/permissoes-efetivas?userId=${userId}`
+    ),
+
+  // Cargos e Áreas distintos
+  getCargosDistintos: () => request<string[]>('/api/users/cargos-distintos'),
+  getAreasDistintas: () => request<string[]>('/api/users/areas-distintas'),
 }
