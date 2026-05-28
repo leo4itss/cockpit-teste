@@ -26,6 +26,11 @@ const {
   componentPermissions,
   instancias,
   instanciaMembros,
+  componenteAtribuicoes,
+  instanciaMembroAtribuicoes,
+  instanciaFases,
+  faseResponsaveis,
+  instanciaPerfilSlots,
 } = schema
 
 const app = new Hono().basePath('/api')
