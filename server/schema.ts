@@ -276,3 +276,71 @@ export const instanciaMembros = pgTable('instancia_membros', {
 }, (t) => [
   index('idx_instancia_membros_lookup').on(t.instanciaId, t.entidadeTipo, t.entidadeId),
 ])
+
+// ── Atribuições por Componente ────────────────────────────────
+// Define ações disponíveis por componente (ex: 'Criar Documento', 'Aprovar').
+// modulo=null → atribuição geral; modulo='MaxDoc' → específica do MaxDoc.
+export const componenteAtribuicoes = pgTable('componente_atribuicoes', {
+  id:           text('id').primaryKey(),
+  componenteId: text('componente_id').notNull().references(() => componentes.id),
+  nome:         text('nome').notNull(),
+  descricao:    text('descricao'),
+  modulo:       text('modulo'),   // ex: 'MaxDoc' | 'DocAction' — null = geral
+  status:       text('status').notNull().default('Ativo'),  // 'Ativo' | 'Inativo'
+  createdAt:    text('created_at').notNull(),
+}, (t) => [
+  index('idx_comp_atrib_lookup').on(t.componenteId, t.nome),
+])
+
+// ── Atribuições de Membro de Instância ───────────────────────
+// Junction: membro de instância ↔ atribuição concedida.
+export const instanciaMembroAtribuicoes = pgTable('instancia_membro_atribuicoes', {
+  id:           text('id').primaryKey(),
+  membroId:     text('membro_id').notNull().references(() => instanciaMembros.id),
+  atribuicaoId: text('atribuicao_id').notNull().references(() => componenteAtribuicoes.id),
+  assignedAt:   text('assigned_at').notNull(),
+}, (t) => [
+  index('idx_inst_membro_atrib').on(t.membroId, t.atribuicaoId),
+])
+
+// ── Fases de Instância ────────────────────────────────────────
+// Fases configuradas por instância (ex: fases do fluxo documental).
+export const instanciaFases = pgTable('instancia_fases', {
+  id:          text('id').primaryKey(),
+  instanciaId: text('instancia_id').notNull().references(() => instancias.id),
+  nome:        text('nome').notNull(),
+  ordem:       integer('ordem').notNull().default(0),
+  descricao:   text('descricao'),
+  createdAt:   text('created_at').notNull(),
+}, (t) => [
+  index('idx_instancia_fases').on(t.instanciaId, t.ordem),
+])
+
+// ── Responsáveis por Fase ─────────────────────────────────────
+// Fluxo pré-definido: responsável padrão por fase.
+// tipoResponsavel: 'usuario' | 'grupo' | 'cargo' | 'area'
+// entidadeId: userId, grupoId, ou texto do cargo/área
+export const faseResponsaveis = pgTable('fase_responsaveis', {
+  id:               text('id').primaryKey(),
+  faseId:           text('fase_id').notNull().references(() => instanciaFases.id),
+  tipoResponsavel:  text('tipo_responsavel').notNull(), // 'usuario' | 'grupo' | 'cargo' | 'area'
+  entidadeId:       text('entidade_id').notNull(),      // userId, grupoId, ou texto do cargo/área
+  createdAt:        text('created_at').notNull(),
+}, (t) => [
+  index('idx_fase_responsaveis').on(t.faseId),
+])
+
+// ── Slots de Perfil de Instância ──────────────────────────────
+// Slots do perfil de objeto por instância.
+// atribuicaoFiltroId=null → qualquer membro pode ocupar o slot.
+export const instanciaPerfilSlots = pgTable('instancia_perfil_slots', {
+  id:                 text('id').primaryKey(),
+  instanciaId:        text('instancia_id').notNull().references(() => instancias.id),
+  slotNome:           text('slot_nome').notNull(),
+  atribuicaoFiltroId: text('atribuicao_filtro_id').references(() => componenteAtribuicoes.id), // nullable
+  obrigatorio:        boolean('obrigatorio').notNull().default(false),
+  ordem:              integer('ordem').notNull().default(0),
+  createdAt:          text('created_at').notNull(),
+}, (t) => [
+  index('idx_instancia_slots').on(t.instanciaId, t.ordem),
+])
