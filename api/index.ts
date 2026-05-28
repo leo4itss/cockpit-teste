@@ -310,6 +310,18 @@ app.delete('/contracts/:id', async (c) => {
 
 // ── Users ─────────────────────────────────────────────────────
 app.get('/users', async (c) => c.json(await db.select().from(users)))
+app.get('/users/cargos-distintos', async (c) => {
+  const rows = await db.selectDistinct({ cargo: users.cargo }).from(users)
+  const cargos = rows.map((r: any) => r.cargo).filter(Boolean).sort()
+  return c.json(cargos)
+})
+
+app.get('/users/areas-distintas', async (c) => {
+  const rows = await db.selectDistinct({ area: users.area }).from(users)
+  const areas = rows.map((r: any) => r.area).filter(Boolean).sort()
+  return c.json(areas)
+})
+
 app.get('/users/:id', async (c) => {
   const [row] = await db.select().from(users).where(eq(users.id, c.req.param('id')))
   return row ? c.json(row) : c.json({ error: 'Not found' }, 404)
