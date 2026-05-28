@@ -750,4 +750,245 @@ app.delete('/instancias/:id/membros/:membroId', async (c) => {
   return c.json({ ok: true })
 })
 
+// ── Atribuições por Componente ────────────────────────────────
+app.get('/componentes/:id/atribuicoes', async (c) => {
+  const { id } = c.req.param()
+  const rows = await db.select().from(componenteAtribuicoes)
+    .where(eq(componenteAtribuicoes.componenteId, id))
+  return c.json(rows)
+})
+
+app.post('/componentes/:id/atribuicoes', async (c) => {
+  const { id } = c.req.param()
+  const body = await c.req.json()
+  const nova = {
+    id: crypto.randomUUID(),
+    componenteId: id,
+    nome: body.nome,
+    descricao: body.descricao ?? null,
+    modulo: body.modulo ?? null,
+    status: 'Ativo',
+    createdAt: new Date().toISOString(),
+  }
+  await db.insert(componenteAtribuicoes).values(nova)
+  return c.json(nova, 201)
+})
+
+app.put('/componentes/:id/atribuicoes/:atribuicaoId', async (c) => {
+  const { atribuicaoId } = c.req.param()
+  const body = await c.req.json()
+  const updates: Record<string, any> = {}
+  if (body.nome !== undefined) updates.nome = body.nome
+  if (body.descricao !== undefined) updates.descricao = body.descricao
+  if (body.modulo !== undefined) updates.modulo = body.modulo
+  if (body.status !== undefined) updates.status = body.status
+  await db.update(componenteAtribuicoes).set(updates).where(eq(componenteAtribuicoes.id, atribuicaoId))
+  const [updated] = await db.select().from(componenteAtribuicoes).where(eq(componenteAtribuicoes.id, atribuicaoId))
+  return c.json(updated)
+})
+
+app.delete('/componentes/:id/atribuicoes/:atribuicaoId', async (c) => {
+  const { atribuicaoId } = c.req.param()
+  await db.delete(componenteAtribuicoes).where(eq(componenteAtribuicoes.id, atribuicaoId))
+  return c.json({ success: true })
+})
+
+// ── Fases por Instância ───────────────────────────────────────
+app.get('/instancias/:id/fases', async (c) => {
+  const { id } = c.req.param()
+  const rows = await db.select().from(instanciaFases)
+    .where(eq(instanciaFases.instanciaId, id))
+    .orderBy(instanciaFases.ordem)
+  return c.json(rows)
+})
+
+app.post('/instancias/:id/fases', async (c) => {
+  const { id } = c.req.param()
+  const body = await c.req.json()
+  const nova = {
+    id: crypto.randomUUID(),
+    instanciaId: id,
+    nome: body.nome,
+    ordem: body.ordem ?? 0,
+    descricao: body.descricao ?? null,
+    createdAt: new Date().toISOString(),
+  }
+  await db.insert(instanciaFases).values(nova)
+  return c.json(nova, 201)
+})
+
+app.put('/instancias/:id/fases/:faseId', async (c) => {
+  const { faseId } = c.req.param()
+  const body = await c.req.json()
+  const updates: Record<string, any> = {}
+  if (body.nome !== undefined) updates.nome = body.nome
+  if (body.ordem !== undefined) updates.ordem = body.ordem
+  if (body.descricao !== undefined) updates.descricao = body.descricao
+  await db.update(instanciaFases).set(updates).where(eq(instanciaFases.id, faseId))
+  const [updated] = await db.select().from(instanciaFases).where(eq(instanciaFases.id, faseId))
+  return c.json(updated)
+})
+
+app.delete('/instancias/:id/fases/:faseId', async (c) => {
+  const { faseId } = c.req.param()
+  await db.delete(faseResponsaveis).where(eq(faseResponsaveis.faseId, faseId))
+  await db.delete(instanciaFases).where(eq(instanciaFases.id, faseId))
+  return c.json({ success: true })
+})
+
+// ── Responsáveis por Fase ─────────────────────────────────────
+app.get('/instancias/:id/fases/:faseId/responsaveis', async (c) => {
+  const { faseId } = c.req.param()
+  const rows = await db.select().from(faseResponsaveis)
+    .where(eq(faseResponsaveis.faseId, faseId))
+  return c.json(rows)
+})
+
+app.post('/instancias/:id/fases/:faseId/responsaveis', async (c) => {
+  const { faseId } = c.req.param()
+  const body = await c.req.json()
+  const novo = {
+    id: crypto.randomUUID(),
+    faseId,
+    tipoResponsavel: body.tipoResponsavel,
+    entidadeId: body.entidadeId,
+    createdAt: new Date().toISOString(),
+  }
+  await db.insert(faseResponsaveis).values(novo)
+  return c.json(novo, 201)
+})
+
+app.delete('/instancias/:id/fases/:faseId/responsaveis/:responsavelId', async (c) => {
+  const { responsavelId } = c.req.param()
+  await db.delete(faseResponsaveis).where(eq(faseResponsaveis.id, responsavelId))
+  return c.json({ success: true })
+})
+
+// ── Slots de Perfil por Instância ─────────────────────────────
+app.get('/instancias/:id/perfil-slots', async (c) => {
+  const { id } = c.req.param()
+  const rows = await db.select().from(instanciaPerfilSlots)
+    .where(eq(instanciaPerfilSlots.instanciaId, id))
+    .orderBy(instanciaPerfilSlots.ordem)
+  return c.json(rows)
+})
+
+app.post('/instancias/:id/perfil-slots', async (c) => {
+  const { id } = c.req.param()
+  const body = await c.req.json()
+  const novo = {
+    id: crypto.randomUUID(),
+    instanciaId: id,
+    slotNome: body.slotNome,
+    atribuicaoFiltroId: body.atribuicaoFiltroId ?? null,
+    obrigatorio: body.obrigatorio ?? false,
+    ordem: body.ordem ?? 0,
+    createdAt: new Date().toISOString(),
+  }
+  await db.insert(instanciaPerfilSlots).values(novo)
+  return c.json(novo, 201)
+})
+
+app.put('/instancias/:id/perfil-slots/:slotId', async (c) => {
+  const { slotId } = c.req.param()
+  const body = await c.req.json()
+  const updates: Record<string, any> = {}
+  if (body.slotNome !== undefined) updates.slotNome = body.slotNome
+  if (body.atribuicaoFiltroId !== undefined) updates.atribuicaoFiltroId = body.atribuicaoFiltroId || null
+  if (body.obrigatorio !== undefined) updates.obrigatorio = body.obrigatorio
+  if (body.ordem !== undefined) updates.ordem = body.ordem
+  await db.update(instanciaPerfilSlots).set(updates).where(eq(instanciaPerfilSlots.id, slotId))
+  const [updated] = await db.select().from(instanciaPerfilSlots).where(eq(instanciaPerfilSlots.id, slotId))
+  return c.json(updated)
+})
+
+app.delete('/instancias/:id/perfil-slots/:slotId', async (c) => {
+  const { slotId } = c.req.param()
+  await db.delete(instanciaPerfilSlots).where(eq(instanciaPerfilSlots.id, slotId))
+  return c.json({ success: true })
+})
+
+// ── Atribuições em Membros de Instância ───────────────────────
+app.get('/instancias/:id/membros/:membroId/atribuicoes', async (c) => {
+  const { membroId } = c.req.param()
+  const rows = await db.select().from(instanciaMembroAtribuicoes)
+    .where(eq(instanciaMembroAtribuicoes.membroId, membroId))
+  return c.json(rows)
+})
+
+app.post('/instancias/:id/membros/:membroId/atribuicoes', async (c) => {
+  const { membroId } = c.req.param()
+  const body = await c.req.json()
+  const novo = {
+    id: crypto.randomUUID(),
+    membroId,
+    atribuicaoId: body.atribuicaoId,
+    assignedAt: new Date().toISOString(),
+  }
+  await db.insert(instanciaMembroAtribuicoes).values(novo)
+  return c.json(novo, 201)
+})
+
+app.delete('/instancias/:id/membros/:membroId/atribuicoes/:atribuicaoId', async (c) => {
+  const { membroId, atribuicaoId } = c.req.param()
+  await db.delete(instanciaMembroAtribuicoes)
+    .where(
+      and(
+        eq(instanciaMembroAtribuicoes.membroId, membroId),
+        eq(instanciaMembroAtribuicoes.atribuicaoId, atribuicaoId)
+      )
+    )
+  return c.json({ success: true })
+})
+
+// ── Permissões Efetivas ───────────────────────────────────────
+app.get('/instancias/:id/permissoes-efetivas', async (c) => {
+  const { id: instanceId } = c.req.param()
+  const userId = c.req.query('userId')
+  if (!userId) return c.json({ error: 'userId é obrigatório' }, 400)
+
+  const membros = await db.select().from(instanciaMembros)
+    .where(
+      and(
+        eq(instanciaMembros.instanciaId, instanceId),
+        eq(instanciaMembros.entidadeTipo, 'user'),
+        eq(instanciaMembros.entidadeId, userId)
+      )
+    )
+
+  const userGruposRows = await db.select().from(usuarioGrupos)
+    .where(eq(usuarioGrupos.userId, userId))
+  const grupoIds = userGruposRows.map((g: any) => g.grupoId)
+
+  const membrosGrupo = grupoIds.length > 0
+    ? await db.select().from(instanciaMembros)
+        .where(
+          and(
+            eq(instanciaMembros.instanciaId, instanceId),
+            eq(instanciaMembros.entidadeTipo, 'group')
+          )
+        )
+    : []
+
+  const membroGrupoFiltrado = membrosGrupo.filter((m: any) => grupoIds.includes(m.entidadeId))
+
+  const membroIds = [
+    ...membros.map((m: any) => ({ id: m.id, fonte: 'direto' as const, entidadeId: userId })),
+    ...membroGrupoFiltrado.map((m: any) => ({ id: m.id, fonte: 'grupo' as const, entidadeId: m.entidadeId })),
+  ]
+
+  const fontes: { atribuicaoId: string; fonte: string; entidadeId: string }[] = []
+
+  for (const membro of membroIds) {
+    const atribs = await db.select().from(instanciaMembroAtribuicoes)
+      .where(eq(instanciaMembroAtribuicoes.membroId, membro.id))
+    for (const a of atribs) {
+      fontes.push({ atribuicaoId: a.atribuicaoId, fonte: membro.fonte, entidadeId: membro.entidadeId })
+    }
+  }
+
+  const atribuicoes = [...new Set(fontes.map((f) => f.atribuicaoId))]
+  return c.json({ atribuicoes, fontes })
+})
+
 export default handle(app)
