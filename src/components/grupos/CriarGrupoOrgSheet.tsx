@@ -189,7 +189,7 @@ export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, grupos 
 
   function handleClose() {
     setNome(''); setDescricao(''); setPapel('User'); setEscopo('org')
-    setOrgSelecionada(''); setContaSelecionada(''); setSearchMembro('')
+    setOrgSelecionada(''); setContaSelecionada(''); setParentId(null); setSearchMembro('')
     setMembros([]); setError(null)
     onClose()
   }
