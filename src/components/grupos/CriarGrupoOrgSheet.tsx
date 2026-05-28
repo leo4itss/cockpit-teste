@@ -29,6 +29,7 @@ interface Props {
   orgId:            string        // orgId padrão (para Org Admin); ignorado quando isPlatformAdmin=true e escopo='org'
   orgs:             any[]         // todas as orgs — usado pelo Platform Admin para escolher
   contas:           Account[]     // todas as contas — agrupadas por org no dropdown
+  grupos?:          Grupo[]       // grupos existentes para seleção de grupo pai
   isPlatformAdmin?: boolean
   onSuccess:        (grupo: Grupo) => void
 }
