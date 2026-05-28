@@ -1,0 +1,177 @@
+import { useState, useEffect } from 'react'
+import {
+  NestedSheet,
+  NestedSheetHeader,
+  NestedSheetTitle,
+  NestedSheetDescription,
+  NestedSheetBody,
+} from '@/components/ui/nested-sheet'
+import { api } from '@/api/client'
+
+// ── Tipos ──────────────────────────────────────────────────────
+
+interface EfetivaFonte {
+  atribuicaoId: string
+  fonte: string
+  entidadeId: string
+}
+
+interface PermissoesEfetivasSheetProps {
+  open: boolean
+  onClose: () => void
+  userId: string
+  userName: string
+  instanciaId: string
+  instanciaNome: string
+  componenteId: string
+}
+
+// ── Badges de origem ──────────────────────────────────────────
+
+function FonteBadge({ fonte, entidadeId }: { fonte: string; entidadeId: string }) {
+  if (fonte === 'direto') {
+    return (
+      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+        Direto
+      </span>
+    )
+  }
+  if (fonte === 'grupo') {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
+        Via Grupo
+        <span className="font-mono text-[10px] opacity-70">{entidadeId}</span>
+      </span>
+    )
+  }
+  return (
+    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">
+      {fonte}
+    </span>
+  )
+}
+
+// ── Componente principal ──────────────────────────────────────
+
+export function PermissoesEfetivasSheet({
+  open,
+  onClose,
+  userId,
+  userName,
+  instanciaId,
+  instanciaNome,
+  componenteId,
+}: PermissoesEfetivasSheetProps) {
+  const [loading, setLoading] = useState(false)
+  const [atribuicaoIds, setAtribuicaoIds] = useState<string[]>([])
+  const [fontes, setFontes] = useState<EfetivaFonte[]>([])
+  const [atribuicoesMap, setAtribuicoesMap] = useState<Record<string, string>>({})
+  const [isUnrestricted, setIsUnrestricted] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!open || !userId || !instanciaId) return
+    setLoading(true)
+    setIsUnrestricted(false)
+    setAtribuicaoIds([])
+    setFontes([])
+    setError(null)
+
+    Promise.all([
+      api.getPermissoesEfetivas(instanciaId, userId),
+      api.getAtribuicoes(componenteId),
+    ])
+      .then(([efetivas, atribs]) => {
+        if (efetivas.atribuicoes.includes('*')) {
+          setIsUnrestricted(true)
+        } else {
+          setAtribuicaoIds(efetivas.atribuicoes)
+          setFontes(efetivas.fontes)
+        }
+        const map: Record<string, string> = {}
+        atribs.forEach((a: any) => { map[a.id] = a.nome })
+        setAtribuicoesMap(map)
+      })
+      .catch(() => setError('Não foi possível carregar as permissões efetivas.'))
+      .finally(() => setLoading(false))
+  }, [open, userId, instanciaId, componenteId])
+
+  return (
+    <NestedSheet open={open} onClose={onClose} width="w-[520px]">
+      <NestedSheetHeader>
+        <NestedSheetTitle>Permissões Efetivas</NestedSheetTitle>
+        <NestedSheetDescription>
+          {userName} · {instanciaNome}
+        </NestedSheetDescription>
+      </NestedSheetHeader>
+
+      <NestedSheetBody>
+        {loading && (
+          <p className="text-sm text-gray-500 py-4">Carregando permissões...</p>
+        )}
+
+        {!loading && error && (
+          <div className="rounded-md bg-red-50 border border-red-200 p-4 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
+        {!loading && !error && isUnrestricted && (
+          <div className="rounded-md bg-blue-50 border border-blue-200 p-4 text-sm text-blue-700">
+            Acesso irrestrito — este usuário é administrador e tem todas as permissões nesta instância.
+          </div>
+        )}
+
+        {!loading && !error && !isUnrestricted && atribuicaoIds.length === 0 && (
+          <div className="py-8 text-center">
+            <p className="text-sm font-medium text-gray-800">Nenhuma atribuição efetiva</p>
+            <p className="text-xs text-gray-500 mt-1">
+              Este usuário não possui atribuições ativas nesta instância.
+            </p>
+          </div>
+        )}
+
+        {!loading && !error && !isUnrestricted && atribuicaoIds.length > 0 && (
+          <div className="overflow-hidden rounded-xl border border-gray-200">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-200 bg-gray-50">
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-70">Atribuição</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-70">Origem</th>
+                </tr>
+              </thead>
+              <tbody>
+                {atribuicaoIds.map(atribId => {
+                  const nomeAtrib = atribuicoesMap[atribId] ?? atribId
+                  const fontesDoAtrib = fontes.filter(f => f.atribuicaoId === atribId)
+
+                  if (fontesDoAtrib.length === 0) {
+                    return (
+                      <tr key={atribId} className="border-b border-gray-200 last:border-0">
+                        <td className="px-4 py-3 text-gray-900 font-medium">{nomeAtrib}</td>
+                        <td className="px-4 py-3">
+                          <span className="text-xs text-gray-400">—</span>
+                        </td>
+                      </tr>
+                    )
+                  }
+
+                  return fontesDoAtrib.map((f, idx) => (
+                    <tr key={`${atribId}-${idx}`} className="border-b border-gray-200 last:border-0 hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3 text-gray-900 font-medium">
+                        {idx === 0 ? nomeAtrib : ''}
+                      </td>
+                      <td className="px-4 py-3">
+                        <FonteBadge fonte={f.fonte} entidadeId={f.entidadeId} />
+                      </td>
+                    </tr>
+                  ))
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </NestedSheetBody>
+    </NestedSheet>
+  )
+}
