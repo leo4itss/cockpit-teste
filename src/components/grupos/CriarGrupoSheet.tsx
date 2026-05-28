@@ -76,15 +76,22 @@ const PAPEIS_OPCOES = [
 
 // ── Componente principal ──────────────────────────────────────
 
-export function CriarGrupoSheet({ open, onClose, accountId, onSuccess }: Props) {
+export function CriarGrupoSheet({ open, onClose, accountId, grupos = [], onSuccess }: Props) {
   const [nome, setNome]           = useState('')
   const [descricao, setDescricao] = useState('')
   const [papel, setPapel]         = useState('User')
+  const [parentId, setParentId]   = useState<string | null>(null)
   const [searchMembro, setSearchMembro] = useState('')
   const [allUsers, setAllUsers]   = useState<User[]>([])
   const [membros, setMembros]     = useState<User[]>([])
   const [saving, setSaving]       = useState(false)
   const [error, setError]         = useState<string | null>(null)
+
+  // Grupos disponíveis como pai: mesma conta, excluindo o próprio (não existe ainda na criação)
+  const gruposDisponiveis = useMemo(
+    () => grupos.filter(g => g.escopo === 'conta' && g.accountId === accountId && g.status === 'Ativo'),
+    [grupos, accountId]
+  )
 
   // Carrega usuários para busca de membros
   useEffect(() => {
