@@ -16,14 +16,25 @@ interface EfetivaFonte {
   entidadeId: string
 }
 
+interface InstanciaOpcao {
+  id: string
+  nome: string
+  componenteId: string
+}
+
 interface PermissoesEfetivasSheetProps {
   open: boolean
   onClose: () => void
   userId: string
   userName: string
-  instanciaId: string
-  instanciaNome: string
-  componenteId: string
+  /** ID da instância — se fornecido sem `instancias`, usa diretamente */
+  instanciaId?: string
+  instanciaNome?: string
+  /** componenteId da instância selecionada */
+  componenteId?: string
+  /** Lista de instâncias para seleção inline (quando não há instanciaId fixo) */
+  instancias?: InstanciaOpcao[]
+  componenteNomes?: Record<string, string>
 }
 
 // ── Badges de origem ──────────────────────────────────────────
