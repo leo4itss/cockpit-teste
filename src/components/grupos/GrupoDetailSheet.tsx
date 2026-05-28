@@ -366,6 +366,28 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
             </span>
           </div>
         )}
+
+        {/* Grupo Pai */}
+        {grupo.parentId && (
+          <div className="flex items-center gap-1.5 mt-1.5">
+            <span className="text-xs text-[#9ca3af]">Grupo Pai:</span>
+            <span className="text-xs font-medium text-[#374151]">{nomeGrupoPai}</span>
+          </div>
+        )}
+
+        {/* Subgrupos */}
+        {gruposFilhos.length > 0 && (
+          <div className="mt-2">
+            <p className="text-xs text-[#9ca3af] mb-1.5">Subgrupos:</p>
+            <div className="flex flex-wrap gap-1.5">
+              {gruposFilhos.map(g => (
+                <span key={g.id} className="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 text-xs text-gray-700">
+                  {g.nome}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </NestedSheetHeader>
 
       <NestedSheetBody noPadding>
