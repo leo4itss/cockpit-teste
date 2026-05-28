@@ -72,13 +72,14 @@ const PAPEIS = [
   { value: 'Admin',  label: 'Administrador', desc: 'Acesso completo à gestão' },
 ]
 
-export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, isPlatformAdmin, onSuccess }: Props) {
+export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, grupos = [], isPlatformAdmin, onSuccess }: Props) {
   const [nome, setNome]                         = useState('')
   const [descricao, setDescricao]               = useState('')
   const [papel, setPapel]                       = useState('User')
   const [escopo, setEscopo]                     = useState<'org' | 'conta'>('org')
   const [orgSelecionada, setOrgSelecionada]     = useState('')   // só usado quando isPlatformAdmin + escopo='org'
   const [contaSelecionada, setContaSelecionada] = useState('')
+  const [parentId, setParentId]                 = useState<string | null>(null)
   const [searchMembro, setSearchMembro]         = useState('')
   const [allUsers, setAllUsers]                 = useState<User[]>([])
   const [membros, setMembros]                   = useState<User[]>([])
