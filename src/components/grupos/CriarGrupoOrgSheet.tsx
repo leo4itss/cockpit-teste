@@ -344,6 +344,34 @@ export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, grupos 
             )}
           </div>
 
+          {/* Grupo Pai */}
+          <div className="flex flex-col gap-1.5">
+            <FieldLabel hint="Deixe em branco para criar um grupo raiz.">Grupo Pai</FieldLabel>
+            <div className="relative">
+              <select
+                value={parentId ?? ''}
+                onChange={e => setParentId(e.target.value || null)}
+                disabled={saving || gruposDisponiveis.length === 0}
+                className="w-full appearance-none pl-3 pr-8 py-2.5 text-sm border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-colors disabled:bg-gray-50 text-[#030712]"
+              >
+                <option value="">(Nenhum — grupo raiz)</option>
+                {gruposDisponiveis.map(g => (
+                  <option key={g.id} value={g.id}>{g.nome}</option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+            </div>
+            {gruposDisponiveis.length === 0 && (
+              <p className="text-xs text-[#6b7280]">
+                {escopo === 'org' && !orgSelecionada && !orgId
+                  ? 'Selecione a organização para ver grupos disponíveis.'
+                  : escopo === 'conta' && !contaSelecionada
+                  ? 'Selecione a conta para ver grupos disponíveis.'
+                  : 'Nenhum grupo disponível para ser usado como pai.'}
+              </p>
+            )}
+          </div>
+
           {/* Busca de membros */}
           <div className="flex flex-col gap-2">
             <FieldLabel>Usuários</FieldLabel>
