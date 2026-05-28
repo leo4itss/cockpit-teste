@@ -172,8 +172,9 @@ export function GruposPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[260px]">Grupo</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[100px]">Membros</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[220px]">Grupo</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[140px]">Grupo Pai</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[90px]">Membros</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[110px]">Papel</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[130px]">Escopo</th>
                 <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 w-[80px]">Ações</th>
@@ -182,7 +183,7 @@ export function GruposPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-500">Carregando...</td>
+                  <td colSpan={6} className="px-4 py-8 text-center text-sm text-gray-500">Carregando...</td>
                 </tr>
               ) : filtered.length > 0 ? (
                 filtered.map(grupo => (
@@ -193,7 +194,14 @@ export function GruposPage() {
                   >
                     {/* Nome + descrição + contexto org/conta */}
                     <td className="px-4 py-3">
-                      <p className="text-sm font-medium text-[#030712]">{grupo.nome}</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-sm font-medium text-[#030712]">{grupo.nome}</p>
+                        {grupo.parentId && (
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600">
+                            Filho
+                          </span>
+                        )}
+                      </div>
                       {grupo.descricao && (
                         <p className="text-xs text-[#6b7280] mt-0.5 max-w-sm truncate">{grupo.descricao}</p>
                       )}
@@ -210,6 +218,13 @@ export function GruposPage() {
                           </span>
                         )
                       })()}
+                    </td>
+
+                    {/* Grupo Pai */}
+                    <td className="px-4 py-3 text-sm text-[#6b7280]">
+                      {grupo.parentId
+                        ? (grupos.find(g => g.id === grupo.parentId)?.nome ?? '—')
+                        : <span className="text-gray-400">—</span>}
                     </td>
 
                     {/* Membros */}
@@ -260,7 +275,7 @@ export function GruposPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-4 py-12 text-center">
+                  <td colSpan={6} className="px-4 py-12 text-center">
                     <p className="text-sm font-medium text-[#030712]">Nenhum grupo encontrado</p>
                     <p className="text-xs text-[#6b7280] mt-1">
                       {search
