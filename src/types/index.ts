@@ -224,6 +224,7 @@ export interface Grupo {
    * ''       → sem papel definido
    */
   papel?: string
+  parentId?: string   // null = grupo raiz; preenchido = grupo filho
   status: 'Ativo' | 'Inativo'
   createdAt: string
   // campos enriquecidos pelo backend (opcionais)
