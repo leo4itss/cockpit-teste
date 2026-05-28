@@ -1,7 +1,10 @@
+import { useState, useEffect } from 'react'
 import { Sheet } from './ui/Sheet'
 import { Button } from './ui/Button'
 import { METADATA_MOCK_TIPOS } from './ComponenteSheet'
-import type { Componente } from '@/types'
+import { api } from '@/api/client'
+import { useIsPlatformAdmin, useIsPasArchitect } from '@/authz/hooks'
+import type { Componente, Atribuicao } from '@/types'
 
 interface Props {
   open: boolean
@@ -29,6 +32,32 @@ function ReadonlyField({ label, value, required }: { label: string; value?: stri
  * Clicar em "Editar" no header abre o ComponenteSheet em modo edição.
  */
 export function ComponenteDetailSheet({ open, onClose, componente, onEdit }: Props) {
+  const isPlatformAdmin  = useIsPlatformAdmin()
+  const isPasArchitect   = useIsPasArchitect()
+  const canManageAtribuicoes = isPlatformAdmin || isPasArchitect
+
+  const [atribuicoes, setAtribuicoes]           = useState<Atribuicao[]>([])
+  const [atribuicoesLoaded, setAtribuicoesLoaded] = useState(false)
+  const [novaAtribNome, setNovaAtribNome]       = useState('')
+  const [novaAtribModulo, setNovaAtribModulo]   = useState('')
+
+  useEffect(() => {
+    if (componente?.id && canManageAtribuicoes && !atribuicoesLoaded) {
+      api.getAtribuicoes(componente.id).then(data => {
+        setAtribuicoes(data)
+        setAtribuicoesLoaded(true)
+      }).catch(() => setAtribuicoesLoaded(true))
+    }
+  }, [componente?.id, canManageAtribuicoes, atribuicoesLoaded])
+
+  // Reset ao mudar de componente
+  useEffect(() => {
+    setAtribuicoes([])
+    setAtribuicoesLoaded(false)
+    setNovaAtribNome('')
+    setNovaAtribModulo('')
+  }, [componente?.id])
+
   if (!componente) return null
 
   // Resolve os tipos do componente contra os tipos mockados
@@ -121,6 +150,79 @@ export function ComponenteDetailSheet({ open, onClose, componente, onEdit }: Pro
                     <p className="text-sm text-[#6b7280]">Unidade: {t.unidade}</p>
                   </div>
                 ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* ── Atribuições do Componente ─────────────────── */}
+        {canManageAtribuicoes && (
+          <>
+            <div className="border-t border-[#e5e7eb]" />
+            <div className="flex flex-col gap-4">
+              <div>
+                <p className="text-base font-bold text-[#030712] leading-6">Atribuições do Componente</p>
+                <p className="text-sm text-[#6b7280] mt-1">
+                  Defina as atribuições disponíveis para membros desta instância.
+                  Atribuições ativas aparecem como opções ao adicionar membros.
+                </p>
+              </div>
+
+              {/* Lista de atribuições ativas */}
+              <div className="flex flex-col gap-2">
+                {atribuicoes.filter(a => a.status === 'Ativo').length === 0 && atribuicoesLoaded && (
+                  <p className="text-xs text-gray-400">Nenhuma atribuição ativa.</p>
+                )}
+                {atribuicoes.filter(a => a.status === 'Ativo').map(a => (
+                  <div key={a.id} className="flex items-center gap-2 px-3 py-2 border border-[#e5e7eb] rounded-md">
+                    <span className="text-sm flex-1 text-[#030712]">{a.nome}</span>
+                    {a.modulo && (
+                      <span className="text-xs text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">{a.modulo}</span>
+                    )}
+                    <button
+                      onClick={async () => {
+                        await api.updateAtribuicao(componente.id, a.id, { status: 'Inativo' })
+                        setAtribuicoes(prev => prev.map(x => x.id === a.id ? { ...x, status: 'Inativo' as const } : x))
+                      }}
+                      className="text-xs text-red-500 hover:text-red-700 ml-2"
+                    >
+                      Inativar
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Adicionar nova atribuição */}
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Nome da atribuição"
+                  value={novaAtribNome}
+                  onChange={e => setNovaAtribNome(e.target.value)}
+                  className="flex-1 text-sm border border-gray-300 rounded-md px-2 py-1.5 outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <input
+                  type="text"
+                  placeholder="Módulo (opcional)"
+                  value={novaAtribModulo}
+                  onChange={e => setNovaAtribModulo(e.target.value)}
+                  className="w-32 text-sm border border-gray-300 rounded-md px-2 py-1.5 outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  onClick={async () => {
+                    if (!novaAtribNome.trim()) return
+                    const nova = await api.createAtribuicao(componente.id, {
+                      nome: novaAtribNome,
+                      modulo: novaAtribModulo || undefined,
+                    })
+                    setAtribuicoes(prev => [...prev, nova])
+                    setNovaAtribNome('')
+                    setNovaAtribModulo('')
+                  }}
+                  className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 shrink-0"
+                >
+                  + Adicionar
+                </button>
               </div>
             </div>
           </>
