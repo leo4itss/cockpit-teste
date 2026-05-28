@@ -337,3 +337,101 @@ export function canManageInstanciaMembros(
   if (isAccountAdmin(userId, accountId, rel)) return true
   return getInstanciaRole(userId, instanceId, rel) === 'admin'
 }
+
+// ── DocNix: Hierarquia de Grupos ──────────────────────────────
+
+/**
+ * Retorna todos os IDs ancestrais de um grupo (percorre a hierarquia para cima).
+ * Ex: grupo-filho → [grupo-pai, grupo-avo]
+ * Proteção contra ciclos: máx 10 níveis.
+ */
+export function getGrupoAncestors(grupoId: string, rel: FGARelations): string[] {
+  const ancestors: string[] = []
+  const visited = new Set<string>()
+  let current = grupoId
+
+  for (let i = 0; i < 10; i++) {
+    const parent = rel.grupoParents?.find(gp => gp.grupoId === current)
+    if (!parent) break
+    if (visited.has(parent.parentId)) break  // ciclo detectado
+    ancestors.push(parent.parentId)
+    visited.add(parent.parentId)
+    current = parent.parentId
+  }
+
+  return ancestors
+}
+
+// ── DocNix: Atribuições por Instância ─────────────────────────
+
+/**
+ * Resolve as atribuições efetivas de um usuário em uma instância.
+ * Considera: (1) atribuições diretas ao usuário, (2) via grupos diretos,
+ * (3) via grupos ancestrais.
+ *
+ * Platform Admin recebe todas as atribuições disponíveis (representado por ['*']).
+ * OrgAdmin e AccountAdmin também recebem ['*'].
+ *
+ * Retorna array de atribuicaoIds únicos.
+ */
+export function getInstanciaAtribuicoes(
+  userId: string,
+  instanceId: string,
+  accountId: string,
+  orgId: string,
+  rel: FGARelations,
+): string[] {
+  // Admins com escopo amplo recebem acesso total
+  if (isPlatformAdmin(userId, rel)) return ['*']
+  if (isOrgAdmin(userId, orgId, rel)) return ['*']
+  if (isAccountAdmin(userId, accountId, rel)) return ['*']
+
+  const atribuicoes = rel.instanciaAtribuicoes ?? []
+  const result = new Set<string>()
+
+  // Atribuições diretas ao usuário
+  atribuicoes
+    .filter(a => a.instanceId === instanceId && a.entityType === 'user' && a.entityId === userId)
+    .forEach(a => result.add(a.atribuicaoId))
+
+  // Grupos diretos do usuário
+  const userGroupIds = rel.groupMembers
+    .filter(g => g.userId === userId)
+    .map(g => g.groupId)
+
+  // Grupos ancestrais (herança de hierarquia)
+  const allGroupIds = [...userGroupIds]
+  for (const gId of userGroupIds) {
+    getGrupoAncestors(gId, rel).forEach(ancestorId => {
+      if (!allGroupIds.includes(ancestorId)) allGroupIds.push(ancestorId)
+    })
+  }
+
+  // Atribuições via grupos (diretos + ancestrais)
+  atribuicoes
+    .filter(a =>
+      a.instanceId === instanceId &&
+      a.entityType === 'group' &&
+      allGroupIds.includes(a.entityId)
+    )
+    .forEach(a => result.add(a.atribuicaoId))
+
+  return Array.from(result)
+}
+
+/**
+ * Verifica se um usuário tem uma atribuição específica em uma instância.
+ * Atalho sobre getInstanciaAtribuicoes.
+ */
+export function canActWithAtribuicao(
+  userId: string,
+  instanceId: string,
+  atribuicaoId: string,
+  accountId: string,
+  orgId: string,
+  rel: FGARelations,
+): boolean {
+  const atribuicoes = getInstanciaAtribuicoes(userId, instanceId, accountId, orgId, rel)
+  if (atribuicoes.includes('*')) return true
+  return atribuicoes.includes(atribuicaoId)
+}
