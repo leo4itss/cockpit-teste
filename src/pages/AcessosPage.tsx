@@ -799,6 +799,22 @@ export function AcessosPage() {
         accountNome={accountNome ?? undefined}
         accountId={accountId}
       />
+
+      {/* Sheet — Permissões Efetivas (a partir da aba Usuários) */}
+      {permEfetivasUser && permEfetivasInstanciaId && (() => {
+        const instancia = instancias.find(i => i.id === permEfetivasInstanciaId)
+        return (
+          <PermissoesEfetivasSheet
+            open={true}
+            onClose={() => { setPermEfetivasUser(null); setPermEfetivasInstanciaId('') }}
+            userId={permEfetivasUser.id}
+            userName={permEfetivasUser.nomeCompleto}
+            instanciaId={permEfetivasInstanciaId}
+            instanciaNome={instancia?.nome ?? permEfetivasInstanciaId}
+            componenteId={instancia?.componenteId ?? ''}
+          />
+        )
+      })()}
     </div>
   )
 }
