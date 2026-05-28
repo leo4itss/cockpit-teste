@@ -82,6 +82,22 @@ export const mockFGARelations: FGARelations = {
     { entityType: 'group', entityId: 'g-analistas',   instanceId: 'inst-dash-ops',        role: 'viewer' },
     { entityType: 'user',  entityId: 'u-marcelo',     instanceId: 'inst-dash-ops',        role: 'member' },
   ],
+
+  // ── Hierarquia de Grupos ──────────────────────────────────────
+  // Hierarquia de grupos mock (ex: "Gestores de Riscos" → pai "Administradores DocNix")
+  grupoParents: [
+    { grupoId: 'grupo-gestores-riscos', parentId: 'grupo-admins-docnix' },
+  ],
+
+  // ── Atribuições de Instância ──────────────────────────────────
+  // Atribuições de instância mock
+  instanciaAtribuicoes: [
+    // inst-vanessa: usuário 1 tem 'Visualizar' e 'Usar'
+    { instanceId: 'inst-vanessa', entityType: 'user', entityId: '1', atribuicaoId: 'atrib-maxdoc-visualizar' },
+    { instanceId: 'inst-vanessa', entityType: 'user', entityId: '1', atribuicaoId: 'atrib-maxdoc-usar' },
+    // inst-ws-vendas: grupo com 'Visualizar'
+    { instanceId: 'inst-ws-vendas', entityType: 'group', entityId: 'grupo-admins-docnix', atribuicaoId: 'atrib-maxdoc-visualizar' },
+  ],
 }
 
 // ── Personas de teste ─────────────────────────────────────────
