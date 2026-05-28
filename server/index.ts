@@ -18,6 +18,11 @@ import {
   accountEntitlements,
   instancias,
   instanciaMembros,
+  componenteAtribuicoes,
+  instanciaMembroAtribuicoes,
+  instanciaFases,
+  faseResponsaveis,
+  instanciaPerfilSlots,
 } from './schema'
 import { eq, and, or, inArray, isNull } from 'drizzle-orm'
 
