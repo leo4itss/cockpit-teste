@@ -682,9 +682,16 @@ app.post('/api/grupos', async (c) => {
  */
 app.put('/api/grupos/:id', async (c) => {
   const body = await c.req.json()
+  const updates: Record<string, any> = {
+    nome: body.nome,
+    descricao: body.descricao,
+    papel: body.papel,
+    status: body.status,
+  }
+  if (body.parentId !== undefined) updates.parentId = body.parentId || null
   const [row] = await db
     .update(grupos)
-    .set({ nome: body.nome, descricao: body.descricao, papel: body.papel, status: body.status })
+    .set(updates)
     .where(eq(grupos.id, c.req.param('id')))
     .returning()
   if (!row) return c.json({ error: 'Not found' }, 404)
