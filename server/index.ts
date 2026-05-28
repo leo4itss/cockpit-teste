@@ -367,6 +367,18 @@ app.get('/api/users', async (c) => {
   return c.json(rows)
 })
 
+app.get('/api/users/cargos-distintos', async (c) => {
+  const rows = await db.selectDistinct({ cargo: users.cargo }).from(users)
+  const cargos = rows.map((r: any) => r.cargo).filter(Boolean).sort()
+  return c.json(cargos)
+})
+
+app.get('/api/users/areas-distintas', async (c) => {
+  const rows = await db.selectDistinct({ area: users.area }).from(users)
+  const areas = rows.map((r: any) => r.area).filter(Boolean).sort()
+  return c.json(areas)
+})
+
 app.get('/api/users/:id', async (c) => {
   const [row] = await db.select().from(users).where(eq(users.id, c.req.param('id')))
   if (!row) return c.json({ error: 'Not found' }, 404)
