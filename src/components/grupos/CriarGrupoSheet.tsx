@@ -165,7 +165,7 @@ export function CriarGrupoSheet({ open, onClose, accountId, grupos = [], onSucce
   }
 
   function handleClose() {
-    setNome(''); setDescricao(''); setPapel('User'); setSearchMembro('')
+    setNome(''); setDescricao(''); setPapel('User'); setParentId(null); setSearchMembro('')
     setMembros([]); setError(null)
     onClose()
   }
