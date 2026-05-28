@@ -86,6 +86,15 @@ export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, grupos 
   const [saving, setSaving]                     = useState(false)
   const [error, setError]                       = useState<string | null>(null)
 
+  // Grupos disponíveis como pai — filtrados pelo escopo atual
+  const gruposDisponiveis = useMemo(() => {
+    const orgIdEfetivo = isPlatformAdmin ? orgSelecionada : orgId
+    if (escopo === 'org') {
+      return grupos.filter(g => g.escopo === 'org' && g.orgId === orgIdEfetivo && g.status === 'Ativo')
+    }
+    return grupos.filter(g => g.escopo === 'conta' && g.accountId === contaSelecionada && g.status === 'Ativo')
+  }, [grupos, escopo, orgSelecionada, orgId, contaSelecionada, isPlatformAdmin])
+
   // Contas agrupadas por org (para o optgroup do select)
   const contasPorOrg = useMemo(() => {
     const map: Record<string, { orgNome: string; contas: Account[] }> = {}
