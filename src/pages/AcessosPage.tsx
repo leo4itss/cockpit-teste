@@ -145,6 +145,8 @@ export function AcessosPage() {
   const [showDetailSheet, setShowDetailSheet]     = useState(false)
   const [showEditSheet, setShowEditSheet]         = useState(false)
   const [selectedUser, setSelectedUser]           = useState<User | null>(null)
+  const [permEfetivasUser, setPermEfetivasUser]   = useState<User | null>(null)
+  const [permEfetivasInstanciaId, setPermEfetivasInstanciaId] = useState<string>('')
 
   useEffect(() => {
     if (!accountId) return
