@@ -801,20 +801,16 @@ export function AcessosPage() {
       />
 
       {/* Sheet — Permissões Efetivas (a partir da aba Usuários) */}
-      {permEfetivasUser && permEfetivasInstanciaId && (() => {
-        const instancia = instancias.find(i => i.id === permEfetivasInstanciaId)
-        return (
-          <PermissoesEfetivasSheet
-            open={true}
-            onClose={() => { setPermEfetivasUser(null); setPermEfetivasInstanciaId('') }}
-            userId={permEfetivasUser.id}
-            userName={permEfetivasUser.nomeCompleto}
-            instanciaId={permEfetivasInstanciaId}
-            instanciaNome={instancia?.nome ?? permEfetivasInstanciaId}
-            componenteId={instancia?.componenteId ?? ''}
-          />
-        )
-      })()}
+      {permEfetivasUser && (
+        <PermissoesEfetivasSheet
+          open={true}
+          onClose={() => { setPermEfetivasUser(null); setPermEfetivasInstanciaId('') }}
+          userId={permEfetivasUser.id}
+          userName={permEfetivasUser.nomeCompleto}
+          instancias={instancias.map(i => ({ id: i.id, nome: i.nome, componenteId: i.componenteId }))}
+          componenteNomes={componenteNomes}
+        />
+      )}
     </div>
   )
 }
