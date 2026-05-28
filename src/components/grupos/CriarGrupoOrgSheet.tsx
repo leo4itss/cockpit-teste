@@ -157,6 +157,7 @@ export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, grupos 
       escopo,
       orgId:     escopo === 'org'   ? orgIdEfetivo     : undefined,
       accountId: escopo === 'conta' ? contaSelecionada : undefined,
+      parentId:  parentId ?? undefined,
       status:    'Ativo',
       createdAt: now,
       qtdMembros: membros.length,
@@ -168,6 +169,7 @@ export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, grupos 
         descricao: descricao.trim() || null,
         orgId:     escopo === 'org'   ? orgIdEfetivo     : null,
         accountId: escopo === 'conta' ? contaSelecionada : null,
+        parentId:  parentId ?? null,
       })
       // Adiciona membros em background — falha silenciosa (API pode não ter a rota)
       if (membros.length > 0) {
