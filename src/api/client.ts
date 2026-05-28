@@ -205,6 +205,17 @@ export const api = {
   deletePerfilSlot: (instanciaId: string, slotId: string) =>
     request<void>(`/api/instancias/${instanciaId}/perfil-slots/${slotId}`, { method: 'DELETE' }),
 
+  getElegiveisSlot: (instanciaId: string, atribuicaoId?: string | null) => {
+    const q = atribuicaoId ? `?atribuicaoId=${encodeURIComponent(atribuicaoId)}` : ''
+    return request<{ usuarios: import('@/types').ElegivelSlot[]; grupos: import('@/types').ElegivelSlot[] }>(
+      `/api/instancias/${instanciaId}/elegiveis-slot${q}`,
+    )
+  },
+  addSlotNomeacao: (instanciaId: string, slotId: string, data: { entidadeTipo: 'user' | 'group'; entidadeId: string }) =>
+    request<any>(`/api/instancias/${instanciaId}/perfil-slots/${slotId}/nomeacoes`, { method: 'POST', body: JSON.stringify(data) }),
+  removeSlotNomeacao: (instanciaId: string, slotId: string, nomeacaoId: string) =>
+    request<void>(`/api/instancias/${instanciaId}/perfil-slots/${slotId}/nomeacoes/${nomeacaoId}`, { method: 'DELETE' }),
+
   // Atribuições de Membro de Instância
   getMembroAtribuicoes: (instanciaId: string, membroId: string) =>
     request<any[]>(`/api/instancias/${instanciaId}/membros/${membroId}/atribuicoes`),

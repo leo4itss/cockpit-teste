@@ -344,3 +344,14 @@ export const instanciaPerfilSlots = pgTable('instancia_perfil_slots', {
 }, (t) => [
   index('idx_instancia_slots').on(t.instanciaId, t.ordem),
 ])
+
+// Nomeação em slot de perfil (ex: "Anne" como Aprovador nesta instância)
+export const instanciaPerfilSlotNomeacoes = pgTable('instancia_perfil_slot_nomeacoes', {
+  id:           text('id').primaryKey(),
+  slotId:       text('slot_id').notNull().references(() => instanciaPerfilSlots.id),
+  entidadeTipo: text('entidade_tipo').notNull(), // 'user' | 'group'
+  entidadeId:   text('entidade_id').notNull(),
+  createdAt:    text('created_at').notNull(),
+}, (t) => [
+  index('idx_slot_nomeacoes_slot').on(t.slotId),
+])

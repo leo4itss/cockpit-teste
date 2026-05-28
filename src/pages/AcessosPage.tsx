@@ -146,7 +146,6 @@ export function AcessosPage() {
   const [showEditSheet, setShowEditSheet]         = useState(false)
   const [selectedUser, setSelectedUser]           = useState<User | null>(null)
   const [permEfetivasUser, setPermEfetivasUser]   = useState<User | null>(null)
-  const [permEfetivasInstanciaId, setPermEfetivasInstanciaId] = useState<string>('')
 
   useEffect(() => {
     if (!accountId) return
@@ -799,7 +798,7 @@ export function AcessosPage() {
       {permEfetivasUser && (
         <PermissoesEfetivasSheet
           open={true}
-          onClose={() => { setPermEfetivasUser(null); setPermEfetivasInstanciaId('') }}
+          onClose={() => setPermEfetivasUser(null)}
           userId={permEfetivasUser.id}
           userName={permEfetivasUser.nomeCompleto}
           instancias={instancias.map(i => ({ id: i.id, nome: i.nome, componenteId: i.componenteId }))}

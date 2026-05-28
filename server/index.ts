@@ -23,8 +23,10 @@ import {
   instanciaFases,
   faseResponsaveis,
   instanciaPerfilSlots,
+  instanciaPerfilSlotNomeacoes,
 } from './schema'
 import { eq, and, or, inArray, isNull } from 'drizzle-orm'
+import { getElegiveisParaSlot } from './docnix-elegiveis'
 
 const app = new Hono()
 
@@ -1340,7 +1342,46 @@ app.get('/api/instancias/:id/perfil-slots', async (c) => {
   const rows = await db.select().from(instanciaPerfilSlots)
     .where(eq(instanciaPerfilSlots.instanciaId, id))
     .orderBy(instanciaPerfilSlots.ordem)
-  return c.json(rows)
+
+  if (rows.length === 0) return c.json([])
+
+  const slotIds = rows.map(r => r.id)
+  const nomeacoes = await db.select().from(instanciaPerfilSlotNomeacoes)
+    .where(inArray(instanciaPerfilSlotNomeacoes.slotId, slotIds))
+
+  const userIds = nomeacoes.filter(n => n.entidadeTipo === 'user').map(n => n.entidadeId)
+  const grupoIds = nomeacoes.filter(n => n.entidadeTipo === 'group').map(n => n.entidadeId)
+  const [userRows, grupoRows] = await Promise.all([
+    userIds.length ? db.select().from(users).where(inArray(users.id, userIds)) : Promise.resolve([]),
+    grupoIds.length ? db.select().from(grupos).where(inArray(grupos.id, grupoIds)) : Promise.resolve([]),
+  ])
+  const userNames = new Map(userRows.map(u => [u.id, u.nomeCompleto]))
+  const grupoNames = new Map(grupoRows.map(g => [g.id, g.nome]))
+
+  const nomeacoesBySlot = new Map<string, typeof nomeacoes>()
+  for (const n of nomeacoes) {
+    if (!nomeacoesBySlot.has(n.slotId)) nomeacoesBySlot.set(n.slotId, [])
+    nomeacoesBySlot.get(n.slotId)!.push(n)
+  }
+
+  const enriched = rows.map(slot => ({
+    ...slot,
+    nomeacoes: (nomeacoesBySlot.get(slot.id) ?? []).map(n => ({
+      ...n,
+      displayName: n.entidadeTipo === 'user'
+        ? userNames.get(n.entidadeId) ?? n.entidadeId
+        : grupoNames.get(n.entidadeId) ?? n.entidadeId,
+    })),
+  }))
+  return c.json(enriched)
+})
+
+/** Elegíveis para nomear em slot (filtro por atribuição — DocNix) */
+app.get('/api/instancias/:id/elegiveis-slot', async (c) => {
+  const { id } = c.req.param()
+  const atribuicaoId = c.req.query('atribuicaoId') || null
+  const result = await getElegiveisParaSlot(db, id, atribuicaoId)
+  return c.json(result)
 })
 
 app.post('/api/instancias/:id/perfil-slots', async (c) => {
@@ -1374,7 +1415,50 @@ app.put('/api/instancias/:id/perfil-slots/:slotId', async (c) => {
 
 app.delete('/api/instancias/:id/perfil-slots/:slotId', async (c) => {
   const { slotId } = c.req.param()
+  await db.delete(instanciaPerfilSlotNomeacoes).where(eq(instanciaPerfilSlotNomeacoes.slotId, slotId))
   await db.delete(instanciaPerfilSlots).where(eq(instanciaPerfilSlots.id, slotId))
+  return c.json({ success: true })
+})
+
+app.post('/api/instancias/:id/perfil-slots/:slotId/nomeacoes', async (c) => {
+  const { slotId } = c.req.param()
+  const body = await c.req.json()
+  const { entidadeTipo, entidadeId } = body
+  if (!entidadeTipo || !entidadeId) {
+    return c.json({ error: 'entidadeTipo e entidadeId são obrigatórios' }, 400)
+  }
+
+  const [slot] = await db.select().from(instanciaPerfilSlots).where(eq(instanciaPerfilSlots.id, slotId))
+  if (!slot) return c.json({ error: 'Slot não encontrado' }, 404)
+
+  const elegiveis = await getElegiveisParaSlot(db, slot.instanciaId, slot.atribuicaoFiltroId ?? null)
+  const pool = entidadeTipo === 'user' ? elegiveis.usuarios : elegiveis.grupos
+  if (!pool.some(e => e.id === entidadeId)) {
+    return c.json({
+      error: 'Entidade não elegível para este slot (sem a atribuição exigida na instância)',
+    }, 403)
+  }
+
+  const existentes = await db.select().from(instanciaPerfilSlotNomeacoes)
+    .where(eq(instanciaPerfilSlotNomeacoes.slotId, slotId))
+  if (existentes.some(n => n.entidadeTipo === entidadeTipo && n.entidadeId === entidadeId)) {
+    return c.json({ error: 'Já nomeado neste slot' }, 409)
+  }
+
+  const novo = {
+    id: crypto.randomUUID(),
+    slotId,
+    entidadeTipo,
+    entidadeId,
+    createdAt: new Date().toISOString(),
+  }
+  await db.insert(instanciaPerfilSlotNomeacoes).values(novo)
+  return c.json(novo, 201)
+})
+
+app.delete('/api/instancias/:id/perfil-slots/:slotId/nomeacoes/:nomeacaoId', async (c) => {
+  const { nomeacaoId } = c.req.param()
+  await db.delete(instanciaPerfilSlotNomeacoes).where(eq(instanciaPerfilSlotNomeacoes.id, nomeacaoId))
   return c.json({ success: true })
 })
 

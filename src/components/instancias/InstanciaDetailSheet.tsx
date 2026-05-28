@@ -24,10 +24,14 @@ import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { AtribuirPermissoesSheet } from '@/components/permissoes/AtribuirPermissoesSheet'
 import { PermissoesEfetivasSheet } from '@/components/permissoes/PermissoesEfetivasSheet'
+import { MembroAtribuicoesSheet } from '@/components/instancias/MembroAtribuicoesSheet'
 import { api } from '@/api/client'
 import { useCanManageInstanciaMembros } from '@/authz/hooks'
 import { cn } from '@/lib/utils'
-import type { Instancia, InstanciaMembro, User, Grupo, Atribuicao, InstanciaFase, FaseResponsavel, InstanciaPerfilSlot } from '@/types'
+import type {
+  Instancia, InstanciaMembro, User, Grupo, Atribuicao,
+  InstanciaFase, FaseResponsavel, InstanciaPerfilSlot, ElegivelSlot,
+} from '@/types'
 import {
   users          as mockUsers,
   grupos         as mockGrupos,
@@ -268,6 +272,247 @@ function AddMembroSection({
   )
 }
 
+// ── Slot de perfil com filtro por atribuição (DocNix) ─────────
+
+function PerfilSlotCard({
+  slot,
+  instanciaId,
+  atribuicoes,
+  canManage,
+  onChange,
+  onRemove,
+}: {
+  slot: InstanciaPerfilSlot
+  instanciaId: string
+  atribuicoes: Atribuicao[]
+  canManage: boolean
+  onChange: (slot: InstanciaPerfilSlot) => void
+  onRemove: () => void
+}) {
+  const [showAdd, setShowAdd]               = useState(false)
+  const [search, setSearch]                 = useState('')
+  const [elegiveis, setElegiveis]             = useState<{ usuarios: ElegivelSlot[]; grupos: ElegivelSlot[] } | null>(null)
+  const [loadingElegiveis, setLoadingElegiveis] = useState(false)
+  const [adding, setAdding]                   = useState(false)
+
+  const atribuicaoFiltro = atribuicoes.find(a => a.id === slot.atribuicaoFiltroId)
+  const nomeacoes = slot.nomeacoes ?? []
+
+  useEffect(() => {
+    if (!showAdd) {
+      setElegiveis(null)
+      setSearch('')
+      return
+    }
+    setLoadingElegiveis(true)
+    api.getElegiveisSlot(instanciaId, slot.atribuicaoFiltroId ?? null)
+      .then(setElegiveis)
+      .catch(() => setElegiveis({ usuarios: [], grupos: [] }))
+      .finally(() => setLoadingElegiveis(false))
+  }, [showAdd, instanciaId, slot.atribuicaoFiltroId])
+
+  const jaNomeado = new Set(nomeacoes.map(n => `${n.entidadeTipo}:${n.entidadeId}`))
+
+  const sugestoes = useMemo(() => {
+    if (!elegiveis) return []
+    const q = search.trim().toLowerCase()
+    const items: Array<ElegivelSlot & { key: string }> = [
+      ...elegiveis.grupos.map(g => ({ ...g, key: `group:${g.id}` })),
+      ...elegiveis.usuarios.map(u => ({ ...u, key: `user:${u.id}` })),
+    ]
+    return items
+      .filter(item => !jaNomeado.has(`${item.tipo}:${item.id}`))
+      .filter(item => !q || item.nome.toLowerCase().includes(q))
+      .slice(0, 8)
+  }, [elegiveis, search, nomeacoes])
+
+  async function handleUpdateFiltro(atribuicaoFiltroId: string) {
+    const updated = await api.updatePerfilSlot(instanciaId, slot.id, {
+      atribuicaoFiltroId: atribuicaoFiltroId || null,
+    })
+    onChange({ ...slot, ...updated, nomeacoes: slot.nomeacoes })
+  }
+
+  async function handleToggleObrigatorio() {
+    const updated = await api.updatePerfilSlot(instanciaId, slot.id, {
+      obrigatorio: !slot.obrigatorio,
+    })
+    onChange({ ...slot, ...updated, nomeacoes: slot.nomeacoes })
+  }
+
+  async function handleAddNomeacao(item: ElegivelSlot) {
+    setAdding(true)
+    try {
+      const row = await api.addSlotNomeacao(instanciaId, slot.id, {
+        entidadeTipo: item.tipo,
+        entidadeId: item.id,
+      })
+      const displayName = item.nome
+      onChange({
+        ...slot,
+        nomeacoes: [...nomeacoes, { ...row, displayName, entidadeTipo: item.tipo, entidadeId: item.id }],
+      })
+      setSearch('')
+      setShowAdd(false)
+    } finally {
+      setAdding(false)
+    }
+  }
+
+  async function handleRemoveNomeacao(nomeacaoId: string) {
+    await api.removeSlotNomeacao(instanciaId, slot.id, nomeacaoId)
+    onChange({ ...slot, nomeacoes: nomeacoes.filter(n => n.id !== nomeacaoId) })
+  }
+
+  return (
+    <div className="border border-gray-200 rounded-lg p-4 space-y-3 bg-white">
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <p className="text-sm font-semibold text-[#030712]">{slot.slotNome}</p>
+          {atribuicaoFiltro ? (
+            <p className="text-xs text-blue-600 mt-0.5">
+              Filtro: {atribuicaoFiltro.nome}
+            </p>
+          ) : (
+            <p className="text-xs text-amber-600 mt-0.5">
+              Sem filtro — qualquer membro da instância pode ser nomeado
+            </p>
+          )}
+        </div>
+        {canManage && (
+          <button onClick={onRemove} className="text-xs text-red-500 hover:text-red-700 shrink-0">
+            Remover slot
+          </button>
+        )}
+      </div>
+
+      {canManage && (
+        <div className="flex flex-wrap items-center gap-3 text-xs">
+          <label className="flex items-center gap-1.5 text-gray-600">
+            Atribuição filtro:
+            <select
+              value={slot.atribuicaoFiltroId ?? ''}
+              onChange={e => handleUpdateFiltro(e.target.value)}
+              className="text-xs border border-gray-300 rounded-md px-2 py-1 bg-white max-w-[200px]"
+            >
+              <option value="">Qualquer membro</option>
+              {atribuicoes.filter(a => a.status === 'Ativo').map(a => (
+                <option key={a.id} value={a.id}>{a.nome}</option>
+              ))}
+            </select>
+          </label>
+          <label className="flex items-center gap-1.5 text-gray-600 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={slot.obrigatorio}
+              onChange={handleToggleObrigatorio}
+              className="rounded"
+            />
+            Obrigatório
+          </label>
+        </div>
+      )}
+
+      <div>
+        <p className="text-xs font-medium text-gray-500 mb-2">Nomeados neste slot</p>
+        {nomeacoes.length === 0 ? (
+          <p className="text-xs text-gray-400">Nenhum usuário ou grupo nomeado.</p>
+        ) : (
+          <ul className="space-y-1.5">
+            {nomeacoes.map(n => (
+              <li key={n.id} className="flex items-center justify-between gap-2 text-sm bg-gray-50 rounded-md px-2 py-1.5">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Avatar nome={n.displayName ?? n.entidadeId} isGroup={n.entidadeTipo === 'group'} />
+                  <span className="truncate">{n.displayName ?? n.entidadeId}</span>
+                  <span className="text-[10px] text-gray-400 shrink-0">
+                    {n.entidadeTipo === 'group' ? 'grupo' : 'usuário'}
+                  </span>
+                </div>
+                {canManage && (
+                  <button
+                    onClick={() => handleRemoveNomeacao(n.id)}
+                    className="text-xs text-red-500 hover:text-red-700 shrink-0"
+                  >
+                    Remover
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {canManage && (
+        <>
+          {!showAdd ? (
+            <button
+              onClick={() => setShowAdd(true)}
+              className="text-xs font-medium text-blue-600 hover:text-blue-800"
+            >
+              + Nomear usuário ou grupo
+            </button>
+          ) : (
+            <div className="border-t border-gray-100 pt-3 space-y-2">
+              <p className="text-xs text-gray-500">
+                {atribuicaoFiltro
+                  ? `Somente quem tem "${atribuicaoFiltro.nome}" nesta instância (direto ou via grupo).`
+                  : 'Membros da instância (sem filtro de atribuição).'}
+              </p>
+              <div className="relative">
+                <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-blue-500">
+                  <Search className="w-4 h-4 text-gray-400 shrink-0" />
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    placeholder="Buscar para nomear..."
+                    disabled={adding}
+                    className="flex-1 bg-transparent text-sm outline-none"
+                    autoFocus
+                  />
+                  <button onClick={() => setShowAdd(false)} className="text-gray-400 hover:text-gray-600 text-sm">×</button>
+                </div>
+                {loadingElegiveis && (
+                  <p className="text-xs text-gray-400 mt-2 flex items-center gap-1">
+                    <Loader2 className="w-3 h-3 animate-spin" /> Carregando elegíveis...
+                  </p>
+                )}
+                {!loadingElegiveis && sugestoes.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto">
+                    {sugestoes.map(item => (
+                      <button
+                        key={item.key}
+                        disabled={adding}
+                        onClick={() => handleAddNomeacao(item)}
+                        className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 text-left"
+                      >
+                        <Avatar nome={item.nome} isGroup={item.tipo === 'group'} />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium truncate">{item.nome}</p>
+                          <p className="text-[10px] text-gray-400">
+                            {item.tipo === 'group' ? 'grupo' : 'usuário'}
+                            {item.origem === 'grupo' && item.origemGrupoNome && (
+                              <> · via {item.origemGrupoNome}</>
+                            )}
+                            {item.origem === 'direto' && item.tipo === 'user' && ' · direto'}
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {!loadingElegiveis && search && sugestoes.length === 0 && (
+                  <p className="text-xs text-gray-400 mt-2">Nenhum elegível encontrado com este filtro.</p>
+                )}
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+
 // ── Componente principal ──────────────────────────────────────
 
 export function InstanciaDetailSheet({
@@ -281,9 +526,11 @@ export function InstanciaDetailSheet({
   const [showAdd, setShowAdd]                   = useState(false)
   const [addingId, setAddingId]                 = useState<string | null>(null)
   const [removingId, setRemovingId]             = useState<string | null>(null)
-  // Permissões granulares por membro
+  // Permissões granulares (legado) ou atribuições DocNix por membro
   const [showPermissoes, setShowPermissoes]     = useState(false)
   const [membroPermissoes, setMembroPermissoes] = useState<InstanciaMembro | null>(null)
+  const [showMembroAtrib, setShowMembroAtrib]   = useState(false)
+  const [membroAtrib, setMembroAtrib]           = useState<InstanciaMembro | null>(null)
   // Permissões efetivas (view-only) por membro usuário
   const [showPermEfetivas, setShowPermEfetivas]         = useState(false)
   const [membroPermEfetivas, setMembroPermEfetivas]     = useState<InstanciaMembro | null>(null)
@@ -308,6 +555,7 @@ export function InstanciaDetailSheet({
   const [perfilSlots, setPerfilSlots]           = useState<InstanciaPerfilSlot[]>([])
   const [slotsLoaded, setSlotsLoaded]           = useState(false)
   const [novoSlotNome, setNovoSlotNome]         = useState('')
+  const [novoSlotAtribId, setNovoSlotAtribId]   = useState('')
 
   const canManage = useCanManageInstanciaMembros(instancia?.id ?? '', accountId)
 
@@ -433,8 +681,15 @@ export function InstanciaDetailSheet({
     // Não limpa `membros` para preservar edições locais ao reabrir a mesma instância
     setShowAdd(false)
     setShowPermissoes(false); setMembroPermissoes(null)
+    setShowMembroAtrib(false); setMembroAtrib(null)
     onClose()
   }
+
+  const atribuicoesDocnix = atribuicoes.filter(a => a.status === 'Ativo').length > 0
+  const grupoNomes = useMemo(
+    () => Object.fromEntries(allGrupos.map(g => [g.id, g.nome])),
+    [allGrupos],
+  )
 
   if (!instancia) return null
 
@@ -552,18 +807,23 @@ export function InstanciaDetailSheet({
                               </div>
                             </div>
                           </td>
-                          <td className="px-3 py-3">
-                            {canManage ? (
-                              <PapelEditor
-                                papel={membro.papel}
-                                onSave={(novo) => handleSavePapel(membro, novo)}
-                              />
-                            ) : (
-                              <PapelBadge papel={membro.papel} />
-                            )}
-                          </td>
+                          {!atribuicoesDocnix && (
+                            <td className="px-3 py-3">
+                              {canManage ? (
+                                <PapelEditor
+                                  papel={membro.papel}
+                                  onSave={(novo) => handleSavePapel(membro, novo)}
+                                />
+                              ) : (
+                                <PapelBadge papel={membro.papel} />
+                              )}
+                            </td>
+                          )}
                           <td className="pr-6 pl-3 py-3 text-right">
-                            <div className="invisible group-hover:visible flex items-center justify-end gap-1">
+                            <div className={cn(
+                              'flex items-center justify-end gap-1',
+                              atribuicoesDocnix ? 'visible' : 'invisible group-hover:visible',
+                            )}>
                               {/* Permissões efetivas — apenas para usuários (não grupos) */}
                               {!isGroup && (
                                 <button
@@ -575,8 +835,18 @@ export function InstanciaDetailSheet({
                                   Efetivas
                                 </button>
                               )}
-                              {/* Permissões granulares — usuários e grupos */}
-                              {canManage && (
+                              {/* Atribuições DocNix ou permissões legado */}
+                              {canManage && atribuicoesDocnix && (
+                                <button
+                                  onClick={() => { setMembroAtrib(membro); setShowMembroAtrib(true) }}
+                                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-blue-600 hover:bg-blue-50 transition-colors"
+                                  title="Editar atribuições na instância"
+                                >
+                                  <Shield className="w-3.5 h-3.5" />
+                                  Atribuições
+                                </button>
+                              )}
+                              {canManage && !atribuicoesDocnix && (
                                 <button
                                   onClick={() => { setMembroPermissoes(membro); setShowPermissoes(true) }}
                                   className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-blue-600 hover:bg-blue-50 transition-colors"
@@ -787,7 +1057,11 @@ export function InstanciaDetailSheet({
 
         {/* ── Aba: Perfil de Objeto ─────────────────────────── */}
         {activeTab === 'perfil' && (
-          <div className="px-6 py-4 space-y-3">
+          <div className="px-6 py-4 space-y-4">
+            <p className="text-xs text-gray-500 leading-relaxed">
+              Slots do perfil de objeto (DocNix). Cada slot pode exigir uma atribuição — ao nomear,
+              só aparecem usuários/grupos que possuem essa capacidade na instância.
+            </p>
             {!slotsLoaded ? (
               <div className="flex items-center justify-center py-8 text-sm text-gray-500">
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -799,56 +1073,61 @@ export function InstanciaDetailSheet({
                   <p className="text-sm text-gray-500">Nenhum slot de perfil configurado.</p>
                 )}
                 {perfilSlots.map(slot => (
-                  <div key={slot.id} className="flex items-center gap-2 p-2 bg-gray-50 rounded-md">
-                    <span className="text-sm flex-1">{slot.slotNome}</span>
-                    {slot.obrigatorio && (
-                      <span className="text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded">Obrigatório</span>
-                    )}
-                    <button
-                      onClick={async () => {
-                        await api.deletePerfilSlot(instancia!.id, slot.id)
-                        setPerfilSlots(prev => prev.filter(s => s.id !== slot.id))
-                      }}
-                      className="text-xs text-red-500 hover:text-red-700"
-                    >Remover</button>
-                  </div>
+                  <PerfilSlotCard
+                    key={slot.id}
+                    slot={slot}
+                    instanciaId={instancia!.id}
+                    atribuicoes={atribuicoes}
+                    canManage={canManage}
+                    onChange={updated => setPerfilSlots(prev => prev.map(s => s.id === updated.id ? updated : s))}
+                    onRemove={async () => {
+                      await api.deletePerfilSlot(instancia!.id, slot.id)
+                      setPerfilSlots(prev => prev.filter(s => s.id !== slot.id))
+                    }}
+                  />
                 ))}
-                {/* Adicionar novo slot */}
-                <div className="flex gap-2 mt-2">
-                  <input
-                    type="text"
-                    placeholder="Nome do slot (ex: Revisores)"
-                    value={novoSlotNome}
-                    onChange={e => setNovoSlotNome(e.target.value)}
-                    onKeyDown={async e => {
-                      if (e.key === 'Enter' && novoSlotNome.trim()) {
+                {canManage && (
+                  <div className="border border-dashed border-gray-300 rounded-lg p-4 space-y-2">
+                    <p className="text-xs font-medium text-gray-600">Novo slot</p>
+                    <div className="flex flex-col gap-2 sm:flex-row">
+                      <input
+                        type="text"
+                        placeholder="Nome (ex: Aprovadores)"
+                        value={novoSlotNome}
+                        onChange={e => setNovoSlotNome(e.target.value)}
+                        className="flex-1 text-sm border border-gray-300 rounded-md px-2 py-1.5 outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <select
+                        value={novoSlotAtribId}
+                        onChange={e => setNovoSlotAtribId(e.target.value)}
+                        className="text-sm border border-gray-300 rounded-md px-2 py-1.5 bg-white sm:max-w-[220px]"
+                      >
+                        <option value="">Atribuição filtro (opcional)</option>
+                        {atribuicoes.filter(a => a.status === 'Ativo').map(a => (
+                          <option key={a.id} value={a.id}>{a.nome}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <button
+                      disabled={!novoSlotNome.trim()}
+                      onClick={async () => {
+                        if (!novoSlotNome.trim()) return
                         const novo = await api.createPerfilSlot(instancia!.id, {
-                          slotNome: novoSlotNome,
+                          slotNome: novoSlotNome.trim(),
+                          atribuicaoFiltroId: novoSlotAtribId || undefined,
                           obrigatorio: false,
                           ordem: perfilSlots.length,
                         })
-                        setPerfilSlots(prev => [...prev, novo])
+                        setPerfilSlots(prev => [...prev, { ...novo, nomeacoes: [] }])
                         setNovoSlotNome('')
-                      }
-                    }}
-                    className="flex-1 text-sm border border-gray-300 rounded-md px-2 py-1 outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <button
-                    onClick={async () => {
-                      if (!novoSlotNome.trim()) return
-                      const novo = await api.createPerfilSlot(instancia!.id, {
-                        slotNome: novoSlotNome,
-                        obrigatorio: false,
-                        ordem: perfilSlots.length,
-                      })
-                      setPerfilSlots(prev => [...prev, novo])
-                      setNovoSlotNome('')
-                    }}
-                    className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
-                  >
-                    + Slot
-                  </button>
-                </div>
+                        setNovoSlotAtribId('')
+                      }}
+                      className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50"
+                    >
+                      + Adicionar slot
+                    </button>
+                  </div>
+                )}
               </>
             )}
           </div>
@@ -859,8 +1138,21 @@ export function InstanciaDetailSheet({
         <Button variant="ghost" onClick={handleClose}>Fechar</Button>
       </NestedSheetFooter>
 
-      {/* Sheet de permissões granulares por membro dentro da instância */}
-      {membroPermissoes && (
+      {/* Sheet de atribuições DocNix por membro */}
+      {membroAtrib && instancia && (
+        <MembroAtribuicoesSheet
+          open={showMembroAtrib}
+          onClose={() => { setShowMembroAtrib(false); setMembroAtrib(null) }}
+          instanciaId={instancia.id}
+          instanciaNome={instancia.nome}
+          componenteId={instancia.componenteId}
+          membro={membroAtrib}
+          grupoNomes={grupoNomes}
+        />
+      )}
+
+      {/* Sheet de permissões granulares (legado) por membro */}
+      {membroPermissoes && !atribuicoesDocnix && (
         <AtribuirPermissoesSheet
           open={showPermissoes}
           onClose={() => { setShowPermissoes(false); setMembroPermissoes(null) }}

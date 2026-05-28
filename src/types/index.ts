@@ -393,6 +393,15 @@ export interface FaseResponsavel {
 }
 
 // ── DocNix: Perfil de Objeto ──────────────────────────────────
+export interface InstanciaPerfilSlotNomeacao {
+  id: string
+  slotId: string
+  entidadeTipo: 'user' | 'group'
+  entidadeId: string
+  displayName?: string
+  createdAt: string
+}
+
 export interface InstanciaPerfilSlot {
   id: string
   instanciaId: string
@@ -401,6 +410,16 @@ export interface InstanciaPerfilSlot {
   obrigatorio: boolean
   ordem: number
   createdAt: string
+  nomeacoes?: InstanciaPerfilSlotNomeacao[]
+}
+
+export type ElegivelSlot = {
+  id: string
+  nome: string
+  tipo: 'user' | 'group'
+  origem: 'direto' | 'grupo'
+  origemGrupoId?: string
+  origemGrupoNome?: string
 }
 
 // ── DocNix: Membro com Atribuições ────────────────────────────
