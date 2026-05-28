@@ -297,6 +297,7 @@ export function GruposPage() {
         orgId={adminOrgId}
         orgs={orgs}
         contas={contas}
+        grupos={grupos}
         isPlatformAdmin={isPlatformAdmin}
         onSuccess={grupo => setGrupos(prev => [...prev, grupo])}
       />
@@ -308,6 +309,7 @@ export function GruposPage() {
         accountId={selectedGrupo?.accountId ?? ''}
         accountNome={selectedGrupo ? (getContexto(selectedGrupo)?.nome ?? undefined) : undefined}
         contextoLabel={selectedGrupo ? (getContexto(selectedGrupo)?.label ?? undefined) : undefined}
+        grupos={grupos}
         onUpdate={updated => setGrupos(prev => prev.map(g => g.id === updated.id ? updated : g))}
       />
     </div>
