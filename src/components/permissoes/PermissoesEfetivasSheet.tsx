@@ -137,6 +137,30 @@ export function PermissoesEfetivasSheet({
       </NestedSheetHeader>
 
       <NestedSheetBody>
+        {/* Seletor de instância — exibido quando há múltiplas opções e nenhuma fixada */}
+        {!instanciaIdProp && instancias && instancias.length > 0 && (
+          <div className="mb-4">
+            <label className="block text-xs font-medium text-gray-600 mb-1">Instância</label>
+            <select
+              value={selectedInstanciaId}
+              onChange={e => setSelectedInstanciaId(e.target.value)}
+              className="w-full text-sm border border-gray-300 rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            >
+              {instancias.map(i => (
+                <option key={i.id} value={i.id}>
+                  {componenteNomes?.[i.componenteId] ? `${componenteNomes[i.componenteId]} — ` : ''}{i.nome}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {!instanciaIdProp && instancias && instancias.length === 0 && (
+          <div className="py-8 text-center">
+            <p className="text-sm text-gray-500">Esta conta não possui instâncias configuradas.</p>
+          </div>
+        )}
+
         {loading && (
           <p className="text-sm text-gray-500 py-4">Carregando permissões...</p>
         )}
