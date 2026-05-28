@@ -68,33 +68,21 @@ Espelhados em `server/index.ts` + `api/index.ts` + `src/api/client.ts`:
 
 ---
 
-## Pendente: push do schema ao banco
+## Banco de dados — concluído
 
-**Problema encontrado:** ao rodar `npm run db:push`, o drizzle detectou 3 tabelas no banco que NÃO existem no schema local e quis deletá-las:
-- `grupo_permissoes` (18 itens)
-- `componente_objetos` (7 itens)
-- `contract_versions` (15 itens)
+### `npm run db:push` ✅
+As 5 novas tabelas foram criadas. 3 tabelas legado sem referências no código foram removidas:
+- `grupo_permissoes`, `componente_objetos`, `contract_versions`
 
-**Abortamos o push** para não perder dados.
-
-### O que precisa ser resolvido antes do push
-
-Opção A (recomendada): Adicionar essas 3 tabelas ao `server/schema.ts` com a estrutura que já existe no banco, para o drizzle não querer deletá-las. Depois rodar o push novamente.
-
-Para descobrir a estrutura atual dessas tabelas, rodar no Drizzle Studio (`npm run db:studio`) ou consultar diretamente o banco.
-
-Opção B: Se essas tabelas são legado e podem ser removidas (dados descartáveis), confirmar o push com "Yes".
-
-### Após resolver o schema conflict, rodar:
+### Seed ✅
 ```bash
-npm run db:push
-# depois:
-npx ts-node server/seed-docnix-atribuicoes.ts
+export $(cat .env | xargs) && npx tsx server/seed-docnix-atribuicoes.ts
 ```
+Resultado: componentes **MaxDoc** (`comp-maxdoc`) e **DocAction** (`comp-docaction`) criados com 15 + 11 atribuições respectivamente.
 
 ---
 
-## Como testar após o push
+## Como testar
 
 1. `npm run dev` + `npm run dev:server` (dois terminais)
 2. Acessar o cockpit em `http://localhost:5173`
