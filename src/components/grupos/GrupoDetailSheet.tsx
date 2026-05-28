@@ -248,6 +248,18 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
     setLocalPapel(grupo?.papel ?? '')
   }, [grupo?.id, grupo?.papel])
 
+  // Nome do grupo pai (se houver)
+  const nomeGrupoPai = useMemo(
+    () => grupo?.parentId ? (grupos.find(g => g.id === grupo.parentId)?.nome ?? grupo.parentId) : null,
+    [grupo?.parentId, grupos]
+  )
+
+  // Subgrupos (grupos que têm este como pai)
+  const gruposFilhos = useMemo(
+    () => grupo ? grupos.filter(g => g.parentId === grupo.id) : [],
+    [grupo?.id, grupos]
+  )
+
   // Carrega membros e todos os usuários ao abrir
   useEffect(() => {
     if (!open || !grupo) return
