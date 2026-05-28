@@ -293,6 +293,20 @@ export interface FGARelations {
     instanceId: string
     role:       'viewer' | 'member' | 'admin'
   }>
+
+  // Atribuições efetivas por instância
+  instanciaAtribuicoes: {
+    instanceId: string
+    entityType: 'user' | 'group'
+    entityId: string
+    atribuicaoId: string
+  }[]
+
+  // Hierarquia de grupos (pai/filho)
+  grupoParents: {
+    grupoId: string
+    parentId: string
+  }[]
 }
 
 // ── Instâncias de Componente ──────────────────────────────────
