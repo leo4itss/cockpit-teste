@@ -562,10 +562,21 @@ export function InstanciaDetailSheet({
                               <PapelBadge papel={membro.papel} />
                             )}
                           </td>
-                          {canManage && (
-                            <td className="pr-6 pl-3 py-3 text-right">
-                              <div className="invisible group-hover:visible flex items-center justify-end gap-1">
-                                {/* Permissões granulares — usuários e grupos */}
+                          <td className="pr-6 pl-3 py-3 text-right">
+                            <div className="invisible group-hover:visible flex items-center justify-end gap-1">
+                              {/* Permissões efetivas — apenas para usuários (não grupos) */}
+                              {!isGroup && (
+                                <button
+                                  onClick={() => { setMembroPermEfetivas(membro); setShowPermEfetivas(true) }}
+                                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+                                  title="Ver permissões efetivas"
+                                >
+                                  <Shield className="w-3.5 h-3.5" />
+                                  Efetivas
+                                </button>
+                              )}
+                              {/* Permissões granulares — usuários e grupos */}
+                              {canManage && (
                                 <button
                                   onClick={() => { setMembroPermissoes(membro); setShowPermissoes(true) }}
                                   className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-blue-600 hover:bg-blue-50 transition-colors"
@@ -574,6 +585,8 @@ export function InstanciaDetailSheet({
                                   <Shield className="w-3.5 h-3.5" />
                                   Permissões
                                 </button>
+                              )}
+                              {canManage && (
                                 <button
                                   onClick={() => handleRemove(membro)}
                                   disabled={isRemoving || !!addingId}
@@ -585,9 +598,9 @@ export function InstanciaDetailSheet({
                                     : <UserMinus className="w-3.5 h-3.5" />}
                                   Remover
                                 </button>
-                              </div>
-                            </td>
-                          )}
+                              )}
+                            </div>
+                          </td>
                         </tr>
                       )
                     })}
