@@ -549,6 +549,17 @@ export function AcessosPage() {
                                 <button onClick={() => handleEditUser(user)} className="flex items-center gap-2 w-full px-3 py-2 text-sm font-medium text-[#030712] hover:bg-gray-100 rounded-md transition-colors text-left">
                                   <FilePen className="w-4 h-4 shrink-0" />Editar usuário
                                 </button>
+                                {instancias.length > 0 && (
+                                  <button
+                                    onClick={() => {
+                                      setPermEfetivasUser(user)
+                                      setPermEfetivasInstanciaId(instancias[0]?.id ?? '')
+                                    }}
+                                    className="flex items-center gap-2 w-full px-3 py-2 text-sm font-medium text-[#030712] hover:bg-gray-100 rounded-md transition-colors text-left"
+                                  >
+                                    <Eye className="w-4 h-4 shrink-0" />Ver permissões efetivas
+                                  </button>
+                                )}
                                 {user.status === 'Ativo' ? (
                                   <button onClick={() => handleInactivateUser(user)} className="flex items-center gap-2 w-full px-3 py-2 text-sm font-medium text-[#030712] hover:bg-gray-100 rounded-md transition-colors text-left">
                                     <UserX className="w-4 h-4 shrink-0" />Inativar usuário
