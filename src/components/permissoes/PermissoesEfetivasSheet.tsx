@@ -69,10 +69,20 @@ export function PermissoesEfetivasSheet({
   onClose,
   userId,
   userName,
-  instanciaId,
-  instanciaNome,
-  componenteId,
+  instanciaId: instanciaIdProp,
+  instanciaNome: instanciaNomeProp,
+  componenteId: componenteIdProp,
+  instancias,
+  componenteNomes,
 }: PermissoesEfetivasSheetProps) {
+  // Seleção de instância (quando não há instanciaId fixo)
+  const [selectedInstanciaId, setSelectedInstanciaId] = useState<string>(instanciaIdProp ?? instancias?.[0]?.id ?? '')
+
+  const instanciaId   = instanciaIdProp ?? selectedInstanciaId
+  const instanciaAtual = instancias?.find(i => i.id === instanciaId)
+  const componenteId  = componenteIdProp ?? instanciaAtual?.componenteId ?? ''
+  const instanciaNome = instanciaNomeProp ?? instanciaAtual?.nome ?? instanciaId
+
   const [loading, setLoading] = useState(false)
   const [atribuicaoIds, setAtribuicaoIds] = useState<string[]>([])
   const [fontes, setFontes] = useState<EfetivaFonte[]>([])
@@ -80,8 +90,17 @@ export function PermissoesEfetivasSheet({
   const [isUnrestricted, setIsUnrestricted] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Reset selected instância when props change
   useEffect(() => {
-    if (!open || !userId || !instanciaId) return
+    if (instanciaIdProp) {
+      setSelectedInstanciaId(instanciaIdProp)
+    } else if (instancias && instancias.length > 0) {
+      setSelectedInstanciaId(instancias[0].id)
+    }
+  }, [instanciaIdProp, instancias])
+
+  useEffect(() => {
+    if (!open || !userId || !instanciaId || !componenteId) return
     setLoading(true)
     setIsUnrestricted(false)
     setAtribuicaoIds([])
