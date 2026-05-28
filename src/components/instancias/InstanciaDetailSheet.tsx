@@ -878,6 +878,19 @@ export function InstanciaDetailSheet({
           instanciaNome={instancia.nome}
         />
       )}
+
+      {/* Sheet de permissões efetivas (view-only) por usuário membro */}
+      {membroPermEfetivas && (
+        <PermissoesEfetivasSheet
+          open={showPermEfetivas}
+          onClose={() => { setShowPermEfetivas(false); setMembroPermEfetivas(null) }}
+          userId={membroPermEfetivas.entidadeId}
+          userName={membroPermEfetivas.displayName ?? membroPermEfetivas.entidadeId}
+          instanciaId={instancia.id}
+          instanciaNome={instancia.nome}
+          componenteId={instancia.componenteId}
+        />
+      )}
     </NestedSheet>
   )
 }
