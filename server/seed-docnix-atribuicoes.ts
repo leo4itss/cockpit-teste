@@ -48,7 +48,6 @@ const DOCACTION_ATRIBUICOES = [
 
 async function resolveComponenteId(nomeAlvo: string, fallbackId: string): Promise<string> {
   const comps = await db.select().from(componentes)
-  console.log('Componentes existentes:', comps.map(c => `${c.id}: ${c.nome}`))
 
   const encontrado = comps.find(c => c.nome.toLowerCase().includes(nomeAlvo.toLowerCase()))
   if (encontrado) {
@@ -56,8 +55,17 @@ async function resolveComponenteId(nomeAlvo: string, fallbackId: string): Promis
     return encontrado.id
   }
 
-  // Fallback: usar ID fixo
-  console.warn(`  Componente "${nomeAlvo}" não encontrado — usando ID fallback "${fallbackId}"`)
+  // Criar componente com ID fixo se não existir
+  console.log(`  Componente "${nomeAlvo}" não encontrado — criando com ID "${fallbackId}"`)
+  await db.insert(componentes).values({
+    id: fallbackId,
+    nome: nomeAlvo,
+    descricao: `Módulo ${nomeAlvo} — DocNix`,
+    metadataUrl: null,
+    tiposLicenca: [],
+    status: 'Ativo',
+    createdAt: new Date().toISOString(),
+  })
   return fallbackId
 }
 
