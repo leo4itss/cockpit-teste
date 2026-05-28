@@ -2,7 +2,7 @@
 
 **Branch:** `feature/grupos-permissoes-docnix-variation`  
 **Data:** 2026-05-28  
-**Status:** Código 100% implementado. Pendente: push do schema ao banco.
+**Status:** ✅ 100% concluído — código implementado, banco atualizado, seed executado.
 
 ---
 
