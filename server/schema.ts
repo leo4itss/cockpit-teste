@@ -161,6 +161,7 @@ export const grupos = pgTable('grupos', {
   // 'Viewer' → leitura/consulta | 'User' → uso padrão | 'Admin' → acesso completo
   // Valor vazio = sem papel definido (grupo criado antes dessa feature)
   papel: text('papel').notNull().default(''),
+  parentId: text('parent_id').references(() => grupos.id),  // null = grupo raiz
   status: text('status').notNull().default('Ativo'), // 'Ativo' | 'Inativo'
   createdAt: text('created_at').notNull(),
 })
