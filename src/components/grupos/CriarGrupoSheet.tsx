@@ -14,7 +14,7 @@
  */
 
 import { useState, useEffect, useMemo } from 'react'
-import { Search, X, Loader2, AlertCircle } from 'lucide-react'
+import { Search, X, Loader2, AlertCircle, ChevronDown } from 'lucide-react'
 import {
   NestedSheet,
   NestedSheetHeader,
@@ -34,6 +34,7 @@ interface Props {
   open:      boolean
   onClose:   () => void
   accountId: string
+  grupos?:   Grupo[]   // lista de grupos existentes (mesma conta) para seleção de grupo pai
   onSuccess: (grupo: Grupo) => void
 }
 
