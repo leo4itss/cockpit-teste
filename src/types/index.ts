@@ -362,3 +362,51 @@ export interface Persona {
   description: string
   color: string // classe Tailwind de gradiente, ex: 'from-orange-400 to-red-500'
 }
+
+// ── DocNix: Atribuições ────────────────────────────────────────
+export interface Atribuicao {
+  id: string
+  componenteId: string
+  nome: string
+  descricao?: string
+  modulo?: string   // 'MaxDoc' | 'DocAction' | undefined
+  status: string
+  createdAt: string
+}
+
+// ── DocNix: Fases e Fluxo ─────────────────────────────────────
+export interface InstanciaFase {
+  id: string
+  instanciaId: string
+  nome: string
+  ordem: number
+  descricao?: string
+  createdAt: string
+}
+
+export interface FaseResponsavel {
+  id: string
+  faseId: string
+  tipoResponsavel: 'usuario' | 'grupo' | 'cargo' | 'area'
+  entidadeId: string  // userId, grupoId, ou texto do cargo/área
+  createdAt: string
+}
+
+// ── DocNix: Perfil de Objeto ──────────────────────────────────
+export interface InstanciaPerfilSlot {
+  id: string
+  instanciaId: string
+  slotNome: string
+  atribuicaoFiltroId?: string   // null = qualquer membro pode ocupar
+  obrigatorio: boolean
+  ordem: number
+  createdAt: string
+}
+
+// ── DocNix: Membro com Atribuições ────────────────────────────
+export interface InstanciaMembroAtribuicao {
+  id: string
+  membroId: string
+  atribuicaoId: string
+  assignedAt: string
+}
