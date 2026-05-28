@@ -284,6 +284,9 @@ export function InstanciaDetailSheet({
   // Permissões granulares por membro
   const [showPermissoes, setShowPermissoes]     = useState(false)
   const [membroPermissoes, setMembroPermissoes] = useState<InstanciaMembro | null>(null)
+  // Permissões efetivas (view-only) por membro usuário
+  const [showPermEfetivas, setShowPermEfetivas]         = useState(false)
+  const [membroPermEfetivas, setMembroPermEfetivas]     = useState<InstanciaMembro | null>(null)
   // Atribuições do componente (para multi-select ao adicionar membro)
   const [atribuicoes, setAtribuicoes]           = useState<Atribuicao[]>([])
 
