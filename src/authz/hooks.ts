@@ -173,3 +173,33 @@ export function useCanManageInstanciaMembros(
     ?? ''
   return engine.canManageInstanciaMembros(currentUser.id, instanceId, accountId, effectiveOrgId, relations)
 }
+
+// ── DocNix: Atribuições ───────────────────────────────────────
+
+/**
+ * Retorna as atribuições efetivas do usuário logado em uma instância.
+ * Retorna ['*'] se o usuário tem acesso irrestrito.
+ */
+export function useGetInstanciaAtribuicoes(
+  instanceId: string,
+  accountId: string,
+  orgId: string,
+): string[] {
+  const { currentUser, relations } = useAuthz()
+  if (!currentUser) return []
+  return getInstanciaAtribuicoes(currentUser.id, instanceId, accountId, orgId, relations)
+}
+
+/**
+ * Verifica se o usuário logado pode executar uma atribuição específica em uma instância.
+ */
+export function useCanActWithAtribuicao(
+  instanceId: string,
+  atribuicaoId: string,
+  accountId: string,
+  orgId: string,
+): boolean {
+  const { currentUser, relations } = useAuthz()
+  if (!currentUser) return false
+  return canActWithAtribuicao(currentUser.id, instanceId, atribuicaoId, accountId, orgId, relations)
+}
