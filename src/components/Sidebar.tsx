@@ -28,11 +28,13 @@ function NavItem({
   icon: Icon,
   label,
   collapsed,
+  badge,
 }: {
   to: string
   icon: React.ElementType
   label: string
   collapsed: boolean
+  badge?: React.ReactNode
 }) {
   return (
     <NavLink
@@ -48,7 +50,12 @@ function NavItem({
       }
     >
       <Icon className="w-4 h-4 shrink-0" />
-      {!collapsed && <span className="whitespace-nowrap">{label}</span>}
+      {!collapsed && (
+        <>
+          <span className="whitespace-nowrap flex-1">{label}</span>
+          {badge}
+        </>
+      )}
     </NavLink>
   )
 }
