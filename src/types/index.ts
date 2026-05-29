@@ -86,6 +86,7 @@ export interface Componente {
   metadataUrl?: string
   tiposLicenca: string[]  // array de TipoLicenca.id disponíveis neste componente
   status?: 'Ativo' | 'Inativo'
+  tipoModelo?: 'fga' | 'docnix' | 'custom'
   createdAt: string
 }
 
