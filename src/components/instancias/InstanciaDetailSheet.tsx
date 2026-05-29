@@ -732,7 +732,7 @@ export function InstanciaDetailSheet({
       <NestedSheetBody noPadding>
         {/* ── Navegação de abas ─────────────────────────────── */}
         <div className="flex border-b border-gray-200 px-6">
-          {(['membros', 'fases', 'fluxo', 'perfil'] as const).map(tab => (
+          {(['membros', ...(isDocNix ? ['fases', 'fluxo', 'perfil'] : [])] as ActiveTab[]).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
