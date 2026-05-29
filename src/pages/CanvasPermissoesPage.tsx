@@ -959,6 +959,7 @@ export default function CanvasPermissoesPage() {
             open={!!instanciaSheet} onClose={() => setInstSheet(null)}
             instancia={instanciaSheet}
             componenteNome={graphData?.components.find(c => c.id === instanciaSheet?.componenteId)?.nome}
+            componenteTipoModelo={(graphData?.components.find(c => c.id === instanciaSheet?.componenteId) as any)?.tipoModelo ?? 'fga'}
             accountNome={selectedAccount?.name}
             accountId={accountId!}
           />
