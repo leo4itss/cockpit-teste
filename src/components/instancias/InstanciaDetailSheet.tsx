@@ -30,7 +30,7 @@ import { useCanManageInstanciaMembros } from '@/authz/hooks'
 import { cn } from '@/lib/utils'
 import type {
   Instancia, InstanciaMembro, User, Grupo, Atribuicao,
-  InstanciaFase, FaseResponsavel, InstanciaPerfilSlot, ElegivelSlot, FaseAtribuicaoPermitida,
+  InstanciaFase, FaseResponsavel, InstanciaPerfilSlot, ElegivelSlot,
 } from '@/types'
 import {
   users          as mockUsers,
