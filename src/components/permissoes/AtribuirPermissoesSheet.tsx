@@ -171,7 +171,7 @@ export function AtribuirPermissoesSheet({
       }).catch(() => []),
       entitlementsFetch,
     ])
-      .then(([comps, perms, entitlements]) => {
+      .then(async ([comps, perms, entitlements]) => {
         if (cancelled) return
 
         let ativos = (comps as Componente[]).filter(c => c.status !== 'Inativo')
