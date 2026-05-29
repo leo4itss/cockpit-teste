@@ -24,6 +24,7 @@ import {
   faseResponsaveis,
   instanciaPerfilSlots,
   instanciaPerfilSlotNomeacoes,
+  faseAtribuicoesPermitidas,
 } from './schema'
 import { eq, and, or, inArray, isNull } from 'drizzle-orm'
 import { getElegiveisParaSlot } from './docnix-elegiveis'
