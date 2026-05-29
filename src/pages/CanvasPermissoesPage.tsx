@@ -631,8 +631,9 @@ function InstanciaPanel({ instanciaId, graphData, theme, onClose, onOpenInstanci
           ? <p className="text-xs text-center py-6" style={{ color: theme.panelMuted }}>Nenhum membro ainda.</p>
           : <div className="space-y-0.5">
               {membros.map((mb: any) => {
-                const isGroup = mb.entidadeTipo === 'group'
-                const nome    = mb.displayName ?? mb.entidadeId
+                const isGroup   = mb.entidadeTipo === 'group'
+                const nome      = mb.displayName ?? mb.entidadeId
+                const isDocNix  = (comp as any)?.tipoModelo === 'docnix'
                 return (
                   <div key={mb.id} className="flex items-center gap-2.5 px-2 py-2 rounded-lg"
                     style={{ background: theme.rowBg, border: `1px solid ${theme.panelBorder}` }}>
@@ -648,7 +649,10 @@ function InstanciaPanel({ instanciaId, graphData, theme, onClose, onOpenInstanci
                         grupo
                       </span>
                     )}
-                    <span className="text-[9px] font-medium" style={{ color: theme.panelMuted }}>{mb.papel}</span>
+                    {isDocNix
+                      ? <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700 border border-violet-200">DocNix</span>
+                      : <span className="text-[9px] font-medium" style={{ color: theme.panelMuted }}>{mb.papel}</span>
+                    }
                   </div>
                 )
               })}
