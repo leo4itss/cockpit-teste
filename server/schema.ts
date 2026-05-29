@@ -29,6 +29,7 @@ export const componentes = pgTable('componentes', {
   metadataUrl: text('metadata_url'),
   tiposLicenca: jsonb('tipos_licenca').notNull().default([]), // string[] — ids de tiposLicenca disponíveis
   status: text('status').notNull().default('Ativo'),          // 'Ativo' | 'Inativo' (soft delete via inativação)
+  tipoModelo: text('tipo_modelo').notNull().default('fga'),   // 'fga' | 'docnix' | 'custom'
   createdAt: text('created_at').notNull(),
 })
 
