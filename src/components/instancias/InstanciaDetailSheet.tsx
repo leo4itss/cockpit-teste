@@ -750,8 +750,8 @@ export function InstanciaDetailSheet({
         {/* ── Aba: Membros ──────────────────────────────────── */}
         {activeTab === 'membros' && (
           <>
-            {/* Toggle: Restringir Acesso */}
-            {canManage && (
+            {/* Toggle: Restringir Acesso — exclusivo DocNix */}
+            {canManage && isDocNix && (
               <div className="flex items-center justify-between px-6 py-3 border-b border-gray-100 bg-gray-50/60">
                 <div>
                   <p className="text-xs font-medium text-gray-700">Restringir acesso</p>
