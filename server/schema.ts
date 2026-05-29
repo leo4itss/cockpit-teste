@@ -310,8 +310,10 @@ export const instanciaFases = pgTable('instancia_fases', {
   instanciaId: text('instancia_id').notNull().references(() => instancias.id),
   nome:        text('nome').notNull(),
   ordem:       integer('ordem').notNull().default(0),
-  descricao:   text('descricao'),
-  createdAt:   text('created_at').notNull(),
+  descricao:      text('descricao'),
+  modoAprovacao:  text('modo_aprovacao').notNull().default('serial'),  // 'serial' | 'paralelo'
+  regraAprovacao: text('regra_aprovacao').notNull().default('um'),     // 'um' | 'todos'
+  createdAt:      text('created_at').notNull(),
 }, (t) => [
   index('idx_instancia_fases').on(t.instanciaId, t.ordem),
 ])
