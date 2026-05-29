@@ -181,6 +181,24 @@ export function AtribuirPermissoesSheet({
         }
         setComponentes(ativos)
 
+        // Busca atribuições DocNix de cada componente (paralelo, silencia falhas)
+        const atribResults = await Promise.all(
+          ativos.map(c =>
+            api.getAtribuicoes(c.id)
+              .then((atribs: any[]) => ({ id: c.id, atribs: atribs.filter((a: any) => a.status !== 'Inativo') }))
+              .catch(() => ({ id: c.id, atribs: [] }))
+          )
+        )
+        if (!cancelled) {
+          const newAtribMap: Record<string, AcaoItem[]> = {}
+          atribResults.forEach(({ id, atribs }) => {
+            if (atribs.length > 0) {
+              newAtribMap[id] = atribs.map((a: any) => ({ acao: a.id, label: a.nome }))
+            }
+          })
+          setAtribuicoesMap(newAtribMap)
+        }
+
         // Constrói o Set de capabilities ativas.
         // Se accountId vazio (grupo org) ou entitlements vazio → Set vazio → nenhum lock.
         const caps = new Set<string>(
