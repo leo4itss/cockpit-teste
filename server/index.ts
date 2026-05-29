@@ -1110,14 +1110,19 @@ app.post('/api/instancias', async (c) => {
 
 /**
  * PUT /api/instancias/:id
- * Body: { nome?, descricao?, status? }
+ * Body: { nome?, descricao?, status?, restringirAcesso? }
  */
 app.put('/api/instancias/:id', async (c) => {
   const id   = c.req.param('id')
   const body = await c.req.json()
+  const updates: Record<string, any> = {}
+  if (body.nome !== undefined) updates.nome = body.nome
+  if (body.descricao !== undefined) updates.descricao = body.descricao
+  if (body.status !== undefined) updates.status = body.status
+  if (body.restringirAcesso !== undefined) updates.restringirAcesso = body.restringirAcesso
   const [row] = await db
     .update(instancias)
-    .set(body)
+    .set(updates)
     .where(eq(instancias.id, id))
     .returning()
   return c.json(row)
