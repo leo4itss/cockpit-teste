@@ -33,6 +33,7 @@ const {
   faseResponsaveis,
   instanciaPerfilSlots,
   instanciaPerfilSlotNomeacoes,
+  faseAtribuicoesPermitidas,
 } = schema
 
 const app = new Hono().basePath('/api')
