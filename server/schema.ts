@@ -350,6 +350,19 @@ export const instanciaPerfilSlots = pgTable('instancia_perfil_slots', {
   index('idx_instancia_slots').on(t.instanciaId, t.ordem),
 ])
 
+// ── Atribuições Permitidas por Fase ───────────────────────────
+// Define quais atribuições estão habilitadas em cada fase do fluxo.
+// Se não houver entradas: todas as atribuições são permitidas (sem restrição).
+// Se houver entradas: apenas as listadas estão permitidas nessa fase.
+export const faseAtribuicoesPermitidas = pgTable('fase_atribuicoes_permitidas', {
+  id:           text('id').primaryKey(),
+  faseId:       text('fase_id').notNull().references(() => instanciaFases.id),
+  atribuicaoId: text('atribuicao_id').notNull().references(() => componenteAtribuicoes.id),
+  createdAt:    text('created_at').notNull(),
+}, (t) => [
+  index('idx_fase_atrib_permitidas').on(t.faseId, t.atribuicaoId),
+])
+
 // Nomeação em slot de perfil (ex: "Anne" como Aprovador nesta instância)
 export const instanciaPerfilSlotNomeacoes = pgTable('instancia_perfil_slot_nomeacoes', {
   id:           text('id').primaryKey(),
