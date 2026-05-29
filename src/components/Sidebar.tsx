@@ -2,6 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { Building2, Users, PanelLeft, Puzzle, Shield, BookUser, Landmark, Network, GitFork, Globe2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useIsPlatformAdmin, useIsOrgAdmin, useIsPasArchitect, useIsAccountAdmin } from '@/authz'
+import { useComponentes } from '@/context/ComponentesContext'
 
 // ── Logo ITSS ─────────────────────────────────────────────────
 
