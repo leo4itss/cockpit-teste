@@ -472,7 +472,7 @@ export function AtribuirPermissoesSheet({
               <div className="divide-y divide-gray-100">
                 {filtered.map(comp => {
                   const tipo          = inferirTipo(comp.nome)
-                  const acoes         = ACOES[tipo]
+                  const acoes         = getAcoes(comp)
                   const ativas        = draft[comp.id] ?? []
                   const inheritedComp = inherited[comp.id] ?? {}
                   // Total visível = diretas + herdadas (sem duplicar)
