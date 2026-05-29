@@ -427,6 +427,14 @@ export type ElegivelSlot = {
   origemGrupoNome?: string
 }
 
+// ── DocNix: Atribuições Permitidas por Fase ───────────────────
+export interface FaseAtribuicaoPermitida {
+  id: string
+  faseId: string
+  atribuicaoId: string
+  createdAt: string
+}
+
 // ── DocNix: Membro com Atribuições ────────────────────────────
 export interface InstanciaMembroAtribuicao {
   id: string
