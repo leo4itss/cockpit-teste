@@ -184,13 +184,57 @@ export function ComponenteDetailSheet({ open, onClose, componente, onEdit }: Pro
                         await api.updateAtribuicao(componente.id, a.id, { status: 'Inativo' })
                         setAtribuicoes(prev => prev.map(x => x.id === a.id ? { ...x, status: 'Inativo' as const } : x))
                       }}
-                      className="text-xs text-red-500 hover:text-red-700 ml-2"
+                      className="text-xs text-amber-600 hover:text-amber-800 ml-2"
                     >
                       Inativar
+                    </button>
+                    <button
+                      onClick={async () => {
+                        if (!confirm(`Remover "${a.nome}" permanentemente?`)) return
+                        await api.deleteAtribuicao(componente.id, a.id)
+                        setAtribuicoes(prev => prev.filter(x => x.id !== a.id))
+                      }}
+                      className="text-xs text-red-500 hover:text-red-700"
+                    >
+                      Remover
                     </button>
                   </div>
                 ))}
               </div>
+
+              {/* Lista de atribuições inativas */}
+              {atribuicoes.filter(a => a.status === 'Inativo').length > 0 && (
+                <div className="flex flex-col gap-2">
+                  <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Inativas</p>
+                  {atribuicoes.filter(a => a.status === 'Inativo').map(a => (
+                    <div key={a.id} className="flex items-center gap-2 px-3 py-2 border border-dashed border-[#e5e7eb] rounded-md bg-gray-50/60 opacity-70">
+                      <span className="text-sm flex-1 text-gray-400 line-through">{a.nome}</span>
+                      {a.modulo && (
+                        <span className="text-xs text-gray-300 bg-gray-100 px-1.5 py-0.5 rounded">{a.modulo}</span>
+                      )}
+                      <button
+                        onClick={async () => {
+                          await api.updateAtribuicao(componente.id, a.id, { status: 'Ativo' })
+                          setAtribuicoes(prev => prev.map(x => x.id === a.id ? { ...x, status: 'Ativo' as const } : x))
+                        }}
+                        className="text-xs text-emerald-600 hover:text-emerald-800"
+                      >
+                        Ativar
+                      </button>
+                      <button
+                        onClick={async () => {
+                          if (!confirm(`Remover "${a.nome}" permanentemente?`)) return
+                          await api.deleteAtribuicao(componente.id, a.id)
+                          setAtribuicoes(prev => prev.filter(x => x.id !== a.id))
+                        }}
+                        className="text-xs text-red-400 hover:text-red-600"
+                      >
+                        Remover
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               {/* Adicionar nova atribuição */}
               <div className="flex gap-2">
