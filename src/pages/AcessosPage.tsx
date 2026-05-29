@@ -796,7 +796,7 @@ export function AcessosPage() {
         onClose={() => setShowInstanciaDetail(false)}
         instancia={selectedInstancia}
         componenteNome={selectedInstancia ? componenteNomes[selectedInstancia.componenteId] : undefined}
-        componenteTipoModelo={selectedInstancia ? (componenteTipoModelos[selectedInstancia.componenteId] ?? 'fga') : 'fga'}
+        componenteTipoModelo={selectedInstancia ? ((componenteTipoModelos[selectedInstancia.componenteId] ?? 'fga') as 'fga' | 'docnix' | 'custom') : 'fga'}
         accountNome={accountNome ?? undefined}
         accountId={accountId}
       />
