@@ -384,6 +384,8 @@ export interface InstanciaFase {
   nome: string
   ordem: number
   descricao?: string
+  modoAprovacao?: string   // 'serial' | 'paralelo'
+  regraAprovacao?: string  // 'um' | 'todos'
   createdAt: string
 }
 
