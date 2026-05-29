@@ -220,7 +220,14 @@ function InstanciaNode({ data, selected }: { data: any; selected?: boolean }) {
         <div className="flex items-start gap-2">
           <CompIcon tipo={tipo} size={15} color={iconC} />
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-semibold truncate leading-tight" style={{ color: t.cardText }}>{data.nome}</p>
+            <div className="flex items-center gap-1.5">
+              <p className="text-[11px] font-semibold truncate leading-tight" style={{ color: t.cardText }}>{data.nome}</p>
+              {data.isDocNix && (
+                <span className="shrink-0 text-[9px] px-1.5 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700 border border-violet-200">
+                  DocNix
+                </span>
+              )}
+            </div>
             <p className="text-[10px] truncate mt-0.5" style={{ color: t.cardSub }}>{data.componenteNome}</p>
             <p className="text-[10px] mt-1 flex items-center gap-0.5" style={{ color: t.instBorder === t.instSelBorder ? t.instSelBorder : '#8b5cf6' }}>
               <Users className="w-2.5 h-2.5" />
