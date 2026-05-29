@@ -226,6 +226,8 @@ export function AtribuirPermissoesSheet({
 
         if (!hasExistingPerms && defaults) {
           ativos.forEach(c => {
+            // Componentes DocNix têm catálogo próprio — não aplicar defaults de papel
+            if (atribResults.find(r => r.id === c.id && r.atribs.length > 0)) return
             const tipo = inferirTipo(c.nome)
             const acoesDefault = defaults[tipo] ?? []
             // Só pré-seleciona ações que existem no catálogo daquele tipo
