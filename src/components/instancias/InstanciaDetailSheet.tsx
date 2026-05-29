@@ -690,7 +690,9 @@ export function InstanciaDetailSheet({
     onClose()
   }
 
-  const atribuicoesDocnix = atribuicoes.filter(a => a.status === 'Ativo').length > 0
+  // Modelo DocNix: usa tipoModelo da prop (fonte de verdade) com fallback para atribuições carregadas
+  const isDocNix = componenteTipoModelo === 'docnix' || atribuicoes.filter(a => a.status === 'Ativo').length > 0
+  const atribuicoesDocnix = isDocNix  // mantém compatibilidade com usos existentes
   const grupoNomes = useMemo(
     () => Object.fromEntries(allGrupos.map(g => [g.id, g.nome])),
     [allGrupos],
