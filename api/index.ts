@@ -827,6 +827,8 @@ app.put('/instancias/:id/fases/:faseId', async (c) => {
   if (body.nome !== undefined) updates.nome = body.nome
   if (body.ordem !== undefined) updates.ordem = body.ordem
   if (body.descricao !== undefined) updates.descricao = body.descricao
+  if (body.modoAprovacao !== undefined) updates.modoAprovacao = body.modoAprovacao
+  if (body.regraAprovacao !== undefined) updates.regraAprovacao = body.regraAprovacao
   await db.update(instanciaFases).set(updates).where(eq(instanciaFases.id, faseId))
   const [updated] = await db.select().from(instanciaFases).where(eq(instanciaFases.id, faseId))
   return c.json(updated)
