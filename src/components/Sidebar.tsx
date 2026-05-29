@@ -181,7 +181,17 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
             <>
               <SectionLabel label="Plataforma" collapsed={collapsed} />
               <div className="flex flex-col gap-1">
-                <NavItem to="/componentes" icon={Puzzle} label="Componentes" collapsed={collapsed} />
+                <NavItem
+                  to="/componentes"
+                  icon={Puzzle}
+                  label="Componentes"
+                  collapsed={collapsed}
+                  badge={hasDocNix && !collapsed ? (
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700 border border-violet-200 shrink-0">
+                      DocNix
+                    </span>
+                  ) : undefined}
+                />
               </div>
             </>
           )}
@@ -190,9 +200,32 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
           <>
             <SectionLabel label="Conta" collapsed={collapsed} />
             <div className="flex flex-col gap-1">
-              <NavItem to="/acessos" icon={Users} label="Acessos" collapsed={collapsed} />
+              <NavItem
+                to="/acessos"
+                icon={Users}
+                label="Acessos"
+                collapsed={collapsed}
+                badge={hasDocNix && !collapsed ? (
+                  <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700 border border-violet-200 shrink-0">
+                    DocNix
+                  </span>
+                ) : undefined}
+              />
             </div>
           </>
+
+          {/* ── DocNix (apenas se existirem componentes docnix) ── */}
+          {hasDocNix && (isPlatformAdmin || isOrgAdmin || isPasArchitect || isAccountAdmin) && (
+            <>
+              <SectionLabel label="DocNix" collapsed={collapsed} />
+              <div className="flex flex-col gap-1">
+                <NavItem to="/acessos" icon={Users}  label="Instâncias & Membros" collapsed={collapsed} />
+                {(isPlatformAdmin || isPasArchitect) && (
+                  <NavItem to="/componentes" icon={Puzzle} label="Catálogo de Atribuições" collapsed={collapsed} />
+                )}
+              </div>
+            </>
+          )}
 
           {/* ── Visualização ── */}
           {(isPlatformAdmin || isOrgAdmin) && (
