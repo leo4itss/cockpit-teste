@@ -799,6 +799,18 @@ export function InstanciaDetailSheet({
               )}
             </div>
 
+            {/* Seção de adicionar membro */}
+            {showAdd && canManage && (
+              <AddMembroSection
+                allUsers={allUsers}
+                allGrupos={allGrupos}
+                membros={membros}
+                onAdd={handleAdd}
+                disabled={!!addingId}
+                atribuicoes={atribuicoes}
+              />
+            )}
+
             {/* Lista de membros */}
             <div className="flex-1 overflow-y-auto">
               {loading ? (
