@@ -104,6 +104,7 @@ async function resolveComponenteId(nomeAlvo: string, fallbackId: string): Promis
     metadataUrl: null,
     tiposLicenca: [],
     status: 'Ativo',
+    tipoModelo: 'docnix',
     createdAt: new Date().toISOString(),
   })
   return fallbackId
