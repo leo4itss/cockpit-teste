@@ -1343,6 +1343,38 @@ app.delete('/api/instancias/:id/fases/:faseId/responsaveis/:responsavelId', asyn
   return c.json({ success: true })
 })
 
+// ── Atribuições Permitidas por Fase ───────────────────────────
+
+app.get('/api/instancias/:id/fases/:faseId/atribuicoes-permitidas', async (c) => {
+  const { faseId } = c.req.param()
+  const rows = await db.select().from(faseAtribuicoesPermitidas)
+    .where(eq(faseAtribuicoesPermitidas.faseId, faseId))
+  return c.json(rows)
+})
+
+app.post('/api/instancias/:id/fases/:faseId/atribuicoes-permitidas', async (c) => {
+  const { faseId } = c.req.param()
+  const body = await c.req.json()
+  const novo = {
+    id: crypto.randomUUID(),
+    faseId,
+    atribuicaoId: body.atribuicaoId,
+    createdAt: new Date().toISOString(),
+  }
+  await db.insert(faseAtribuicoesPermitidas).values(novo)
+  return c.json(novo, 201)
+})
+
+app.delete('/api/instancias/:id/fases/:faseId/atribuicoes-permitidas/:atribuicaoId', async (c) => {
+  const { faseId, atribuicaoId } = c.req.param()
+  await db.delete(faseAtribuicoesPermitidas)
+    .where(and(
+      eq(faseAtribuicoesPermitidas.faseId, faseId),
+      eq(faseAtribuicoesPermitidas.atribuicaoId, atribuicaoId),
+    ))
+  return c.json({ success: true })
+})
+
 // ── Slots de Perfil por Instância ─────────────────────────────
 
 app.get('/api/instancias/:id/perfil-slots', async (c) => {
