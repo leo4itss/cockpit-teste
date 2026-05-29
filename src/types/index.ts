@@ -319,15 +319,18 @@ export interface FGARelations {
  *            instance:<id> account  account:<accountId>
  */
 export interface Instancia {
-  id:           string
-  componenteId: string
-  accountId:    string
-  nome:         string
-  descricao?:   string
-  status:       'Ativo' | 'Inativo'
-  createdAt:    string
+  id:               string
+  componenteId:     string
+  accountId:        string
+  nome:             string
+  descricao?:       string
+  restringirAcesso?: boolean
+  // false = todos os membros da conta podem enxergar
+  // true  = só membros com atribuição nesta instância podem enxergar
+  status:           'Ativo' | 'Inativo'
+  createdAt:        string
   // enriquecido pelo backend
-  qtdMembros?:  number
+  qtdMembros?:      number
 }
 
 /**
