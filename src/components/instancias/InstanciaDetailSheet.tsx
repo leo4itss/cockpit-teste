@@ -747,6 +747,34 @@ export function InstanciaDetailSheet({
         {/* ── Aba: Membros ──────────────────────────────────── */}
         {activeTab === 'membros' && (
           <>
+            {/* Toggle: Restringir Acesso */}
+            {canManage && (
+              <div className="flex items-center justify-between px-6 py-3 border-b border-gray-100 bg-gray-50/60">
+                <div>
+                  <p className="text-xs font-medium text-gray-700">Restringir acesso</p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">Apenas membros com atribuição enxergam esta instância</p>
+                </div>
+                <button
+                  onClick={async () => {
+                    const novoValor = !(instancia?.restringirAcesso ?? false)
+                    try {
+                      await fetch(`/api/instancias/${instancia!.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ restringirAcesso: novoValor }),
+                      })
+                    } catch { /* silencioso */ }
+                  }}
+                  className={`relative inline-flex h-5 w-9 flex-shrink-0 items-center rounded-full transition-colors ${
+                    instancia?.restringirAcesso ? 'bg-blue-600' : 'bg-gray-300'
+                  }`}
+                >
+                  <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                    instancia?.restringirAcesso ? 'translate-x-5' : 'translate-x-1'
+                  }`} />
+                </button>
+              </div>
+            )}
             {/* Barra de membros */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <p className="text-sm font-medium text-[#030712]">
