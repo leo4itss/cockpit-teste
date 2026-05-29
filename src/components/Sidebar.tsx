@@ -91,6 +91,11 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
   const isPasArchitect  = useIsPasArchitect()
   const isAccountAdmin  = useIsAccountAdmin()
 
+  // Componentes disponíveis na plataforma
+  const { componentes } = useComponentes()
+  const hasDocNix = componentes.some(c => c.tipoModelo === 'docnix' && c.status !== 'Inativo')
+  const hasFGA    = componentes.some(c => (!c.tipoModelo || c.tipoModelo === 'fga') && c.status !== 'Inativo')
+
   // Derivados de visibilidade por perfil
   // Account Admin puro: só tem papel de account_admin, nenhum outro
   const isAccountAdminOnly = isAccountAdmin && !isPlatformAdmin && !isOrgAdmin && !isPasArchitect
