@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import {
   Search, Ellipsis, Eye,
   ShieldCheck, UserMinus, Loader2, Building2,
-  Bot, Database, Layers, CheckCircle2, XCircle, ChevronDown,
+  Bot, Database, Layers, CheckCircle2, XCircle, ChevronDown, FileText, Zap,
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
