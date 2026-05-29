@@ -87,6 +87,36 @@ export function ComponenteDetailSheet({ open, onClose, componente, onEdit }: Pro
         <div className="flex flex-col gap-5">
           <ReadonlyField label="Nome do componente" value={componente.nome} required />
           <ReadonlyField label="Descrição" value={componente.descricao} required />
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-[#030712]">Modelo de permissões</label>
+            <div className="flex items-center gap-2">
+              {componente.tipoModelo === 'docnix' && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-violet-100 text-violet-700 border border-violet-200">
+                  <span className="w-1.5 h-1.5 rounded-full bg-violet-500" />
+                  DocNix
+                </span>
+              )}
+              {componente.tipoModelo === 'custom' && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-200">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                  Custom
+                </span>
+              )}
+              {(!componente.tipoModelo || componente.tipoModelo === 'fga') && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-200">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                  FGA (OpenFGA)
+                </span>
+              )}
+              <span className="text-xs text-[#6b7280]">
+                {componente.tipoModelo === 'docnix'
+                  ? 'Atribuições granulares por instância (MaxDoc / DocAction)'
+                  : componente.tipoModelo === 'custom'
+                  ? 'Modelo customizado'
+                  : 'Modelo padrão baseado em relações OpenFGA'}
+              </span>
+            </div>
+          </div>
         </div>
 
         <div className="border-t border-[#e5e7eb]" />
