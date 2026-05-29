@@ -706,7 +706,13 @@ app.post('/instancias', async (c) => {
 })
 
 app.put('/instancias/:id', async (c) => {
-  const [row] = await db.update(instancias).set(await c.req.json()).where(eq(instancias.id, c.req.param('id'))).returning()
+  const body = await c.req.json()
+  const updates: Record<string, any> = {}
+  if (body.nome !== undefined) updates.nome = body.nome
+  if (body.descricao !== undefined) updates.descricao = body.descricao
+  if (body.status !== undefined) updates.status = body.status
+  if (body.restringirAcesso !== undefined) updates.restringirAcesso = body.restringirAcesso
+  const [row] = await db.update(instancias).set(updates).where(eq(instancias.id, c.req.param('id'))).returning()
   return c.json(row)
 })
 
