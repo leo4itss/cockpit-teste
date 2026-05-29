@@ -565,15 +565,20 @@ function UsuarioPanel({ userId, graphData, accountId, theme, onClose, onRefresh:
             ? <p className="text-xs" style={{ color: theme.panelMuted }}>Sem acesso direto a instâncias.</p>
             : <div className="space-y-1">
                 {userInstancias.map(inst => {
-                  const mb      = (graphData.instMembros[inst.id] ?? []).find((m: any) => m.entidadeId === userId)
-                  const compNome= graphData.components.find(c => c.id === inst.componenteId)?.nome
-                  const tipo    = inferTipo(compNome)
+                  const mb        = (graphData.instMembros[inst.id] ?? []).find((m: any) => m.entidadeId === userId)
+                  const comp      = graphData.components.find(c => c.id === inst.componenteId)
+                  const compNome  = comp?.nome
+                  const tipo      = inferTipo(compNome)
+                  const isDocNix  = (comp as any)?.tipoModelo === 'docnix'
                   return (
                     <div key={inst.id} className="flex items-center gap-2 px-3 py-2 rounded-lg"
                       style={{ background: theme.instBg, border: `1px solid ${theme.instBorder}` }}>
                       <CompIcon tipo={tipo} size={13} color={compIconColor(tipo, theme.mode)} />
                       <span className="text-xs flex-1 truncate" style={{ color: theme.panelText }}>{inst.nome}</span>
-                      {mb?.papel && <span className="text-[9px] font-semibold" style={{ color: theme.btnPermText }}>{mb.papel}</span>}
+                      {isDocNix
+                        ? <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700 border border-violet-200">DocNix</span>
+                        : mb?.papel && <span className="text-[9px] font-semibold" style={{ color: theme.btnPermText }}>{mb.papel}</span>
+                      }
                     </div>
                   )
                 })}
