@@ -254,12 +254,18 @@ export function AcessosPage() {
 
   // Mapa de componenteId → nome (para exibir na coluna Componente)
   const [componenteNomes, setComponenteNomes] = useState<Record<string, string>>({})
+  const [componenteTipoModelos, setComponenteTipoModelos] = useState<Record<string, string>>({})
   useEffect(() => {
     api.getComponentes()
       .then(data => {
-        const map: Record<string, string> = {}
-        data.forEach((c: any) => { map[c.id] = c.nome })
-        setComponenteNomes(map)
+        const nomes: Record<string, string> = {}
+        const tipos: Record<string, string> = {}
+        data.forEach((c: any) => {
+          nomes[c.id] = c.nome
+          tipos[c.id] = c.tipoModelo ?? 'fga'
+        })
+        setComponenteNomes(nomes)
+        setComponenteTipoModelos(tipos)
       })
       .catch(() => {})
   }, [])
