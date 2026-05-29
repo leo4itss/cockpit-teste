@@ -95,7 +95,8 @@ export function ComponenteSheet({ open, onClose, onSave, onDelete, isLinked, ini
     return (
       nome !== initialNomeRef.current ||
       descricao !== initialDescricaoRef.current ||
-      JSON.stringify(selectedTipos) !== JSON.stringify(initialTiposRef.current)
+      JSON.stringify(selectedTipos) !== JSON.stringify(initialTiposRef.current) ||
+      tipoModelo !== initialTipoModeloRef.current
     )
   }
 
