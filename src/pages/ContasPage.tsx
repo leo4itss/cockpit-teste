@@ -248,6 +248,20 @@ const CAPABILITIES: CapabilityDef[] = [
     icon:     Layers,
     color:    'text-teal-500',
   },
+  {
+    id:       'maxdoc.use',
+    nome:     'MaxDoc',
+    descricao: 'Permite acesso ao módulo de gestão documental MaxDoc (criação, aprovação, revisão e publicação de documentos).',
+    icon:     FileText,
+    color:    'text-orange-500',
+  },
+  {
+    id:       'docaction.use',
+    nome:     'DocAction',
+    descricao: 'Permite acesso ao módulo de ações corretivas e preventivas DocAction (ocorrências, planos de ação, análise de causa).',
+    icon:     Zap,
+    color:    'text-yellow-500',
+  },
 ]
 
 // ─────────────────────────────────────────────────────────────
