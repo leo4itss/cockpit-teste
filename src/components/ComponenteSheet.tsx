@@ -219,6 +219,7 @@ export function ComponenteSheet({ open, onClose, onSave, onDelete, isLinked, ini
     setMetadataTestado(false)
     setTestedUrl('')
     setSelectedTipos([])
+    setTipoModelo('fga')
     setUnsavedDialogOpen(false)
     onClose()
   }
