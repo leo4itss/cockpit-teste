@@ -195,6 +195,16 @@ export const api = {
   deleteFaseResponsavel: (instanciaId: string, faseId: string, responsavelId: string) =>
     request<void>(`/api/instancias/${instanciaId}/fases/${faseId}/responsaveis/${responsavelId}`, { method: 'DELETE' }),
 
+  // Atribuições Permitidas por Fase
+  getFaseAtribuicoesPermitidas: (instanciaId: string, faseId: string) =>
+    request<any[]>(`/api/instancias/${instanciaId}/fases/${faseId}/atribuicoes-permitidas`),
+  addFaseAtribuicaoPermitida: (instanciaId: string, faseId: string, atribuicaoId: string) =>
+    request<any>(`/api/instancias/${instanciaId}/fases/${faseId}/atribuicoes-permitidas`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ atribuicaoId }),
+    }),
+  removeFaseAtribuicaoPermitida: (instanciaId: string, faseId: string, atribuicaoId: string) =>
+    request<void>(`/api/instancias/${instanciaId}/fases/${faseId}/atribuicoes-permitidas/${atribuicaoId}`, { method: 'DELETE' }),
+
   // Slots de Perfil por Instância
   getPerfilSlots: (instanciaId: string) =>
     request<any[]>(`/api/instancias/${instanciaId}/perfil-slots`),
