@@ -923,17 +923,6 @@ export function InstanciaDetailSheet({
               )}
             </div>
 
-            {/* Seção de adicionar membro */}
-            {showAdd && canManage && (
-              <AddMembroSection
-                allUsers={allUsers}
-                allGrupos={allGrupos}
-                membros={membros}
-                onAdd={handleAdd}
-                disabled={!!addingId}
-                atribuicoes={atribuicoes}
-              />
-            )}
           </>
         )}
 
