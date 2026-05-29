@@ -544,6 +544,8 @@ export function InstanciaDetailSheet({
   const [fases, setFases]                       = useState<InstanciaFase[]>([])
   const [fasesLoaded, setFasesLoaded]           = useState(false)
   const [novaFaseNome, setNovaFaseNome]         = useState('')
+  const [faseAtribPermitidas, setFaseAtribPermitidas] = useState<Record<string, string[]>>({})
+  const [fasesExpandidas, setFasesExpandidas]   = useState<Set<string>>(new Set())
 
   // ── State: Fluxo Padrão ───────────────────────────────────
   const [faseComResponsaveis, setFaseComResponsaveis] = useState<Record<string, FaseResponsavel[]>>({})
