@@ -279,6 +279,50 @@ export function ComponenteSheet({ open, onClose, onSave, onDelete, isLinked, ini
               value={descricao}
               onChange={e => setDescricao(e.target.value)}
             />
+
+            {/* Modelo de permissões */}
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-[#030712]">
+                Modelo de permissões
+              </label>
+              <div className="flex flex-col gap-2">
+                {([
+                  { value: 'fga',    label: 'FGA (OpenFGA)',  desc: 'Modelo padrão baseado em relações OpenFGA (viewer / member / admin)', color: 'blue'   },
+                  { value: 'docnix', label: 'DocNix',         desc: 'Atribuições granulares por instância — MaxDoc, DocAction, DocAudit',   color: 'violet' },
+                  { value: 'custom', label: 'Custom',         desc: 'Modelo customizado (configuração avançada)',                           color: 'amber'  },
+                ] as const).map(opt => (
+                  <label
+                    key={opt.value}
+                    className={`flex items-start gap-3 px-4 py-3 rounded-lg border cursor-pointer transition-colors ${
+                      tipoModelo === opt.value
+                        ? opt.color === 'blue'   ? 'border-blue-400 bg-blue-50'
+                        : opt.color === 'violet' ? 'border-violet-400 bg-violet-50'
+                        :                          'border-amber-400 bg-amber-50'
+                        : 'border-[#e5e7eb] hover:bg-gray-50'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="tipoModelo"
+                      value={opt.value}
+                      checked={tipoModelo === opt.value}
+                      onChange={() => setTipoModelo(opt.value)}
+                      className="mt-0.5 shrink-0"
+                    />
+                    <div>
+                      <p className={`text-sm font-semibold ${
+                        tipoModelo === opt.value
+                          ? opt.color === 'blue'   ? 'text-blue-700'
+                          : opt.color === 'violet' ? 'text-violet-700'
+                          :                          'text-amber-700'
+                          : 'text-[#030712]'
+                      }`}>{opt.label}</p>
+                      <p className="text-xs text-[#6b7280] mt-0.5">{opt.desc}</p>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </div>
           </div>
 
           <div className="border-t border-[#e5e7eb]" />
