@@ -140,6 +140,8 @@ export function AtribuirPermissoesSheet({
   const [draft, setDraft]       = useState<Record<string, string[]>>({})
   // componenteId → { acao → nome do grupo que concede } (permissões herdadas via grupo)
   const [inherited, setInherited] = useState<Record<string, Record<string, string>>>({})
+  // componenteId → AcaoItem[] vindas do catálogo DocNix (substitui ACOES['default'] quando presente)
+  const [atribuicoesMap, setAtribuicoesMap] = useState<Record<string, AcaoItem[]>>({})
 
 
   useEffect(() => {
