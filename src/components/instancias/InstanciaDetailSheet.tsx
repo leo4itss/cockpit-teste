@@ -43,12 +43,13 @@ import {
 // ── Tipos internos ────────────────────────────────────────────
 
 interface Props {
-  open:          boolean
-  onClose:       () => void
-  instancia:     Instancia | null
-  componenteNome?: string
-  accountNome?:  string
-  accountId?:    string
+  open:                  boolean
+  onClose:               () => void
+  instancia:             Instancia | null
+  componenteNome?:       string
+  componenteTipoModelo?: 'fga' | 'docnix' | 'custom'
+  accountNome?:          string
+  accountId?:            string
 }
 
 type ActiveTab = 'membros' | 'fases' | 'fluxo' | 'perfil'
