@@ -911,18 +911,98 @@ export function InstanciaDetailSheet({
                   <p className="text-sm text-gray-500">Nenhuma fase configurada.</p>
                 )}
                 {fases.map((fase, idx) => (
-                  <div key={fase.id} className="flex items-center gap-2 p-2 bg-gray-50 rounded-md">
-                    <span className="text-xs text-gray-400 w-6 text-center">{idx + 1}</span>
-                    <span className="text-sm flex-1">{fase.nome}</span>
-                    <button
-                      onClick={async () => {
-                        await api.deleteFase(instancia!.id, fase.id)
-                        setFases(prev => prev.filter(f => f.id !== fase.id))
-                      }}
-                      className="text-xs text-red-500 hover:text-red-700"
-                    >
-                      Remover
-                    </button>
+                  <div key={fase.id} className="border border-gray-200 rounded-md p-3 bg-white space-y-2">
+                    {/* Linha principal: número, nome, selects, remover */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-400 w-5 text-center shrink-0">{idx + 1}</span>
+                      <span className="text-sm font-medium flex-1">{fase.nome}</span>
+                      <select
+                        value={fase.modoAprovacao ?? 'serial'}
+                        onChange={async (e) => {
+                          const updated = await api.updateFase(instancia!.id, fase.id, { modoAprovacao: e.target.value })
+                          setFases(prev => prev.map(f => f.id === fase.id ? { ...f, modoAprovacao: updated.modoAprovacao } : f))
+                        }}
+                        className="text-xs border border-gray-300 rounded px-1.5 py-0.5 text-gray-600 bg-white"
+                        title="Modo de aprovação"
+                      >
+                        <option value="serial">Serial</option>
+                        <option value="paralelo">Paralelo</option>
+                      </select>
+                      <select
+                        value={fase.regraAprovacao ?? 'um'}
+                        onChange={async (e) => {
+                          const updated = await api.updateFase(instancia!.id, fase.id, { regraAprovacao: e.target.value })
+                          setFases(prev => prev.map(f => f.id === fase.id ? { ...f, regraAprovacao: updated.regraAprovacao } : f))
+                        }}
+                        className="text-xs border border-gray-300 rounded px-1.5 py-0.5 text-gray-600 bg-white"
+                        title="Regra de aprovação"
+                      >
+                        <option value="um">Basta um</option>
+                        <option value="todos">Todos devem</option>
+                      </select>
+                      <button
+                        onClick={async () => {
+                          await api.deleteFase(instancia!.id, fase.id)
+                          setFases(prev => prev.filter(f => f.id !== fase.id))
+                        }}
+                        className="text-xs text-red-500 hover:text-red-700 shrink-0"
+                      >
+                        Remover
+                      </button>
+                    </div>
+                    {/* Atribuições permitidas nesta fase */}
+                    {atribuicoes.filter(a => a.status === 'Ativo').length > 0 && (
+                      <div>
+                        <button
+                          onClick={() => {
+                            const next = new Set(fasesExpandidas)
+                            if (next.has(fase.id)) {
+                              next.delete(fase.id)
+                            } else {
+                              next.add(fase.id)
+                              // carregar se ainda não carregou
+                              if (faseAtribPermitidas[fase.id] === undefined) {
+                                api.getFaseAtribuicoesPermitidas(instancia!.id, fase.id)
+                                  .then((data: any[]) => setFaseAtribPermitidas(prev => ({ ...prev, [fase.id]: data.map((d: any) => d.atribuicaoId) })))
+                                  .catch(() => setFaseAtribPermitidas(prev => ({ ...prev, [fase.id]: [] })))
+                              }
+                            }
+                            setFasesExpandidas(next)
+                          }}
+                          className="text-xs text-blue-600 hover:underline"
+                        >
+                          {fasesExpandidas.has(fase.id) ? '▾' : '▸'} Atribuições desta fase
+                        </button>
+                        {fasesExpandidas.has(fase.id) && (
+                          <div className="mt-1.5 border-t border-gray-100 pt-2 space-y-0.5 max-h-36 overflow-y-auto pl-1">
+                            <p className="text-[10px] text-gray-400 mb-1">Vazio = todas as atribuições são permitidas nesta fase</p>
+                            {atribuicoes.filter(a => a.status === 'Ativo').map(a => {
+                              const permitidas = faseAtribPermitidas[fase.id] ?? []
+                              return (
+                                <label key={a.id} className="flex items-center gap-2 text-xs cursor-pointer hover:bg-gray-50 rounded px-1 py-0.5">
+                                  <input
+                                    type="checkbox"
+                                    checked={permitidas.includes(a.id)}
+                                    onChange={async (e) => {
+                                      if (e.target.checked) {
+                                        await api.addFaseAtribuicaoPermitida(instancia!.id, fase.id, a.id)
+                                        setFaseAtribPermitidas(prev => ({ ...prev, [fase.id]: [...(prev[fase.id] ?? []), a.id] }))
+                                      } else {
+                                        await api.removeFaseAtribuicaoPermitida(instancia!.id, fase.id, a.id)
+                                        setFaseAtribPermitidas(prev => ({ ...prev, [fase.id]: (prev[fase.id] ?? []).filter(id => id !== a.id) }))
+                                      }
+                                    }}
+                                    className="rounded"
+                                  />
+                                  <span>{a.nome}</span>
+                                  {a.modulo && <span className="text-gray-400">({a.modulo})</span>}
+                                </label>
+                              )
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ))}
                 {/* Adicionar nova fase */}
