@@ -288,6 +288,13 @@ export function AtribuirPermissoesSheet({
     )
   }, [componentes, search])
 
+  // Retorna as ações do componente: catálogo DocNix se disponível, senão fallback hardcoded
+  function getAcoes(comp: Componente): AcaoItem[] {
+    const docnix = atribuicoesMap[comp.id]
+    if (docnix && docnix.length > 0) return docnix
+    return ACOES[inferirTipo(comp.nome)]
+  }
+
   function toggle(componenteId: string, acao: string) {
     setDraft(prev => {
       const current = prev[componenteId] ?? []
