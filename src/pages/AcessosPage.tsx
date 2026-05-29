@@ -796,6 +796,7 @@ export function AcessosPage() {
         onClose={() => setShowInstanciaDetail(false)}
         instancia={selectedInstancia}
         componenteNome={selectedInstancia ? componenteNomes[selectedInstancia.componenteId] : undefined}
+        componenteTipoModelo={selectedInstancia ? (componenteTipoModelos[selectedInstancia.componenteId] ?? 'fga') : 'fga'}
         accountNome={accountNome ?? undefined}
         accountId={accountId}
       />
