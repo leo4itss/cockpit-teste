@@ -517,7 +517,7 @@ function PerfilSlotCard({
 // ── Componente principal ──────────────────────────────────────
 
 export function InstanciaDetailSheet({
-  open, onClose, instancia, componenteNome, accountNome, accountId = 'acc-comgas',
+  open, onClose, instancia, componenteNome, componenteTipoModelo = 'fga', accountNome, accountId = 'acc-comgas',
 }: Props) {
   // ── State: Membros ────────────────────────────────────────
   const [membros, setMembros]                   = useState<InstanciaMembro[]>([])
