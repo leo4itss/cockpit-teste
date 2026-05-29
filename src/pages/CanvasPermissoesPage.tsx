@@ -295,11 +295,13 @@ function buildGraph(data: GraphData, selectedId: string | null, theme: Visualize
   instances.forEach((inst, i) => {
     const id  = `instancia-${inst.id}`
     const mbs = instMembros[inst.id] ?? []
-    const compNome = components.find(c => c.id === inst.componenteId)?.nome ?? inst.componenteId
+    const comp    = components.find(c => c.id === inst.componenteId)
+    const compNome = comp?.nome ?? inst.componenteId
+    const isDocNix = (comp as any)?.tipoModelo === 'docnix'
     nodes.push({
       id, type: 'instancia',
       position: { x: instX, y: i * (IH + INST_GAP) },
-      data: { nome: inst.nome, componenteNome: compNome, componenteId: inst.componenteId, qtdMembros: mbs.length },
+      data: { nome: inst.nome, componenteNome: compNome, componenteId: inst.componenteId, qtdMembros: mbs.length, isDocNix },
       selected: selectedId === id,
     })
     mbs.forEach((mb: any) => {
@@ -312,7 +314,7 @@ function buildGraph(data: GraphData, selectedId: string | null, theme: Visualize
           stroke: mb.entidadeTipo === 'user' ? theme.edgeInstUser : theme.edgeInstGroup,
           strokeWidth: 1.5, strokeDasharray: '6 3',
         },
-        label: mb.papel,
+        label: isDocNix ? 'DocNix' : mb.papel,
         labelStyle: { fontSize: 9, fill: theme.cardMuted },
         labelBgStyle: { fill: theme.canvasBg, fillOpacity: 0.85 },
       })
