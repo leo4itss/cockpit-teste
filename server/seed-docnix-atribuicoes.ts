@@ -142,12 +142,12 @@ async function seed() {
 
   console.log(`--- MaxDoc (${MAXDOC_ATRIBUICOES.length} atribuições) ---`)
   const maxdocId = await resolveComponenteId('MaxDoc', 'comp-maxdoc')
-  await db.update(componentes).set({ status: 'Ativo' }).where(eq(componentes.id, maxdocId))
+  await db.update(componentes).set({ status: 'Ativo', tipoModelo: 'docnix' }).where(eq(componentes.id, maxdocId))
   await seedAtribuicoes(maxdocId, MAXDOC_ATRIBUICOES)
 
   console.log(`\n--- DocAction (${DOCACTION_ATRIBUICOES.length} atribuições) ---`)
   const docactionId = await resolveComponenteId('DocAction', 'comp-docaction')
-  await db.update(componentes).set({ status: 'Ativo' }).where(eq(componentes.id, docactionId))
+  await db.update(componentes).set({ status: 'Ativo', tipoModelo: 'docnix' }).where(eq(componentes.id, docactionId))
   await seedAtribuicoes(docactionId, DOCACTION_ATRIBUICOES)
 
   console.log('\nSeed concluído. Ver docs/ATRIBUICOES_DOCNIX_CATALOGO.md')
