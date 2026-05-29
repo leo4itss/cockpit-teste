@@ -572,6 +572,8 @@ export function InstanciaDetailSheet({
     setFases([])
     setPerfilSlots([])
     setFaseComResponsaveis({})
+    setFaseAtribPermitidas({})
+    setFasesExpandidas(new Set())
 
     Promise.all([
       api.getInstanciaMembros(instancia.id),
