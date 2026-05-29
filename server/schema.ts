@@ -251,10 +251,13 @@ export const instancias = pgTable('instancias', {
   id:           text('id').primaryKey(),
   componenteId: text('componente_id').notNull().references(() => componentes.id),
   accountId:    text('account_id').notNull().references(() => accounts.id),
-  nome:         text('nome').notNull(),
-  descricao:    text('descricao'),
-  status:       text('status').notNull().default('Ativo'), // 'Ativo' | 'Inativo'
-  createdAt:    text('created_at').notNull(),
+  nome:             text('nome').notNull(),
+  descricao:        text('descricao'),
+  restringirAcesso: boolean('restringir_acesso').notNull().default(false),
+  // false = todos os membros da conta podem enxergar
+  // true  = só membros com atribuição nesta instância podem enxergar
+  status:           text('status').notNull().default('Ativo'), // 'Ativo' | 'Inativo'
+  createdAt:        text('created_at').notNull(),
 }, (t) => [
   index('idx_instancias_componente').on(t.componenteId, t.accountId),
 ])
