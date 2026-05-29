@@ -2,7 +2,6 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { Building2, Users, PanelLeft, Puzzle, Shield, BookUser, Landmark, Network, GitFork, Globe2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useIsPlatformAdmin, useIsOrgAdmin, useIsPasArchitect, useIsAccountAdmin } from '@/authz'
-import { useComponentes } from '@/context/ComponentesContext'
 
 // ── Logo ITSS ─────────────────────────────────────────────────
 
@@ -28,13 +27,11 @@ function NavItem({
   icon: Icon,
   label,
   collapsed,
-  badge,
 }: {
   to: string
   icon: React.ElementType
   label: string
   collapsed: boolean
-  badge?: React.ReactNode
 }) {
   return (
     <NavLink
@@ -50,12 +47,7 @@ function NavItem({
       }
     >
       <Icon className="w-4 h-4 shrink-0" />
-      {!collapsed && (
-        <>
-          <span className="whitespace-nowrap flex-1">{label}</span>
-          {badge}
-        </>
-      )}
+      {!collapsed && <span className="whitespace-nowrap">{label}</span>}
     </NavLink>
   )
 }
@@ -90,10 +82,6 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
   const isOrgAdmin      = useIsOrgAdmin()
   const isPasArchitect  = useIsPasArchitect()
   const isAccountAdmin  = useIsAccountAdmin()
-
-  // Componentes disponíveis na plataforma
-  const { componentes } = useComponentes()
-  const hasDocNix = componentes.some(c => c.tipoModelo === 'docnix' && c.status !== 'Inativo')
 
   // Derivados de visibilidade por perfil
   // Account Admin puro: só tem papel de account_admin, nenhum outro
@@ -180,17 +168,7 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
             <>
               <SectionLabel label="Plataforma" collapsed={collapsed} />
               <div className="flex flex-col gap-1">
-                <NavItem
-                  to="/componentes"
-                  icon={Puzzle}
-                  label="Componentes"
-                  collapsed={collapsed}
-                  badge={hasDocNix && !collapsed ? (
-                    <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700 border border-violet-200 shrink-0">
-                      DocNix
-                    </span>
-                  ) : undefined}
-                />
+                <NavItem to="/componentes" icon={Puzzle} label="Componentes" collapsed={collapsed} />
               </div>
             </>
           )}
@@ -199,32 +177,9 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
           <>
             <SectionLabel label="Conta" collapsed={collapsed} />
             <div className="flex flex-col gap-1">
-              <NavItem
-                to="/acessos"
-                icon={Users}
-                label="Acessos"
-                collapsed={collapsed}
-                badge={hasDocNix && !collapsed ? (
-                  <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700 border border-violet-200 shrink-0">
-                    DocNix
-                  </span>
-                ) : undefined}
-              />
+              <NavItem to="/acessos" icon={Users} label="Acessos" collapsed={collapsed} />
             </div>
           </>
-
-          {/* ── DocNix (apenas se existirem componentes docnix) ── */}
-          {hasDocNix && (isPlatformAdmin || isOrgAdmin || isPasArchitect || isAccountAdmin) && (
-            <>
-              <SectionLabel label="DocNix" collapsed={collapsed} />
-              <div className="flex flex-col gap-1">
-                <NavItem to="/acessos" icon={Users}  label="Instâncias & Membros" collapsed={collapsed} />
-                {(isPlatformAdmin || isPasArchitect) && (
-                  <NavItem to="/componentes" icon={Puzzle} label="Catálogo de Atribuições" collapsed={collapsed} />
-                )}
-              </div>
-            </>
-          )}
 
           {/* ── Visualização ── */}
           {(isPlatformAdmin || isOrgAdmin) && (
