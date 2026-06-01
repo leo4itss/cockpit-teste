@@ -1292,6 +1292,27 @@ export function OrganizacaoDetailPage() {
         modo="org"
         onSuccess={() => {}}
       />
+      <UsuarioDetailOrgSheet
+        open={showOrgUserDetail}
+        onClose={() => setShowOrgUserDetail(false)}
+        user={selectedOrgUser}
+        contasVinculadas={selectedOrgUser ? (userAccountsMap[selectedOrgUser.id] ?? []) : []}
+        todasContas={accounts}
+        onVincularSuccess={(userId, conta) => {
+          setUserAccountsMap(prev => ({
+            ...prev,
+            [userId]: [...(prev[userId] ?? []), conta],
+          }))
+        }}
+        onPapelChange={(userId, accountId, novoPapel) => {
+          setUserAccountsMap(prev => ({
+            ...prev,
+            [userId]: (prev[userId] ?? []).map(cv =>
+              cv.account.id === accountId ? { ...cv, papel: novoPapel } : cv
+            ),
+          }))
+        }}
+      />
       <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </div>
   )
