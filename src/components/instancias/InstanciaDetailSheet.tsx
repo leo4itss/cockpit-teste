@@ -1131,7 +1131,11 @@ export function InstanciaDetailSheet({
                       <button
                         onClick={async () => {
                           await api.deleteFase(instancia!.id, fase.id)
-                          setFases(prev => prev.filter(f => f.id !== fase.id))
+                          setFases(prev => {
+                            const updated = prev.filter(f => f.id !== fase.id)
+                            if (updated.length === 0) setActiveTab('membros')
+                            return updated
+                          })
                         }}
                         className="text-xs text-red-500 hover:text-red-700 shrink-0"
                       >
