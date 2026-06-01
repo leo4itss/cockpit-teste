@@ -29,7 +29,7 @@ import {
 } from '@/data/mock'
 import type { Account, Solution, Contract, Organization, Contact, TipoLicenca, User } from '@/types'
 
-type Tab = 'conta' | 'solucoes' | 'contrato' | 'marketplace'
+type Tab = 'conta' | 'solucoes' | 'contrato' | 'marketplace' | 'usuarios'
 
 export function OrganizacaoDetailPage() {
   const { id } = useParams()
