@@ -152,6 +152,7 @@ interface Props {
   instanciaId: string
   instanciaNome: string
   componenteId: string
+  componenteNome?: string        // usado para inferir as ações FGA disponíveis
   componenteTipoModelo?: string
   membro: InstanciaMembro
   grupoNomes?: Record<string, string>
