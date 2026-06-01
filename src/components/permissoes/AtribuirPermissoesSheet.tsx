@@ -225,16 +225,23 @@ export function AtribuirPermissoesSheet({
         const draftMap = JSON.parse(JSON.stringify(permMap)) as Record<string, string[]>
 
         if (!hasExistingPerms && defaults) {
+          let anyDefaultApplied = false
           ativos.forEach(c => {
-            // Componentes DocNix têm catálogo próprio — não aplicar defaults de papel
-            if (atribResults.find(r => r.id === c.id && r.atribs.length > 0)) return
+            // Só pula componentes DocNix — esses têm catálogo próprio de atribuições
+            // Componentes FGA podem ter atribuições extras no banco, mas ainda usam os defaults por papel
+            if (c.tipoModelo === 'docnix') return
             const tipo = inferirTipo(c.nome)
             const acoesDefault = defaults[tipo] ?? []
             // Só pré-seleciona ações que existem no catálogo daquele tipo
             const acoesValidas = ACOES[tipo].map(a => a.acao)
-            draftMap[c.id] = acoesDefault.filter(a => acoesValidas.includes(a))
+            const aplicadas = acoesDefault.filter(a => acoesValidas.includes(a))
+            if (aplicadas.length > 0) {
+              draftMap[c.id] = aplicadas
+              anyDefaultApplied = true
+            }
           })
-          if (!cancelled) setDefaultsAplicados(true)
+          // Só exibe o banner se defaults foram realmente aplicados
+          if (!cancelled && anyDefaultApplied) setDefaultsAplicados(true)
         }
 
         setOriginal(permMap)
