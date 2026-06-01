@@ -577,6 +577,25 @@ export function InstanciaDetailSheet({
     setFaseComResponsaveis({})
     setFaseAtribPermitidas({})
     setFasesExpandidas(new Set())
+    setShowAtivarFases(false)
+    setShowAtivarPerfil(false)
+
+    // Fases e slots carregados eagerly para progressive disclosure (DocNix)
+    if (componenteTipoModelo === 'docnix') {
+      api.getFases(instancia.id)
+        .then(data => {
+          setFases(data.sort((a: InstanciaFase, b: InstanciaFase) => a.ordem - b.ordem))
+          setFasesLoaded(true)
+        })
+        .catch(() => setFasesLoaded(true))
+
+      api.getPerfilSlots(instancia.id)
+        .then(data => {
+          setPerfilSlots(data.sort((a: InstanciaPerfilSlot, b: InstanciaPerfilSlot) => a.ordem - b.ordem))
+          setSlotsLoaded(true)
+        })
+        .catch(() => setSlotsLoaded(true))
+    }
 
     Promise.all([
       api.getInstanciaMembros(instancia.id),
