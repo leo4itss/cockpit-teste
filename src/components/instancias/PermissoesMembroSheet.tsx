@@ -343,7 +343,7 @@ export function PermissoesMembroSheet({
 
   // Quando o papel muda (FGA), aplica os defaults do novo papel como ponto de partida
   function handlePapelChange(novoPapel: string) {
-    setPapel(novoPapel)
+    setPapel(novoPapel as 'viewer' | 'member' | 'admin')
     const defaults = DEFAULTS_POR_PAPEL[novoPapel]?.[tipoFGA] ?? []
     setFgaDraft(defaults)
   }
