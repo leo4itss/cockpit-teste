@@ -487,9 +487,10 @@ export function OrganizacaoDetailPage() {
   }
 
   const tabs: { key: Tab; label: string }[] = [
-    { key: 'conta', label: 'Conta' },
-    { key: 'solucoes', label: 'Soluções e planos' },
-    { key: 'contrato', label: 'Contrato' },
+    { key: 'conta',     label: 'Conta' },
+    { key: 'usuarios',  label: 'Usuários' },
+    { key: 'solucoes',  label: 'Soluções e planos' },
+    { key: 'contrato',  label: 'Contrato' },
   ]
 
   return (
