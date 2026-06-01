@@ -692,18 +692,21 @@ export function OrganizacaoDetailPage() {
                 {tab !== 'marketplace' && (() => {
                   const canCreate =
                     tab === 'conta'     ? (isPlatformAdmin || isOrgAdmin) :
+                    tab === 'usuarios'  ? (isPlatformAdmin || isOrgAdmin) :
                     tab === 'solucoes'  ? (isPlatformAdmin || isPasArchitect) :
                     tab === 'contrato'  ? isPlatformAdmin :
                     false
                   if (!canCreate) return null
                   return (
                     <Button onClick={() => {
-                      if (tab === 'conta') setSheetAccount(true)
-                      else if (tab === 'solucoes') setSheetSolution(true)
-                      else if (tab === 'contrato') setSheetContract(true)
+                      if (tab === 'conta')    setSheetAccount(true)
+                      else if (tab === 'usuarios')  setShowConvidarUsuario(true)
+                      else if (tab === 'solucoes')  setSheetSolution(true)
+                      else if (tab === 'contrato')  setSheetContract(true)
                     }}>
-                      {tab === 'conta' ? 'Criar Conta'
-                        : tab === 'solucoes' ? 'Criar Solução'
+                      {tab === 'conta'     ? 'Criar Conta'
+                        : tab === 'usuarios'  ? 'Convidar Usuário'
+                        : tab === 'solucoes'  ? 'Criar Solução'
                         : 'Criar Contrato'}
                     </Button>
                   )
