@@ -134,48 +134,33 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
       <div className="flex flex-col flex-1 min-h-0 overflow-y-auto">
         <div className="p-2 flex flex-col shrink-0">
 
-          {/* ── Principal (sem seção) ── */}
-          <div className="flex flex-col gap-1">
-            {showOrganizacoes && (
-              <NavItem to="/organizacoes" icon={Building2} label="Organizações" collapsed={collapsed} />
-            )}
-          </div>
-
-          {/* ── Organização ── */}
-          {(showUsuarios || showGrupos || showContas) && (
+          {/* ── Organizações ── */}
+          {showOrganizacoes && (
             <>
-              <SectionLabel label="Organização" collapsed={collapsed} />
+              <SectionLabel label="Organizações" collapsed={collapsed} />
               <div className="flex flex-col gap-1">
-                {showUsuarios && (
-                  <NavItem to="/usuarios" icon={BookUser} label="Usuários"      collapsed={collapsed} />
-                )}
-                {showGrupos && (
-                  <NavItem to="/grupos"   icon={Shield}   label="Grupos"        collapsed={collapsed} />
-                )}
-                {showContas && (
-                  <NavItem to="/contas"   icon={Landmark} label="Contas"        collapsed={collapsed} />
-                )}
+                <NavItem to="/organizacoes" icon={Building2} label="Organizações" collapsed={collapsed} />
               </div>
             </>
           )}
 
-          {/* ── Plataforma ── */}
+          {/* ── Acessos ── */}
+          <>
+            <SectionLabel label="Acessos" collapsed={collapsed} />
+            <div className="flex flex-col gap-1">
+              <NavItem to="/acessos" icon={Users} label="Acessos" collapsed={collapsed} />
+            </div>
+          </>
+
+          {/* ── Componentes ── */}
           {showComponentes && (
             <>
-              <SectionLabel label="Plataforma" collapsed={collapsed} />
+              <SectionLabel label="Componentes" collapsed={collapsed} />
               <div className="flex flex-col gap-1">
                 <NavItem to="/componentes" icon={Puzzle} label="Componentes" collapsed={collapsed} />
               </div>
             </>
           )}
-
-          {/* ── Conta ── */}
-          <>
-            <SectionLabel label="Conta" collapsed={collapsed} />
-            <div className="flex flex-col gap-1">
-              <NavItem to="/acessos" icon={Users} label="Acessos" collapsed={collapsed} />
-            </div>
-          </>
 
           {/* ── Visualização ── */}
           {(isPlatformAdmin || isOrgAdmin) && (
