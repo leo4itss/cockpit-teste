@@ -1032,38 +1032,15 @@ export function InstanciaDetailSheet({
                               'flex items-center justify-end gap-1',
                               atribuicoesDocnix ? 'visible' : 'invisible group-hover:visible',
                             )}>
-                              {/* Permissões efetivas — apenas para usuários (não grupos) */}
-                              {!isGroup && (
-                                <button
-                                  onClick={() => { setMembroPermEfetivas(membro); setShowPermEfetivas(true) }}
-                                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors"
-                                  title="Ver permissões efetivas"
-                                >
-                                  <Shield className="w-3.5 h-3.5" />
-                                  Efetivas
-                                </button>
-                              )}
-                              {/* Atribuições DocNix ou permissões legado */}
-                              {canManage && atribuicoesDocnix && (
-                                <button
-                                  onClick={() => { setMembroAtrib(membro); setShowMembroAtrib(true) }}
-                                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-blue-600 hover:bg-blue-50 transition-colors"
-                                  title="Editar atribuições na instância"
-                                >
-                                  <Shield className="w-3.5 h-3.5" />
-                                  Atribuições
-                                </button>
-                              )}
-                              {canManage && !atribuicoesDocnix && (
-                                <button
-                                  onClick={() => { setMembroPermissoes(membro); setShowPermissoes(true) }}
-                                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-blue-600 hover:bg-blue-50 transition-colors"
-                                  title="Permissões granulares"
-                                >
-                                  <Shield className="w-3.5 h-3.5" />
-                                  Permissões
-                                </button>
-                              )}
+                              {/* Botão unificado de permissões (FGA ou DocNix) */}
+                              <button
+                                onClick={() => { setMembroPermissoes(membro); setShowPermissoes(true) }}
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-blue-600 hover:bg-blue-50 transition-colors"
+                                title="Ver e editar permissões"
+                              >
+                                <Shield className="w-3.5 h-3.5" />
+                                Permissões
+                              </button>
                               {canManage && (
                                 <button
                                   onClick={() => handleRemove(membro)}
