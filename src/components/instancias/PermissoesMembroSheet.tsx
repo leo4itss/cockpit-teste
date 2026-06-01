@@ -167,6 +167,7 @@ export function PermissoesMembroSheet({
   instanciaId,
   instanciaNome,
   componenteId,
+  componenteNome = '',
   componenteTipoModelo,
   membro,
   grupoNomes = {},
@@ -176,11 +177,18 @@ export function PermissoesMembroSheet({
   const isUser   = membro.entidadeTipo === 'user'
   const entityNome = membro.displayName ?? membro.entidadeId
 
+  // Tipo de componente para ações FGA
+  const tipoFGA = inferirTipoFGA(componenteNome)
+  const acoesFGA = ACOES_FGA[tipoFGA]
+
   // ── Tab (DocNix) ───────────────────────────────────────────
   const [docNixTab, setDocNixTab] = useState<DocNixTab>('diretas')
 
-  // ── FGA: papel ────────────────────────────────────────────
-  const [papel, setPapel]     = useState(membro.papel ?? 'member')
+  // ── FGA: papel + ações ────────────────────────────────────
+  const [papel, setPapel]           = useState(membro.papel ?? 'member')
+  const [fgaAcoes, setFgaAcoes]     = useState<string[]>([])   // ações salvas (original)
+  const [fgaDraft, setFgaDraft]     = useState<string[]>([])   // draft editável
+  const [loadingFga, setLoadingFga] = useState(false)
   const [savingPapel, setSavingPapel] = useState(false)
   const [papelError, setPapelError]   = useState<string | null>(null)
 
