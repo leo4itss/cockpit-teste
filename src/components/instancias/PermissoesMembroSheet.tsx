@@ -341,12 +341,33 @@ export function PermissoesMembroSheet({
     )
   }, [catalog, search])
 
+  // Quando o papel muda (FGA), aplica os defaults do novo papel como ponto de partida
+  function handlePapelChange(novoPapel: string) {
+    setPapel(novoPapel)
+    const defaults = DEFAULTS_POR_PAPEL[novoPapel]?.[tipoFGA] ?? []
+    setFgaDraft(defaults)
+  }
+
+  function toggleFgaAcao(acao: string) {
+    setFgaDraft(prev =>
+      prev.includes(acao) ? prev.filter(a => a !== acao) : [...prev, acao]
+    )
+  }
+
   const hasChanges = useMemo(() => {
-    if (!isDocNix) return papel !== (membro.papel ?? 'member')
+    if (!isDocNix) {
+      const papelChanged = papel !== (membro.papel ?? 'member')
+      const acoesChanged = (() => {
+        const o = new Set(fgaAcoes)
+        if (fgaDraft.length !== o.size) return true
+        return fgaDraft.some(a => !o.has(a))
+      })()
+      return papelChanged || acoesChanged
+    }
     const o = new Set(original)
     if (draft.length !== original.length) return true
     return draft.some(id => !o.has(id))
-  }, [isDocNix, papel, membro.papel, original, draft])
+  }, [isDocNix, papel, membro.papel, fgaAcoes, fgaDraft, original, draft])
 
   function toggleAtrib(atribuicaoId: string) {
     const soHerdada = herdadasSet.has(atribuicaoId) && !draft.includes(atribuicaoId)
