@@ -790,25 +790,32 @@ export function InstanciaDetailSheet({
               <div className="flex items-center justify-between px-6 py-3 border-b border-gray-100 bg-gray-50/60">
                 <div>
                   <p className="text-xs font-medium text-gray-700">Restringir acesso</p>
-                  <p className="text-[10px] text-gray-400 mt-0.5">Apenas membros com atribuição enxergam esta instância</p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">
+                    {restringirAcesso
+                      ? 'Ativo — somente membros com atribuição enxergam esta instância'
+                      : 'Inativo — qualquer usuário da conta pode enxergar esta instância'}
+                  </p>
                 </div>
                 <button
                   onClick={async () => {
-                    const novoValor = !(instancia?.restringirAcesso ?? false)
+                    const novoValor = !restringirAcesso
+                    setRestringirAcesso(novoValor)   // atualiza localmente de imediato
                     try {
                       await fetch(`/api/instancias/${instancia!.id}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ restringirAcesso: novoValor }),
                       })
-                    } catch { /* silencioso */ }
+                    } catch {
+                      setRestringirAcesso(!novoValor) // reverte em caso de erro
+                    }
                   }}
                   className={`relative inline-flex h-5 w-9 flex-shrink-0 items-center rounded-full transition-colors ${
-                    instancia?.restringirAcesso ? 'bg-blue-600' : 'bg-gray-300'
+                    restringirAcesso ? 'bg-blue-600' : 'bg-gray-300'
                   }`}
                 >
                   <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                    instancia?.restringirAcesso ? 'translate-x-5' : 'translate-x-1'
+                    restringirAcesso ? 'translate-x-5' : 'translate-x-1'
                   }`} />
                 </button>
               </div>
