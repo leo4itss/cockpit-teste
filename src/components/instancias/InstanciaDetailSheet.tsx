@@ -526,14 +526,9 @@ export function InstanciaDetailSheet({
   const [showAdd, setShowAdd]                   = useState(false)
   const [addingId, setAddingId]                 = useState<string | null>(null)
   const [removingId, setRemovingId]             = useState<string | null>(null)
-  // Permissões granulares (legado) ou atribuições DocNix por membro
+  // Sheet unificado de permissões por membro (FGA ou DocNix)
   const [showPermissoes, setShowPermissoes]     = useState(false)
   const [membroPermissoes, setMembroPermissoes] = useState<InstanciaMembro | null>(null)
-  const [showMembroAtrib, setShowMembroAtrib]   = useState(false)
-  const [membroAtrib, setMembroAtrib]           = useState<InstanciaMembro | null>(null)
-  // Permissões efetivas (view-only) por membro usuário
-  const [showPermEfetivas, setShowPermEfetivas]         = useState(false)
-  const [membroPermEfetivas, setMembroPermEfetivas]     = useState<InstanciaMembro | null>(null)
   // Atribuições do componente (para multi-select ao adicionar membro)
   const [atribuicoes, setAtribuicoes]           = useState<Atribuicao[]>([])
 
