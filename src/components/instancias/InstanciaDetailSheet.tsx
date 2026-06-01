@@ -543,6 +543,9 @@ export function InstanciaDetailSheet({
   const [showAtivarFases, setShowAtivarFases]   = useState(false)
   const [showAtivarPerfil, setShowAtivarPerfil] = useState(false)
 
+  // ── State: Restringir Acesso (local para refletir toggle imediatamente) ──
+  const [restringirAcesso, setRestringirAcesso] = useState(instancia?.restringirAcesso ?? false)
+
   // ── State: Fases ──────────────────────────────────────────
   const [fases, setFases]                       = useState<InstanciaFase[]>([])
   const [fasesLoaded, setFasesLoaded]           = useState(false)
