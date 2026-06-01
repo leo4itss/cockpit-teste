@@ -690,8 +690,9 @@ export function InstanciaDetailSheet({
     onClose()
   }
 
-  // Modelo DocNix: usa tipoModelo da prop (fonte de verdade) com fallback para atribuições carregadas
-  const isDocNix = componenteTipoModelo === 'docnix' || atribuicoes.filter(a => a.status === 'Ativo').length > 0
+  // Modelo DocNix: determinado exclusivamente pelo tipoModelo do componente pai.
+  // Não usar fallback por atribuições — instâncias FGA também podem ter atribuições carregadas.
+  const isDocNix = componenteTipoModelo === 'docnix'
   const atribuicoesDocnix = isDocNix  // mantém compatibilidade com usos existentes
   const grupoNomes = useMemo(
     () => Object.fromEntries(allGrupos.map(g => [g.id, g.nome])),
