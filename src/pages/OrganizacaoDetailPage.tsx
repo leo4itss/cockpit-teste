@@ -80,12 +80,18 @@ export function OrganizacaoDetailPage() {
     })
   }, [id])
 
-  // Métricas de usuários
+  // Métricas + lista de usuários da org
   const [userCount, setUserCount]           = useState(0)
+  const [orgUsers, setOrgUsers]             = useState<User[]>([])
   const [loadingMetrics, setLoadingMetrics] = useState(true)
+  const [showConvidarUsuario, setShowConvidarUsuario] = useState(false)
   useEffect(() => {
     api.getUsers()
-      .then((users: User[]) => { setUserCount(users.length); setLoadingMetrics(false) })
+      .then((users: User[]) => {
+        setUserCount(users.length)
+        setOrgUsers(users)
+        setLoadingMetrics(false)
+      })
       .catch(() => setLoadingMetrics(false))
   }, [])
 
