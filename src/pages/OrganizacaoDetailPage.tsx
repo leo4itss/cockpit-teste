@@ -808,6 +808,58 @@ export function OrganizacaoDetailPage() {
             </>
           )}
 
+          {/* USUÁRIOS TAB */}
+          {tab === 'usuarios' && (
+            <>
+              {loadingMetrics ? (
+                <div className="flex items-center justify-center py-16">
+                  <div className="w-6 h-6 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
+                </div>
+              ) : orgUsers.length === 0 ? (
+                <EmptyState message="Nenhum usuário encontrado" description="Convide usuários para que apareçam aqui." />
+              ) : (
+                <div className="border border-[#e5e7eb] rounded-2xl p-4 overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-[#e5e7eb]">
+                        <th className="text-left px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10">Nome</th>
+                        <th className="text-left px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10">E-mail</th>
+                        <th className="text-left px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10 w-[180px]">Cargo</th>
+                        <th className="text-left px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10 w-[140px]">Área</th>
+                        <th className="text-center px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10 w-[120px]">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {orgUsers.map(u => (
+                        <tr key={u.id} className="border-b border-[#e5e7eb] last:border-0 hover:bg-gray-50 transition-colors">
+                          <td className="px-2 py-2 h-[52px]">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <OrgUserAvatar nome={u.nomeCompleto} />
+                              <span className="text-sm font-medium text-[#030712] truncate">{u.nomeCompleto}</span>
+                            </div>
+                          </td>
+                          <td className="px-2 py-2 h-[52px] text-sm text-[#6b7280] truncate max-w-0">
+                            <span className="block truncate">{u.email}</span>
+                          </td>
+                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712] w-[180px]">{u.cargo || '—'}</td>
+                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712] w-[140px]">{u.area || '—'}</td>
+                          <td className="px-2 py-2 h-[52px] text-center w-[120px]">
+                            <Badge
+                              variant={u.status === 'Ativo' ? 'success' : 'secondary'}
+                              showIcon
+                            >
+                              {u.status}
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </>
+          )}
+
           {/* SOLUÇÕES TAB */}
           {tab === 'solucoes' && (
             <>
