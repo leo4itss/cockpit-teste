@@ -1302,3 +1302,22 @@ function EmptyState({ message, description }: { message: string; description: st
     </div>
   )
 }
+
+const AVATAR_COLORS = [
+  { bg: 'bg-blue-100',   text: 'text-blue-700'   },
+  { bg: 'bg-green-100',  text: 'text-green-700'  },
+  { bg: 'bg-violet-100', text: 'text-violet-700' },
+  { bg: 'bg-orange-100', text: 'text-orange-700' },
+  { bg: 'bg-pink-100',   text: 'text-pink-700'   },
+  { bg: 'bg-teal-100',   text: 'text-teal-700'   },
+]
+function OrgUserAvatar({ nome }: { nome: string }) {
+  const hash = nome.split('').reduce((a, c) => a + c.charCodeAt(0), 0)
+  const { bg, text } = AVATAR_COLORS[hash % AVATAR_COLORS.length]
+  const ini = nome.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase()
+  return (
+    <div className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-semibold select-none ${bg} ${text}`}>
+      {ini}
+    </div>
+  )
+}
