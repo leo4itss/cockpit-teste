@@ -1358,7 +1358,11 @@ export function InstanciaDetailSheet({
                     onChange={updated => setPerfilSlots(prev => prev.map(s => s.id === updated.id ? updated : s))}
                     onRemove={async () => {
                       await api.deletePerfilSlot(instancia!.id, slot.id)
-                      setPerfilSlots(prev => prev.filter(s => s.id !== slot.id))
+                      setPerfilSlots(prev => {
+                        const updated = prev.filter(s => s.id !== slot.id)
+                        if (updated.length === 0) setActiveTab('membros')
+                        return updated
+                      })
                     }}
                   />
                 ))}
