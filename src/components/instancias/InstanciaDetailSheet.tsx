@@ -715,6 +715,15 @@ export function InstanciaDetailSheet({
   // Não usar fallback por atribuições — instâncias FGA também podem ter atribuições carregadas.
   const isDocNix = componenteTipoModelo === 'docnix'
   const atribuicoesDocnix = isDocNix  // mantém compatibilidade com usos existentes
+
+  // Progressive disclosure: abas Fases/Perfil só aparecem quando há dados
+  const mostraFases  = isDocNix && fasesLoaded  && fases.length > 0
+  const mostraPerfil = isDocNix && slotsLoaded  && perfilSlots.length > 0
+  const tabList: ActiveTab[] = [
+    'membros',
+    ...(mostraFases  ? ['fases' as ActiveTab, 'fluxo' as ActiveTab] : []),
+    ...(mostraPerfil ? ['perfil' as ActiveTab] : []),
+  ]
   const grupoNomes = useMemo(
     () => Object.fromEntries(allGrupos.map(g => [g.id, g.nome])),
     [allGrupos],
