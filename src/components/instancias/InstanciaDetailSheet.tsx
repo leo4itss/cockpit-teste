@@ -1404,6 +1404,7 @@ export function InstanciaDetailSheet({
           instanciaId={instancia.id}
           instanciaNome={instancia.nome}
           componenteId={instancia.componenteId}
+          componenteNome={componenteNome}
           componenteTipoModelo={componenteTipoModelo}
           membro={membroPermissoes}
           grupoNomes={grupoNomes}
