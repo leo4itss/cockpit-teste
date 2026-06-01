@@ -1027,10 +1027,7 @@ export function InstanciaDetailSheet({
                             </td>
                           )}
                           <td className="pr-6 pl-3 py-3 text-right">
-                            <div className={cn(
-                              'flex items-center justify-end gap-1',
-                              atribuicoesDocnix ? 'visible' : 'invisible group-hover:visible',
-                            )}>
+                            <div className="flex items-center justify-end gap-1 invisible group-hover:visible">
                               {/* Botão unificado de permissões (FGA ou DocNix) */}
                               <button
                                 onClick={() => { setMembroPermissoes(membro); setShowPermissoes(true) }}
