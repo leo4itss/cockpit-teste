@@ -22,6 +22,72 @@ import { api } from '@/api/client'
 import { cn } from '@/lib/utils'
 import type { Atribuicao, InstanciaMembro } from '@/types'
 
+// ── FGA: catálogo de ações por tipo de componente ─────────────
+
+type ComponenteTipoFGA = 'assistente-ia' | 'base-conhecimento' | 'analytics' | 'default'
+
+const ACOES_FGA: Record<ComponenteTipoFGA, { acao: string; label: string }[]> = {
+  'assistente-ia': [
+    { acao: 'can_use_assistant',             label: 'Usar o assistente' },
+    { acao: 'can_share_conversation_results', label: 'Compartilhar resultados de conversas' },
+    { acao: 'can_view_consulted_sources',    label: 'Visualizar fontes consultadas' },
+    { acao: 'can_upload_rag_sources',        label: 'Upload de fontes RAG' },
+    { acao: 'can_create_assistant',          label: 'Criar assistente' },
+    { acao: 'can_configure_agents',          label: 'Configurar agentes' },
+    { acao: 'can_manage_business_scenarios', label: 'Gerenciar cenários de negócio' },
+    { acao: 'can_manage_users',              label: 'Gerenciar usuários' },
+  ],
+  'base-conhecimento': [
+    { acao: 'pode_ler',                   label: 'Ler documentos' },
+    { acao: 'pode_editar',                label: 'Editar conteúdo' },
+    { acao: 'pode_criar_documento',       label: 'Criar documentos' },
+    { acao: 'pode_enviar_para_aprovacao', label: 'Enviar para aprovação' },
+    { acao: 'pode_aprovar',               label: 'Aprovar documentos' },
+    { acao: 'pode_publicar',              label: 'Publicar documentos' },
+    { acao: 'pode_excluir',               label: 'Excluir' },
+  ],
+  'analytics': [
+    { acao: 'can_view_dashboards',  label: 'Visualizar dashboards' },
+    { acao: 'can_export_reports',   label: 'Exportar relatórios' },
+    { acao: 'can_manage_analytics', label: 'Administrar analytics' },
+  ],
+  'default': [
+    { acao: 'can_view',   label: 'Visualizar' },
+    { acao: 'can_edit',   label: 'Editar' },
+    { acao: 'can_manage', label: 'Administrar' },
+  ],
+}
+
+// Ações padrão por papel (viewer → member → admin acumulam)
+const DEFAULTS_POR_PAPEL: Record<string, Partial<Record<ComponenteTipoFGA, string[]>>> = {
+  viewer: {
+    'assistente-ia':    ['can_use_assistant'],
+    'base-conhecimento':['pode_ler'],
+    'analytics':        ['can_view_dashboards'],
+    'default':          ['can_view'],
+  },
+  member: {
+    'assistente-ia':    ['can_use_assistant', 'can_share_conversation_results', 'can_view_consulted_sources', 'can_upload_rag_sources'],
+    'base-conhecimento':['pode_ler', 'pode_criar_documento', 'pode_editar', 'pode_enviar_para_aprovacao'],
+    'analytics':        ['can_view_dashboards', 'can_export_reports'],
+    'default':          ['can_view', 'can_edit'],
+  },
+  admin: {
+    'assistente-ia':    ['can_use_assistant', 'can_share_conversation_results', 'can_view_consulted_sources', 'can_upload_rag_sources', 'can_create_assistant', 'can_configure_agents', 'can_manage_business_scenarios', 'can_manage_users'],
+    'base-conhecimento':['pode_ler', 'pode_editar', 'pode_criar_documento', 'pode_enviar_para_aprovacao', 'pode_aprovar', 'pode_publicar', 'pode_excluir'],
+    'analytics':        ['can_view_dashboards', 'can_export_reports', 'can_manage_analytics'],
+    'default':          ['can_view', 'can_edit', 'can_manage'],
+  },
+}
+
+function inferirTipoFGA(nome: string): ComponenteTipoFGA {
+  const n = nome.toLowerCase()
+  if (n.includes('assistente') || n.includes('pas core')) return 'assistente-ia'
+  if (n.includes('base') || n.includes('knowledge') || n.includes('kb') || n.includes('jurídic')) return 'base-conhecimento'
+  if (n.includes('analytics') || n.includes('analytic')) return 'analytics'
+  return 'default'
+}
+
 // ── Tipos ─────────────────────────────────────────────────────
 
 interface EfetivaFonte {
