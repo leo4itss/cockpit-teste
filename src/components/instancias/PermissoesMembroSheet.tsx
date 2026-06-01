@@ -214,10 +214,41 @@ export function PermissoesMembroSheet({
   useEffect(() => {
     if (!open) return
     setDocNixTab('diretas')
-    setPapel(membro.papel ?? 'member')
+    const papelAtual = membro.papel ?? 'member'
+    setPapel(papelAtual)
     setPapelError(null)
     setSearch('')
     setSaveError(null)
+
+    if (!isDocNix) {
+      // FGA: carrega permissões granulares existentes na instância
+      setLoadingFga(true)
+      api.getPermissions({
+        entidade_tipo: membro.entidadeTipo === 'user' ? 'user' : 'group',
+        entidade_id:   membro.entidadeId,
+        instancia_id:  instanciaId,
+      })
+        .then((perms: any[]) => {
+          const existing = perms.map((p: any) => p.acao as string)
+          if (existing.length > 0) {
+            // Usa as permissões já salvas
+            setFgaAcoes(existing)
+            setFgaDraft(existing)
+          } else {
+            // Sem permissões salvas: pré-seleciona defaults do papel atual
+            const defaults = DEFAULTS_POR_PAPEL[papelAtual]?.[tipoFGA] ?? []
+            setFgaAcoes([])
+            setFgaDraft(defaults)
+          }
+        })
+        .catch(() => {
+          // Fallback: pré-seleciona defaults do papel
+          const defaults = DEFAULTS_POR_PAPEL[papelAtual]?.[tipoFGA] ?? []
+          setFgaAcoes([])
+          setFgaDraft(defaults)
+        })
+        .finally(() => setLoadingFga(false))
+    }
 
     if (isDocNix) {
       // Carrega catálogo + atribuições diretas
