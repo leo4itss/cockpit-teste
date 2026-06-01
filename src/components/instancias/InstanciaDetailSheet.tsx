@@ -582,6 +582,7 @@ export function InstanciaDetailSheet({
     setFasesExpandidas(new Set())
     setShowAtivarFases(false)
     setShowAtivarPerfil(false)
+    setRestringirAcesso(instancia.restringirAcesso ?? false)
 
     // Fases e slots carregados eagerly para progressive disclosure (DocNix)
     if (componenteTipoModelo === 'docnix') {
