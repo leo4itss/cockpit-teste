@@ -540,6 +540,8 @@ export function InstanciaDetailSheet({
 
   // ── State: Abas ───────────────────────────────────────────
   const [activeTab, setActiveTab]               = useState<ActiveTab>('membros')
+  const [showAtivarFases, setShowAtivarFases]   = useState(false)
+  const [showAtivarPerfil, setShowAtivarPerfil] = useState(false)
 
   // ── State: Fases ──────────────────────────────────────────
   const [fases, setFases]                       = useState<InstanciaFase[]>([])
