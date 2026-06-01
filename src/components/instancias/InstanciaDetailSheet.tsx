@@ -22,7 +22,6 @@ import {
 } from '@/components/ui/nested-sheet'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
-import { AtribuirPermissoesSheet } from '@/components/permissoes/AtribuirPermissoesSheet'
 import { PermissoesMembroSheet } from '@/components/instancias/PermissoesMembroSheet'
 import { api } from '@/api/client'
 import { useCanManageInstanciaMembros } from '@/authz/hooks'
