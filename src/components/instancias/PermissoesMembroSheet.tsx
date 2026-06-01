@@ -409,15 +409,38 @@ export function PermissoesMembroSheet({
         setSavingDir(false)
       }
     } else {
-      // Salva papel FGA
+      // Salva papel FGA + permissões granulares
       setSavingPapel(true)
       setPapelError(null)
       try {
+        // 1. Atualiza papel
         await api.addInstanciaMembro(instanciaId, {
           entidadeTipo: membro.entidadeTipo,
           entidadeId:   membro.entidadeId,
           papel,
         })
+        // 2. Sincroniza permissões granulares (add novas, remove removidas)
+        const entidadeTipo = membro.entidadeTipo === 'user' ? 'user' : 'group'
+        const origSet  = new Set(fgaAcoes)
+        const draftSet = new Set(fgaDraft)
+        const toAdd    = fgaDraft.filter(a => !origSet.has(a))
+        const toRemove = fgaAcoes.filter(a => !draftSet.has(a))
+        await Promise.all([
+          ...toAdd.map(acao => api.addPermission({
+            entidade_tipo: entidadeTipo,
+            entidade_id:   membro.entidadeId,
+            componente_id: componenteId,
+            acao,
+            instancia_id:  instanciaId,
+          }).catch(() => null)),
+          ...toRemove.map(acao => api.removePermission({
+            entidade_tipo: entidadeTipo,
+            entidade_id:   membro.entidadeId,
+            componente_id: componenteId,
+            acao,
+            instancia_id:  instanciaId,
+          }).catch(() => null)),
+        ])
         onSaved?.()
         handleClose()
       } catch {
