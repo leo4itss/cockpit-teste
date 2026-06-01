@@ -469,36 +469,79 @@ export function PermissoesMembroSheet({
 
       <NestedSheetBody noPadding>
 
-        {/* ── FGA: seletor de papel ──────────────────────────── */}
+        {/* ── FGA: seletor de papel + ações ─────────────────── */}
         {!isDocNix && (
-          <div className="px-6 py-5 space-y-3">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Nível de acesso</p>
-            {PAPEL_OPTIONS.map(opt => (
-              <label
-                key={opt.value}
-                className={cn(
-                  'flex items-start gap-3 p-3.5 rounded-xl border cursor-pointer transition-colors',
-                  papel === opt.value
-                    ? 'border-blue-300 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50',
+          <div className="px-6 py-5 space-y-4">
+            {/* Seletor de papel */}
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Nível de acesso</p>
+              {PAPEL_OPTIONS.map(opt => (
+                <label
+                  key={opt.value}
+                  className={cn(
+                    'flex items-start gap-3 p-3.5 rounded-xl border cursor-pointer transition-colors',
+                    papel === opt.value
+                      ? 'border-blue-300 bg-blue-50'
+                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50',
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name="papel"
+                    value={opt.value}
+                    checked={papel === opt.value}
+                    onChange={() => handlePapelChange(opt.value)}
+                    className="mt-0.5 accent-blue-600 shrink-0"
+                  />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-gray-900">{opt.label}</p>
+                    <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{opt.descricao}</p>
+                  </div>
+                </label>
+              ))}
+              {papelError && (
+                <p className="text-xs text-red-600">{papelError}</p>
+              )}
+            </div>
+
+            {/* Ações incluídas neste papel */}
+            {acoesFGA.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                  Ações da instância
+                </p>
+                {loadingFga ? (
+                  <div className="flex items-center gap-2 py-3 text-sm text-gray-400">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    Carregando...
+                  </div>
+                ) : (
+                  <div className="border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100">
+                    {acoesFGA.map(({ acao, label }) => (
+                      <label
+                        key={acao}
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={fgaDraft.includes(acao)}
+                          onChange={() => toggleFgaAcao(acao)}
+                          className="w-4 h-4 rounded border-gray-300 accent-blue-600 shrink-0"
+                        />
+                        <span className={cn(
+                          'text-sm flex-1',
+                          fgaDraft.includes(acao) ? 'font-medium text-gray-900' : 'text-gray-500',
+                        )}>
+                          {label}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
                 )}
-              >
-                <input
-                  type="radio"
-                  name="papel"
-                  value={opt.value}
-                  checked={papel === opt.value}
-                  onChange={() => setPapel(opt.value)}
-                  className="mt-0.5 accent-blue-600 shrink-0"
-                />
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-gray-900">{opt.label}</p>
-                  <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{opt.descricao}</p>
-                </div>
-              </label>
-            ))}
-            {papelError && (
-              <p className="text-xs text-red-600">{papelError}</p>
+                <p className="text-xs text-gray-400">
+                  Ao alterar o papel, as ações são atualizadas com os valores padrão — ajuste conforme necessário.
+                </p>
+              </div>
             )}
           </div>
         )}
