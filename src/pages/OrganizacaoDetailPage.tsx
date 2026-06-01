@@ -1259,6 +1259,12 @@ export function OrganizacaoDetailPage() {
         modo="org"
         onSuccess={() => {}}
       />
+      <ConvidarUsuarioSheet
+        open={showConvidarUsuario}
+        onClose={() => setShowConvidarUsuario(false)}
+        modo="org"
+        onSuccess={() => {}}
+      />
       <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </div>
   )
