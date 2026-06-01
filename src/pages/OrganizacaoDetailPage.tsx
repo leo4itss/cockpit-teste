@@ -86,6 +86,9 @@ export function OrganizacaoDetailPage() {
   const [orgUsers, setOrgUsers]             = useState<User[]>([])
   const [loadingMetrics, setLoadingMetrics] = useState(true)
   const [showConvidarUsuario, setShowConvidarUsuario] = useState(false)
+  const [selectedOrgUser, setSelectedOrgUser] = useState<User | null>(null)
+  const [showOrgUserDetail, setShowOrgUserDetail] = useState(false)
+  const [userAccountsMap, setUserAccountsMap] = useState<Record<string, ContaVinculada[]>>({})
   useEffect(() => {
     api.getUsers()
       .then((users: User[]) => {
@@ -95,6 +98,25 @@ export function OrganizacaoDetailPage() {
       })
       .catch(() => setLoadingMetrics(false))
   }, [])
+
+  // Carrega membros por conta para montar userAccountsMap (necessário para UsuarioDetailOrgSheet)
+  useEffect(() => {
+    if (accounts.length === 0) return
+    Promise.all(
+      accounts.map(acc =>
+        api.getAccountMembros(acc.id)
+          .then((mems: any[]) => mems.map(m => ({ userId: m.id as string, account: acc, papel: m.papel as 'member' | 'account_admin' })))
+          .catch(() => [] as { userId: string; account: Account; papel: 'member' | 'account_admin' }[])
+      )
+    ).then(results => {
+      const map: Record<string, ContaVinculada[]> = {}
+      results.flat().forEach(({ userId, account, papel }) => {
+        if (!map[userId]) map[userId] = []
+        map[userId].push({ account, papel })
+      })
+      setUserAccountsMap(map)
+    })
+  }, [accounts])
 
   // Create sheets
   const [sheetAccount, setSheetAccount] = useState(false)
