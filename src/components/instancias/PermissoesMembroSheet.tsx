@@ -1,7 +1,8 @@
 /**
  * PermissoesMembroSheet — painel unificado de permissões por membro.
  *
- * FGA:      radio Visualizador / Membro / Administrador + descrição do que cada papel permite.
+ * FGA:      radio Visualizador / Membro / Administrador + checkboxes de ações (pré-selecionadas por papel).
+ *           Quando o papel muda, as ações são atualizadas com os defaults do novo papel.
  * DocNix usuário: abas "Diretas" (checkboxes editáveis + via grupo read-only) | "Efetivo" (resultado calculado com origem).
  * DocNix grupo:   aba "Diretas" (checkboxes editáveis) + info de herança.
  */
