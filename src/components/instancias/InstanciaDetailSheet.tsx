@@ -1400,49 +1400,21 @@ export function InstanciaDetailSheet({
         <Button variant="ghost" onClick={handleClose}>Fechar</Button>
       </NestedSheetFooter>
 
-      {/* Sheet de atribuições DocNix por membro */}
-      {membroAtrib && instancia && (
-        <MembroAtribuicoesSheet
-          open={showMembroAtrib}
-          onClose={() => { setShowMembroAtrib(false); setMembroAtrib(null) }}
-          instanciaId={instancia.id}
-          instanciaNome={instancia.nome}
-          componenteId={instancia.componenteId}
-          membro={membroAtrib}
-          grupoNomes={grupoNomes}
-        />
-      )}
-
-      {/* Sheet de permissões granulares (legado) por membro */}
-      {membroPermissoes && !atribuicoesDocnix && (
-        <AtribuirPermissoesSheet
+      {/* Sheet unificado de permissões (FGA ou DocNix) */}
+      {membroPermissoes && instancia && (
+        <PermissoesMembroSheet
           open={showPermissoes}
           onClose={() => { setShowPermissoes(false); setMembroPermissoes(null) }}
-          entityType={membroPermissoes.entidadeTipo === 'user' ? 'usuario' : 'grupo'}
-          entityId={membroPermissoes.entidadeId}
-          entityNome={membroPermissoes.displayName ?? membroPermissoes.entidadeId}
-          accountId={accountId}
-          papel={
-            membroPermissoes.papel === 'viewer' ? 'Viewer'
-            : membroPermissoes.papel === 'admin'  ? 'Admin'
-            : 'User'
-          }
-          instanciaId={instancia.id}
-          instanciaComponenteId={instancia.componenteId}
-          instanciaNome={instancia.nome}
-        />
-      )}
-
-      {/* Sheet de permissões efetivas (view-only) por usuário membro */}
-      {membroPermEfetivas && (
-        <PermissoesEfetivasSheet
-          open={showPermEfetivas}
-          onClose={() => { setShowPermEfetivas(false); setMembroPermEfetivas(null) }}
-          userId={membroPermEfetivas.entidadeId}
-          userName={membroPermEfetivas.displayName ?? membroPermEfetivas.entidadeId}
           instanciaId={instancia.id}
           instanciaNome={instancia.nome}
           componenteId={instancia.componenteId}
+          componenteTipoModelo={componenteTipoModelo}
+          membro={membroPermissoes}
+          grupoNomes={grupoNomes}
+          onSaved={() => {
+            // Recarregar membros após salvar permissões
+            api.getInstanciaMembros(instancia.id).then(setMembros).catch(() => {})
+          }}
         />
       )}
     </NestedSheet>
