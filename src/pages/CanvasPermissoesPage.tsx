@@ -559,10 +559,10 @@ function UsuarioPanel({ userId, graphData, accountId, theme, onClose, onRefresh:
 
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: theme.sectionLabel }}>
-            Instâncias com acesso direto ({userInstancias.length})
+            Objetos com acesso direto ({userInstancias.length})
           </p>
           {userInstancias.length === 0
-            ? <p className="text-xs" style={{ color: theme.panelMuted }}>Sem acesso direto a instâncias.</p>
+            ? <p className="text-xs" style={{ color: theme.panelMuted }}>Sem acesso direto a objetos.</p>
             : <div className="space-y-1">
                 {userInstancias.map(inst => {
                   const mb        = (graphData.instMembros[inst.id] ?? []).find((m: any) => m.entidadeId === userId)
