@@ -89,7 +89,7 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
 
   // Itens visíveis para cada grupo
   const showOrganizacoes = !isAccountAdminOnly  // todos exceto Account Admin puro
-  const showComponentes  = true                 // todos podem visualizar
+  const showComponentes  = isPlatformAdmin || isPasArchitect  // só quem gerencia componentes
 
   return (
     <aside
