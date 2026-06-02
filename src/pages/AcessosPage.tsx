@@ -487,7 +487,7 @@ export function AcessosPage() {
           {([
             { id: 'usuarios',   label: 'Usuários' },
             { id: 'grupos',     label: 'Grupos' },
-            { id: 'instancias', label: 'Instâncias' },
+            { id: 'instancias', label: 'Objetos' },
           ] as const).map(({ id, label }) => (
             <button
               key={id}
