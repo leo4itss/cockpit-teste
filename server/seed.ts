@@ -197,6 +197,22 @@ async function seed() {
   )
   console.log(`✓ componentes (${mockComponentes.length})`)
 
+  // ── Atribuições de Componentes DocNix ─────────────────────────
+  if (componenteAtribuicoesMock.length > 0) {
+    await db.insert(componenteAtribuicoes).values(
+      componenteAtribuicoesMock.map(a => ({
+        id:           a.id,
+        componenteId: a.componenteId,
+        nome:         a.nome,
+        descricao:    a.descricao ?? null,
+        modulo:       a.modulo ?? null,
+        status:       a.status,
+        createdAt:    a.createdAt,
+      }))
+    )
+    console.log(`✓ componenteAtribuicoes (${componenteAtribuicoesMock.length})`)
+  }
+
   // ── Grupos ────────────────────────────────────────────────────
   if (mockGrupos.length > 0) {
     await db.insert(grupos).values(
