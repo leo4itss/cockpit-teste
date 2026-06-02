@@ -23,6 +23,10 @@ async function seed() {
   console.log('Seeding database...\n')
 
   // ── Limpar na ordem correta (FK) ─────────────────────────────
+  await db.delete(instanciaMembroAtribuicoes)
+  await db.delete(faseResponsaveis)
+  await db.delete(instanciaFases)
+  await db.delete(instanciaPerfilSlots)
   await db.delete(instanciaMembros)
   await db.delete(instancias)
   await db.delete(usuarioGrupos)
