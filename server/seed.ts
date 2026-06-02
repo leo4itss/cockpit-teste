@@ -2,7 +2,8 @@ import 'dotenv/config'
 import { db } from './db'
 import {
   organizations, accounts, solutions, contracts, users, tiposLicenca, componentes,
-  grupos, usuarioGrupos, instancias, instanciaMembros, instanciaMembroAtribuicoes,
+  grupos, usuarioGrupos, componentPermissions, componenteAtribuicoes,
+  instancias, instanciaMembros, instanciaMembroAtribuicoes,
   instanciaFases, faseResponsaveis, faseAtribuicoesPermitidas,
   instanciaPerfilSlots, instanciaPerfilSlotNomeacoes,
 } from './schema'
