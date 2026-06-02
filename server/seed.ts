@@ -18,6 +18,7 @@ import {
   componentes as mockComponentes,
   grupos as mockGrupos,
   grupoMembrosMap,
+  accountMembrosIds,
   instancias as mockInstancias,
   instanciaMembros as mockInstanciaMembros,
 } from '../src/data/mock'
