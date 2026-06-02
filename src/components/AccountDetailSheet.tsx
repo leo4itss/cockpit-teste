@@ -376,7 +376,7 @@ export function AccountDetailSheet({ open, onClose, account, org, onEdit }: Prop
         </div>
       )}
 
-      {/* ── Aba: Capacidades ── */}
+      {/* ── Aba: Licenças Ativas ── */}
       {tab === 'capacidades' && (
         <div className="flex flex-col gap-4">
 
@@ -386,15 +386,15 @@ export function AccountDetailSheet({ open, onClose, account, org, onEdit }: Prop
               <strong>Regra de decisão:</strong>{' '}
               <code className="bg-blue-100 px-1 rounded text-[11px]">allow = permission AND entitlement</code>
               <br />
-              Habilitar uma capacidade <strong>não cria instâncias</strong> — apenas libera a conta para recebê-las.
+              Habilitar uma licença <strong>não cria objetos</strong> — apenas libera a conta para recebê-los.
               É um pré-requisito: sem ela, nenhum acesso é liberado mesmo que a permissão exista.
-              As instâncias são criadas dentro do próprio produto (ex: MaxDoc) e refletidas automaticamente no cockpit.
+              Os objetos são criados dentro do próprio produto (ex: MaxDoc) e refletidos automaticamente no cockpit.
             </p>
           </div>
 
           {loadingCaps ? (
             <div className="flex items-center justify-center py-12 text-sm text-gray-500">
-              Carregando capacidades...
+              Carregando licenças...
             </div>
           ) : (
             <div className="flex flex-col gap-3">
