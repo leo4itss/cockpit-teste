@@ -67,8 +67,8 @@ function FieldLabel({ children, required, hint }: {
 
 // Papéis disponíveis — abstração sobre as tuplas FGA de permissão
 const PAPEIS = [
-  { value: 'Viewer', label: 'Viewer',     desc: 'Acesso de leitura e consulta' },
-  { value: 'User',   label: 'User',       desc: 'Uso padrão do assistente' },
+  { value: 'Viewer', label: 'Visualizador', desc: 'Acesso de leitura e consulta' },
+  { value: 'User',   label: 'Usuário',      desc: 'Uso padrão do assistente' },
   { value: 'Admin',  label: 'Administrador', desc: 'Acesso completo à gestão' },
 ]
 
