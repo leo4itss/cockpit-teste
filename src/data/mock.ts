@@ -1158,6 +1158,28 @@ export const instancias: Instancia[] = [
     createdAt:    '01/02/2026',
     qtdMembros:   2,
   },
+  // ── Comgas / org-docnix (Org Admin Marcelo) ──────────────────
+  {
+    id:           'inst-comgas-maxdoc',
+    componenteId: 'comp-maxdoc',
+    accountId:    'acc-comgas',
+    nome:         'Gestão Documental Comgas',
+    descricao:    'MaxDoc para controle de documentos técnicos e regulatórios da Comgas.',
+    status:       'Ativo',
+    createdAt:    '01/03/2026',
+    qtdMembros:   3,
+  },
+  {
+    id:           'inst-comgas-docaction',
+    componenteId: 'comp-docaction',
+    accountId:    'acc-comgas',
+    nome:         'Ocorrências Comgas',
+    descricao:    'DocAction para não conformidades e planos de ação da área de segurança.',
+    status:       'Ativo',
+    createdAt:    '01/03/2026',
+    qtdMembros:   2,
+  },
+  // ── Santacruz (Account Admin — Carla) ────────────────────────
   {
     id:           'inst-a2-maxdoc',
     componenteId: 'comp-maxdoc',
