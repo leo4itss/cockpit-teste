@@ -43,7 +43,7 @@ const CARGOS = [
   { value: 'C-Level (CEO, CTO, etc.)', label: 'C-Level (CEO, CTO, etc.)' },
 ]
 
-const PAPEIS = [
+const PERFIS = [
   { value: 'Administrador', label: 'Administrador' },
   { value: 'Usuário', label: 'Usuário' },
 ]
