@@ -3,6 +3,7 @@ import { db } from './db'
 import {
   organizations, accounts, solutions, contracts, users, tiposLicenca, componentes,
   grupos, usuarioGrupos, componentPermissions, componenteAtribuicoes,
+  userAccountMemberships, accountEntitlements,
   instancias, instanciaMembros, instanciaMembroAtribuicoes,
   instanciaFases, faseResponsaveis, faseAtribuicoesPermitidas,
   instanciaPerfilSlots, instanciaPerfilSlotNomeacoes,
