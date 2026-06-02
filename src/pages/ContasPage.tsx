@@ -462,22 +462,22 @@ function ContaDetailSheet({ open, onClose, account }: ContaDetailProps) {
             </div>
           )}
 
-          {/* ── Aba Capacidades ── */}
+          {/* ── Aba Licenças Ativas ── */}
           {tab === 'capacidades' && (
             <div className="flex-1 overflow-y-auto">
               {/* Banner explicativo */}
               <div className="mx-6 mt-5 mb-4 p-3.5 rounded-xl border border-blue-100 bg-blue-50">
                 <p className="text-xs text-blue-800 leading-relaxed">
                   <strong>Regra de decisão:</strong> <code className="bg-blue-100 px-1 rounded text-[11px]">allow = permission AND entitlement</code><br />
-                  Ativar uma capacidade aqui equivale à tupla FGA{' '}
+                  Ativar uma licença aqui equivale à tupla FGA{' '}
                   <code className="bg-blue-100 px-1 rounded text-[11px]">account:{account.id} enabled_for_tenant capability:X</code>.
-                  Sem o entitlement ativo, nenhuma permissão individual é suficiente para liberar o acesso.
+                  Sem a licença ativa, nenhuma permissão individual é suficiente para liberar o acesso.
                 </p>
               </div>
 
               {loadingCaps ? (
                 <div className="flex items-center justify-center py-12 text-sm text-gray-500">
-                  Carregando capacidades...
+                  Carregando licenças...
                 </div>
               ) : (
                 <div className="px-6 pb-6 flex flex-col gap-3">
