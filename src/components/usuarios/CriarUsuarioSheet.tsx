@@ -285,9 +285,9 @@ export function CriarUsuarioSheet({ open, onClose, onSuccess }: Props) {
               />
 
               <Select
-                label="Papel"
+                label="Nível de Acesso"
                 options={PAPEIS}
-                placeholder="Selecione o papel"
+                placeholder="Selecione o nível de acesso"
                 value={form.papel}
                 onChange={e => set('papel', e.target.value)}
               />
