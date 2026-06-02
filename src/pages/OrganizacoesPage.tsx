@@ -26,6 +26,10 @@ export function OrganizacoesPage() {
   const [deleteTarget, setDeleteTarget] = useState<Organization | null>(null)
   const [deleteModal, setDeleteModal] = useState<'inativar' | null>(null)
 
+  // Account Admin não tem acesso à página de Organizações
+  // (só gerencia sua própria conta — usa a aba Acessos)
+  const isAccountAdminOnly = isAccountAdmin && !isPlatformAdmin && !isOrgAdmin && !isPasArchitect
+
   useEffect(() => {
     api.getOrganizations()
       .then(data => { setOrgs(data); setLoading(false) })
@@ -36,8 +40,12 @@ export function OrganizacoesPage() {
       })
   }, [])
 
+  if (isAccountAdminOnly) {
+    return <Navigate to="/acessos" replace />
+  }
+
   const filtered = orgs
-    .filter(o => !isOrgAdmin || !adminOrgId || o.id === adminOrgId)
+    .filter(o => isPlatformAdmin || !isOrgAdmin || !adminOrgId || o.id === adminOrgId)
     .filter(o => showInativas || o.status !== 'Inativo')
     .filter(o =>
       !search ||
