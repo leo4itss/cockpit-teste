@@ -1213,7 +1213,7 @@ export const instancias: Instancia[] = [
 // ── Entitlements (capacidades ativas por conta) — fallback local ──
 // accountId → capability[]
 export const accountEntitlements: Record<string, string[]> = {
-  'acc-comgas': ['assistant.use', 'knowledge.use'],
+  'acc-comgas': ['assistant.use', 'knowledge.use', 'maxdoc.use', 'docaction.use'],
   'a1':         ['assistant.use', 'knowledge.use', 'analytics.use'],
   'a2':         ['assistant.use', 'knowledge.use', 'analytics.use', 'maxdoc.use', 'docaction.use'],
 }
