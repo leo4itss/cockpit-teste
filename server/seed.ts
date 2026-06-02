@@ -16,6 +16,7 @@ import {
   users as mockUsers,
   tiposLicenca as mockTiposLicenca,
   componentes as mockComponentes,
+  componenteAtribuicoesMock,
   grupos as mockGrupos,
   grupoMembrosMap,
   accountMembrosIds,
