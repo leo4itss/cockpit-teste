@@ -59,8 +59,8 @@ function Avatar({ nome, size = 'md' }: { nome: string; size?: 'sm' | 'md' }) {
 
 function PapelBadge({ papel }: { papel: 'member' | 'account_admin' }) {
   return papel === 'account_admin'
-    ? <Badge variant="warning">Account Admin</Badge>
-    : <Badge variant="default">Member</Badge>
+    ? <Badge variant="warning">Administrador da Conta</Badge>
+    : <Badge variant="default">Membro</Badge>
 }
 
 function StatusBadge({ status }: { status: Account['status'] }) {
