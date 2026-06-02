@@ -715,7 +715,7 @@ export function ContasPage() {
           </div>
           <h1 className="text-2xl font-bold leading-8 text-[#030712]">Contas</h1>
           <p className="text-sm text-[#6b7280] mt-1 max-w-[1080px]">
-            Contas são subdivisões da organização — cada uma com seus próprios usuários, grupos e capacidades ativas. Para criar uma conta, acesse o detalhe da organização em <strong className="font-medium text-[#374151]">Organizações</strong>.
+            Contas são subdivisões da organização — cada uma com seus próprios usuários, grupos e licenças ativas. Para criar uma conta, acesse o detalhe da organização em <strong className="font-medium text-[#374151]">Organizações</strong>.
           </p>
         </div>
       </div>
