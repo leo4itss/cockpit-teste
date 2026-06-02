@@ -388,7 +388,7 @@ export function AccountDetailSheet({ open, onClose, account, org, onEdit }: Prop
               <br />
               Habilitar uma capacidade <strong>não cria instâncias</strong> — apenas libera a conta para recebê-las.
               É um pré-requisito: sem ela, nenhum acesso é liberado mesmo que a permissão exista.
-              Para que os módulos apareçam em Acessos, crie as instâncias do componente em <strong>Componentes</strong> após habilitar.
+              As instâncias são criadas dentro do próprio produto (ex: MaxDoc) e refletidas automaticamente no cockpit.
             </p>
           </div>
 
