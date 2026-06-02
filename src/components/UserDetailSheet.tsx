@@ -95,7 +95,7 @@ export function UserDetailSheet({ open, onClose, user, onEdit }: Props) {
           <SectionTitle>Informações Profissionais</SectionTitle>
           <Field label="Área" value={user.area} required />
           <Field label="Cargo" value={user.cargo} required />
-          <Field label="Papel" value={user.papel} required />
+          <Field label="Nível de Acesso" value={user.papel} required />
           <Field label="Etiquetas de classificação" value={user.etiquetas} required />
         </div>
 
