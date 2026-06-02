@@ -618,6 +618,7 @@ export function AtribuirPermissoesSheet({
                           )
                         })}
                       </div>
+                      )}
                     </div>
                   )
                 })}
