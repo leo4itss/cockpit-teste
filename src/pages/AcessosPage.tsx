@@ -670,20 +670,20 @@ export function AcessosPage() {
         </div>
       )}
 
-      {/* ── Aba Instâncias ── */}
+      {/* ── Aba Objetos ── */}
       {abaAtiva === 'instancias' && (
         <div className="px-8 pt-6 pb-8">
           <p className="text-sm text-[#6b7280] mb-4">
-            Instâncias são contextos específicos de um componente dentro desta conta.
-            Cada instância tem sua própria lista de membros — o acesso a uma instância não é herdado automaticamente do acesso ao componente.
+            Objetos são serviços configurados dentro desta conta — cada um com sua própria lista de membros e níveis de acesso.
+            O acesso a um objeto não é herdado automaticamente do componente ao qual pertence.
           </p>
 
           {loadingInstancias ? (
-            <div className="flex items-center justify-center py-16 text-sm text-gray-500">Carregando instâncias...</div>
+            <div className="flex items-center justify-center py-16 text-sm text-gray-500">Carregando objetos...</div>
           ) : filteredInstancias.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 gap-2">
-              <p className="text-sm font-medium text-[#030712]">Nenhuma instância encontrada</p>
-              <p className="text-xs text-[#6b7280]">Esta conta ainda não possui instâncias configuradas.</p>
+              <p className="text-sm font-medium text-[#030712]">Nenhum objeto encontrado</p>
+              <p className="text-xs text-[#6b7280]">Esta conta ainda não possui objetos configurados.</p>
             </div>
           ) : (
             <div className="space-y-6">
