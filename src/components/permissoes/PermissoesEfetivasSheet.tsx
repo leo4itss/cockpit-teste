@@ -137,10 +137,10 @@ export function PermissoesEfetivasSheet({
       </NestedSheetHeader>
 
       <NestedSheetBody>
-        {/* Seletor de instância — exibido quando há múltiplas opções e nenhuma fixada */}
+        {/* Seletor de objeto — exibido quando há múltiplos e nenhum fixado */}
         {!instanciaIdProp && instancias && instancias.length > 0 && (
           <div className="mb-4">
-            <label className="block text-xs font-medium text-gray-600 mb-1">Instância</label>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Objeto</label>
             <select
               value={selectedInstanciaId}
               onChange={e => setSelectedInstanciaId(e.target.value)}
