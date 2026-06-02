@@ -29,6 +29,8 @@ async function seed() {
   await db.delete(instanciaMembroAtribuicoes)
   await db.delete(componentPermissions)
   await db.delete(componenteAtribuicoes)
+  await db.delete(userAccountMemberships)
+  await db.delete(accountEntitlements)
   await db.delete(instanciaPerfilSlotNomeacoes)
   await db.delete(faseAtribuicoesPermitidas)
   await db.delete(faseResponsaveis)
