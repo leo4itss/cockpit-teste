@@ -1210,6 +1210,33 @@ export const instancias: Instancia[] = [
   },
 ]
 
+// ── Atribuições de Componentes DocNix ────────────────────────────
+// Espelha componente_atribuicoes do DB. Usado como fallback local e no seed.
+export const componenteAtribuicoesMock = [
+  // ── MaxDoc ──────────────────────────────────────────────────
+  { id: 'ca-md-criar',       componenteId: 'comp-maxdoc', nome: 'Criar Documento',             modulo: 'MaxDoc',    status: 'Ativo', createdAt: '01/01/2026' },
+  { id: 'ca-md-editar',      componenteId: 'comp-maxdoc', nome: 'Editar Documento',             modulo: 'MaxDoc',    status: 'Ativo', createdAt: '01/01/2026' },
+  { id: 'ca-md-excluir',     componenteId: 'comp-maxdoc', nome: 'Excluir Documento',            modulo: 'MaxDoc',    status: 'Ativo', createdAt: '01/01/2026' },
+  { id: 'ca-md-revisar',     componenteId: 'comp-maxdoc', nome: 'Revisar Documento',            modulo: 'MaxDoc',    status: 'Ativo', createdAt: '01/01/2026' },
+  { id: 'ca-md-aprovar',     componenteId: 'comp-maxdoc', nome: 'Aprovar Documento',            modulo: 'MaxDoc',    status: 'Ativo', createdAt: '01/01/2026' },
+  { id: 'ca-md-obsoleter',   componenteId: 'comp-maxdoc', nome: 'Obsoletetar Documento',        modulo: 'MaxDoc',    status: 'Ativo', createdAt: '01/01/2026' },
+  { id: 'ca-md-ler-todos',   componenteId: 'comp-maxdoc', nome: 'Ler Todos os Documentos',      modulo: 'MaxDoc',    status: 'Ativo', createdAt: '01/01/2026' },
+  { id: 'ca-md-imprimir',    componenteId: 'comp-maxdoc', nome: 'Imprimir',                     modulo: 'MaxDoc',    status: 'Ativo', createdAt: '01/01/2026' },
+  { id: 'ca-md-copia-ctrl',  componenteId: 'comp-maxdoc', nome: 'Cópia Controlada',             modulo: 'MaxDoc',    status: 'Ativo', createdAt: '01/01/2026' },
+  { id: 'ca-md-copia-nctrl', componenteId: 'comp-maxdoc', nome: 'Emitir Cópia Não Controlada',  modulo: 'MaxDoc',    status: 'Ativo', createdAt: '01/01/2026' },
+  { id: 'ca-md-tab-admin',   componenteId: 'comp-maxdoc', nome: 'Tabelas Administrativas',      modulo: 'MaxDoc',    status: 'Ativo', createdAt: '01/01/2026' },
+  { id: 'ca-md-admin',       componenteId: 'comp-maxdoc', nome: 'Administrar MaxDoc',           modulo: 'MaxDoc',    status: 'Ativo', createdAt: '01/01/2026' },
+  // ── DocAction ────────────────────────────────────────────────
+  { id: 'ca-da-criar',       componenteId: 'comp-docaction', nome: 'Criar Ocorrência',          modulo: 'DocAction', status: 'Ativo', createdAt: '01/01/2026' },
+  { id: 'ca-da-categorizar', componenteId: 'comp-docaction', nome: 'Categorizar Ocorrência',    modulo: 'DocAction', status: 'Ativo', createdAt: '01/01/2026' },
+  { id: 'ca-da-analisar',    componenteId: 'comp-docaction', nome: 'Analisar Causa',            modulo: 'DocAction', status: 'Ativo', createdAt: '01/01/2026' },
+  { id: 'ca-da-aprovar',     componenteId: 'comp-docaction', nome: 'Aprovar Análise',           modulo: 'DocAction', status: 'Ativo', createdAt: '01/01/2026' },
+  { id: 'ca-da-plano',       componenteId: 'comp-docaction', nome: 'Criar Plano de Ação',       modulo: 'DocAction', status: 'Ativo', createdAt: '01/01/2026' },
+  { id: 'ca-da-verificar',   componenteId: 'comp-docaction', nome: 'Verificar Eficácia',        modulo: 'DocAction', status: 'Ativo', createdAt: '01/01/2026' },
+  { id: 'ca-da-encerrar',    componenteId: 'comp-docaction', nome: 'Encerrar Ocorrência',       modulo: 'DocAction', status: 'Ativo', createdAt: '01/01/2026' },
+  { id: 'ca-da-admin',       componenteId: 'comp-docaction', nome: 'Administrar DocAction',     modulo: 'DocAction', status: 'Ativo', createdAt: '01/01/2026' },
+]
+
 // ── Entitlements (capacidades ativas por conta) — fallback local ──
 // accountId → capability[]
 export const accountEntitlements: Record<string, string[]> = {
