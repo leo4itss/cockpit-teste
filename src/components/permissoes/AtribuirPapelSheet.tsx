@@ -63,6 +63,14 @@ function inferirTipo(nome: string): ComponenteTipo {
   return 'default'
 }
 
+const PAPEL_LABEL: Record<string, string> = {
+  'Nenhum': 'Nenhum',
+  'Viewer': 'Visualizador',
+  'User':   'Usuário',
+  'Editor': 'Editor',
+  'Admin':  'Administrador',
+}
+
 function getPapeis(tipo: ComponenteTipo): string[] {
   if (tipo === 'assistente-ia')     return ['Nenhum', 'Viewer', 'User', 'Admin']
   if (tipo === 'base-conhecimento') return ['Nenhum', 'Viewer', 'Editor', 'Admin']
