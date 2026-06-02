@@ -990,12 +990,19 @@ export const instanciaMembros: InstanciaMembro[] = [
   // ── Apple — inst-apple-kb: grupo Desenvolvedores (member) ─────
   { id: 'im-akb-dev',      instanciaId: 'inst-apple-kb',     entidadeTipo: 'group', entidadeId: 'grp-apple-dev',    papel: 'member', assignedAt: '01/02/2026', displayName: 'Desenvolvedores' },
   { id: 'im-akb-sofia',    instanciaId: 'inst-apple-kb',     entidadeTipo: 'user',  entidadeId: 'usr-sofia',        papel: 'viewer', assignedAt: '01/02/2026', displayName: 'Sofia Mendes',  email: 'sofia.mendes@appletecgo.com.br' },
-  // ── Santacruz — inst-santa-assist: grupo Farmacêuticos (member) ──
-  { id: 'im-sast-farma',   instanciaId: 'inst-santa-assist', entidadeTipo: 'group', entidadeId: 'grp-santa-farma',  papel: 'member', assignedAt: '01/02/2026', displayName: 'Farmacêuticos' },
-  { id: 'im-sast-thiago',  instanciaId: 'inst-santa-assist', entidadeTipo: 'user',  entidadeId: 'usr-thiago',       papel: 'viewer', assignedAt: '01/02/2026', displayName: 'Thiago Martins', email: 'thiago.martins@santacruz.com.br' },
-  // ── Santacruz — inst-santa-dash: grupo Vendas (member); Lucas (viewer) ──
-  { id: 'im-sdash-vendas', instanciaId: 'inst-santa-dash',   entidadeTipo: 'group', entidadeId: 'grp-santa-vendas', papel: 'member', assignedAt: '01/02/2026', displayName: 'Equipe de Vendas' },
-  { id: 'im-sdash-lucas',  instanciaId: 'inst-santa-dash',   entidadeTipo: 'user',  entidadeId: 'usr-lucas',        papel: 'viewer', assignedAt: '01/02/2026', displayName: 'Lucas Oliveira', email: 'lucas.oliveira@santacruz.com.br' },
+  // ── Santacruz — inst-a2-atend: Assistente Farmacêutico ────────
+  { id: 'im-sast-farma',   instanciaId: 'inst-a2-atend',    entidadeTipo: 'group', entidadeId: 'grp-santa-farma',  papel: 'member', assignedAt: '01/02/2026', displayName: 'Farmacêuticos' },
+  { id: 'im-sast-thiago',  instanciaId: 'inst-a2-atend',    entidadeTipo: 'user',  entidadeId: 'usr-thiago',       papel: 'viewer', assignedAt: '01/02/2026', displayName: 'Thiago Martins', email: 'thiago.martins@santacruz.com.br' },
+  // ── Santacruz — inst-a2-dash-com: Dashboard Comercial ─────────
+  { id: 'im-sdash-vendas', instanciaId: 'inst-a2-dash-com', entidadeTipo: 'group', entidadeId: 'grp-santa-vendas', papel: 'member', assignedAt: '01/02/2026', displayName: 'Equipe de Vendas' },
+  { id: 'im-sdash-lucas',  instanciaId: 'inst-a2-dash-com', entidadeTipo: 'user',  entidadeId: 'usr-lucas',        papel: 'viewer', assignedAt: '01/02/2026', displayName: 'Lucas Oliveira', email: 'lucas.oliveira@santacruz.com.br' },
+  // ── Santacruz — inst-a2-maxdoc: Gestão Documental (DocNix) ────
+  { id: 'im-a2md-thiago',  instanciaId: 'inst-a2-maxdoc',   entidadeTipo: 'user',  entidadeId: 'usr-thiago',       papel: 'admin',  assignedAt: '01/03/2026', displayName: 'Thiago Martins', email: 'thiago.martins@santacruz.com.br' },
+  { id: 'im-a2md-beatriz', instanciaId: 'inst-a2-maxdoc',   entidadeTipo: 'user',  entidadeId: 'usr-beatriz',      papel: 'member', assignedAt: '01/03/2026', displayName: 'Beatriz Lima',   email: 'beatriz.lima@santacruz.com.br' },
+  { id: 'im-a2md-farma',   instanciaId: 'inst-a2-maxdoc',   entidadeTipo: 'group', entidadeId: 'grp-santa-farma',  papel: 'member', assignedAt: '01/03/2026', displayName: 'Farmacêuticos' },
+  // ── Santacruz — inst-a2-docaction: Ocorrências (DocNix) ───────
+  { id: 'im-a2da-lucas',   instanciaId: 'inst-a2-docaction', entidadeTipo: 'user',  entidadeId: 'usr-lucas',        papel: 'member', assignedAt: '01/03/2026', displayName: 'Lucas Oliveira', email: 'lucas.oliveira@santacruz.com.br' },
+  { id: 'im-a2da-vendas',  instanciaId: 'inst-a2-docaction', entidadeTipo: 'group', entidadeId: 'grp-santa-vendas', papel: 'viewer', assignedAt: '01/03/2026', displayName: 'Equipe de Vendas' },
 ]
 
 // ── Instâncias — fallback local para cenário Docnix/Comgas ─────
