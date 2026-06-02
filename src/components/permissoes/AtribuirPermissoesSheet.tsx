@@ -540,7 +540,18 @@ export function AtribuirPermissoesSheet({
                         </div>
                       </div>
 
-                      {/* Checkboxes — desabilitados se bloqueado */}
+                      {/* DocNix sem atribuições carregadas: permissões gerenciadas por instância */}
+                      {comp.tipoModelo === 'docnix' && acoes === ACOES['default'] && (
+                        <div className="pl-8">
+                          <p className="text-xs text-[#6b7280] italic">
+                            Permissões gerenciadas por instância — configure em{' '}
+                            <strong className="text-[#030712]">Acessos → Instâncias</strong>.
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Checkboxes — desabilitados se bloqueado; ocultos para DocNix sem catálogo */}
+                      {!(comp.tipoModelo === 'docnix' && acoes === ACOES['default']) && (
                       <div className="grid grid-cols-1 gap-1 pl-8">
                         {acoes.map(({ acao, label }) => {
                           const isHerited  = !!inheritedComp[acao]
