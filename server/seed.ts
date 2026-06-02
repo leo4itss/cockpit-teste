@@ -227,6 +227,27 @@ async function seed() {
     }
   }
 
+  // ── Membros de Conta (user_account_memberships) ───────────────
+  // account_admins: primeiro userId com ID numérico curto (ex: '2', '4')
+  const accountAdminIds = new Set(['1', '2', '3', '4', '5', '6'])
+  const membershipRows: { id: string; userId: string; accountId: string; papel: string; assignedAt: string }[] = []
+  for (const [accountId, userIds] of Object.entries(accountMembrosIds)) {
+    for (const userId of userIds) {
+      const papel = accountAdminIds.has(userId) ? 'account_admin' : 'member'
+      membershipRows.push({
+        id: `uam-${accountId}-${userId}`,
+        userId,
+        accountId,
+        papel,
+        assignedAt: '01/01/2026',
+      })
+    }
+  }
+  if (membershipRows.length > 0) {
+    await db.insert(userAccountMemberships).values(membershipRows)
+    console.log(`✓ userAccountMemberships (${membershipRows.length} vínculos)`)
+  }
+
   // ── Instâncias ────────────────────────────────────────────────
   if (mockInstancias.length > 0) {
     await db.insert(instancias).values(
