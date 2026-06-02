@@ -87,8 +87,12 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
   // Account Admin puro: só tem papel de account_admin, nenhum outro
   const isAccountAdminOnly = isAccountAdmin && !isPlatformAdmin && !isOrgAdmin && !isPasArchitect
 
+  // PAS Architect puro: só tem esse papel (sem platform_admin, org_admin, account_admin)
+  const isPasArchitectOnly = isPasArchitect && !isPlatformAdmin && !isOrgAdmin && !isAccountAdmin
+
   // Itens visíveis para cada grupo
-  const showOrganizacoes = !isAccountAdminOnly  // todos exceto Account Admin puro
+  const showOrganizacoes = !isAccountAdminOnly   // todos exceto Account Admin puro
+  const showAcessos      = !isPasArchitectOnly   // PAS Architect puro não vê Acessos
   const showComponentes  = isPlatformAdmin || isPasArchitect  // só quem gerencia componentes
 
   return (
