@@ -72,8 +72,8 @@ function Avatar({ nome, size = 'lg' }: { nome: string; size?: 'md' | 'lg' }) {
 
 function PapelBadge({ papel }: { papel: string }) {
   return papel === 'account_admin'
-    ? <Badge variant="warning">Account Admin</Badge>
-    : <Badge variant="default">Member</Badge>
+    ? <Badge variant="warning">Administrador da Conta</Badge>
+    : <Badge variant="default">Membro</Badge>
 }
 
 // ── Dialog de vínculo ─────────────────────────────────────────
