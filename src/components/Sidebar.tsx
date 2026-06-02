@@ -149,12 +149,14 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
           )}
 
           {/* ── Acessos ── */}
-          <>
-            <SectionLabel label="Acessos" collapsed={collapsed} />
-            <div className="flex flex-col gap-1">
-              <NavItem to="/acessos" icon={Users} label="Acessos" collapsed={collapsed} />
-            </div>
-          </>
+          {showAcessos && (
+            <>
+              <SectionLabel label="Acessos" collapsed={collapsed} />
+              <div className="flex flex-col gap-1">
+                <NavItem to="/acessos" icon={Users} label="Acessos" collapsed={collapsed} />
+              </div>
+            </>
+          )}
 
           {/* ── Componentes ── */}
           {showComponentes && (
