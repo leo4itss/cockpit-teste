@@ -179,7 +179,7 @@ export function HomePage() {
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[#111827] hover:bg-gray-100 rounded-md w-full text-left transition-colors"
                   >
                     <UserRoundCog className="w-4 h-4 shrink-0" />
-                    <span>Acessos</span>
+                    <span>Permissões</span>
                   </button>
                 </div>
               </div>
