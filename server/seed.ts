@@ -3,7 +3,8 @@ import { db } from './db'
 import {
   organizations, accounts, solutions, contracts, users, tiposLicenca, componentes,
   grupos, usuarioGrupos, instancias, instanciaMembros, instanciaMembroAtribuicoes,
-  instanciaFases, faseResponsaveis, instanciaPerfilSlots,
+  instanciaFases, faseResponsaveis, faseAtribuicoesPermitidas,
+  instanciaPerfilSlots, instanciaPerfilSlotNomeacoes,
 } from './schema'
 import {
   organizations as mockOrgs,
