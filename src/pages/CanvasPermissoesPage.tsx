@@ -25,7 +25,7 @@ import {
   Sun, Moon,
 } from 'lucide-react'
 import { api } from '@/api/client'
-import { useIsPlatformAdmin, useIsOrgAdmin } from '@/authz'
+import { useIsPlatformAdmin, useIsOrgAdmin, useIsAccountAdmin } from '@/authz'
 import { useAdminAccountId, useAdminOrgId } from '@/authz/hooks'
 import { useSessionState } from '@/hooks/useSessionState'
 import {
