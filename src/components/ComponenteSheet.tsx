@@ -288,7 +288,7 @@ export function ComponenteSheet({ open, onClose, onSave, onDelete, isLinked, ini
               <div className="flex flex-col gap-2">
                 {([
                   { value: 'fga',    label: 'FGA (OpenFGA)',  desc: 'Modelo padrão baseado em relações OpenFGA (viewer / member / admin)', color: 'blue'   },
-                  { value: 'docnix', label: 'DocNix',         desc: 'Atribuições granulares por instância — MaxDoc, DocAction, DocAudit',   color: 'violet' },
+                  { value: 'docnix', label: 'DocNix',         desc: 'Atribuições granulares por objeto — MaxDoc, DocAction, DocAudit',     color: 'violet' },
                   { value: 'custom', label: 'Custom',         desc: 'Modelo customizado (configuração avançada)',                           color: 'amber'  },
                 ] as const).map(opt => (
                   <label
