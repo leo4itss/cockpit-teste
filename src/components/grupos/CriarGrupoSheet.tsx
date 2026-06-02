@@ -69,8 +69,8 @@ function FieldLabel({ children, required, hint }: {
 
 // Papéis disponíveis — Account Admin segue o mesmo catálogo do Org Admin
 const PAPEIS_OPCOES = [
-  { value: 'Viewer', label: 'Viewer',        desc: 'Leitura e consulta' },
-  { value: 'User',   label: 'User',          desc: 'Uso padrão' },
+  { value: 'Viewer', label: 'Visualizador', desc: 'Leitura e consulta' },
+  { value: 'User',   label: 'Usuário',      desc: 'Uso padrão' },
   { value: 'Admin',  label: 'Administrador', desc: 'Acesso completo' },
 ]
 
