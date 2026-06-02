@@ -69,9 +69,9 @@ function Avatar({ nome, isGroup }: { nome: string; isGroup?: boolean }) {
 }
 
 const PAPEIS_INSTANCIA = [
-  { value: 'viewer', label: 'Viewer', desc: 'Apenas leitura',    cls: 'bg-gray-100 text-gray-600 border-gray-200' },
-  { value: 'member', label: 'Member', desc: 'Uso padrão',        cls: 'bg-blue-50 text-blue-700 border-blue-200' },
-  { value: 'admin',  label: 'Admin',  desc: 'Acesso completo',   cls: 'bg-orange-50 text-orange-700 border-orange-200' },
+  { value: 'viewer', label: 'Visualizador', desc: 'Apenas leitura',    cls: 'bg-gray-100 text-gray-600 border-gray-200' },
+  { value: 'member', label: 'Membro',       desc: 'Uso padrão',        cls: 'bg-blue-50 text-blue-700 border-blue-200' },
+  { value: 'admin',  label: 'Administrador', desc: 'Acesso completo',  cls: 'bg-orange-50 text-orange-700 border-orange-200' },
 ]
 
 function PapelBadge({ papel }: { papel: string }) {
