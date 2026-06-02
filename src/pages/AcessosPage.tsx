@@ -545,7 +545,11 @@ export function AcessosPage() {
                       </td>
                       <td className="px-4 py-3 text-sm text-[#030712]">{user.usuario}</td>
                       <td className="px-4 py-3 text-sm text-[#030712]">{user.email}</td>
-                      <td className="px-4 py-3 text-sm text-[#030712]">{user.papel}</td>
+                      <td className="px-4 py-3">
+                        {user.papel === 'account_admin'
+                          ? <Badge variant="warning">Administrador da Conta</Badge>
+                          : <Badge variant="default">Membro</Badge>}
+                      </td>
                       <td className="px-4 py-3 text-center">
                         {user.status === 'Ativo'
                           ? <Badge variant="success" showIcon>Ativo</Badge>
