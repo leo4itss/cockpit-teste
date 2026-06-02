@@ -31,6 +31,34 @@ export const componentes: Componente[] = [
     tiposLicenca: ['tl-3', 'tl-5'],  // banco de dados, workspaces
     createdAt: '01/01/2026',
   },
+  // ── Componentes FGA (cenário Docnix/Comgas) ──────────────────
+  {
+    id: 'comp-assistente-ia',
+    nome: 'Assistente de IA',
+    descricao: 'Motor de assistentes de IA conversacionais com RAG e agentes.',
+    tiposLicenca: ['tl-1', 'tl-4', 'tl-6'],
+    status: 'Ativo' as const,
+    tipoModelo: 'fga' as const,
+    createdAt: '01/01/2026',
+  },
+  {
+    id: 'comp-base-conhecimento',
+    nome: 'Base de Conhecimento',
+    descricao: 'Workspace vetorial para documentos corporativos com busca semântica.',
+    tiposLicenca: ['tl-3', 'tl-5'],
+    status: 'Ativo' as const,
+    tipoModelo: 'fga' as const,
+    createdAt: '01/01/2026',
+  },
+  {
+    id: 'comp-analytics',
+    nome: 'Analytics',
+    descricao: 'Dashboards e relatórios analíticos com BI integrado.',
+    tiposLicenca: ['tl-1'],
+    status: 'Ativo' as const,
+    tipoModelo: 'fga' as const,
+    createdAt: '01/01/2026',
+  },
   {
     id: 'comp-maxdoc',
     nome: 'MaxDoc',
