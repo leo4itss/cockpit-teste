@@ -1150,5 +1150,5 @@ export const instancias: Instancia[] = [
 export const accountEntitlements: Record<string, string[]> = {
   'acc-comgas': ['assistant.use', 'knowledge.use'],
   'a1':         ['assistant.use', 'knowledge.use', 'analytics.use'],
-  'a2':         ['assistant.use'],
+  'a2':         ['assistant.use', 'knowledge.use', 'analytics.use', 'maxdoc.use', 'docaction.use'],
 }
