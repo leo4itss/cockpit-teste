@@ -386,8 +386,9 @@ export function AccountDetailSheet({ open, onClose, account, org, onEdit }: Prop
               <strong>Regra de decisão:</strong>{' '}
               <code className="bg-blue-100 px-1 rounded text-[11px]">allow = permission AND entitlement</code>
               <br />
-              Ativar uma capacidade aqui é pré-requisito para que qualquer permissão individual funcione.
-              Sem o entitlement ativo, nenhum acesso é liberado para a conta.
+              Habilitar uma capacidade <strong>não cria instâncias</strong> — apenas libera a conta para recebê-las.
+              É um pré-requisito: sem ela, nenhum acesso é liberado mesmo que a permissão exista.
+              Para que os módulos apareçam em Acessos, crie as instâncias do componente em <strong>Componentes</strong> após habilitar.
             </p>
           </div>
 
