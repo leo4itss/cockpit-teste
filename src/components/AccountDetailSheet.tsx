@@ -204,7 +204,7 @@ export function AccountDetailSheet({ open, onClose, account, org, onEdit }: Prop
           >
             {t === 'detalhes' ? 'Detalhes' : (
               <>
-                Capacidades{' '}
+                Licenças Ativas{' '}
                 {!loadingCaps && (
                   <span className="ml-1 text-xs font-normal text-[#6b7280]">
                     ({activeCapabilities.length}/{CAPABILITIES.length})
