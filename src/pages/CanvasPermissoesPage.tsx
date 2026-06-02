@@ -692,10 +692,12 @@ function DetailPanel({ selected, graphData, accountId, theme, onClose, onRefresh
 // ── Página principal ──────────────────────────────────────────
 
 export default function CanvasPermissoesPage() {
-  const isPlatformAdmin = useIsPlatformAdmin()
-  const isOrgAdmin      = useIsOrgAdmin()
-  const defaultAccId    = useAdminAccountId()
-  const adminOrgId      = useAdminOrgId()           // orgId do Org Admin (null para Platform Admin)
+  const isPlatformAdmin   = useIsPlatformAdmin()
+  const isOrgAdmin        = useIsOrgAdmin()
+  const isAccountAdmin    = useIsAccountAdmin()
+  const defaultAccId      = useAdminAccountId()
+  const adminOrgId        = useAdminOrgId()
+  const isAccountAdminOnly = isAccountAdmin && !isPlatformAdmin && !isOrgAdmin
   const { theme, mode, toggle } = useVisualizerTheme()
 
   // accountId persiste em sessionStorage — sobrevive à navegação entre abas
@@ -713,15 +715,27 @@ export default function CanvasPermissoesPage() {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
 
-  // Carrega contas — Org Admin só vê contas da sua org
+  // Carrega contas:
+  // - Account Admin: fixa na própria conta (sem dropdown)
+  // - Org Admin: só contas da sua org
+  // - Platform Admin: todas
   useEffect(() => {
+    if (isAccountAdminOnly && defaultAccId) {
+      api.getAccount(defaultAccId).then(acc => {
+        setAllAccounts([acc])
+        setAccountId(defaultAccId)
+      }).catch(() => {
+        const mock = mockAccounts.find(a => a.id === defaultAccId)
+        if (mock) { setAllAccounts([mock]); setAccountId(defaultAccId) }
+      })
+      return
+    }
     const orgFilter = (!isPlatformAdmin && isOrgAdmin && adminOrgId) ? adminOrgId : undefined
     api.getAccounts(orgFilter).then(acc => {
       const ativos = (acc as any[]).filter(a => !a.deletedAt)
       setAllAccounts(ativos)
       if (!accountId) setAccountId(defaultAccId ?? ativos[0]?.id ?? null)
     }).catch(() => {
-      // Fallback mock: filtra contas pelo orgId do usuário
       const fallback = mockAccounts.filter(a => !orgFilter || a.orgId === orgFilter)
       setAllAccounts(fallback)
       if (!accountId) setAccountId(defaultAccId ?? fallback[0]?.id ?? null)
