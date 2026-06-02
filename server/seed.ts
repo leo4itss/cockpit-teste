@@ -25,6 +25,8 @@ async function seed() {
 
   // ── Limpar na ordem correta (FK) ─────────────────────────────
   await db.delete(instanciaMembroAtribuicoes)
+  await db.delete(instanciaPerfilSlotNomeacoes)
+  await db.delete(faseAtribuicoesPermitidas)
   await db.delete(faseResponsaveis)
   await db.delete(instanciaFases)
   await db.delete(instanciaPerfilSlots)
