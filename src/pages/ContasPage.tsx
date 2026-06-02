@@ -402,7 +402,7 @@ function ContaDetailSheet({ open, onClose, account }: ContaDetailProps) {
                 {t === 'usuarios' ? (
                   <>Usuários {!loading && <span className="ml-1 text-xs font-normal text-[#6b7280]">({membros.length})</span>}</>
                 ) : (
-                  <>Capacidades {!loadingCaps && <span className="ml-1 text-xs font-normal text-[#6b7280]">({activeCapabilities.length}/{CAPABILITIES.length})</span>}</>
+                  <>Licenças Ativas {!loadingCaps && <span className="ml-1 text-xs font-normal text-[#6b7280]">({activeCapabilities.length}/{CAPABILITIES.length})</span>}</>
                 )}
               </button>
             ))}
