@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { Navigate } from 'react-router-dom'
 import { Search, Plus, FolderOpen, Cpu, X } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
@@ -17,6 +18,11 @@ export function ComponentesPage() {
   const isPlatformAdmin = useIsPlatformAdmin()
   const isPasArchitect  = useIsPasArchitect()
   const canCreate = isPlatformAdmin || isPasArchitect
+
+  // Redirecionar perfis sem acesso a componentes
+  if (!isPlatformAdmin && !isPasArchitect) {
+    return <Navigate to="/home" replace />
+  }
   const [search, setSearch] = useState('')
 
   // Toast: erro de carregamento (node 1)
