@@ -169,7 +169,7 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
           )}
 
           {/* ── Visualização ── */}
-          {(isPlatformAdmin || isOrgAdmin) && (
+          {(isPlatformAdmin || isOrgAdmin || isAccountAdmin) && (
             <>
               <SectionLabel label="Visualização" collapsed={collapsed} />
               <div className="flex flex-col gap-1">
@@ -181,6 +181,9 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
                   </>
                 )}
                 {isOrgAdmin && !isPlatformAdmin && (
+                  <NavItem to="/canvas" icon={GitFork} label="Canvas" collapsed={collapsed} />
+                )}
+                {isAccountAdminOnly && (
                   <NavItem to="/canvas" icon={GitFork} label="Canvas" collapsed={collapsed} />
                 )}
               </div>
