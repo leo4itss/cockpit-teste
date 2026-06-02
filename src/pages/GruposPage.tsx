@@ -139,7 +139,7 @@ export function GruposPage() {
           <p className="text-sm text-[#6b7280] mt-1 max-w-[1080px]">
             Gerencie grupos de acesso da organização. Grupos com escopo{' '}
             <strong className="font-medium text-[#374151]">Organização</strong> são criados aqui e ficam disponíveis em todas as contas.
-            Grupos com escopo <strong className="font-medium text-[#374151]">Conta</strong> são criados pelo Account Admin dentro de cada conta, em <strong className="font-medium text-[#374151]">Acessos</strong>.
+            Grupos com escopo <strong className="font-medium text-[#374151]">Conta</strong> são criados pelo Account Admin dentro de cada conta, em <strong className="font-medium text-[#374151]">Permissões</strong>.
           </p>
         </div>
         <Button onClick={() => setShowCriar(true)} className="shrink-0 mt-1">
