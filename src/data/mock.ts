@@ -31,6 +31,24 @@ export const componentes: Componente[] = [
     tiposLicenca: ['tl-3', 'tl-5'],  // banco de dados, workspaces
     createdAt: '01/01/2026',
   },
+  {
+    id: 'comp-maxdoc',
+    nome: 'MaxDoc',
+    descricao: 'Gestão documental controlada — criação, aprovação, revisão e publicação de documentos.',
+    tiposLicenca: [],
+    status: 'Ativo',
+    tipoModelo: 'docnix',
+    createdAt: '01/01/2026',
+  },
+  {
+    id: 'comp-docaction',
+    nome: 'DocAction',
+    descricao: 'Gestão de ocorrências, planos de ação e verificação de eficácia.',
+    tiposLicenca: [],
+    status: 'Ativo',
+    tipoModelo: 'docnix',
+    createdAt: '01/01/2026',
+  },
 ]
 
 // ── Organizations ─────────────────────────────────────────────
