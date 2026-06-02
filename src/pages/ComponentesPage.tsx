@@ -189,7 +189,7 @@ export function ComponentesPage() {
             </div>
             <h1 className="text-2xl font-bold leading-8 text-[#030712]">Componentes</h1>
             <p className="text-sm text-[#6b7280] mt-1 max-w-[1080px]">
-              Módulos e serviços que compõem as Soluções PAS. Cada componente define quais permissões granulares (<code className="text-xs bg-gray-100 px-1 rounded">can_use_assistant</code>, <code className="text-xs bg-gray-100 px-1 rounded">pode_ler</code>…) podem ser atribuídas a usuários e grupos via <strong className="font-medium text-[#374151]">Acessos</strong>.
+              Módulos e serviços que compõem as Soluções PAS. Cada componente define quais permissões granulares (<code className="text-xs bg-gray-100 px-1 rounded">can_use_assistant</code>, <code className="text-xs bg-gray-100 px-1 rounded">pode_ler</code>…) podem ser atribuídas a usuários e grupos via <strong className="font-medium text-[#374151]">Permissões</strong>.
             </p>
           </div>
           {/* Controles */}
