@@ -694,7 +694,7 @@ export function AcessosPage() {
                     <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
                       {componenteNomes[componenteId] ?? componenteId}
                     </span>
-                    <span className="text-xs text-gray-400">({insts.length} {insts.length === 1 ? 'instância' : 'instâncias'})</span>
+                    <span className="text-xs text-gray-400">({insts.length} {insts.length === 1 ? 'objeto' : 'objetos'})</span>
                     <div className="flex-1 h-px bg-gray-200 ml-1" />
                   </div>
 
