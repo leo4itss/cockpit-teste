@@ -540,12 +540,12 @@ export function AtribuirPermissoesSheet({
                         </div>
                       </div>
 
-                      {/* DocNix sem atribuições carregadas: permissões gerenciadas por instância */}
+                      {/* DocNix sem atribuições carregadas: permissões gerenciadas por objeto */}
                       {comp.tipoModelo === 'docnix' && acoes === ACOES['default'] && (
                         <div className="pl-8">
                           <p className="text-xs text-[#6b7280] italic">
-                            Permissões gerenciadas por instância — configure em{' '}
-                            <strong className="text-[#030712]">Acessos → Instâncias</strong>.
+                            Permissões gerenciadas por objeto — configure em{' '}
+                            <strong className="text-[#030712]">Permissões → Objetos</strong>.
                           </p>
                         </div>
                       )}
