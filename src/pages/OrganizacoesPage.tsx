@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Navigate } from 'react-router-dom'
 import { Plus, FolderOpen, Trash2, Circle, Search, X } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { NewOrganizationSheet } from '@/components/NewOrganizationSheet'
 import { ConfirmDeleteModal } from '@/components/ConfirmDeleteModal'
 import { api } from '@/api/client'
-import { useIsPlatformAdmin, useIsOrgAdmin, useAdminOrgId } from '@/authz/hooks'
+import { useIsPlatformAdmin, useIsOrgAdmin, useIsAccountAdmin, useIsPasArchitect, useAdminOrgId } from '@/authz/hooks'
 import { organizations as mockOrgs } from '@/data/mock'
 import type { Organization } from '@/types'
 
@@ -14,6 +14,8 @@ export function OrganizacoesPage() {
   const navigate = useNavigate()
   const isPlatformAdmin = useIsPlatformAdmin()
   const isOrgAdmin = useIsOrgAdmin()
+  const isPasArchitect = useIsPasArchitect()
+  const isAccountAdmin = useIsAccountAdmin()
   const adminOrgId = useAdminOrgId()
   const [orgs, setOrgs] = useState<Organization[]>([])
   const [loading, setLoading] = useState(true)
