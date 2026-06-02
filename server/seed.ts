@@ -217,7 +217,7 @@ async function seed() {
     const membroRows: { id: string; usuarioId: string; grupoId: string }[] = []
     for (const [grupoId, userIds] of Object.entries(grupoMembrosMap)) {
       for (const userId of userIds) {
-        membroRows.push({ id: `ugm-${grupoId}-${userId}`, usuarioId: userId, grupoId })
+        membroRows.push({ id: `ugm-${grupoId}-${userId}`, userId, grupoId, assignedAt: '01/01/2026' })
       }
     }
     if (membroRows.length > 0) {
