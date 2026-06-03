@@ -40,11 +40,6 @@ const CARGOS = [
   { value: 'C-Level (CEO, CTO, etc.)', label: 'C-Level (CEO, CTO, etc.)' },
 ]
 
-const PERFIS = [
-  { value: 'Administrador', label: 'Administrador' },
-  { value: 'Usuário',       label: 'Usuário' },
-]
-
 const FORMATOS_DATA = [
   { value: 'DD/MM/YYYY', label: 'DD/MM/AAAA' },
   { value: 'MM/DD/YYYY', label: 'MM/DD/AAAA' },
