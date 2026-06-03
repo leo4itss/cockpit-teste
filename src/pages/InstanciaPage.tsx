@@ -638,7 +638,7 @@ export function InstanciaPage() {
 
                         {/* Ações */}
                         <td className="px-5 py-4 text-right">
-                          <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="flex items-center justify-end gap-1">
                             <button
                               onClick={() => { setMembroPermissoes(membro); setShowPermissoes(true) }}
                               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-blue-600 hover:bg-blue-50 transition-colors"
