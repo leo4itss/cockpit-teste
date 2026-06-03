@@ -32,11 +32,12 @@ import type { User, Grupo } from '@/types'
 // ── Tipos ─────────────────────────────────────────────────────
 
 interface Props {
-  open:      boolean
-  onClose:   () => void
-  accountId: string
-  grupos?:   Grupo[]   // lista de grupos existentes (mesma conta) para seleção de grupo pai
-  onSuccess: (grupo: Grupo) => void
+  open:           boolean
+  onClose:        () => void
+  accountId:      string
+  grupos?:        Grupo[]     // lista de grupos existentes (mesma conta) para seleção de grupo pai
+  modulosDocNix?: string[]    // ex: ['MaxDoc'], ['DocAction'], ['MaxDoc','DocAction'] ou []
+  onSuccess:      (grupo: Grupo) => void
 }
 
 // ── Helpers ───────────────────────────────────────────────────
