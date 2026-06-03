@@ -15,6 +15,7 @@ import {
 import { Badge } from '@/components/ui/Badge'
 import { api } from '@/api/client'
 import { mockDocNixPapeis } from '@/authz/mock'
+import { PermissoesMembroSheet } from '@/components/instancias/PermissoesMembroSheet'
 import { cn } from '@/lib/utils'
 import type { Instancia, InstanciaMembro, User, Grupo, Atribuicao } from '@/types'
 import {
