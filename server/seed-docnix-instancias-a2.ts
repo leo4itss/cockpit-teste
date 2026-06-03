@@ -64,7 +64,7 @@ async function main() {
     await sql`
       INSERT INTO instancia_membros (id, instancia_id, entidade_tipo, entidade_id, papel, assigned_at)
       VALUES (${m.id}, ${m.instId}, ${m.tipo}, ${m.entId}, ${m.papel}, to_char(current_date, 'DD/MM/YYYY'))
-      ON CONFLICT (id) DO NOTHING
+      ON CONFLICT (id) DO UPDATE SET papel = EXCLUDED.papel
     `
   }
   console.log(`✅ ${membros.length} membros atribuídos`)
