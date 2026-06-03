@@ -603,7 +603,7 @@ export function InstanciaPage() {
                     const isRemoving = removingId === membro.id
 
                     return (
-                      <tr key={membro.id} className="hover:bg-gray-50/60 transition-colors group">
+                      <tr key={membro.id} className="hover:bg-gray-50/60 transition-colors border-b border-gray-50 last:border-0">
                         {/* Nome */}
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-3">
