@@ -724,9 +724,9 @@ export function AcessosPage() {
                             </td>
                             <td className="px-4 py-3 text-center" onClick={e => e.stopPropagation()}>
                               <button
-                                onClick={() => { setSelectedInstancia(inst); setShowInstanciaDetail(true) }}
+                                onClick={() => navigate(`/instancia/${inst.id}`)}
                                 className="p-2 hover:bg-gray-100 rounded-md transition-colors"
-                                title="Ver membros"
+                                title="Gerenciar membros"
                               >
                                 <Search className="w-4 h-4 text-gray-500" />
                               </button>
