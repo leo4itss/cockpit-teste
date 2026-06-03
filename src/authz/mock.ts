@@ -299,3 +299,243 @@ export const mockDocNixPapeis: {
     atribuicaoNomes: [], // vazio = todas as atribuições ativas
   },
 ]
+
+// ── Configuração unificada por tipo de componente ─────────────
+//
+// Cada componente define seus próprios papéis e ações.
+// permissaoMode determina como as permissões são armazenadas:
+//   'atribuicoes'          → instancia_membro_atribuicoes (DocNix)
+//   'component_permissions'→ component_permissions (FGA genérico)
+//
+// Todos seguem a mesma metodologia FGA — o que varia é o contrato
+// de papéis/ações de cada tipo de componente.
+
+export type PapelDef = {
+  value: string
+  label: string
+  desc: string
+  cls: string
+  // Modo 'atribuicoes': nomes das atribuições incluídas neste papel
+  // [] = TODAS as atribuições ativas (padrão Administrador)
+  atribuicaoNomes?: string[]
+  // Modo 'component_permissions': ações padrão concedidas por este papel
+  defaultAcoes?: string[]
+}
+
+export type AcaoDef = {
+  acao: string
+  label: string
+}
+
+export type ComponenteTypeConfig = {
+  label: string
+  permissaoMode: 'component_permissions' | 'atribuicoes'
+  papeis: PapelDef[]
+  acoes?: AcaoDef[]   // somente para permissaoMode === 'component_permissions'
+}
+
+const COMPONENTE_CONFIGS: Record<string, ComponenteTypeConfig> = {
+
+  // ── MaxDoc ────────────────────────────────────────────────────
+  'maxdoc': {
+    label: 'MaxDoc',
+    permissaoMode: 'atribuicoes',
+    papeis: [
+      {
+        value: 'leitor', label: 'Leitor', desc: 'Leitura e download de documentos',
+        cls: 'bg-gray-100 text-gray-600 border-gray-200',
+        atribuicaoNomes: ['Visualizar','Ler Todos','Leitor Documento','Leitor Anexos','Download Documento','Imprimir'],
+      },
+      {
+        value: 'editor', label: 'Editor', desc: 'Cria e edita documentos e anexos',
+        cls: 'bg-blue-50 text-blue-700 border-blue-200',
+        atribuicaoNomes: ['Visualizar','Ler Todos','Leitor Documento','Leitor Anexos','Download Documento','Imprimir','Criar Documento','Editar Documento','Nova Versão','Upload Documento','Editor Documento','Criar Anexo','Editar Anexo','Anexar Arquivos'],
+      },
+      {
+        value: 'revisor', label: 'Revisor', desc: 'Revisa e submete documentos para aprovação',
+        cls: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+        atribuicaoNomes: ['Visualizar','Ler Todos','Leitor Documento','Leitor Anexos','Download Documento','Imprimir','Criar Documento','Editar Documento','Nova Versão','Upload Documento','Editor Documento','Criar Anexo','Editar Anexo','Anexar Arquivos','Revisar Documento','Submeter para Aprovação','Revisor Documento','Revisar como Substituto Documento'],
+      },
+      {
+        value: 'aprovador', label: 'Aprovador', desc: 'Aprova, obsoleta e emite cópias controladas',
+        cls: 'bg-orange-50 text-orange-700 border-orange-200',
+        atribuicaoNomes: ['Visualizar','Ler Todos','Leitor Documento','Leitor Anexos','Download Documento','Imprimir','Assinatura Eletrônica','Revisar Documento','Aprovar Documento','Aprovador Documento','Aprovador Substituto Documento','Obsoletetar Documento','Emitir Cópia Controlada','Emitir Cópia Não Controlada','Cópia Controlada Anexos','Ciclo de Aprovação Documentos'],
+      },
+      {
+        value: 'admin-maxdoc', label: 'Administrador', desc: 'Acesso completo ao MaxDoc',
+        cls: 'bg-red-50 text-red-700 border-red-200',
+        atribuicaoNomes: [],
+      },
+    ],
+  },
+
+  // ── DocAction ─────────────────────────────────────────────────
+  'docaction': {
+    label: 'DocAction',
+    permissaoMode: 'atribuicoes',
+    papeis: [
+      {
+        value: 'colaborador', label: 'Colaborador', desc: 'Cria e acompanha ocorrências',
+        cls: 'bg-green-50 text-green-700 border-green-200',
+        atribuicaoNomes: ['Visualizar','Criar Ocorrência','Criar Ocorrência 8D','Editar Ocorrência','Vincular Ocorrência','Acompanhar Ocorrência'],
+      },
+      {
+        value: 'analista', label: 'Analista', desc: 'Categoriza, analisa e cria planos de ação',
+        cls: 'bg-blue-50 text-blue-700 border-blue-200',
+        atribuicaoNomes: ['Visualizar','Criar Ocorrência','Criar Ocorrência 8D','Editar Ocorrência','Vincular Ocorrência','Acompanhar Ocorrência','Categorizar Ocorrência','Analisar Causa','Criar Plano de Ação','Verificar Eficácia','Encaminhar Ocorrência'],
+      },
+      {
+        value: 'aprovador-docaction', label: 'Aprovador', desc: 'Aprova análises e encerra ocorrências',
+        cls: 'bg-orange-50 text-orange-700 border-orange-200',
+        atribuicaoNomes: ['Visualizar','Criar Ocorrência','Criar Ocorrência 8D','Editar Ocorrência','Vincular Ocorrência','Acompanhar Ocorrência','Categorizar Ocorrência','Analisar Causa','Criar Plano de Ação','Verificar Eficácia','Encaminhar Ocorrência','Aprovar Análise de Causa','Encerrar Ocorrência','Reprogramar Prazo/Responsável'],
+      },
+      {
+        value: 'admin-docaction', label: 'Administrador', desc: 'Acesso completo ao DocAction',
+        cls: 'bg-red-50 text-red-700 border-red-200',
+        atribuicaoNomes: [],
+      },
+    ],
+  },
+
+  // ── Assistente IA ─────────────────────────────────────────────
+  'assistente-ia': {
+    label: 'Assistente IA',
+    permissaoMode: 'component_permissions',
+    papeis: [
+      {
+        value: 'viewer', label: 'Visualizador', desc: 'Acesso somente leitura às conversas',
+        cls: 'bg-gray-100 text-gray-600 border-gray-200',
+        defaultAcoes: ['can_use_assistant'],
+      },
+      {
+        value: 'member', label: 'Usuário', desc: 'Usa o assistente e compartilha resultados',
+        cls: 'bg-blue-50 text-blue-700 border-blue-200',
+        defaultAcoes: ['can_use_assistant','can_share_conversation_results','can_view_consulted_sources','can_upload_rag_sources'],
+      },
+      {
+        value: 'admin', label: 'Administrador', desc: 'Acesso completo — configura e gerencia',
+        cls: 'bg-red-50 text-red-700 border-red-200',
+        defaultAcoes: ['can_use_assistant','can_share_conversation_results','can_view_consulted_sources','can_upload_rag_sources','can_create_assistant','can_configure_agents','can_manage_business_scenarios','can_manage_users'],
+      },
+    ],
+    acoes: [
+      { acao: 'can_use_assistant',             label: 'Usar o assistente' },
+      { acao: 'can_share_conversation_results', label: 'Compartilhar resultados' },
+      { acao: 'can_view_consulted_sources',    label: 'Ver fontes consultadas' },
+      { acao: 'can_upload_rag_sources',        label: 'Upload de fontes RAG' },
+      { acao: 'can_create_assistant',          label: 'Criar assistente' },
+      { acao: 'can_configure_agents',          label: 'Configurar agentes' },
+      { acao: 'can_manage_business_scenarios', label: 'Gerenciar cenários de negócio' },
+      { acao: 'can_manage_users',              label: 'Gerenciar usuários' },
+    ],
+  },
+
+  // ── Analytics ─────────────────────────────────────────────────
+  'analytics': {
+    label: 'Analytics',
+    permissaoMode: 'component_permissions',
+    papeis: [
+      {
+        value: 'viewer', label: 'Visualizador', desc: 'Vê dashboards publicados',
+        cls: 'bg-gray-100 text-gray-600 border-gray-200',
+        defaultAcoes: ['can_view_dashboards'],
+      },
+      {
+        value: 'member', label: 'Analista', desc: 'Visualiza e exporta relatórios',
+        cls: 'bg-blue-50 text-blue-700 border-blue-200',
+        defaultAcoes: ['can_view_dashboards','can_export_reports'],
+      },
+      {
+        value: 'admin', label: 'Administrador', desc: 'Gerencia dashboards e usuários',
+        cls: 'bg-red-50 text-red-700 border-red-200',
+        defaultAcoes: ['can_view_dashboards','can_export_reports','can_manage_analytics'],
+      },
+    ],
+    acoes: [
+      { acao: 'can_view_dashboards',  label: 'Visualizar dashboards' },
+      { acao: 'can_export_reports',   label: 'Exportar relatórios' },
+      { acao: 'can_manage_analytics', label: 'Administrar analytics' },
+    ],
+  },
+
+  // ── Base de Conhecimento ──────────────────────────────────────
+  'base-conhecimento': {
+    label: 'Base de Conhecimento',
+    permissaoMode: 'component_permissions',
+    papeis: [
+      {
+        value: 'viewer', label: 'Leitor', desc: 'Lê documentos publicados',
+        cls: 'bg-gray-100 text-gray-600 border-gray-200',
+        defaultAcoes: ['pode_ler'],
+      },
+      {
+        value: 'member', label: 'Editor', desc: 'Cria, edita e submete documentos',
+        cls: 'bg-blue-50 text-blue-700 border-blue-200',
+        defaultAcoes: ['pode_ler','pode_criar_documento','pode_editar','pode_enviar_para_aprovacao'],
+      },
+      {
+        value: 'admin', label: 'Administrador', desc: 'Aprova, publica e exclui documentos',
+        cls: 'bg-red-50 text-red-700 border-red-200',
+        defaultAcoes: ['pode_ler','pode_editar','pode_criar_documento','pode_enviar_para_aprovacao','pode_aprovar','pode_publicar','pode_excluir'],
+      },
+    ],
+    acoes: [
+      { acao: 'pode_ler',                   label: 'Ler documentos' },
+      { acao: 'pode_editar',                label: 'Editar conteúdo' },
+      { acao: 'pode_criar_documento',       label: 'Criar documentos' },
+      { acao: 'pode_enviar_para_aprovacao', label: 'Enviar para aprovação' },
+      { acao: 'pode_aprovar',               label: 'Aprovar documentos' },
+      { acao: 'pode_publicar',              label: 'Publicar documentos' },
+      { acao: 'pode_excluir',               label: 'Excluir' },
+    ],
+  },
+
+  // ── Genérico / Fallback ───────────────────────────────────────
+  'default': {
+    label: 'Geral',
+    permissaoMode: 'component_permissions',
+    papeis: [
+      {
+        value: 'viewer', label: 'Visualizador', desc: 'Acesso de leitura e consulta',
+        cls: 'bg-gray-100 text-gray-600 border-gray-200',
+        defaultAcoes: ['can_view'],
+      },
+      {
+        value: 'member', label: 'Usuário', desc: 'Uso padrão da solução',
+        cls: 'bg-blue-50 text-blue-700 border-blue-200',
+        defaultAcoes: ['can_view','can_edit'],
+      },
+      {
+        value: 'admin', label: 'Administrador', desc: 'Acesso completo à gestão',
+        cls: 'bg-red-50 text-red-700 border-red-200',
+        defaultAcoes: ['can_view','can_edit','can_manage'],
+      },
+    ],
+    acoes: [
+      { acao: 'can_view',   label: 'Visualizar' },
+      { acao: 'can_edit',   label: 'Editar' },
+      { acao: 'can_manage', label: 'Administrar' },
+    ],
+  },
+}
+
+/** Normaliza o nome de um componente para a chave de configuração. */
+function normalizeComponenteKey(nome: string): string {
+  const n = nome.toLowerCase()
+  if (n.includes('maxdoc'))                                              return 'maxdoc'
+  if (n.includes('docaction'))                                           return 'docaction'
+  if (n.includes('assistente') || n.includes('pas core'))               return 'assistente-ia'
+  if (n.includes('analytics') || n.includes('analytic'))                return 'analytics'
+  if (n.includes('base') || n.includes('knowledge') || n.includes('kb')) return 'base-conhecimento'
+  return 'default'
+}
+
+/**
+ * Retorna a configuração de papéis e ações para um tipo de componente.
+ * Usa o nome do componente como discriminador primário.
+ * Fallback: configuração genérica ('default').
+ */
+export function getComponenteConfig(componenteNome: string): ComponenteTypeConfig {
+  const key = normalizeComponenteKey(componenteNome)
+  return COMPONENTE_CONFIGS[key] ?? COMPONENTE_CONFIGS['default']
+}
