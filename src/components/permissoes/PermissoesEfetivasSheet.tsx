@@ -191,7 +191,7 @@ export function PermissoesEfetivasSheet({
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50">
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-70">Atribuição</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-70">Ação</th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-70">Origem</th>
                 </tr>
               </thead>
