@@ -612,7 +612,7 @@ export function PermissoesMembroSheet({
                     </div>
                   ) : filtered.length === 0 ? (
                     <p className="text-sm text-gray-500 text-center py-10">
-                      {search ? 'Nenhuma atribuição encontrada.' : 'Nenhuma atribuição cadastrada para este componente.'}
+                      {search ? 'Nenhuma ação encontrada.' : 'Nenhuma ação cadastrada para este componente.'}
                     </p>
                   ) : (
                     <div className="divide-y divide-gray-50">
