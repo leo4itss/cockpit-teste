@@ -143,9 +143,26 @@ function AddMembroSection({
   const [search, setSearch]                     = useState('')
   const [papel, setPapel]                       = useState<'viewer' | 'member' | 'admin'>('viewer')
   const [selectedAtribuicoes, setSelectedAtribuicoes] = useState<string[]>([])
+  const [papelDocNix, setPapelDocNix]           = useState<string>('personalizado')
 
   const jaMembroIds = new Set(membros.map(m => m.entidadeId))
   const atribuicoesAtivas = atribuicoes.filter(a => a.status === 'Ativo')
+
+  // Detecta o módulo (MaxDoc / DocAction) a partir das atribuições ativas
+  const moduloDetectado = atribuicoesAtivas.find(a => a.modulo)?.modulo ?? null
+  const papeisDocNix = moduloDetectado
+    ? mockDocNixPapeis.filter(p => p.modulo === moduloDetectado)
+    : []
+
+  function handlePapelDocNix(valor: string) {
+    setPapelDocNix(valor)
+    const p = mockDocNixPapeis.find(x => x.value === valor)
+    if (!p) { setSelectedAtribuicoes([]); return }
+    const ids = p.atribuicaoNomes.length === 0
+      ? atribuicoesAtivas.map(a => a.id)
+      : atribuicoesAtivas.filter(a => p.atribuicaoNomes.includes(a.nome)).map(a => a.id)
+    setSelectedAtribuicoes(ids)
+  }
 
   const sugestoes = useMemo(() => {
     const q = search.trim().toLowerCase()
