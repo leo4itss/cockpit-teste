@@ -685,6 +685,21 @@ export function InstanciaPage() {
           </div>
         )}
       </div>
+
+      {/* ── Sheet de Permissões ──────────────────────────── */}
+      {membroPermissoes && componente && (
+        <PermissoesMembroSheet
+          open={showPermissoes}
+          onClose={() => { setShowPermissoes(false); setMembroPermissoes(null) }}
+          instanciaId={instancia.id}
+          instanciaNome={instancia.nome}
+          componenteId={componente.id}
+          componenteNome={componente.nome}
+          componenteTipoModelo={componente.tipoModelo}
+          membro={membroPermissoes}
+          onSaved={() => setShowPermissoes(false)}
+        />
+      )}
     </div>
   )
 }
