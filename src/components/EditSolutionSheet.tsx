@@ -524,9 +524,9 @@ export function EditSolutionSheet({
             <SectionTitle>Dados da solução</SectionTitle>
 
             <Input
-              label="Nome da instância da solução"
+              label="Nome do objeto da solução"
               required
-              placeholder="Nome da instância da solução"
+              placeholder="Nome do objeto da solução"
               value={form.name}
               onChange={e => set('name', e.target.value)}
               disabled={isInactive}
