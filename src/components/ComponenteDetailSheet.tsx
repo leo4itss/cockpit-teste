@@ -185,23 +185,23 @@ export function ComponenteDetailSheet({ open, onClose, componente, onEdit }: Pro
           </>
         )}
 
-        {/* ── Atribuições do Componente ─────────────────── */}
+        {/* ── Ações do Componente ─────────────────── */}
         {canManageAtribuicoes && (
           <>
             <div className="border-t border-[#e5e7eb]" />
             <div className="flex flex-col gap-4">
               <div>
-                <p className="text-base font-bold text-[#030712] leading-6">Atribuições do Componente</p>
+                <p className="text-base font-bold text-[#030712] leading-6">Ações do Componente</p>
                 <p className="text-sm text-[#6b7280] mt-1">
-                  Defina as atribuições disponíveis para membros desta instância.
-                  Atribuições ativas aparecem como opções ao adicionar membros.
+                  Defina as ações disponíveis para membros deste objeto.
+                  Ações ativas aparecem como opções ao adicionar membros.
                 </p>
               </div>
 
-              {/* Lista de atribuições ativas */}
+              {/* Lista de ações ativas */}
               <div className="flex flex-col gap-2">
                 {atribuicoes.filter(a => a.status === 'Ativo').length === 0 && atribuicoesLoaded && (
-                  <p className="text-xs text-gray-400">Nenhuma atribuição ativa.</p>
+                  <p className="text-xs text-gray-400">Nenhuma ação ativa.</p>
                 )}
                 {atribuicoes.filter(a => a.status === 'Ativo').map(a => (
                   <div key={a.id} className="flex items-center gap-2 px-3 py-2 border border-[#e5e7eb] rounded-md">
