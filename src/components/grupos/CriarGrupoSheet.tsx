@@ -71,17 +71,18 @@ function FieldLabel({ children, required, hint }: {
 
 // ── Componente principal ──────────────────────────────────────
 
-export function CriarGrupoSheet({ open, onClose, accountId, grupos = [], modulosDocNix = [], onSuccess }: Props) {
-  const isDocNix = modulosDocNix.length > 0
+export function CriarGrupoSheet({ open, onClose, accountId, grupos = [], modulosAtivos = ['fga'], onSuccess }: Props) {
+  const hasFga    = modulosAtivos.includes('fga')
+  const modulosDocNix = modulosAtivos.filter(m => m !== 'fga')  // ['MaxDoc'], ['DocAction'], etc.
 
   // Papéis disponíveis: DocNix ou FGA
   const papeisDocNixFiltrados = useMemo(
     () => mockDocNixPapeis.filter(p => modulosDocNix.includes(p.modulo)),
     [modulosDocNix],
   )
-  const defaultPapel = isDocNix
-    ? (papeisDocNixFiltrados[0]?.value ?? 'leitor')
-    : 'User'
+  const multiSecao = (hasFga && modulosDocNix.length > 0) || modulosDocNix.length > 1
+
+  const defaultPapel = hasFga ? 'User' : (papeisDocNixFiltrados[0]?.value ?? 'leitor')
 
   const [nome, setNome]           = useState('')
   const [descricao, setDescricao] = useState('')
