@@ -280,23 +280,15 @@ export function AcessosPage() {
     )
   }, [instancias, searchInstancias, componenteNomes])
 
-  // Detecta módulos ativos na conta: 'fga' | 'MaxDoc' | 'DocAction'
-  const modulosAtivos = useMemo(() => {
-    const modulos = new Set<string>()
+  // Nomes únicos de componentes ativos na conta (para determinar papéis disponíveis)
+  const componentesAtivos = useMemo(() => {
+    const nomes = new Set<string>()
     instancias.forEach(inst => {
-      const tipo = componenteTipoModelos[inst.componenteId] ?? 'fga'
-      if (tipo === 'docnix') {
-        const nome = (componenteNomes[inst.componenteId] ?? '').toLowerCase()
-        if (nome.includes('maxdoc'))    modulos.add('MaxDoc')
-        if (nome.includes('docaction')) modulos.add('DocAction')
-      } else {
-        modulos.add('fga')
-      }
+      const nome = componenteNomes[inst.componenteId]
+      if (nome) nomes.add(nome)
     })
-    // Fallback: se não há instâncias ainda, assume FGA
-    if (modulos.size === 0) modulos.add('fga')
-    return [...modulos]
-  }, [instancias, componenteTipoModelos, componenteNomes])
+    return [...nomes]
+  }, [instancias, componenteNomes])
 
   // Agrupa instâncias por componenteId para exibição agrupada
   const instanciasPorComponente = useMemo(() => {
