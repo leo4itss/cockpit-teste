@@ -5,14 +5,11 @@
  *   - Lista de membros com avatar, nome e e-mail
  *   - Adicionar membro via busca inline (dropdown de sugestões)
  *   - Remover membro com confirmação (ação visível só no hover)
- *   - Atribuir permissões ao grupo → abre AtribuirPermissoesSheet aninhada (nível 2)
- *
- * O AtribuirPermissoesSheet é renderizado dentro do contexto do GrupoDetailSheet,
- * recebendo automaticamente nível 2 (painel z=60, overlay z=59).
+ *   - Edição inline do papel (role) do grupo
  */
 
 import { useState, useEffect, useMemo } from 'react'
-import { Search, UserPlus, UserMinus, Shield, Loader2, Pencil, Check, X, Building2, Building } from 'lucide-react'
+import { Search, UserPlus, UserMinus, Loader2, Pencil, Check, X, Building2, Building } from 'lucide-react'
 import {
   NestedSheet,
   NestedSheetHeader,
