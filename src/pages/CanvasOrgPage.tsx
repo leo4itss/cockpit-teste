@@ -751,7 +751,7 @@ function OrgCanvas({
                   stroke={theme.edgeInstUser} strokeWidth="1.5"
                   strokeDasharray="5 3" />
               </svg>
-              <span className="text-[11px]" style={{ color: theme.legendText }}>Acesso à instância</span>
+              <span className="text-[11px]" style={{ color: theme.legendText }}>Acesso ao objeto</span>
             </div>
           </div>
         </div>
