@@ -48,8 +48,6 @@ interface Props {
   accountId?:            string
 }
 
-type ActiveTab = 'membros' | 'fases' | 'fluxo' | 'perfil'
-
 // ── Helpers visuais ───────────────────────────────────────────
 
 function Avatar({ nome, isGroup }: { nome: string; isGroup?: boolean }) {
