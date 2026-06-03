@@ -72,18 +72,26 @@ function FieldLabel({ children, required, hint }: {
 
 // ── Componente principal ──────────────────────────────────────
 
-export function CriarGrupoSheet({ open, onClose, accountId, grupos = [], modulosAtivos = ['fga'], onSuccess }: Props) {
-  const hasFga    = modulosAtivos.includes('fga')
-  const modulosDocNix = modulosAtivos.filter(m => m !== 'fga')  // ['MaxDoc'], ['DocAction'], etc.
+export function CriarGrupoSheet({ open, onClose, accountId, grupos = [], componentesAtivos = [], onSuccess }: Props) {
+  // Obtém configs únicas para cada componente ativo (deduplicadas por tipo)
+  const secoesConfig = useMemo(() => {
+    if (componentesAtivos.length === 0) {
+      // Sem instâncias detectadas: usa config genérica
+      return [{ label: 'Geral', config: getComponenteConfig('') }]
+    }
+    const seen = new Set<string>()
+    return componentesAtivos
+      .map(nome => ({ nome, config: getComponenteConfig(nome) }))
+      .filter(({ config }) => {
+        if (seen.has(config.label)) return false
+        seen.add(config.label)
+        return true
+      })
+      .map(({ config }) => ({ label: config.label, config }))
+  }, [componentesAtivos])
 
-  // Papéis disponíveis: DocNix ou FGA
-  const papeisDocNixFiltrados = useMemo(
-    () => mockDocNixPapeis.filter(p => modulosDocNix.includes(p.modulo)),
-    [modulosDocNix],
-  )
-  const multiSecao = (hasFga && modulosDocNix.length > 0) || modulosDocNix.length > 1
-
-  const defaultPapel = hasFga ? 'User' : (papeisDocNixFiltrados[0]?.value ?? 'leitor')
+  const multiSecao  = secoesConfig.length > 1
+  const defaultPapel = secoesConfig[0]?.config.papeis[0]?.value ?? 'viewer'
 
   const [nome, setNome]           = useState('')
   const [descricao, setDescricao] = useState('')
