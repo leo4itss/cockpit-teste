@@ -376,16 +376,16 @@ export function CriarUsuarioSheet({ open, onClose, onSuccess, accountId }: Props
                 <div className="flex flex-col gap-7">
                   <SectionTitle>Acesso e grupo</SectionTitle>
 
-                  {/* Papel */}
+                  {/* Nível de acesso na conta */}
                   <div className="flex flex-col gap-2">
                     <p className="text-sm font-medium text-[#030712]">
-                      Papel
+                      Nível de acesso na conta
                       <span className="ml-1 text-xs text-[#6b7280] font-normal">
-                        — define o nível de acesso FGA padrão
+                        — opcional; define o vínculo com esta conta
                       </span>
                     </p>
-                    <div className="grid grid-cols-3 gap-2">
-                      {mockPapeisDisponiveis.map(p => (
+                    <div className="grid grid-cols-2 gap-2">
+                      {NIVEIS_CONTA.map(p => (
                         <button
                           key={p.value}
                           type="button"
@@ -402,6 +402,9 @@ export function CriarUsuarioSheet({ open, onClose, onSuccess, accountId }: Props
                         </button>
                       ))}
                     </div>
+                    <p className="text-xs text-[#6b7280]">
+                      Promoção para Administrador de conta é feita pelo Org Admin. Perfis de acesso às instâncias são configurados separadamente.
+                    </p>
                   </div>
 
                   {/* Grupo */}
