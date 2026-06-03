@@ -710,7 +710,7 @@ export function PermissoesMembroSheet({
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b border-gray-200 bg-gray-50">
-                          <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500">Atribuição</th>
+                          <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500">Ação</th>
                           <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500">Origem</th>
                         </tr>
                       </thead>
