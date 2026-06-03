@@ -426,7 +426,7 @@ export function InstanciaPage() {
     setMembros(prev => prev.map(m => m.id === membro.id ? { ...m, papel: novoPapel as InstanciaMembro['papel'] } : m))
   }
 
-  async function handleAdd(tipo: 'user' | 'group', entidadeId: string, nome: string, papel: string, atribuicaoIds: string[]) {
+  async function handleAdd(tipo: 'user' | 'group', entidadeId: string, nome: string, papel: string) {
     if (!instancia) return
     const tempId = `tmp-${Date.now()}`
     setAddingId(tempId)
