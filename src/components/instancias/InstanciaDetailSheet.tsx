@@ -72,13 +72,24 @@ const PAPEIS_INSTANCIA = [
 ]
 
 function PapelBadge({ papel }: { papel: string }) {
-  const opt = PAPEIS_INSTANCIA.find(p => p.value === papel)
-  if (!opt) return <span className="text-xs text-gray-400">—</span>
-  return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${opt.cls}`}>
-      {opt.label}
-    </span>
-  )
+  // Tenta primeiro PAPEIS_INSTANCIA (FGA), depois mockDocNixPapeis (DocNix)
+  const fga = PAPEIS_INSTANCIA.find(p => p.value === papel)
+  if (fga) {
+    return (
+      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${fga.cls}`}>
+        {fga.label}
+      </span>
+    )
+  }
+  const docnix = mockDocNixPapeis.find(p => p.value === papel)
+  if (docnix) {
+    return (
+      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${docnix.cls}`}>
+        {docnix.label}
+      </span>
+    )
+  }
+  return <span className="text-xs text-gray-400">—</span>
 }
 
 // Editor inline de papel para membro de instância
