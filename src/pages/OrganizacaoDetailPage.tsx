@@ -1280,17 +1280,13 @@ export function OrganizacaoDetailPage() {
           onActivate={() => handleActivateContract(editingContract)}
         />
       )}
-      <ConvidarUsuarioSheet
+      <CriarUsuarioSheet
         open={showCriarOrgAdmin}
         onClose={() => setShowCriarOrgAdmin(false)}
-        modo="org"
-        onSuccess={() => {}}
       />
-      <ConvidarUsuarioSheet
-        open={showConvidarUsuario}
-        onClose={() => setShowConvidarUsuario(false)}
-        modo="org"
-        onSuccess={() => {}}
+      <CriarUsuarioSheet
+        open={showCriarUsuario}
+        onClose={() => setShowCriarUsuario(false)}
       />
       <UsuarioDetailOrgSheet
         open={showOrgUserDetail}
