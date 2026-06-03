@@ -192,7 +192,7 @@ function AddMembroPanel({
   }, [search, allUsers, allGrupos, membros.length])
 
   function select(item: { id: string; nome: string; tipo: 'user' | 'group' }) {
-    onAdd(item.tipo, item.id, item.nome, isDocNix ? papelDocNix : papelFGA, selectedAtribuicoes)
+    onAdd(item.tipo, item.id, item.nome, isDocNix ? papelDocNix : papelFGA)
     setSearch('')
     setSelectedAtribuicoes([])
     setPapelDocNix('personalizado')
