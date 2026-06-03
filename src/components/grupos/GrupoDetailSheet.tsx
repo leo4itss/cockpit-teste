@@ -468,28 +468,9 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
           />
         )}
 
-        {/* AtribuirPermissoesSheet aninhada — nível 2 automaticamente */}
-        <AtribuirPermissoesSheet
-          open={showAtribuir}
-          onClose={() => setShowAtribuir(false)}
-          entityType="grupo"
-          entityId={grupo.id}
-          entityNome={grupo.nome}
-          accountId={accountId}
-          accountNome={accountNome}
-          papel={localPapel}
-          onSuccess={handleAtribuirSuccess}
-        />
       </NestedSheetBody>
 
-      <NestedSheetFooter className="justify-between">
-        <Button
-          variant="outline"
-          onClick={() => setShowAtribuir(true)}
-        >
-          <Shield className="w-4 h-4 mr-1.5" />
-          Atribuir permissões ao grupo
-        </Button>
+      <NestedSheetFooter>
         <Button variant="ghost" onClick={handleClose}>
           Fechar
         </Button>
