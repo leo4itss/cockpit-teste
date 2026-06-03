@@ -1,4 +1,13 @@
 /**
+ * ConvidarUsuarioSheet — DESATIVADO (decisão de produto 02/06/2026)
+ *
+ * O fluxo de convite por e-mail foi substituído pela criação direta de usuário
+ * (CriarUsuarioSheet), onde a senha é definida pelo próprio usuário após o
+ * primeiro acesso. Este componente não deve ser importado nem utilizado.
+ *
+ * Mantido no repositório apenas como referência histórica.
+ *
+ * --- Documentação original ---
  * ConvidarUsuarioSheet — convida usuário para a organização ou para uma conta.
  *
  * modo='org'  (Org Admin):
