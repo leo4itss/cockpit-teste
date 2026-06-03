@@ -285,14 +285,6 @@ export function EditUserSheet({ open, onClose, user, onSave, onDelete }: Props) 
               onChange={e => set('cargo', e.target.value)}
             />
 
-            <Select
-              label="Perfil na empresa"
-              options={PERFIS}
-              placeholder="Selecione o perfil"
-              value={form.papel}
-              onChange={e => set('papel', e.target.value)}
-            />
-
             {/* Etiquetas de classificação */}
             <div className="border border-[#e5e7eb] rounded-md flex items-center justify-between px-4 py-3 w-full">
               <p className="text-sm font-medium text-[#030712] leading-4">
