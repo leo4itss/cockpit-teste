@@ -422,8 +422,34 @@ export function InstanciaPage() {
   const modulo = componente?.nome ?? null  // 'MaxDoc' | 'DocAction' | etc.
 
   async function handleSavePapel(membro: InstanciaMembro, novoPapel: string) {
-    await api.updateInstanciaMembro(instancia!.id, membro.id, novoPapel)
+    // Optimistic update
     setMembros(prev => prev.map(m => m.id === membro.id ? { ...m, papel: novoPapel as InstanciaMembro['papel'] } : m))
+    try {
+      // 1. Salvar o rótulo do papel
+      await api.updateInstanciaMembro(instancia!.id, membro.id, novoPapel)
+
+      // 2. Para DocNix: sincronizar instancia_membro_atribuicoes com o papel escolhido
+      if (isDocNix) {
+        const papelInfo = mockDocNixPapeis.find(p => p.value === novoPapel)
+        if (papelInfo) {
+          const atribuicoesAtivas = atribuicoes.filter(a => a.status === 'Ativo')
+          const novasIds = papelInfo.atribuicaoNomes.length === 0
+            ? atribuicoesAtivas.map(a => a.id)
+            : atribuicoesAtivas.filter(a => papelInfo.atribuicaoNomes.includes(a.nome)).map(a => a.id)
+
+          const atuais = await api.getMembroAtribuicoes(instancia!.id, membro.id)
+          const atualIds = (atuais as { atribuicaoId: string }[]).map(v => v.atribuicaoId)
+
+          const toAdd    = novasIds.filter(id => !atualIds.includes(id))
+          const toRemove = atualIds.filter(id => !novasIds.includes(id))
+
+          await Promise.all([
+            ...toAdd.map(id    => api.addMembroAtribuicao(instancia!.id, membro.id, id).catch(() => null)),
+            ...toRemove.map(id => api.removeMembroAtribuicao(instancia!.id, membro.id, id).catch(() => null)),
+          ])
+        }
+      }
+    } catch { /* silencioso — mudança já aplicada localmente */ }
   }
 
   async function handleAdd(tipo: 'user' | 'group', entidadeId: string, nome: string, papel: string) {
