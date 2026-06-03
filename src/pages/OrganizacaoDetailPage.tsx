@@ -728,7 +728,7 @@ export function OrganizacaoDetailPage() {
                       else if (tab === 'contrato')  setSheetContract(true)
                     }}>
                       {tab === 'conta'     ? 'Criar Conta'
-                        : tab === 'usuarios'  ? 'Convidar Usuário'
+                        : tab === 'usuarios'  ? 'Criar usuário'
                         : tab === 'solucoes'  ? 'Criar Solução'
                         : 'Criar Contrato'}
                     </Button>
