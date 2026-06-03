@@ -134,7 +134,7 @@ export function CriarUsuarioSheet({ open, onClose, onSuccess, accountId }: Props
         nomeCompleto: form.nomeCompleto.trim(),
         usuario:      form.usuario.trim(),
         email:        form.email.trim(),
-        senha:        form.senha,
+        senha:        '',   // senha definida pelo usuário após criação
         pais:         form.pais,
         telefone:     form.telefone.trim(),
         area:         form.area,
@@ -149,6 +149,17 @@ export function CriarUsuarioSheet({ open, onClose, onSuccess, accountId }: Props
         createdAt:    new Date().toISOString(),
       }
       const created = await api.createUser(payload)
+
+      // Vincula à conta com papel e/ou grupo, se fornecidos
+      if (accountId) {
+        if (papel) {
+          await api.addAccountMembro(accountId, { userId: created.id, papel }).catch(() => null)
+        }
+        if (grupoId) {
+          await api.addGrupoMembro(grupoId, created.id).catch(() => null)
+        }
+      }
+
       onSuccess?.(created)
       handleClose()
     } catch (err: any) {
