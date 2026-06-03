@@ -747,6 +747,7 @@ export function AcessosPage() {
         open={showCriarSheet}
         onClose={() => setShowCriarSheet(false)}
         onSuccess={handleCriarSuccess}
+        accountId={accountId || undefined}
       />
       <UsuarioDetailAccountSheet
         open={showDetailSheet}
