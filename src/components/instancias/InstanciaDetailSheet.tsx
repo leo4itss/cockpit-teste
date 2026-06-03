@@ -92,7 +92,7 @@ function PapelBadge({ papel }: { papel: string }) {
   return <span className="text-xs text-gray-400">—</span>
 }
 
-// Editor inline de papel para membro de instância
+// Editor inline de papel para membro de instância FGA (Viewer/Member/Admin)
 function PapelEditor({
   papel, onSave,
 }: { papel: string; onSave: (novo: string) => Promise<void> }) {
