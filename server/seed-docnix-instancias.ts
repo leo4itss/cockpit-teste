@@ -35,7 +35,7 @@ type MembroSeed = {
   instanciaId: string
   entidadeTipo: 'user' | 'group'
   entidadeId: string
-  papel: 'viewer' | 'member' | 'admin'
+  papel: string
   atribuicaoIds: string[]
 }
 
