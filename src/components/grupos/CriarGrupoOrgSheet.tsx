@@ -66,12 +66,8 @@ function FieldLabel({ children, required, hint }: {
 
 // ── Componente principal ──────────────────────────────────────
 
-// Papéis disponíveis — abstração sobre as tuplas FGA de permissão
-const PAPEIS = [
-  { value: 'Viewer', label: 'Visualizador', desc: 'Acesso de leitura e consulta' },
-  { value: 'User',   label: 'Usuário',      desc: 'Uso padrão do assistente' },
-  { value: 'Admin',  label: 'Administrador', desc: 'Acesso completo à gestão' },
-]
+// Papéis disponíveis — consumidos do mock FGA (em produção viriam via API)
+const PAPEIS = mockPapeisDisponiveis
 
 export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, grupos = [], isPlatformAdmin, onSuccess }: Props) {
   const [nome, setNome]                         = useState('')
