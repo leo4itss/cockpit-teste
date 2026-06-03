@@ -110,7 +110,7 @@ export function ComponenteDetailSheet({ open, onClose, componente, onEdit }: Pro
               )}
               <span className="text-xs text-[#6b7280]">
                 {componente.tipoModelo === 'docnix'
-                  ? 'Atribuições granulares por instância (MaxDoc / DocAction)'
+                  ? 'Ações granulares por objeto (MaxDoc / DocAction)'
                   : componente.tipoModelo === 'custom'
                   ? 'Modelo customizado'
                   : 'Modelo padrão baseado em relações OpenFGA'}
