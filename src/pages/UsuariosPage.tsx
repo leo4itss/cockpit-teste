@@ -3,7 +3,6 @@ import { Search, Plus, Ellipsis, UserX, UserCheck, ChevronDown } from 'lucide-re
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Popover } from '@/components/ui/Popover'
-import { ConvidarUsuarioSheet } from '@/components/usuarios/ConvidarUsuarioSheet'
 import { CriarUsuarioSheet } from '@/components/usuarios/CriarUsuarioSheet'
 import {
   UsuarioDetailOrgSheet,
