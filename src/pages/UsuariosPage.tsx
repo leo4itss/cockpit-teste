@@ -83,7 +83,6 @@ export function UsuariosPage() {
   const [funcaoFilter, setFuncaoFilter] = useState('')
 
   // Sheets
-  const [showConvidar, setShowConvidar]     = useState(false)
   const [showCriar, setShowCriar]           = useState(false)
   const [showDetail, setShowDetail]         = useState(false)
   const [selectedUser, setSelectedUser]     = useState<User | null>(null)
