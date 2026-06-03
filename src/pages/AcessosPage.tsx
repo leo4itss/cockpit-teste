@@ -280,6 +280,19 @@ export function AcessosPage() {
     )
   }, [instancias, searchInstancias, componenteNomes])
 
+  // Detecta módulos DocNix ativos na conta (MaxDoc, DocAction)
+  const modulosDocNix = useMemo(() => {
+    const modulos = new Set<string>()
+    instancias.forEach(inst => {
+      if (componenteTipoModelos[inst.componenteId] === 'docnix') {
+        const nome = (componenteNomes[inst.componenteId] ?? '').toLowerCase()
+        if (nome.includes('maxdoc'))    modulos.add('MaxDoc')
+        if (nome.includes('docaction')) modulos.add('DocAction')
+      }
+    })
+    return [...modulos]
+  }, [instancias, componenteTipoModelos, componenteNomes])
+
   // Agrupa instâncias por componenteId para exibição agrupada
   const instanciasPorComponente = useMemo(() => {
     const map: Record<string, Instancia[]> = {}
