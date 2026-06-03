@@ -26,18 +26,19 @@ import {
 import { Button } from '@/components/ui/Button'
 import { api } from '@/api/client'
 import { cn } from '@/lib/utils'
-import { mockPapeisDisponiveis, mockDocNixPapeis } from '@/authz/mock'
+import { getComponenteConfig } from '@/authz/mock'
 import type { User, Grupo } from '@/types'
 
 // ── Tipos ─────────────────────────────────────────────────────
 
 interface Props {
-  open:           boolean
-  onClose:        () => void
-  accountId:      string
-  grupos?:        Grupo[]     // lista de grupos existentes (mesma conta) para seleção de grupo pai
-  modulosAtivos?: string[]    // ex: ['fga'], ['MaxDoc'], ['DocAction'], ['MaxDoc','DocAction','fga']
-  onSuccess:      (grupo: Grupo) => void
+  open:              boolean
+  onClose:           () => void
+  accountId:         string
+  grupos?:           Grupo[]    // lista de grupos existentes (mesma conta) para seleção de grupo pai
+  // Nomes dos componentes ativos na conta (ex: ['MaxDoc','DocAction'] ou ['Assistente IA'])
+  componentesAtivos?: string[]
+  onSuccess:         (grupo: Grupo) => void
 }
 
 // ── Helpers ───────────────────────────────────────────────────
