@@ -1,14 +1,14 @@
 /**
  * PermissoesMembroSheet — painel unificado de permissões por membro.
  *
- * FGA:      radio Visualizador / Membro / Administrador + checkboxes de ações (pré-selecionadas por papel).
- *           Quando o papel muda, as ações são atualizadas com os defaults do novo papel.
- * DocNix usuário: abas "Diretas" (checkboxes editáveis + via grupo read-only) | "Efetivo" (resultado calculado com origem).
- * DocNix grupo:   aba "Diretas" (checkboxes editáveis) + info de herança.
+ * FGA:    radio Visualizador / Membro / Administrador + checkboxes de ações (pré-selecionadas por papel).
+ *         Quando o papel muda, as ações são atualizadas com os defaults do novo papel.
+ * DocNix: cards de papel (mockDocNixPapeis) + título + checkboxes de atribuições (sem busca).
+ *         Quando um card é selecionado, as atribuições são pré-selecionadas automaticamente.
  */
 
 import { useState, useEffect, useMemo } from 'react'
-import { Search, Users, Lock, Loader2 } from 'lucide-react'
+import { Users, Lock, Loader2 } from 'lucide-react'
 import {
   NestedSheet,
   NestedSheetHeader,
@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/Button'
 import { api } from '@/api/client'
 import { cn } from '@/lib/utils'
 import type { Atribuicao, InstanciaMembro } from '@/types'
+import { mockDocNixPapeis } from '@/authz/mock'
 
 // ── FGA: catálogo de ações por tipo de componente ─────────────
 
@@ -88,16 +89,6 @@ function inferirTipoFGA(nome: string): ComponenteTipoFGA {
   return 'default'
 }
 
-// ── Tipos ─────────────────────────────────────────────────────
-
-interface EfetivaFonte {
-  atribuicaoId: string
-  fonte: string
-  entidadeId: string
-}
-
-type DocNixTab = 'diretas' | 'efetivo'
-
 // ── FGA: descrições dos papéis ────────────────────────────────
 
 const PAPEL_OPTIONS: { value: string; label: string; descricao: string }[] = [
@@ -117,32 +108,6 @@ const PAPEL_OPTIONS: { value: string; label: string; descricao: string }[] = [
     descricao: 'Acesso completo: gerencia membros, atribuições e configurações.',
   },
 ]
-
-// ── Badge de origem (aba Efetivo) ─────────────────────────────
-
-function FonteBadge({ fonte, entidadeId }: { fonte: string; entidadeId: string }) {
-  if (fonte === 'direto') {
-    return (
-      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
-        Direto
-      </span>
-    )
-  }
-  if (fonte === 'grupo') {
-    return (
-      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
-        <Users className="w-3 h-3" />
-        Via Grupo
-        <span className="font-mono text-[10px] opacity-70">{entidadeId}</span>
-      </span>
-    )
-  }
-  return (
-    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">
-      {fonte}
-    </span>
-  )
-}
 
 // ── Props ─────────────────────────────────────────────────────
 
@@ -181,16 +146,16 @@ export function PermissoesMembroSheet({
   const tipoFGA = inferirTipoFGA(componenteNome)
   const acoesFGA = ACOES_FGA[tipoFGA]
 
-  // ── Tab (DocNix) ───────────────────────────────────────────
-  const [docNixTab, setDocNixTab] = useState<DocNixTab>('diretas')
-
   // ── FGA: papel + ações ────────────────────────────────────
   const [papel, setPapel]           = useState(membro.papel ?? 'member')
-  const [fgaAcoes, setFgaAcoes]     = useState<string[]>([])   // ações salvas (original)
-  const [fgaDraft, setFgaDraft]     = useState<string[]>([])   // draft editável
+  const [fgaAcoes, setFgaAcoes]     = useState<string[]>([])
+  const [fgaDraft, setFgaDraft]     = useState<string[]>([])
   const [loadingFga, setLoadingFga] = useState(false)
   const [savingPapel, setSavingPapel] = useState(false)
   const [papelError, setPapelError]   = useState<string | null>(null)
+
+  // ── DocNix: papel selecionado ─────────────────────────────
+  const [papelDocNix, setPapelDocNix] = useState<string>('personalizado')
 
   // ── DocNix: atribuições diretas ───────────────────────────
   type GrupoHerdada = { atribuicaoId: string; grupoId: string }
@@ -198,30 +163,31 @@ export function PermissoesMembroSheet({
   const [original, setOriginal]     = useState<string[]>([])
   const [draft, setDraft]           = useState<string[]>([])
   const [herdadas, setHerdadas]     = useState<GrupoHerdada[]>([])
-  const [search, setSearch]         = useState('')
   const [loadingDir, setLoadingDir] = useState(false)
   const [savingDir, setSavingDir]   = useState(false)
   const [saveError, setSaveError]   = useState<string | null>(null)
 
-  // ── DocNix: permissões efetivas ───────────────────────────
-  const [atribEfetivas, setAtribEfetivas]   = useState<string[]>([])
-  const [fontesEfetivas, setFontesEfetivas] = useState<EfetivaFonte[]>([])
-  const [atribuicoesMap, setAtribuicoesMap] = useState<Record<string, string>>({})
-  const [loadingEfet, setLoadingEfet]       = useState(false)
-  const [isUnrestricted, setIsUnrestricted] = useState(false)
+  // ── Módulo DocNix detectado pelo catálogo ─────────────────
+  const moduloDetectado = useMemo(
+    () => catalog.find(a => a.modulo)?.modulo ?? null,
+    [catalog],
+  )
+  const papeisDocNix = useMemo(
+    () => moduloDetectado
+      ? mockDocNixPapeis.filter(p => p.modulo === moduloDetectado)
+      : mockDocNixPapeis,
+    [moduloDetectado],
+  )
 
   // ── Reset ao abrir ────────────────────────────────────────
   useEffect(() => {
     if (!open) return
-    setDocNixTab('diretas')
     const papelAtual = membro.papel ?? 'member'
     setPapel(papelAtual)
     setPapelError(null)
-    setSearch('')
     setSaveError(null)
 
     if (!isDocNix) {
-      // FGA: carrega permissões granulares existentes na instância
       setLoadingFga(true)
       api.getPermissions({
         entidade_tipo: membro.entidadeTipo === 'user' ? 'user' : 'group',
@@ -231,18 +197,15 @@ export function PermissoesMembroSheet({
         .then((perms: any[]) => {
           const existing = perms.map((p: any) => p.acao as string)
           if (existing.length > 0) {
-            // Usa as permissões já salvas
             setFgaAcoes(existing)
             setFgaDraft(existing)
           } else {
-            // Sem permissões salvas: pré-seleciona defaults do papel atual
             const defaults = DEFAULTS_POR_PAPEL[papelAtual]?.[tipoFGA] ?? []
             setFgaAcoes([])
             setFgaDraft(defaults)
           }
         })
         .catch(() => {
-          // Fallback: pré-seleciona defaults do papel
           const defaults = DEFAULTS_POR_PAPEL[papelAtual]?.[tipoFGA] ?? []
           setFgaAcoes([])
           setFgaDraft(defaults)
@@ -251,73 +214,38 @@ export function PermissoesMembroSheet({
     }
 
     if (isDocNix) {
-      // Carrega catálogo + atribuições diretas
       setLoadingDir(true)
-      const efetivasFetch = isUser
-        ? api.getPermissoesEfetivas(instanciaId, membro.entidadeId).catch(() => ({
-            atribuicoes: [] as string[],
-            fontes: [] as EfetivaFonte[],
-          }))
-        : Promise.resolve(null)
-
       Promise.all([
         api.getAtribuicoes(componenteId),
         api.getMembroAtribuicoes(instanciaId, membro.id),
-        efetivasFetch,
+        isUser
+          ? api.getPermissoesEfetivas(instanciaId, membro.entidadeId).catch(() => null)
+          : Promise.resolve(null),
       ])
         .then(([atribs, vinculos, efetivas]) => {
           const ativas = (atribs as Atribuicao[]).filter(a => a.status === 'Ativo')
           setCatalog(ativas)
 
-          const map: Record<string, string> = {}
-          ativas.forEach(a => { map[a.id] = a.nome })
-          setAtribuicoesMap(map)
-
           const diretas = (vinculos as { atribuicaoId: string }[]).map(v => v.atribuicaoId)
           setOriginal(diretas)
           setDraft([...diretas])
 
+          // Tenta detectar qual papel corresponde às atribuições atuais
+          const papelCurrent = membro.papel ?? ''
+          const papelMatch = mockDocNixPapeis.find(p => p.value === papelCurrent)
+          setPapelDocNix(papelMatch ? papelMatch.value : 'personalizado')
+
           if (efetivas && isUser) {
             const fromGrupo = (efetivas as any).fontes
-              .filter((f: EfetivaFonte) => f.fonte === 'grupo')
-              .map((f: EfetivaFonte) => ({ atribuicaoId: f.atribuicaoId, grupoId: f.entidadeId }))
+              .filter((f: { fonte: string; atribuicaoId: string; entidadeId: string }) => f.fonte === 'grupo')
+              .map((f: { fonte: string; atribuicaoId: string; entidadeId: string }) => ({ atribuicaoId: f.atribuicaoId, grupoId: f.entidadeId }))
             setHerdadas(fromGrupo)
-
-            if ((efetivas as any).atribuicoes.includes('*')) {
-              setIsUnrestricted(true)
-            } else {
-              setAtribEfetivas((efetivas as any).atribuicoes)
-              setFontesEfetivas((efetivas as any).fontes)
-            }
           }
         })
         .finally(() => setLoadingDir(false))
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, membro.id])
-
-  // Carrega efetivas separadamente quando trocar para aba Efetivo
-  useEffect(() => {
-    if (!open || !isDocNix || !isUser || docNixTab !== 'efetivo' || atribEfetivas.length > 0 || isUnrestricted) return
-    setLoadingEfet(true)
-    Promise.all([
-      api.getPermissoesEfetivas(instanciaId, membro.entidadeId),
-      api.getAtribuicoes(componenteId),
-    ])
-      .then(([efetivas, atribs]) => {
-        if (efetivas.atribuicoes.includes('*')) {
-          setIsUnrestricted(true)
-        } else {
-          setAtribEfetivas(efetivas.atribuicoes)
-          setFontesEfetivas(efetivas.fontes)
-        }
-        const map: Record<string, string> = {}
-        ;(atribs as Atribuicao[]).forEach(a => { map[a.id] = a.nome })
-        setAtribuicoesMap(prev => ({ ...prev, ...map }))
-      })
-      .finally(() => setLoadingEfet(false))
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [docNixTab, open])
 
   // ── Helpers ───────────────────────────────────────────────
   const herdadasSet = useMemo(
@@ -333,19 +261,23 @@ export function PermissoesMembroSheet({
     return map
   }, [herdadas])
 
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase()
-    if (!q) return catalog
-    return catalog.filter(
-      a => a.nome.toLowerCase().includes(q) || (a.modulo ?? '').toLowerCase().includes(q),
-    )
-  }, [catalog, search])
-
   // Quando o papel muda (FGA), aplica os defaults do novo papel como ponto de partida
   function handlePapelChange(novoPapel: string) {
     setPapel(novoPapel as 'viewer' | 'member' | 'admin')
     const defaults = DEFAULTS_POR_PAPEL[novoPapel]?.[tipoFGA] ?? []
     setFgaDraft(defaults)
+  }
+
+  // Quando um card DocNix é selecionado, pré-seleciona atribuições correspondentes
+  function handlePapelDocNix(valor: string) {
+    setPapelDocNix(valor)
+    const papelInfo = mockDocNixPapeis.find(p => p.value === valor)
+    if (!papelInfo) { setDraft([]); return }
+    const ativas = catalog.filter(a => a.status === 'Ativo')
+    const novasIds = papelInfo.atribuicaoNomes.length === 0
+      ? ativas.map(a => a.id)
+      : ativas.filter(a => papelInfo.atribuicaoNomes.includes(a.nome)).map(a => a.id)
+    setDraft(novasIds)
   }
 
   function toggleFgaAcao(acao: string) {
@@ -372,6 +304,8 @@ export function PermissoesMembroSheet({
   function toggleAtrib(atribuicaoId: string) {
     const soHerdada = herdadasSet.has(atribuicaoId) && !draft.includes(atribuicaoId)
     if (soHerdada) return
+    // Ao alterar manualmente, volta para "Personalizado"
+    setPapelDocNix('personalizado')
     setDraft(prev =>
       prev.includes(atribuicaoId)
         ? prev.filter(id => id !== atribuicaoId)
@@ -380,7 +314,6 @@ export function PermissoesMembroSheet({
   }
 
   function handleClose() {
-    setSearch('')
     setSaveError(null)
     setPapelError(null)
     onClose()
@@ -388,7 +321,6 @@ export function PermissoesMembroSheet({
 
   async function handleSalvar() {
     if (isDocNix) {
-      // Salva atribuições
       setSavingDir(true)
       setSaveError(null)
       const origSet  = new Set(original)
@@ -409,17 +341,14 @@ export function PermissoesMembroSheet({
         setSavingDir(false)
       }
     } else {
-      // Salva papel FGA + permissões granulares
       setSavingPapel(true)
       setPapelError(null)
       try {
-        // 1. Atualiza papel
         await api.addInstanciaMembro(instanciaId, {
           entidadeTipo: membro.entidadeTipo,
           entidadeId:   membro.entidadeId,
           papel,
         })
-        // 2. Sincroniza permissões granulares (add novas, remove removidas)
         const entidadeTipo = membro.entidadeTipo === 'user' ? 'user' : 'group'
         const origSet  = new Set(fgaAcoes)
         const draftSet = new Set(fgaDraft)
@@ -452,7 +381,6 @@ export function PermissoesMembroSheet({
   }
 
   const saving = savingDir || savingPapel
-
   const diretasCount  = draft.length
   const herdadasCount = [...herdadasSet].filter(id => !draft.includes(id)).length
 
@@ -546,205 +474,139 @@ export function PermissoesMembroSheet({
           </div>
         )}
 
-        {/* ── DocNix: tabs Diretas | Efetivo ────────────────── */}
+        {/* ── DocNix: cards de papel + ações ────────────────── */}
         {isDocNix && (
-          <>
-            {/* Tab bar — só mostra "Efetivo" para usuários */}
-            <div className="flex border-b border-gray-200 px-6">
-              {(['diretas', ...(isUser ? ['efetivo'] : [])] as DocNixTab[]).map(t => (
+          <div className="px-6 py-5 space-y-5">
+
+            {/* Cards de papel */}
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Papel</p>
+              <div className="grid grid-cols-3 gap-1.5">
+                {papeisDocNix.map(p => (
+                  <button
+                    key={p.value}
+                    type="button"
+                    onClick={() => handlePapelDocNix(p.value)}
+                    className={cn(
+                      'flex flex-col items-start px-2.5 py-2 rounded-lg border text-left transition-colors',
+                      papelDocNix === p.value
+                        ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
+                        : 'border-gray-200 bg-white hover:bg-gray-50',
+                    )}
+                  >
+                    <span className="text-xs font-medium text-gray-900">{p.label}</span>
+                    <span className="text-[10px] text-gray-500 mt-0.5 leading-tight">{p.desc}</span>
+                  </button>
+                ))}
+                {/* Card Personalizado */}
                 <button
-                  key={t}
-                  onClick={() => setDocNixTab(t)}
+                  type="button"
+                  onClick={() => { setPapelDocNix('personalizado'); setDraft([]) }}
                   className={cn(
-                    'px-1 py-3 mr-6 text-sm font-medium border-b-2 -mb-px transition-colors',
-                    docNixTab === t
-                      ? 'border-blue-600 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700',
+                    'flex flex-col items-start px-2.5 py-2 rounded-lg border text-left transition-colors',
+                    papelDocNix === 'personalizado'
+                      ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
+                      : 'border-gray-200 bg-white hover:bg-gray-50',
                   )}
                 >
-                  {t === 'diretas' ? (
-                    <>
-                      Diretas
-                      {!loadingDir && (
-                        <span className="ml-1 text-xs font-normal text-gray-400">
-                          ({diretasCount + herdadasCount})
-                        </span>
-                      )}
-                    </>
-                  ) : 'Efetivo'}
+                  <span className="text-xs font-medium text-gray-900">Personalizado</span>
+                  <span className="text-[10px] text-gray-500 mt-0.5 leading-tight">Selecionar manualmente</span>
                 </button>
-              ))}
+              </div>
             </div>
 
-            {/* ── Aba: Diretas ──────────────────────────────── */}
-            {docNixTab === 'diretas' && (
-              <>
-                {isUser && herdadas.length > 0 && (
-                  <div className="flex items-start gap-3 mx-6 mt-4 p-3 rounded-xl border border-emerald-200 bg-emerald-50">
-                    <Users className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                    <p className="text-sm text-emerald-800">
-                      Itens marcados com <strong>Via Grupo</strong> vêm de grupos do usuário.
-                      Para alterá-los, edite as ações do grupo correspondente.
-                    </p>
-                  </div>
-                )}
-
-                <div className="px-6 py-3">
-                  <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-md shadow-sm">
-                    <Search className="w-4 h-4 text-gray-400 shrink-0" />
-                    <input
-                      type="text"
-                      value={search}
-                      onChange={e => setSearch(e.target.value)}
-                      placeholder="Buscar ação..."
-                      className="flex-1 bg-transparent text-sm outline-none placeholder:text-gray-400"
-                    />
-                    {search && (
-                      <button type="button" onClick={() => setSearch('')} className="text-gray-400 hover:text-gray-600">×</button>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex-1 overflow-y-auto border-t border-gray-100 max-h-[min(55vh,440px)]">
-                  {loadingDir ? (
-                    <div className="flex items-center justify-center gap-2 py-12 text-sm text-gray-500">
-                      <Loader2 className="w-4 h-4 animate-spin" /> Carregando...
-                    </div>
-                  ) : filtered.length === 0 ? (
-                    <p className="text-sm text-gray-500 text-center py-10">
-                      {search ? 'Nenhuma ação encontrada.' : 'Nenhuma ação cadastrada para este componente.'}
-                    </p>
-                  ) : (
-                    <div className="divide-y divide-gray-50">
-                      {filtered.map(a => {
-                        const herdadasDesteAtrib = herdadaPorAtrib[a.id] ?? []
-                        const soHerdada = herdadasDesteAtrib.length > 0 && !draft.includes(a.id)
-                        const checked   = draft.includes(a.id) || soHerdada
-
-                        return (
-                          <div
-                            key={a.id}
-                            className={cn('px-6 py-2.5', soHerdada && 'bg-emerald-50/40')}
-                          >
-                            <label className={cn(
-                              'flex items-start gap-2.5',
-                              soHerdada ? 'cursor-default' : 'cursor-pointer',
-                              saving && 'opacity-60 pointer-events-none',
-                            )}>
-                              <input
-                                type="checkbox"
-                                checked={checked}
-                                disabled={soHerdada || saving}
-                                onChange={() => !soHerdada && toggleAtrib(a.id)}
-                                className={cn(
-                                  'mt-0.5 w-4 h-4 rounded border-gray-300 shrink-0',
-                                  soHerdada ? 'accent-emerald-600 cursor-default' : 'accent-blue-600',
-                                )}
-                              />
-                              <span className="flex-1 min-w-0">
-                                <span className={cn('text-sm', checked ? 'font-medium text-gray-900' : 'text-gray-700')}>
-                                  {a.nome}
-                                </span>
-                                {a.modulo && (
-                                  <span className="ml-1.5 text-xs text-gray-400">({a.modulo})</span>
-                                )}
-                                {soHerdada && (
-                                  <span className="mt-1 flex flex-wrap gap-1">
-                                    {herdadasDesteAtrib.map((h, i) => (
-                                      <span
-                                        key={`${h.grupoId}-${i}`}
-                                        className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-emerald-100 text-emerald-700 border border-emerald-200"
-                                      >
-                                        <Lock className="w-2.5 h-2.5" />
-                                        Via {grupoNomes[h.grupoId] ?? h.grupoId}
-                                      </span>
-                                    ))}
-                                  </span>
-                                )}
-                              </span>
-                            </label>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  )}
-                </div>
-
-                {/* Footer info */}
-                {!loadingDir && catalog.length > 0 && (
-                  <div className="px-6 py-2 border-t border-gray-100 bg-gray-50 text-xs text-gray-500">
-                    <strong className="text-gray-700">{diretasCount}</strong> direta{diretasCount !== 1 ? 's' : ''}
-                    {isUser && herdadasCount > 0 && (
-                      <> · <strong className="text-gray-700">{herdadasCount}</strong> só via grupo</>
-                    )}
-                    {!isUser && (
-                      <span className="ml-2 text-gray-400">
-                        — membros do grupo herdam estas ações
-                      </span>
-                    )}
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* ── Aba: Efetivo (apenas usuários) ────────────── */}
-            {docNixTab === 'efetivo' && isUser && (
-              <div className="px-6 py-5">
-                {loadingEfet ? (
-                  <div className="flex items-center justify-center gap-2 py-10 text-sm text-gray-500">
-                    <Loader2 className="w-4 h-4 animate-spin" /> Carregando...
-                  </div>
-                ) : isUnrestricted ? (
-                  <div className="rounded-xl bg-blue-50 border border-blue-200 p-4 text-sm text-blue-700">
-                    Acesso irrestrito — administrador com todas as permissões nesta instância.
-                  </div>
-                ) : atribEfetivas.length === 0 ? (
-                  <div className="py-8 text-center">
-                    <p className="text-sm font-medium text-gray-800">Nenhuma ação efetiva</p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Este usuário não possui ações ativas neste objeto.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="overflow-hidden rounded-xl border border-gray-200">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-gray-200 bg-gray-50">
-                          <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500">Ação</th>
-                          <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500">Origem</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {atribEfetivas.map(atribId => {
-                          const nome          = atribuicoesMap[atribId] ?? atribId
-                          const fontesDoAtrib = fontesEfetivas.filter(f => f.atribuicaoId === atribId)
-
-                          if (fontesDoAtrib.length === 0) {
-                            return (
-                              <tr key={atribId} className="border-b border-gray-100 last:border-0">
-                                <td className="px-4 py-2.5 font-medium text-gray-900">{nome}</td>
-                                <td className="px-4 py-2.5 text-xs text-gray-400">—</td>
-                              </tr>
-                            )
-                          }
-                          return fontesDoAtrib.map((f, idx) => (
-                            <tr key={`${atribId}-${idx}`} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
-                              <td className="px-4 py-2.5 font-medium text-gray-900">
-                                {idx === 0 ? nome : ''}
-                              </td>
-                              <td className="px-4 py-2.5">
-                                <FonteBadge fonte={f.fonte} entidadeId={f.entidadeId} />
-                              </td>
-                            </tr>
-                          ))
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
+            {/* Aviso de herança via grupo */}
+            {isUser && herdadas.length > 0 && (
+              <div className="flex items-start gap-3 p-3 rounded-xl border border-emerald-200 bg-emerald-50">
+                <Users className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <p className="text-sm text-emerald-800">
+                  Itens marcados com <strong>Via Grupo</strong> vêm de grupos do usuário.
+                  Para alterá-los, edite as ações do grupo correspondente.
+                </p>
               </div>
             )}
-          </>
+
+            {/* Ações da instância */}
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                Ações da instância
+              </p>
+              {loadingDir ? (
+                <div className="flex items-center gap-2 py-3 text-sm text-gray-400">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  Carregando...
+                </div>
+              ) : catalog.length === 0 ? (
+                <p className="text-sm text-gray-500 py-4 text-center">
+                  Nenhuma ação cadastrada para este componente.
+                </p>
+              ) : (
+                <div className="border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100 max-h-[min(50vh,380px)] overflow-y-auto">
+                  {catalog.map(a => {
+                    const herdadasDesteAtrib = herdadaPorAtrib[a.id] ?? []
+                    const soHerdada = herdadasDesteAtrib.length > 0 && !draft.includes(a.id)
+                    const checked   = draft.includes(a.id) || soHerdada
+
+                    return (
+                      <div
+                        key={a.id}
+                        className={cn('px-4', soHerdada && 'bg-emerald-50/40')}
+                      >
+                        <label className={cn(
+                          'flex items-start gap-3 py-2.5',
+                          soHerdada ? 'cursor-default' : 'cursor-pointer',
+                          saving && 'opacity-60 pointer-events-none',
+                        )}>
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            disabled={soHerdada || saving}
+                            onChange={() => !soHerdada && toggleAtrib(a.id)}
+                            className={cn(
+                              'mt-0.5 w-4 h-4 rounded border-gray-300 shrink-0',
+                              soHerdada ? 'accent-emerald-600 cursor-default' : 'accent-blue-600',
+                            )}
+                          />
+                          <span className="flex-1 min-w-0">
+                            <span className={cn('text-sm', checked ? 'font-medium text-gray-900' : 'text-gray-700')}>
+                              {a.nome}
+                            </span>
+                            {a.modulo && (
+                              <span className="ml-1.5 text-xs text-gray-400">({a.modulo})</span>
+                            )}
+                            {soHerdada && (
+                              <span className="mt-1 flex flex-wrap gap-1">
+                                {herdadasDesteAtrib.map((h, i) => (
+                                  <span
+                                    key={`${h.grupoId}-${i}`}
+                                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-emerald-100 text-emerald-700 border border-emerald-200"
+                                  >
+                                    <Lock className="w-2.5 h-2.5" />
+                                    Via {grupoNomes[h.grupoId] ?? h.grupoId}
+                                  </span>
+                                ))}
+                              </span>
+                            )}
+                          </span>
+                        </label>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+
+              {/* Info rodapé */}
+              {!loadingDir && catalog.length > 0 && (
+                <p className="text-xs text-gray-400">
+                  <strong className="text-gray-600">{diretasCount}</strong> ação{diretasCount !== 1 ? 'ões' : ''} selecionada{diretasCount !== 1 ? 's' : ''}
+                  {isUser && herdadasCount > 0 && (
+                    <> · <strong className="text-gray-600">{herdadasCount}</strong> só via grupo</>
+                  )}
+                </p>
+              )}
+            </div>
+
+          </div>
         )}
 
       </NestedSheetBody>
@@ -754,12 +616,9 @@ export function PermissoesMembroSheet({
           <p className="text-xs text-red-600 flex-1 mr-2">{saveError ?? papelError}</p>
         )}
         <Button variant="outline" onClick={handleClose} disabled={saving}>Cancelar</Button>
-        {/* Aba Efetivo é read-only — não mostra Salvar */}
-        {(!isDocNix || docNixTab === 'diretas') && (
-          <Button onClick={handleSalvar} disabled={!hasChanges || saving || loadingDir}>
-            {saving ? 'Salvando...' : 'Salvar'}
-          </Button>
-        )}
+        <Button onClick={handleSalvar} disabled={!hasChanges || saving || loadingDir}>
+          {saving ? 'Salvando...' : 'Salvar'}
+        </Button>
       </NestedSheetFooter>
     </NestedSheet>
   )
