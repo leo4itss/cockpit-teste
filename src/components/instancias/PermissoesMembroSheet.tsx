@@ -596,7 +596,7 @@ export function PermissoesMembroSheet({
                       type="text"
                       value={search}
                       onChange={e => setSearch(e.target.value)}
-                      placeholder="Buscar atribuição..."
+                      placeholder="Buscar ação..."
                       className="flex-1 bg-transparent text-sm outline-none placeholder:text-gray-400"
                     />
                     {search && (
