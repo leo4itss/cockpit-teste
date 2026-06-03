@@ -229,25 +229,62 @@ export function CriarGrupoSheet({ open, onClose, accountId, grupos = [], modulos
             <FieldLabel required hint="Define o papel padrão dos membros deste grupo.">
               Papel
             </FieldLabel>
-            <div className="grid grid-cols-3 gap-2">
-              {PAPEIS_OPCOES.map(p => (
-                <button
-                  key={p.value}
-                  type="button"
-                  onClick={() => setPapel(p.value)}
-                  disabled={saving}
-                  className={cn(
-                    'flex flex-col items-start px-3 py-2.5 rounded-lg border text-left transition-colors',
-                    papel === p.value
-                      ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
-                      : 'border-gray-200 bg-white hover:bg-gray-50'
-                  )}
-                >
-                  <span className="text-sm font-medium text-[#030712]">{p.label}</span>
-                  <span className="text-xs text-[#6b7280] mt-0.5 leading-tight">{p.desc}</span>
-                </button>
-              ))}
-            </div>
+
+            {isDocNix ? (
+              /* DocNix: cards agrupados por módulo */
+              <div className="space-y-3">
+                {modulosDocNix.map(modulo => {
+                  const papeisModulo = papeisDocNixFiltrados.filter(p => p.modulo === modulo)
+                  return (
+                    <div key={modulo}>
+                      {modulosDocNix.length > 1 && (
+                        <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-1.5">{modulo}</p>
+                      )}
+                      <div className="grid grid-cols-3 gap-2">
+                        {papeisModulo.map(p => (
+                          <button
+                            key={p.value}
+                            type="button"
+                            onClick={() => setPapel(p.value)}
+                            disabled={saving}
+                            className={cn(
+                              'flex flex-col items-start px-3 py-2.5 rounded-lg border text-left transition-colors',
+                              papel === p.value
+                                ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
+                                : 'border-gray-200 bg-white hover:bg-gray-50'
+                            )}
+                          >
+                            <span className="text-sm font-medium text-[#030712]">{p.label}</span>
+                            <span className="text-xs text-[#6b7280] mt-0.5 leading-tight">{p.desc}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            ) : (
+              /* FGA: cards padrão */
+              <div className="grid grid-cols-3 gap-2">
+                {mockPapeisDisponiveis.map(p => (
+                  <button
+                    key={p.value}
+                    type="button"
+                    onClick={() => setPapel(p.value)}
+                    disabled={saving}
+                    className={cn(
+                      'flex flex-col items-start px-3 py-2.5 rounded-lg border text-left transition-colors',
+                      papel === p.value
+                        ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
+                        : 'border-gray-200 bg-white hover:bg-gray-50'
+                    )}
+                  >
+                    <span className="text-sm font-medium text-[#030712]">{p.label}</span>
+                    <span className="text-xs text-[#6b7280] mt-0.5 leading-tight">{p.desc}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Escopo — read-only para Account Admin */}
