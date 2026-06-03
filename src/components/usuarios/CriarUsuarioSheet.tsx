@@ -344,6 +344,91 @@ export function CriarUsuarioSheet({ open, onClose, onSuccess, accountId }: Props
               />
             </div>
 
+            {/* ── Papel + Grupo (só quando accountId fornecido) ─ */}
+            {accountId && (
+              <>
+                <Divider />
+                <div className="flex flex-col gap-7">
+                  <SectionTitle>Acesso e grupo</SectionTitle>
+
+                  {/* Papel */}
+                  <div className="flex flex-col gap-2">
+                    <p className="text-sm font-medium text-[#030712]">
+                      Papel
+                      <span className="ml-1 text-xs text-[#6b7280] font-normal">
+                        — define o nível de acesso FGA padrão
+                      </span>
+                    </p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {mockPapeisDisponiveis.map(p => (
+                        <button
+                          key={p.value}
+                          type="button"
+                          onClick={() => setPapel(prev => prev === p.value ? '' : p.value)}
+                          className={cn(
+                            'flex flex-col items-start px-3 py-2.5 rounded-lg border text-left transition-colors',
+                            papel === p.value
+                              ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
+                              : 'border-gray-200 bg-white hover:bg-gray-50'
+                          )}
+                        >
+                          <span className="text-sm font-medium text-[#030712]">{p.label}</span>
+                          <span className="text-xs text-[#6b7280] mt-0.5 leading-tight">{p.desc}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Grupo */}
+                  <div className="flex flex-col gap-1.5">
+                    <p className="text-sm font-medium text-[#030712]">
+                      Grupo
+                      <span className="ml-1 text-xs text-[#6b7280] font-normal">
+                        — opcional
+                      </span>
+                    </p>
+                    <select
+                      value={grupoId}
+                      onChange={e => setGrupoId(e.target.value)}
+                      className="w-full appearance-none pl-3 pr-8 py-2 text-sm border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-colors text-[#030712]"
+                    >
+                      <option value="">(Nenhum grupo)</option>
+                      {grupos.filter(g => g.status === 'Ativo').map(g => (
+                        <option key={g.id} value={g.id}>{g.nome}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Preview das permissões resultantes */}
+                  {(papel || grupoId) && (
+                    <div className="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 flex flex-col gap-1.5">
+                      <p className="text-xs font-medium text-blue-700 uppercase tracking-wide">
+                        Permissões resultantes
+                      </p>
+                      <div className="flex flex-wrap gap-2 mt-0.5">
+                        {papel && (() => {
+                          const p = mockPapeisDisponiveis.find(p => p.value === papel)
+                          return p ? (
+                            <span className={cn('inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border', p.cls)}>
+                              Papel: {p.label}
+                            </span>
+                          ) : null
+                        })()}
+                        {grupoId && (() => {
+                          const g = grupos.find(g => g.id === grupoId)
+                          return g ? (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-purple-50 text-purple-700 border-purple-200">
+                              Grupo: {g.nome}
+                            </span>
+                          ) : null
+                        })()}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+
           </div>
         </NestedSheetBody>
 
