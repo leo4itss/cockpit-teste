@@ -422,7 +422,7 @@ export function InstanciaPage() {
   const modulo = componente?.nome ?? null  // 'MaxDoc' | 'DocAction' | etc.
 
   async function handleSavePapel(membro: InstanciaMembro, novoPapel: string) {
-    await api.updateInstanciaMembro(instancia!.id, membro.id, { papel: novoPapel })
+    await api.updateInstanciaMembro(instancia!.id, membro.id, novoPapel)
     setMembros(prev => prev.map(m => m.id === membro.id ? { ...m, papel: novoPapel as InstanciaMembro['papel'] } : m))
   }
 
