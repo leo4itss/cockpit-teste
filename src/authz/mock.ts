@@ -168,3 +168,134 @@ export const mockPapeisDisponiveis: {
     cls: 'bg-orange-50 text-orange-700 border-orange-200',
   },
 ]
+
+// ── Papéis estruturados para objetos DocNix ───────────────────
+//
+// Cada papel agrupa um conjunto de atribuições granulares.
+// `atribuicaoNomes` é matchado contra `atribuicao.nome` em runtime
+// para resolver os IDs corretos sem depender de IDs fixos.
+// `atribuicaoNomes: []` (Administrador) = seleciona TODAS as atribuições ativas.
+
+export const mockDocNixPapeis: {
+  value: string
+  label: string
+  desc: string
+  cls: string
+  modulo: 'MaxDoc' | 'DocAction'
+  atribuicaoNomes: string[]
+}[] = [
+  // ── MaxDoc ────────────────────────────────────────────────
+  {
+    value: 'leitor',
+    label: 'Leitor',
+    modulo: 'MaxDoc',
+    desc: 'Leitura e download de documentos',
+    cls: 'bg-gray-100 text-gray-600 border-gray-200',
+    atribuicaoNomes: [
+      'Visualizar', 'Ler Todos', 'Leitor Documento', 'Leitor Anexos',
+      'Download Documento', 'Imprimir',
+    ],
+  },
+  {
+    value: 'editor',
+    label: 'Editor',
+    modulo: 'MaxDoc',
+    desc: 'Cria e edita documentos e anexos',
+    cls: 'bg-blue-50 text-blue-700 border-blue-200',
+    atribuicaoNomes: [
+      'Visualizar', 'Ler Todos', 'Leitor Documento', 'Leitor Anexos',
+      'Download Documento', 'Imprimir',
+      'Criar Documento', 'Editar Documento', 'Nova Versão',
+      'Upload Documento', 'Editor Documento',
+      'Criar Anexo', 'Editar Anexo', 'Anexar Arquivos',
+    ],
+  },
+  {
+    value: 'revisor',
+    label: 'Revisor',
+    modulo: 'MaxDoc',
+    desc: 'Revisa e submete documentos para aprovação',
+    cls: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+    atribuicaoNomes: [
+      'Visualizar', 'Ler Todos', 'Leitor Documento', 'Leitor Anexos',
+      'Download Documento', 'Imprimir',
+      'Criar Documento', 'Editar Documento', 'Nova Versão',
+      'Upload Documento', 'Editor Documento',
+      'Criar Anexo', 'Editar Anexo', 'Anexar Arquivos',
+      'Revisar Documento', 'Submeter para Aprovação',
+      'Revisor Documento', 'Revisar como Substituto Documento',
+    ],
+  },
+  {
+    value: 'aprovador',
+    label: 'Aprovador',
+    modulo: 'MaxDoc',
+    desc: 'Aprova, obsoleta e emite cópias controladas',
+    cls: 'bg-orange-50 text-orange-700 border-orange-200',
+    atribuicaoNomes: [
+      'Visualizar', 'Ler Todos', 'Leitor Documento', 'Leitor Anexos',
+      'Download Documento', 'Imprimir', 'Assinatura Eletrônica',
+      'Revisar Documento', 'Aprovar Documento',
+      'Aprovador Documento', 'Aprovador Substituto Documento',
+      'Obsoletetar Documento',
+      'Emitir Cópia Controlada', 'Emitir Cópia Não Controlada',
+      'Cópia Controlada Anexos', 'Ciclo de Aprovação Documentos',
+    ],
+  },
+  {
+    value: 'admin-maxdoc',
+    label: 'Administrador',
+    modulo: 'MaxDoc',
+    desc: 'Acesso completo ao MaxDoc',
+    cls: 'bg-red-50 text-red-700 border-red-200',
+    atribuicaoNomes: [], // vazio = todas as atribuições ativas
+  },
+  // ── DocAction ─────────────────────────────────────────────
+  {
+    value: 'colaborador',
+    label: 'Colaborador',
+    modulo: 'DocAction',
+    desc: 'Cria e acompanha ocorrências',
+    cls: 'bg-green-50 text-green-700 border-green-200',
+    atribuicaoNomes: [
+      'Visualizar', 'Criar Ocorrência', 'Criar Ocorrência 8D',
+      'Editar Ocorrência', 'Vincular Ocorrência', 'Acompanhar Ocorrência',
+    ],
+  },
+  {
+    value: 'analista',
+    label: 'Analista',
+    modulo: 'DocAction',
+    desc: 'Categoriza, analisa e cria planos de ação',
+    cls: 'bg-blue-50 text-blue-700 border-blue-200',
+    atribuicaoNomes: [
+      'Visualizar', 'Criar Ocorrência', 'Criar Ocorrência 8D',
+      'Editar Ocorrência', 'Vincular Ocorrência', 'Acompanhar Ocorrência',
+      'Categorizar Ocorrência', 'Analisar Causa',
+      'Criar Plano de Ação', 'Verificar Eficácia', 'Encaminhar Ocorrência',
+    ],
+  },
+  {
+    value: 'aprovador-docaction',
+    label: 'Aprovador',
+    modulo: 'DocAction',
+    desc: 'Aprova análises e encerra ocorrências',
+    cls: 'bg-orange-50 text-orange-700 border-orange-200',
+    atribuicaoNomes: [
+      'Visualizar', 'Criar Ocorrência', 'Criar Ocorrência 8D',
+      'Editar Ocorrência', 'Vincular Ocorrência', 'Acompanhar Ocorrência',
+      'Categorizar Ocorrência', 'Analisar Causa',
+      'Criar Plano de Ação', 'Verificar Eficácia', 'Encaminhar Ocorrência',
+      'Aprovar Análise de Causa', 'Encerrar Ocorrência',
+      'Reprogramar Prazo/Responsável',
+    ],
+  },
+  {
+    value: 'admin-docaction',
+    label: 'Administrador',
+    modulo: 'DocAction',
+    desc: 'Acesso completo ao DocAction',
+    cls: 'bg-red-50 text-red-700 border-red-200',
+    atribuicaoNomes: [], // vazio = todas as atribuições ativas
+  },
+]
