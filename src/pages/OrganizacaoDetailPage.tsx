@@ -85,7 +85,7 @@ export function OrganizacaoDetailPage() {
   const [userCount, setUserCount]           = useState(0)
   const [orgUsers, setOrgUsers]             = useState<User[]>([])
   const [loadingMetrics, setLoadingMetrics] = useState(true)
-  const [showConvidarUsuario, setShowConvidarUsuario] = useState(false)
+  const [showCriarUsuario, setShowCriarUsuario] = useState(false)
   const [selectedOrgUser, setSelectedOrgUser] = useState<User | null>(null)
   const [showOrgUserDetail, setShowOrgUserDetail] = useState(false)
   const [userAccountsMap, setUserAccountsMap] = useState<Record<string, ContaVinculada[]>>({})
