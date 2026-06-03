@@ -157,7 +157,7 @@ export function PermissoesEfetivasSheet({
 
         {!instanciaIdProp && instancias && instancias.length === 0 && (
           <div className="py-8 text-center">
-            <p className="text-sm text-gray-500">Esta conta não possui instâncias configuradas.</p>
+            <p className="text-sm text-gray-500">Esta conta não possui objetos configurados.</p>
           </div>
         )}
 
