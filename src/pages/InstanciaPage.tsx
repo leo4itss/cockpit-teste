@@ -431,7 +431,7 @@ export function InstanciaPage() {
     const tempId = `tmp-${Date.now()}`
     setAddingId(tempId)
     try {
-      const novo = await api.addInstanciaMembro(instancia.id, { entidadeTipo: tipo, entidadeId, papel, atribuicaoIds })
+      const novo = await api.addInstanciaMembro(instancia.id, { entidadeTipo: tipo, entidadeId, papel })
       setMembros(prev => [...prev, { ...novo, displayName: nome }])
     } finally {
       setAddingId(null)
