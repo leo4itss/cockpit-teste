@@ -642,18 +642,17 @@ export function InstanciaDetailSheet({
                               </div>
                             </div>
                           </td>
-                          {!atribuicoesDocnix && (
-                            <td className="px-3 py-3">
-                              {canManage ? (
-                                <PapelEditor
-                                  papel={membro.papel}
-                                  onSave={(novo) => handleSavePapel(membro, novo)}
-                                />
-                              ) : (
-                                <PapelBadge papel={membro.papel} />
-                              )}
-                            </td>
-                          )}
+                          <td className="px-3 py-3">
+                            {/* FGA: editor inline; DocNix: badge read-only (papel = nome do role DocNix) */}
+                            {canManage && !atribuicoesDocnix ? (
+                              <PapelEditor
+                                papel={membro.papel}
+                                onSave={(novo) => handleSavePapel(membro, novo)}
+                              />
+                            ) : (
+                              <PapelBadge papel={membro.papel} />
+                            )}
+                          </td>
                           <td className="pr-6 pl-3 py-3 text-right">
                             <div className="flex items-center justify-end gap-1 invisible group-hover:visible">
                               {/* Botão unificado de permissões (FGA ou DocNix) */}
