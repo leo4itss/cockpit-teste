@@ -584,7 +584,7 @@ export function PermissoesMembroSheet({
                     <Users className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                     <p className="text-sm text-emerald-800">
                       Itens marcados com <strong>Via Grupo</strong> vêm de grupos do usuário.
-                      Para alterá-los, edite as atribuições do grupo correspondente.
+                      Para alterá-los, edite as ações do grupo correspondente.
                     </p>
                   </div>
                 )}
