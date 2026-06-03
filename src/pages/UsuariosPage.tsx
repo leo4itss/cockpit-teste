@@ -192,10 +192,6 @@ export function UsuariosPage() {
 
   // ── Handlers ──────────────────────────────────────────────
 
-  function handleConvidarSuccess(user: User) {
-    setUsers(prev => prev.find(u => u.id === user.id) ? prev : [...prev, user])
-  }
-
   function handleCriarSuccess(user: User) {
     setUsers(prev => prev.find(u => u.id === user.id) ? prev : [...prev, user])
   }
