@@ -232,8 +232,7 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
   const [showAdd, setShowAdd]           = useState(false)
   const [addingId, setAddingId]         = useState<string | null>(null)
   const [removingId, setRemovingId]     = useState<string | null>(null)
-  const [showAtribuir, setShowAtribuir] = useState(false)
-  // Papel local — permite edição inline sem recarregar a lista pai
+// Papel local — permite edição inline sem recarregar a lista pai
   const [localPapel, setLocalPapel]     = useState(grupo?.papel ?? '')
 
   // Sincroniza papel local quando o grupo muda
