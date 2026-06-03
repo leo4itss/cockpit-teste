@@ -474,7 +474,7 @@ export function PermissoesMembroSheet({
           <div className="px-6 py-5 space-y-4">
             {/* Seletor de papel */}
             <div className="space-y-2">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Nível de acesso</p>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Papel</p>
               {PAPEL_OPTIONS.map(opt => (
                 <label
                   key={opt.value}
