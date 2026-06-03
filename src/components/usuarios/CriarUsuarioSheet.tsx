@@ -89,6 +89,7 @@ interface Props {
   open:       boolean
   onClose:    () => void
   onSuccess?: (user: User) => void
+  accountId?: string   // quando fornecido, habilita seleção de papel e grupo
 }
 
 // ── Componente ────────────────────────────────────────────────
