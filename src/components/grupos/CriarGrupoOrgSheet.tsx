@@ -236,10 +236,10 @@ export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, grupos 
             />
           </div>
 
-          {/* Nível de Acesso — seletor visual */}
+          {/* Papel — seletor visual */}
           <div className="flex flex-col gap-2">
-            <FieldLabel required hint="Define o nível de acesso padrão dos membros deste grupo.">
-              Nível de Acesso
+            <FieldLabel required hint="Define o papel padrão dos membros deste grupo.">
+              Papel
             </FieldLabel>
             <div className="grid grid-cols-3 gap-2">
               {PAPEIS.map(p => (
