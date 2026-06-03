@@ -1215,6 +1215,26 @@ app.post('/api/instancias/:id/membros', async (c) => {
 })
 
 /**
+ * PUT /api/instancias/:id/membros/:membroId
+ * Body: { papel: string }
+ * Atualiza o papel de um membro existente.
+ */
+app.put('/api/instancias/:id/membros/:membroId', async (c) => {
+  const instanciaId = c.req.param('id')
+  const membroId    = c.req.param('membroId')
+  const body        = await c.req.json()
+  const { papel }   = body
+  if (!papel) return c.json({ error: 'papel é obrigatório' }, 400)
+  const [row] = await db
+    .update(instanciaMembros)
+    .set({ papel })
+    .where(and(eq(instanciaMembros.id, membroId), eq(instanciaMembros.instanciaId, instanciaId)))
+    .returning()
+  if (!row) return c.json({ error: 'Membro não encontrado' }, 404)
+  return c.json(row)
+})
+
+/**
  * DELETE /api/instancias/:id/membros/:membroId
  * membroId = id da linha em instancia_membros (não o entidadeId).
  */
