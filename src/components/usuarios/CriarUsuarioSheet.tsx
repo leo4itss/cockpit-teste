@@ -164,6 +164,9 @@ export function CriarUsuarioSheet({ open, onClose, onSuccess, accountId }: Props
     setForm({ ...EMPTY_FORM })
     setErrors({})
     setSaveError(null)
+    setPapel('')
+    setGrupoId('')
+    setGrupos([])
     onClose()
   }
 
