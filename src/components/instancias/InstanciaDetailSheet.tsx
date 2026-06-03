@@ -695,10 +695,17 @@ export function InstanciaDetailSheet({
                             </div>
                           </td>
                           <td className="px-3 py-3">
-                            {/* FGA: editor inline; DocNix: badge read-only (papel = nome do role DocNix) */}
                             {canManage && !atribuicoesDocnix ? (
+                              /* FGA: seletor Visualizador / Membro / Administrador */
                               <PapelEditor
                                 papel={membro.papel}
+                                onSave={(novo) => handleSavePapel(membro, novo)}
+                              />
+                            ) : canManage && atribuicoesDocnix ? (
+                              /* DocNix: seletor com roles do módulo (MaxDoc ou DocAction) */
+                              <PapelEditorDocNix
+                                papel={membro.papel}
+                                modulo={componenteNome}
                                 onSave={(novo) => handleSavePapel(membro, novo)}
                               />
                             ) : (
