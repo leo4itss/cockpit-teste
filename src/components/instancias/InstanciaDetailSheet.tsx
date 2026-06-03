@@ -24,6 +24,7 @@ import { Button } from '@/components/ui/Button'
 import { PermissoesMembroSheet } from '@/components/instancias/PermissoesMembroSheet'
 import { api } from '@/api/client'
 import { useCanManageInstanciaMembros } from '@/authz/hooks'
+import { mockDocNixPapeis } from '@/authz/mock'
 import { cn } from '@/lib/utils'
 import type {
   Instancia, InstanciaMembro, User, Grupo, Atribuicao,
