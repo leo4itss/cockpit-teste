@@ -134,3 +134,37 @@ export const mockPersonas: Persona[] = [
     color: 'from-rose-400 to-pink-500',
   },
 ]
+
+// ── Papéis disponíveis (consumidos do FGA) ────────────────────
+//
+// Em produção, esta lista seria obtida via API do OpenFGA para a
+// solução/conta em questão. No PoC, é uma lista estática que
+// simula o que o FGA exporia.
+//
+// O Cockpit nunca permite criar ou editar papéis — apenas selecioná-los.
+
+export const mockPapeisDisponiveis: {
+  value: string
+  label: string
+  desc: string
+  cls: string
+}[] = [
+  {
+    value: 'Viewer',
+    label: 'Visualizador',
+    desc: 'Acesso de leitura e consulta',
+    cls: 'bg-gray-100 text-gray-600 border-gray-200',
+  },
+  {
+    value: 'User',
+    label: 'Usuário',
+    desc: 'Uso padrão da solução',
+    cls: 'bg-blue-50 text-blue-700 border-blue-200',
+  },
+  {
+    value: 'Admin',
+    label: 'Administrador',
+    desc: 'Acesso completo à gestão',
+    cls: 'bg-orange-50 text-orange-700 border-orange-200',
+  },
+]
