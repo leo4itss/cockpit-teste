@@ -288,32 +288,8 @@ export function InstanciaDetailSheet({
   // Atribuições do componente (para multi-select ao adicionar membro)
   const [atribuicoes, setAtribuicoes]           = useState<Atribuicao[]>([])
 
-  // ── State: Abas ───────────────────────────────────────────
-  const [activeTab, setActiveTab]               = useState<ActiveTab>('membros')
-  const [showAtivarFases, setShowAtivarFases]   = useState(false)
-  const [showAtivarPerfil, setShowAtivarPerfil] = useState(false)
-
   // ── State: Restringir Acesso (local para refletir toggle imediatamente) ──
   const [restringirAcesso, setRestringirAcesso] = useState(instancia?.restringirAcesso ?? false)
-
-  // ── State: Fases ──────────────────────────────────────────
-  const [fases, setFases]                       = useState<InstanciaFase[]>([])
-  const [fasesLoaded, setFasesLoaded]           = useState(false)
-  const [novaFaseNome, setNovaFaseNome]         = useState('')
-  const [faseAtribPermitidas, setFaseAtribPermitidas] = useState<Record<string, string[]>>({})
-  const [fasesExpandidas, setFasesExpandidas]   = useState<Set<string>>(new Set())
-
-  // ── State: Fluxo Padrão ───────────────────────────────────
-  const [faseComResponsaveis, setFaseComResponsaveis] = useState<Record<string, FaseResponsavel[]>>({})
-  const [tipoResp, setTipoResp]                 = useState<'usuario' | 'grupo' | 'cargo' | 'area'>('usuario')
-  const [entidadeIdResp, setEntidadeIdResp]     = useState('')
-  const [faseSelecionadaFluxo, setFaseSelecionadaFluxo] = useState<string>('')
-
-  // ── State: Perfil de Objeto ───────────────────────────────
-  const [perfilSlots, setPerfilSlots]           = useState<InstanciaPerfilSlot[]>([])
-  const [slotsLoaded, setSlotsLoaded]           = useState(false)
-  const [novoSlotNome, setNovoSlotNome]         = useState('')
-  const [novoSlotAtribId, setNovoSlotAtribId]   = useState('')
 
   const canManage = useCanManageInstanciaMembros(instancia?.id ?? '', accountId)
 
@@ -322,34 +298,7 @@ export function InstanciaDetailSheet({
     if (!instancia) return
     setLoading(true)
     setShowAdd(false)
-    setActiveTab('membros')
-    setFasesLoaded(false)
-    setSlotsLoaded(false)
-    setFases([])
-    setPerfilSlots([])
-    setFaseComResponsaveis({})
-    setFaseAtribPermitidas({})
-    setFasesExpandidas(new Set())
-    setShowAtivarFases(false)
-    setShowAtivarPerfil(false)
     setRestringirAcesso(instancia.restringirAcesso ?? false)
-
-    // Fases e slots carregados eagerly para progressive disclosure (DocNix)
-    if (componenteTipoModelo === 'docnix') {
-      api.getFases(instancia.id)
-        .then(data => {
-          setFases(data.sort((a: InstanciaFase, b: InstanciaFase) => a.ordem - b.ordem))
-          setFasesLoaded(true)
-        })
-        .catch(() => setFasesLoaded(true))
-
-      api.getPerfilSlots(instancia.id)
-        .then(data => {
-          setPerfilSlots(data.sort((a: InstanciaPerfilSlot, b: InstanciaPerfilSlot) => a.ordem - b.ordem))
-          setSlotsLoaded(true)
-        })
-        .catch(() => setSlotsLoaded(true))
-    }
 
     Promise.all([
       api.getInstanciaMembros(instancia.id),
@@ -382,26 +331,6 @@ export function InstanciaDetailSheet({
         .catch(() => setAtribuicoes([]))
     }
   }, [instancia?.componenteId])
-
-  // Carregar fases quando aba ativa
-  useEffect(() => {
-    if ((activeTab === 'fases' || activeTab === 'fluxo') && instancia && !fasesLoaded) {
-      api.getFases(instancia.id).then(data => {
-        setFases(data.sort((a: InstanciaFase, b: InstanciaFase) => a.ordem - b.ordem))
-        setFasesLoaded(true)
-      }).catch(() => setFasesLoaded(true))
-    }
-  }, [activeTab, instancia, fasesLoaded])
-
-  // Carregar slots de perfil quando aba ativa
-  useEffect(() => {
-    if (activeTab === 'perfil' && instancia && !slotsLoaded) {
-      api.getPerfilSlots(instancia.id).then(data => {
-        setPerfilSlots(data.sort((a: InstanciaPerfilSlot, b: InstanciaPerfilSlot) => a.ordem - b.ordem))
-        setSlotsLoaded(true)
-      }).catch(() => setSlotsLoaded(true))
-    }
-  }, [activeTab, instancia, slotsLoaded])
 
   async function handleAdd(
     entidadeTipo: 'user' | 'group',
