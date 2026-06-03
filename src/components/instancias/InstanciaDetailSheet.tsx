@@ -196,7 +196,7 @@ function AddMembroSection({
         </div>
       ) : (
         <div>
-          <label className="text-xs text-gray-500 font-medium">Atribuições</label>
+          <label className="text-xs text-gray-500 font-medium">Ações</label>
           <div className="mt-1 space-y-1 max-h-48 overflow-y-auto border border-gray-200 rounded-md p-2 bg-white">
             {atribuicoesAtivas.map(a => (
               <label key={a.id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 rounded px-1 py-0.5">
