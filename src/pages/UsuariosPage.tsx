@@ -9,7 +9,7 @@ import {
   type ContaVinculada,
 } from '@/components/usuarios/UsuarioDetailOrgSheet'
 import { api } from '@/api/client'
-import { useAuthz, useIsPlatformAdmin, useIsOrgAdmin } from '@/authz/hooks'
+import { useAuthz } from '@/authz/hooks'
 import { cn } from '@/lib/utils'
 import type { User, Account } from '@/types'
 import {
