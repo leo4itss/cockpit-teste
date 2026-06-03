@@ -192,8 +192,9 @@ function AddMembroSection({
 
   return (
     <div className="px-6 py-3 border-t border-gray-100 bg-gray-50/60 space-y-2">
-      {/* Seletor de papel (apenas se não houver atribuições) */}
+      {/* Seletor de papel / ações */}
       {atribuicoesAtivas.length === 0 ? (
+        /* FGA — seletor de papel fixo */
         <div className="flex items-center gap-2">
           <span className="text-xs text-gray-500">Papel:</span>
           {PAPEIS_INSTANCIA.map(p => (
@@ -209,7 +210,75 @@ function AddMembroSection({
             </button>
           ))}
         </div>
+      ) : papeisDocNix.length > 0 ? (
+        /* DocNix — role cards + checkboxes colapsáveis */
+        <div className="space-y-2">
+          <p className="text-xs text-gray-500 font-medium">Papel</p>
+          <div className="grid grid-cols-3 gap-1.5">
+            {papeisDocNix.map(p => (
+              <button
+                key={p.value}
+                type="button"
+                onClick={() => handlePapelDocNix(p.value)}
+                className={cn(
+                  'flex flex-col items-start px-2.5 py-2 rounded-lg border text-left transition-colors',
+                  papelDocNix === p.value
+                    ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
+                    : 'border-gray-200 bg-white hover:bg-gray-50'
+                )}
+              >
+                <span className="text-xs font-medium text-[#030712]">{p.label}</span>
+                <span className="text-[10px] text-[#6b7280] mt-0.5 leading-tight">{p.desc}</span>
+              </button>
+            ))}
+            {/* Card Personalizado */}
+            <button
+              type="button"
+              onClick={() => { setPapelDocNix('personalizado'); setSelectedAtribuicoes([]) }}
+              className={cn(
+                'flex flex-col items-start px-2.5 py-2 rounded-lg border text-left transition-colors',
+                papelDocNix === 'personalizado'
+                  ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
+                  : 'border-gray-200 bg-white hover:bg-gray-50'
+              )}
+            >
+              <span className="text-xs font-medium text-[#030712]">Personalizado</span>
+              <span className="text-[10px] text-[#6b7280] mt-0.5 leading-tight">Selecionar manualmente</span>
+            </button>
+          </div>
+
+          {/* Checkboxes colapsáveis — abertos no modo Personalizado */}
+          <details open={papelDocNix === 'personalizado'}>
+            <summary className="text-xs text-blue-600 cursor-pointer hover:underline select-none">
+              {selectedAtribuicoes.length > 0
+                ? `${selectedAtribuicoes.length} ações selecionadas ▾`
+                : 'Ver ações ▾'}
+            </summary>
+            <div className="mt-1 space-y-0.5 max-h-40 overflow-y-auto border border-gray-200 rounded-md p-2 bg-white">
+              {atribuicoesAtivas.map(a => (
+                <label key={a.id} className="flex items-center gap-2 text-xs cursor-pointer hover:bg-gray-50 rounded px-1 py-0.5">
+                  <input
+                    type="checkbox"
+                    checked={selectedAtribuicoes.includes(a.id)}
+                    onChange={e => {
+                      setPapelDocNix('personalizado')
+                      if (e.target.checked) {
+                        setSelectedAtribuicoes(prev => [...prev, a.id])
+                      } else {
+                        setSelectedAtribuicoes(prev => prev.filter(id => id !== a.id))
+                      }
+                    }}
+                    className="rounded"
+                  />
+                  <span>{a.nome}</span>
+                  {a.modulo && <span className="text-[#9ca3af]">({a.modulo})</span>}
+                </label>
+              ))}
+            </div>
+          </details>
+        </div>
       ) : (
+        /* DocNix sem módulo reconhecido — fallback checkboxes */
         <div>
           <label className="text-xs text-gray-500 font-medium">Ações</label>
           <div className="mt-1 space-y-1 max-h-48 overflow-y-auto border border-gray-200 rounded-md p-2 bg-white">
