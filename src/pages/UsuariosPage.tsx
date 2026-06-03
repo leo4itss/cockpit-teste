@@ -405,12 +405,6 @@ export function UsuariosPage() {
         onClose={() => setShowCriar(false)}
         onSuccess={handleCriarSuccess}
       />
-      <ConvidarUsuarioSheet
-        open={showConvidar}
-        onClose={() => setShowConvidar(false)}
-        modo="org"
-        onSuccess={handleConvidarSuccess}
-      />
       <UsuarioDetailOrgSheet
         open={showDetail}
         onClose={() => setShowDetail(false)}
