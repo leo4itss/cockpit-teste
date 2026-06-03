@@ -187,6 +187,7 @@ function AddMembroSection({
     onAdd(item.tipo, item.id, item.nome, papel, selectedAtribuicoes)
     setSearch('')
     setSelectedAtribuicoes([])
+    setPapelDocNix('personalizado')
   }
 
   return (
