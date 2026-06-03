@@ -398,14 +398,6 @@ export function InstanciaDetailSheet({
   const isDocNix = componenteTipoModelo === 'docnix'
   const atribuicoesDocnix = isDocNix  // mantém compatibilidade com usos existentes
 
-  // Progressive disclosure: abas Fases/Perfil só aparecem quando há dados
-  const mostraFases  = isDocNix && fasesLoaded  && fases.length > 0
-  const mostraPerfil = isDocNix && slotsLoaded  && perfilSlots.length > 0
-  const tabList: ActiveTab[] = [
-    'membros',
-    ...(mostraFases  ? ['fases' as ActiveTab, 'fluxo' as ActiveTab] : []),
-    ...(mostraPerfil ? ['perfil' as ActiveTab] : []),
-  ]
   const grupoNomes = useMemo(
     () => Object.fromEntries(allGrupos.map(g => [g.id, g.nome])),
     [allGrupos],
@@ -417,13 +409,6 @@ export function InstanciaDetailSheet({
   const tipoLabel = componenteNome
     ? componenteNome
     : instancia.componenteId.replace('comp-', '').replace(/-/g, ' ')
-
-  const TAB_LABELS: Record<ActiveTab, string> = {
-    membros: 'Membros',
-    fases:   'Fases',
-    fluxo:   'Fluxo Padrão',
-    perfil:  'Perfil de Objeto',
-  }
 
   return (
     <NestedSheet open={open} onClose={handleClose} width="w-[600px]">
@@ -443,26 +428,9 @@ export function InstanciaDetailSheet({
       </NestedSheetHeader>
 
       <NestedSheetBody noPadding>
-        {/* ── Navegação de abas ─────────────────────────────── */}
-        <div className="flex border-b border-gray-200 px-6">
-          {tabList.map(tab => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
-                activeTab === tab
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              {TAB_LABELS[tab]}
-            </button>
-          ))}
-        </div>
+        {/* ── Conteúdo: Membros ─────────────────────────────── */}
+        <>
 
-        {/* ── Aba: Membros ──────────────────────────────────── */}
-        {activeTab === 'membros' && (
-          <>
             {/* Toggle: Restringir Acesso — exclusivo DocNix */}
             {canManage && isDocNix && (
               <div className="flex items-center justify-between px-6 py-3 border-b border-gray-100 bg-gray-50/60">
