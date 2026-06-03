@@ -69,15 +69,23 @@ function FieldLabel({ children, required, hint }: {
   )
 }
 
-// Papéis disponíveis — consumidos do mock FGA (em produção viriam via API)
-const PAPEIS_OPCOES = mockPapeisDisponiveis
-
 // ── Componente principal ──────────────────────────────────────
 
-export function CriarGrupoSheet({ open, onClose, accountId, grupos = [], onSuccess }: Props) {
+export function CriarGrupoSheet({ open, onClose, accountId, grupos = [], modulosDocNix = [], onSuccess }: Props) {
+  const isDocNix = modulosDocNix.length > 0
+
+  // Papéis disponíveis: DocNix ou FGA
+  const papeisDocNixFiltrados = useMemo(
+    () => mockDocNixPapeis.filter(p => modulosDocNix.includes(p.modulo)),
+    [modulosDocNix],
+  )
+  const defaultPapel = isDocNix
+    ? (papeisDocNixFiltrados[0]?.value ?? 'leitor')
+    : 'User'
+
   const [nome, setNome]           = useState('')
   const [descricao, setDescricao] = useState('')
-  const [papel, setPapel]         = useState('User')
+  const [papel, setPapel]         = useState(defaultPapel)
   const [parentId, setParentId]   = useState<string | null>(null)
   const [searchMembro, setSearchMembro] = useState('')
   const [allUsers, setAllUsers]   = useState<User[]>([])
