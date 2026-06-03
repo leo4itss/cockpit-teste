@@ -679,7 +679,7 @@ export function PermissoesMembroSheet({
                     )}
                     {!isUser && (
                       <span className="ml-2 text-gray-400">
-                        — membros do grupo herdam estas atribuições
+                        — membros do grupo herdam estas ações
                       </span>
                     )}
                   </div>
