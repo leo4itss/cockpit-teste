@@ -140,6 +140,58 @@ function PapelEditor({
   )
 }
 
+// Editor inline de papel para membro de instância DocNix (usa mockDocNixPapeis)
+function PapelEditorDocNix({
+  papel, modulo, onSave,
+}: { papel: string; modulo: string | null; onSave: (novo: string) => Promise<void> }) {
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft]     = useState(papel)
+  const [saving, setSaving]   = useState(false)
+
+  useEffect(() => { setDraft(papel); setEditing(false) }, [papel])
+
+  const papeis = modulo
+    ? mockDocNixPapeis.filter(p => p.modulo === modulo)
+    : mockDocNixPapeis
+
+  async function handleSave() {
+    if (draft === papel) { setEditing(false); return }
+    setSaving(true)
+    try { await onSave(draft) }
+    finally { setSaving(false); setEditing(false) }
+  }
+
+  if (!editing) {
+    return (
+      <button onClick={() => setEditing(true)} className="group flex items-center gap-1" title="Editar papel">
+        <PapelBadge papel={papel} />
+      </button>
+    )
+  }
+
+  return (
+    <div className="flex items-center gap-1.5">
+      <select
+        value={draft}
+        onChange={e => setDraft(e.target.value)}
+        disabled={saving}
+        autoFocus
+        className="text-xs border border-gray-300 rounded-md px-2 py-1 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+      >
+        {papeis.map(p => (
+          <option key={p.value} value={p.value}>{p.label} — {p.desc}</option>
+        ))}
+      </select>
+      <button onClick={handleSave} disabled={saving} className="p-1 rounded text-green-600 hover:bg-green-50 transition-colors disabled:opacity-50" title="Confirmar">
+        {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+      </button>
+      <button onClick={() => { setDraft(papel); setEditing(false) }} disabled={saving} className="p-1 rounded text-gray-400 hover:bg-gray-100 transition-colors" title="Cancelar">
+        <X className="w-3.5 h-3.5" />
+      </button>
+    </div>
+  )
+}
+
 // Seção de busca para adicionar usuário ou grupo
 function AddMembroSection({
   allUsers, allGrupos, membros, onAdd, disabled, atribuicoes,
