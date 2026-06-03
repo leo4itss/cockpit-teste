@@ -256,9 +256,9 @@ export function UsuariosPage() {
               <span className="ml-0.5 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-700 leading-none">Dev</span>
             </button>
           )}
-          <Button onClick={() => setShowConvidar(true)}>
+          <Button onClick={() => setShowCriar(true)}>
             <Plus className="w-4 h-4 mr-1.5" />
-            Convidar usuário
+            Criar usuário
           </Button>
         </div>
       </div>
