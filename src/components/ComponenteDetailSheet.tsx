@@ -232,7 +232,7 @@ export function ComponenteDetailSheet({ open, onClose, componente, onEdit }: Pro
                 ))}
               </div>
 
-              {/* Lista de atribuições inativas */}
+              {/* Lista de ações inativas */}
               {atribuicoes.filter(a => a.status === 'Inativo').length > 0 && (
                 <div className="flex flex-col gap-2">
                   <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Inativas</p>
