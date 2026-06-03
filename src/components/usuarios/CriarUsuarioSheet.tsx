@@ -254,16 +254,14 @@ export function CriarUsuarioSheet({ open, onClose, onSuccess, accountId }: Props
                 {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
               </div>
 
-              <div>
-                <Input
-                  label="Senha"
-                  required
-                  placeholder="Crie uma senha"
-                  type="password"
-                  value={form.senha}
-                  onChange={e => set('senha', e.target.value)}
-                />
-                {errors.senha && <p className="mt-1 text-xs text-red-600">{errors.senha}</p>}
+              <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-blue-100 bg-blue-50">
+                <svg className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 110 20A10 10 0 0112 2z" />
+                </svg>
+                <p className="text-xs text-blue-700 leading-relaxed">
+                  A senha será definida pelo próprio usuário após a criação da conta,
+                  por meio de um e-mail de primeiro acesso.
+                </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
