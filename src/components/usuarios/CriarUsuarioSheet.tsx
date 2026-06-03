@@ -120,7 +120,6 @@ export function CriarUsuarioSheet({ open, onClose, onSuccess, accountId }: Props
     if (!form.nomeCompleto.trim()) e.nomeCompleto = 'Nome obrigatório'
     if (!form.usuario.trim())      e.usuario      = 'Usuário obrigatório'
     if (!form.email.trim())        e.email        = 'E-mail obrigatório'
-    if (!form.senha.trim())        e.senha        = 'Senha obrigatória'
     setErrors(e)
     return Object.keys(e).length === 0
   }
