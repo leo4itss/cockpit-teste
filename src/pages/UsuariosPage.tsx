@@ -61,8 +61,6 @@ function MetricCard({ label, value, loading }: { label: string; value: number; l
 
 export function UsuariosPage() {
   const { currentUser, relations } = useAuthz()
-  const isPlatformAdmin = useIsPlatformAdmin()
-  const isOrgAdmin      = useIsOrgAdmin()
   const adminOrgId = relations.orgAdmins.find(a => a.userId === currentUser.id)?.orgId ?? '1'
 
   // ── Estado ────────────────────────────────────────────────
