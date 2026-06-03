@@ -153,7 +153,10 @@ async function seed() {
         papel: m.papel,
         assignedAt: createdAt,
       })
-      .onConflictDoNothing()
+      .onConflictDoUpdate({
+        target: instanciaMembros.id,
+        set: { papel: m.papel },
+      })
 
     for (const atribuicaoId of m.atribuicaoIds) {
       const linkId = `${m.id}-${atribuicaoId}`
