@@ -758,12 +758,6 @@ export function AcessosPage() {
         onClose={() => setShowCriarSheet(false)}
         onSuccess={handleCriarSuccess}
       />
-      <ConvidarUsuarioSheet
-        open={showConvidarSheet}
-        onClose={() => setShowConvidarSheet(false)}
-        accountId={accountId}
-        onSuccess={handleConvidarSuccess}
-      />
       <UsuarioDetailAccountSheet
         open={showDetailSheet}
         onClose={() => setShowDetailSheet(false)}
