@@ -246,16 +246,6 @@ export function UsuariosPage() {
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0 mt-1">
-          {(isPlatformAdmin || isOrgAdmin) && (
-            <button
-              onClick={() => setShowCriar(true)}
-              className="inline-flex items-center gap-1.5 h-9 px-3 rounded-md border border-gray-200 bg-white text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              Criar usuário
-              <span className="ml-0.5 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-700 leading-none">Dev</span>
-            </button>
-          )}
           <Button onClick={() => setShowCriar(true)}>
             <Plus className="w-4 h-4 mr-1.5" />
             Criar usuário
