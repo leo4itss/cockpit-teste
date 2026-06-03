@@ -816,7 +816,7 @@ export function InstanciaDetailSheet({
             {/* ── Configurações da instância (DocNix) ─────────── */}
             {canManage && isDocNix && fasesLoaded && slotsLoaded && (!mostraFases || !mostraPerfil) && (
               <div className="border-b border-gray-100 px-6 py-4 space-y-3">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Configurações da instância</p>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Configurações do objeto</p>
 
                 {/* Ativar Fases */}
                 {!mostraFases && (
