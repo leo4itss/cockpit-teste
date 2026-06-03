@@ -37,6 +37,7 @@ export default function App() {
           <Route path="canvas"       element={<CanvasPermissoesPage />} />
           <Route path="canvas-org"   element={<CanvasOrgPage />} />
         </Route>
+        <Route path="/instancia/:id" element={<InstanciaPage />} />
         <Route path="/organizacoes/:id" element={<DetailLayout />}>
           <Route index element={<OrganizacaoDetailPage />} />
         </Route>
