@@ -3,11 +3,10 @@
  *
  * Funcionalidades:
  *   - Exibe nome, componente e conta da instância
- *   - Abas: Membros | Fases | Fluxo Padrão | Perfil de Objeto
- *   - Membros: lista com papel (viewer/member/admin) ou multi-select de atribuições
- *   - Fases: CRUD de fases da instância
- *   - Fluxo Padrão: responsáveis por fase
- *   - Perfil de Objeto: slots de perfil da instância
+ *   - Membros: lista com papel (viewer/member/admin) ou ações DocNix
+ *
+ * Etapa 7: abas Fases / Fluxo Padrão / Perfil de Objeto removidas desta sheet.
+ * A complexidade DocNix fica isolada — exposta apenas via ferramentas internas.
  */
 
 import { useState, useEffect, useMemo } from 'react'
