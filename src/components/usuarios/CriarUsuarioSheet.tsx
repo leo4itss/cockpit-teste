@@ -94,12 +94,22 @@ interface Props {
 
 // ── Componente ────────────────────────────────────────────────
 
-export function CriarUsuarioSheet({ open, onClose, onSuccess }: Props) {
+export function CriarUsuarioSheet({ open, onClose, onSuccess, accountId }: Props) {
   const [form, setForm]                   = useState({ ...EMPTY_FORM })
   const [etiquetaDialogOpen, setEtiquetaDialogOpen] = useState(false)
   const [saving, setSaving]               = useState(false)
   const [errors, setErrors]               = useState<Record<string, string>>({})
   const [saveError, setSaveError]         = useState<string | null>(null)
+  // Papel + Grupo
+  const [papel, setPapel]                 = useState('')
+  const [grupoId, setGrupoId]             = useState('')
+  const [grupos, setGrupos]               = useState<Grupo[]>([])
+
+  // Carrega grupos da conta ao abrir
+  useEffect(() => {
+    if (!open || !accountId) return
+    api.getGrupos({ accountId }).then(setGrupos).catch(() => setGrupos([]))
+  }, [open, accountId])
 
   function set(field: string, value: string) {
     setForm(f => ({ ...f, [field]: value }))
