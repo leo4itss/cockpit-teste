@@ -151,7 +151,7 @@ function AddMembroPanel({
   atribuicoes: Atribuicao[]
   isDocNix:    boolean
   modulo:      string | null
-  onAdd:       (tipo: 'user' | 'group', id: string, nome: string, papel: string, atribuicaoIds: string[]) => void
+  onAdd:       (tipo: 'user' | 'group', id: string, nome: string, papel: string) => void
   onClose:     () => void
 }) {
   const [search, setSearch]                           = useState('')
