@@ -723,7 +723,7 @@ export function OrganizacaoDetailPage() {
                   return (
                     <Button onClick={() => {
                       if (tab === 'conta')    setSheetAccount(true)
-                      else if (tab === 'usuarios')  setShowConvidarUsuario(true)
+                      else if (tab === 'usuarios')  setShowCriarUsuario(true)
                       else if (tab === 'solucoes')  setSheetSolution(true)
                       else if (tab === 'contrato')  setSheetContract(true)
                     }}>
