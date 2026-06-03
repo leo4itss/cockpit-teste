@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Upload, Plus } from 'lucide-react'
 import {
   NestedSheet,
@@ -13,7 +13,9 @@ import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 import { EtiquetaDialog } from '@/components/EtiquetaDialog'
 import { api } from '@/api/client'
-import type { User } from '@/types'
+import { mockPapeisDisponiveis } from '@/authz/mock'
+import { cn } from '@/lib/utils'
+import type { User, Grupo } from '@/types'
 
 // ── Opções dos selects (espelho do EditUserSheet) ─────────────
 
