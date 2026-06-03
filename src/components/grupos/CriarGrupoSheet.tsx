@@ -99,6 +99,12 @@ export function CriarGrupoSheet({ open, onClose, accountId, grupos = [], modulos
     [grupos, accountId]
   )
 
+  // Reset papel ao default correto quando o sheet abre
+  useEffect(() => {
+    if (!open) return
+    setPapel(defaultPapel)
+  }, [open, defaultPapel])
+
   // Carrega usuários para busca de membros
   useEffect(() => {
     if (!open) return
