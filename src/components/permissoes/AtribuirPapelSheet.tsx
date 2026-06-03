@@ -235,7 +235,7 @@ export function AtribuirPapelSheet({
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Componente</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide w-[130px]">Conta</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide w-[160px]">Nível de Acesso</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide w-[160px]">Papel</th>
                   </tr>
                 </thead>
                 <tbody>
