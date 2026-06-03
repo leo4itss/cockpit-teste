@@ -337,9 +337,9 @@ export interface Instancia {
 /**
  * Membro de uma instância — pode ser usuário ou grupo.
  *
- * papel: 'viewer' → leitura/consulta
- *        'member' → uso padrão
- *        'admin'  → acesso completo + gerenciar membros da instância
+ * papel: valor livre por tipo de componente (ex: 'viewer'|'member'|'admin' para FGA genérico;
+ *        'leitor'|'editor'|'revisor'|'aprovador'|'admin-maxdoc' para MaxDoc;
+ *        'colaborador'|'analista'|'aprovador-docaction'|'admin-docaction' para DocAction; etc.)
  *
  * Tupla FGA: user:<entidadeId>  <papel> instance:<instanciaId>
  *            group:<entidadeId> <papel> instance:<instanciaId>
@@ -349,7 +349,7 @@ export interface InstanciaMembro {
   instanciaId:  string
   entidadeTipo: 'user' | 'group'
   entidadeId:   string
-  papel:        'viewer' | 'member' | 'admin'
+  papel:        string
   assignedAt:   string
   // enriquecido pelo backend
   displayName?: string
