@@ -180,7 +180,7 @@ function AddMembroSection({
       {/* Seletor de papel (apenas se não houver atribuições) */}
       {atribuicoesAtivas.length === 0 ? (
         <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-500">Nível de acesso:</span>
+          <span className="text-xs text-gray-500">Papel:</span>
           {PAPEIS_INSTANCIA.map(p => (
             <button
               key={p.value}
