@@ -71,6 +71,7 @@ function PapelBadge({ papel }: { papel?: string }) {
 
 export function AcessosPage() {
   const [searchParams, setSearchParams] = useSearchParams()
+  const navigate = useNavigate()
   const abaParam = searchParams.get('aba') as Aba | null
   const abaAtiva: Aba = abaParam === 'grupos' ? 'grupos' : abaParam === 'instancias' ? 'instancias' : 'usuarios'
 
