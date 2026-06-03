@@ -435,10 +435,10 @@ export function CriarUsuarioSheet({ open, onClose, onSuccess, accountId }: Props
                       </p>
                       <div className="flex flex-wrap gap-2 mt-0.5">
                         {papel && (() => {
-                          const p = mockPapeisDisponiveis.find(p => p.value === papel)
+                          const p = NIVEIS_CONTA.find(p => p.value === papel)
                           return p ? (
                             <span className={cn('inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border', p.cls)}>
-                              Papel: {p.label}
+                              {p.label}
                             </span>
                           ) : null
                         })()}
