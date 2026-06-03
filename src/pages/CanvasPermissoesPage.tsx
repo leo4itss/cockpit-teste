@@ -947,7 +947,7 @@ export default function CanvasPermissoesPage() {
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="w-5 border-t-2 border-dashed" style={{ borderColor: theme.instBorder }} />
-                        <span className="text-[10px]" style={{ color: theme.legendSub }}>acesso à instância</span>
+                        <span className="text-[10px]" style={{ color: theme.legendSub }}>acesso ao objeto</span>
                       </div>
                     </div>
                   </div>
