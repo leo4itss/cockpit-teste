@@ -788,7 +788,7 @@ export function AcessosPage() {
         open={showCriarGrupoSheet}
         onClose={() => setShowCriarGrupoSheet(false)}
         accountId={accountId}
-        modulosDocNix={modulosDocNix}
+        modulosAtivos={modulosAtivos}
         onSuccess={grupo => setGrupos(prev => [...prev, grupo])}
       />
       <GrupoDetailSheet
