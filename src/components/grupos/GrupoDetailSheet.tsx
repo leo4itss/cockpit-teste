@@ -64,12 +64,8 @@ function EscopoBadge({ escopo }: { escopo: 'org' | 'conta' }) {
     : <Badge variant="default" className="bg-violet-50 text-violet-700 border border-violet-200">Conta</Badge>
 }
 
-// Opções de papel — alinhadas com benchmark Auth0 FGA
-const PAPEIS_OPCOES = [
-  { value: 'Viewer', label: 'Visualizador',  desc: 'Leitura e consulta',    cls: 'bg-gray-100 text-gray-600 border-gray-200' },
-  { value: 'User',   label: 'Usuário',       desc: 'Uso padrão',            cls: 'bg-blue-50 text-blue-700 border-blue-200' },
-  { value: 'Admin',  label: 'Administrador', desc: 'Acesso completo',       cls: 'bg-orange-50 text-orange-700 border-orange-200' },
-]
+// Papéis disponíveis — consumidos do mock FGA (em produção viriam via API)
+const PAPEIS_OPCOES = mockPapeisDisponiveis
 
 
 // Editor inline de papel — dropdown com confirm/cancel
