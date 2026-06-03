@@ -320,15 +320,8 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
     } catch { /* silencioso — mudança já aplicada localmente */ }
   }
 
-  // ── Atribuir permissões ──────────────────────────────────
-
-  function handleAtribuirSuccess() {
-    console.info('[FGA] Permissões atualizadas para o grupo:', grupo?.nome)
-  }
-
   function handleClose() {
     setMembros([]); setAllUsers([]); setShowAdd(false)
-    setShowAtribuir(false)
     onClose()
   }
 
