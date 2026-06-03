@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import { Search, Plus, Ellipsis, FilePen, UserX, UserCheck, Eye, Trash2, Building2, ChevronDown } from 'lucide-react'
 import { useSessionState } from '@/hooks/useSessionState'
 import { useAdminOrgId } from '@/authz/hooks'
