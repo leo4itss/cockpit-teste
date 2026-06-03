@@ -705,7 +705,7 @@ export function InstanciaDetailSheet({
                               /* DocNix: seletor com roles do módulo (MaxDoc ou DocAction) */
                               <PapelEditorDocNix
                                 papel={membro.papel}
-                                modulo={componenteNome}
+                                modulo={componenteNome ?? null}
                                 onSave={(novo) => handleSavePapel(membro, novo)}
                               />
                             ) : (
