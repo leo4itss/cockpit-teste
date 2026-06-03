@@ -36,7 +36,7 @@ interface Props {
   onClose:        () => void
   accountId:      string
   grupos?:        Grupo[]     // lista de grupos existentes (mesma conta) para seleção de grupo pai
-  modulosDocNix?: string[]    // ex: ['MaxDoc'], ['DocAction'], ['MaxDoc','DocAction'] ou []
+  modulosAtivos?: string[]    // ex: ['fga'], ['MaxDoc'], ['DocAction'], ['MaxDoc','DocAction','fga']
   onSuccess:      (grupo: Grupo) => void
 }
 
