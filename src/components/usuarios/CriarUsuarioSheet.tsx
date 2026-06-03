@@ -73,7 +73,6 @@ const EMPTY_FORM = {
   nomeCompleto: '',
   usuario:      '',
   email:        '',
-  senha:        '',
   pais:         'Brasil',
   telefone:     '',
   area:         '',
