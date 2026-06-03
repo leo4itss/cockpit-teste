@@ -266,11 +266,11 @@ export function ComponenteDetailSheet({ open, onClose, componente, onEdit }: Pro
                 </div>
               )}
 
-              {/* Adicionar nova atribuição */}
+              {/* Adicionar nova ação */}
               <div className="flex gap-2">
                 <input
                   type="text"
-                  placeholder="Nome da atribuição"
+                  placeholder="Nome da ação"
                   value={novaAtribNome}
                   onChange={e => setNovaAtribNome(e.target.value)}
                   className="flex-1 text-sm border border-gray-300 rounded-md px-2 py-1.5 outline-none focus:ring-2 focus:ring-blue-500"
