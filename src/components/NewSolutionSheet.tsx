@@ -215,7 +215,7 @@ export function NewSolutionSheet({
           <SectionTitle>Dados da solução</SectionTitle>
 
           <Input
-            label="Nome da instância da solução"
+            label="Nome do objeto da solução"
             required
             placeholder="Como chama a solução?"
             value={form.name}
