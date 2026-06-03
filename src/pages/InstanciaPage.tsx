@@ -380,9 +380,11 @@ export function InstanciaPage() {
   const [atribuicoes, setAtribuicoes] = useState<Atribuicao[]>([])
   const [loading,     setLoading]     = useState(true)
   const [showAdd,     setShowAdd]     = useState(false)
-  const [addingId,    setAddingId]    = useState<string | null>(null)
-  const [removingId,  setRemovingId]  = useState<string | null>(null)
+  const [addingId,        setAddingId]        = useState<string | null>(null)
+  const [removingId,      setRemovingId]      = useState<string | null>(null)
   const [restringirAcesso, setRestringirAcesso] = useState(false)
+  const [showPermissoes,  setShowPermissoes]  = useState(false)
+  const [membroPermissoes, setMembroPermissoes] = useState<InstanciaMembro | null>(null)
 
   useEffect(() => {
     if (!id) return
