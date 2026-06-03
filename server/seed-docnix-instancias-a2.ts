@@ -51,13 +51,13 @@ async function main() {
 
   // ── 3. Membros das instâncias ──────────────────────────────────
   const membros = [
-    // MaxDoc — Thiago admin, Beatriz member, grupo Farmacêuticos member
-    { id: 'im-a2md-thiago',  instId: 'inst-a2-maxdoc',   tipo: 'user',  entId: 'usr-thiago',       papel: 'admin'  },
-    { id: 'im-a2md-beatriz', instId: 'inst-a2-maxdoc',   tipo: 'user',  entId: 'usr-beatriz',      papel: 'member' },
-    { id: 'im-a2md-farma',   instId: 'inst-a2-maxdoc',   tipo: 'group', entId: 'grp-santa-farma',  papel: 'member' },
-    // DocAction — Lucas member, grupo Vendas viewer
-    { id: 'im-a2da-lucas',   instId: 'inst-a2-docaction', tipo: 'user',  entId: 'usr-lucas',        papel: 'member' },
-    { id: 'im-a2da-vendas',  instId: 'inst-a2-docaction', tipo: 'group', entId: 'grp-santa-vendas', papel: 'viewer' },
+    // MaxDoc — Thiago admin, Beatriz editor, grupo Farmacêuticos revisor
+    { id: 'im-a2md-thiago',  instId: 'inst-a2-maxdoc',   tipo: 'user',  entId: 'usr-thiago',       papel: 'admin-maxdoc' },
+    { id: 'im-a2md-beatriz', instId: 'inst-a2-maxdoc',   tipo: 'user',  entId: 'usr-beatriz',      papel: 'editor'       },
+    { id: 'im-a2md-farma',   instId: 'inst-a2-maxdoc',   tipo: 'group', entId: 'grp-santa-farma',  papel: 'revisor'      },
+    // DocAction — Lucas analista, grupo Vendas colaborador
+    { id: 'im-a2da-lucas',   instId: 'inst-a2-docaction', tipo: 'user',  entId: 'usr-lucas',        papel: 'analista'    },
+    { id: 'im-a2da-vendas',  instId: 'inst-a2-docaction', tipo: 'group', entId: 'grp-santa-vendas', papel: 'colaborador' },
   ]
 
   for (const m of membros) {
