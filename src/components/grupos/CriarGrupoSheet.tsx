@@ -241,14 +241,13 @@ export function CriarGrupoSheet({ open, onClose, accountId, grupos = [], compone
             </FieldLabel>
 
             <div className="space-y-4">
-              {/* Seção FGA — só aparece se a conta tem instâncias FGA */}
-              {hasFga && (
-                <div>
+              {secoesConfig.map(({ label, config: cfg }) => (
+                <div key={label}>
                   {multiSecao && (
-                    <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-1.5">Geral</p>
+                    <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-1.5">{label}</p>
                   )}
                   <div className="grid grid-cols-3 gap-2">
-                    {mockPapeisDisponiveis.map(p => (
+                    {cfg.papeis.map(p => (
                       <button
                         key={p.value}
                         type="button"
@@ -267,38 +266,7 @@ export function CriarGrupoSheet({ open, onClose, accountId, grupos = [], compone
                     ))}
                   </div>
                 </div>
-              )}
-
-              {/* Seções DocNix — uma por módulo detectado */}
-              {modulosDocNix.map(modulo => {
-                const papeisModulo = papeisDocNixFiltrados.filter(p => p.modulo === modulo)
-                return (
-                  <div key={modulo}>
-                    {multiSecao && (
-                      <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-1.5">{modulo}</p>
-                    )}
-                    <div className="grid grid-cols-3 gap-2">
-                      {papeisModulo.map(p => (
-                        <button
-                          key={p.value}
-                          type="button"
-                          onClick={() => setPapel(p.value)}
-                          disabled={saving}
-                          className={cn(
-                            'flex flex-col items-start px-3 py-2.5 rounded-lg border text-left transition-colors',
-                            papel === p.value
-                              ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
-                              : 'border-gray-200 bg-white hover:bg-gray-50'
-                          )}
-                        >
-                          <span className="text-sm font-medium text-[#030712]">{p.label}</span>
-                          <span className="text-xs text-[#6b7280] mt-0.5 leading-tight">{p.desc}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )
-              })}
+              ))}
             </div>
           </div>
 
