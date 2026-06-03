@@ -46,7 +46,7 @@ const MEMBROS: MembroSeed[] = [
     instanciaId: 'inst-maxdoc-comgas',
     entidadeTipo: 'user',
     entidadeId: 'usr-marcelo-c',
-    papel: 'admin',
+    papel: 'admin-maxdoc',
     atribuicaoIds: ['atrib-maxdoc-administrar', 'atrib-maxdoc-aprovar-doc', 'atrib-maxdoc-usar'],
   },
   {
@@ -54,7 +54,7 @@ const MEMBROS: MembroSeed[] = [
     instanciaId: 'inst-maxdoc-comgas',
     entidadeTipo: 'user',
     entidadeId: 'usr-fernando',
-    papel: 'member',
+    papel: 'editor',
     atribuicaoIds: ['atrib-maxdoc-criar-doc', 'atrib-maxdoc-editar-doc', 'atrib-maxdoc-usar'],
   },
   {
@@ -62,7 +62,7 @@ const MEMBROS: MembroSeed[] = [
     instanciaId: 'inst-maxdoc-comgas',
     entidadeTipo: 'group',
     entidadeId: 'grp-comgas-aq',
-    papel: 'member',
+    papel: 'revisor',
     atribuicaoIds: ['atrib-maxdoc-revisar-doc', 'atrib-maxdoc-visualizar'],
   },
   // DocAction
@@ -71,7 +71,7 @@ const MEMBROS: MembroSeed[] = [
     instanciaId: 'inst-docaction-comgas',
     entidadeTipo: 'user',
     entidadeId: 'usr-neide',
-    papel: 'member',
+    papel: 'analista',
     atribuicaoIds: ['atrib-docaction-criar-ocorrencia', 'atrib-docaction-categorizar-ocorrencia', 'atrib-docaction-usar'],
   },
   {
@@ -79,7 +79,7 @@ const MEMBROS: MembroSeed[] = [
     instanciaId: 'inst-docaction-comgas',
     entidadeTipo: 'user',
     entidadeId: 'usr-marcelo-c',
-    papel: 'admin',
+    papel: 'admin-docaction',
     atribuicaoIds: ['atrib-docaction-administrar', 'atrib-docaction-encerrar-ocorrencia'],
   },
   {
@@ -87,7 +87,7 @@ const MEMBROS: MembroSeed[] = [
     instanciaId: 'inst-docaction-comgas',
     entidadeTipo: 'group',
     entidadeId: 'grp-comgas-aq',
-    papel: 'member',
+    papel: 'aprovador-docaction',
     atribuicaoIds: ['atrib-docaction-analisar-causa', 'atrib-docaction-aprovar-analise-causa'],
   },
 ]
