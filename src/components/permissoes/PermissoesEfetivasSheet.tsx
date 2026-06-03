@@ -179,9 +179,9 @@ export function PermissoesEfetivasSheet({
 
         {!loading && !error && !isUnrestricted && atribuicaoIds.length === 0 && (
           <div className="py-8 text-center">
-            <p className="text-sm font-medium text-gray-800">Nenhuma atribuição efetiva</p>
+            <p className="text-sm font-medium text-gray-800">Nenhuma ação efetiva</p>
             <p className="text-xs text-gray-500 mt-1">
-              Este usuário não possui atribuições ativas nesta instância.
+              Este usuário não possui ações ativas neste objeto.
             </p>
           </div>
         )}
