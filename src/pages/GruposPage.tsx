@@ -181,7 +181,7 @@ export function GruposPage() {
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[220px]">Grupo</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[140px]">Grupo Pai</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[90px]">Membros</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[130px]">Nível de Acesso</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[130px]">Papel</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[130px]">Escopo</th>
                 <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 w-[80px]">Ações</th>
               </tr>
