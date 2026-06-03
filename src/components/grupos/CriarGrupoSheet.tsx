@@ -212,10 +212,10 @@ export function CriarGrupoSheet({ open, onClose, accountId, grupos = [], onSucce
             />
           </div>
 
-          {/* Nível de Acesso */}
+          {/* Papel */}
           <div className="flex flex-col gap-2">
-            <FieldLabel required hint="Define o nível de acesso padrão dos membros deste grupo.">
-              Nível de Acesso
+            <FieldLabel required hint="Define o papel padrão dos membros deste grupo.">
+              Papel
             </FieldLabel>
             <div className="grid grid-cols-3 gap-2">
               {PAPEIS_OPCOES.map(p => (
