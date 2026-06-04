@@ -478,11 +478,15 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
           </div>
         )}
 
-        {/* Grupo Pai */}
-        {grupo.parentId && (
-          <div className="flex items-center gap-1.5 mt-1.5">
-            <span className="text-xs text-[#9ca3af]">Grupo Pai:</span>
-            <span className="text-xs font-medium text-[#374151]">{nomeGrupoPai}</span>
+        {/* Grupo Pai — editável */}
+        {grupos.length > 0 && (
+          <div className="mt-1.5">
+            <ParentEditor
+              currentParentId={grupo.parentId ?? null}
+              grupo={grupo}
+              grupos={grupos}
+              onSave={handleSaveParent}
+            />
           </div>
         )}
 
