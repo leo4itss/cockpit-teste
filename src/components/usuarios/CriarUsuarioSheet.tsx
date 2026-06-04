@@ -59,25 +59,6 @@ const FUSOS = [
   { value: 'Europe/Lisbon',      label: 'Portugal (Lisboa)' },
 ]
 
-// ── Níveis de acesso na conta ─────────────────────────────────
-// Esses são os únicos dois papéis gerenciados pelo Cockpit a nível de conta.
-// Correspondem a UserAccountMembership.papel no banco.
-// (Perfis de instância/FGA são gerenciados separadamente, por instância.)
-const NIVEIS_CONTA = [
-  {
-    value: 'member',
-    label: 'Membro',
-    desc:  'Acesso básico à conta e seus recursos',
-    cls:   'bg-gray-50 text-gray-700 border-gray-200',
-  },
-  {
-    value: 'account_admin',
-    label: 'Administrador de conta',
-    desc:  'Gerencia usuários e grupos desta conta',
-    cls:   'bg-orange-50 text-orange-700 border-orange-200',
-  },
-] as const
-
 // ── Helpers ───────────────────────────────────────────────────
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
