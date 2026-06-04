@@ -686,83 +686,115 @@ export function InstanciaDetailSheet({
                     {canManage ? 'Use o botão acima para adicionar usuários ou grupos.' : 'Esta instância ainda não tem membros.'}
                   </p>
                 </div>
-              ) : (
-                <table className="w-full">
-                  <tbody>
-                    {membros.map(membro => {
-                      const isGroup    = membro.entidadeTipo === 'group'
-                      const isRemoving = removingId === membro.id
-                      const nome       = membro.displayName ?? membro.entidadeId
+              ) : (() => {
+                // Separa grupos de usuários individuais
+                const gruposMembros   = membros.filter(m => m.entidadeTipo === 'group')
+                const usuariosMembros = membros.filter(m => m.entidadeTipo === 'user')
 
-                      return (
-                        <tr
-                          key={membro.id}
-                          className="group border-b border-gray-50 hover:bg-gray-50/60 transition-colors last:border-b-0"
-                        >
-                          <td className="pl-6 pr-3 py-3">
-                            <div className="flex items-center gap-3">
-                              <Avatar nome={nome} isGroup={isGroup} />
-                              <div className="min-w-0">
-                                <p className="text-sm font-medium text-[#030712] truncate">{nome}</p>
-                                {membro.email && (
-                                  <p className="text-xs text-[#6b7280] truncate">{membro.email}</p>
-                                )}
-                                {isGroup && (
-                                  <p className="text-xs text-violet-500">Grupo</p>
-                                )}
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-3 py-3">
-                            {canManage && !atribuicoesDocnix ? (
-                              /* FGA: seletor Visualizador / Membro / Administrador */
-                              <PapelEditor
-                                papel={membro.papel}
-                                onSave={(novo) => handleSavePapel(membro, novo)}
-                              />
-                            ) : canManage && atribuicoesDocnix ? (
-                              /* DocNix: seletor com roles do módulo (MaxDoc ou DocAction) */
-                              <PapelEditorDocNix
-                                papel={membro.papel}
-                                modulo={componenteNome ?? null}
-                                onSave={(novo) => handleSavePapel(membro, novo)}
-                              />
-                            ) : (
-                              <PapelBadge papel={membro.papel} />
+                function renderRow(membro: typeof membros[number]) {
+                  const isGroup    = membro.entidadeTipo === 'group'
+                  const isRemoving = removingId === membro.id
+                  const nome       = membro.displayName ?? membro.entidadeId
+                  return (
+                    <tr
+                      key={membro.id}
+                      className="group border-b border-gray-50 hover:bg-gray-50/60 transition-colors last:border-b-0"
+                    >
+                      <td className="pl-6 pr-3 py-3">
+                        <div className="flex items-center gap-3">
+                          <Avatar nome={nome} isGroup={isGroup} />
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-[#030712] truncate">{nome}</p>
+                            {membro.email && (
+                              <p className="text-xs text-[#6b7280] truncate">{membro.email}</p>
                             )}
-                          </td>
-                          <td className="pr-6 pl-3 py-3 text-right">
-                            <div className="flex items-center justify-end gap-1 invisible group-hover:visible">
-                              {/* Botão unificado de permissões (FGA ou DocNix) */}
-                              <button
-                                onClick={() => { setMembroPermissoes(membro); setShowPermissoes(true) }}
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-blue-600 hover:bg-blue-50 transition-colors"
-                                title="Ver e editar permissões"
-                              >
-                                <Shield className="w-3.5 h-3.5" />
-                                Permissões
-                              </button>
-                              {canManage && (
-                                <button
-                                  onClick={() => handleRemove(membro)}
-                                  disabled={isRemoving || !!addingId}
-                                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
-                                  title="Remover do objeto"
-                                >
-                                  {isRemoving
-                                    ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                    : <UserMinus className="w-3.5 h-3.5" />}
-                                  Remover
-                                </button>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-3 py-3">
+                        {canManage && !atribuicoesDocnix ? (
+                          <PapelEditor
+                            papel={membro.papel}
+                            onSave={(novo) => handleSavePapel(membro, novo)}
+                          />
+                        ) : canManage && atribuicoesDocnix ? (
+                          <PapelEditorDocNix
+                            papel={membro.papel}
+                            modulo={componenteNome ?? null}
+                            onSave={(novo) => handleSavePapel(membro, novo)}
+                          />
+                        ) : (
+                          <PapelBadge papel={membro.papel} />
+                        )}
+                      </td>
+                      <td className="pr-6 pl-3 py-3 text-right">
+                        <div className="flex items-center justify-end gap-1 invisible group-hover:visible">
+                          <button
+                            onClick={() => { setMembroPermissoes(membro); setShowPermissoes(true) }}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-blue-600 hover:bg-blue-50 transition-colors"
+                            title="Ver e editar permissões"
+                          >
+                            <Shield className="w-3.5 h-3.5" />
+                            Permissões
+                          </button>
+                          {canManage && (
+                            <button
+                              onClick={() => handleRemove(membro)}
+                              disabled={isRemoving || !!addingId}
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
+                              title="Remover do objeto"
+                            >
+                              {isRemoving
+                                ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                : <UserMinus className="w-3.5 h-3.5" />}
+                              Remover
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                }
+
+                return (
+                  <div className="flex flex-col">
+                    {/* Grupos */}
+                    {gruposMembros.length > 0 && (
+                      <>
+                        <div className="flex items-center gap-2 px-6 py-2 bg-violet-50 border-b border-violet-100">
+                          <Users className="w-3.5 h-3.5 text-violet-500 shrink-0" />
+                          <span className="text-xs font-medium text-violet-700">
+                            Grupos ({gruposMembros.length})
+                          </span>
+                          <span className="text-xs text-violet-400 ml-1">
+                            — membros dos grupos herdarão este acesso
+                          </span>
+                        </div>
+                        <table className="w-full">
+                          <tbody>{gruposMembros.map(renderRow)}</tbody>
+                        </table>
+                      </>
+                    )}
+
+                    {/* Usuários */}
+                    {usuariosMembros.length > 0 && (
+                      <>
+                        {gruposMembros.length > 0 && (
+                          <div className="flex items-center gap-2 px-6 py-2 bg-gray-50 border-b border-gray-100 border-t border-t-gray-200">
+                            <User className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                            <span className="text-xs font-medium text-gray-600">
+                              Usuários ({usuariosMembros.length})
+                            </span>
+                          </div>
+                        )}
+                        <table className="w-full">
+                          <tbody>{usuariosMembros.map(renderRow)}</tbody>
+                        </table>
+                      </>
+                    )}
+                  </div>
+                )
+              })()}
             </div>
 
           </>
