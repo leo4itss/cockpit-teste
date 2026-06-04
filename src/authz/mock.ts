@@ -135,6 +135,33 @@ export const mockPersonas: Persona[] = [
   },
 ]
 
+// ── Níveis de acesso na conta ─────────────────────────────────
+// Esses são os únicos dois papéis gerenciados pelo Cockpit a nível de conta.
+// Correspondem a UserAccountMembership.papel no banco.
+// Distinto dos papéis de instância (FGA Server), que variam por componente.
+
+export type NivelContaDef = {
+  value: 'member' | 'account_admin'
+  label: string
+  desc: string
+  cls: string
+}
+
+export const NIVEIS_CONTA: readonly NivelContaDef[] = [
+  {
+    value: 'member',
+    label: 'Membro',
+    desc:  'Acesso básico à conta e seus recursos',
+    cls:   'bg-gray-50 text-gray-700 border-gray-200',
+  },
+  {
+    value: 'account_admin',
+    label: 'Administrador de conta',
+    desc:  'Gerencia usuários e grupos desta conta',
+    cls:   'bg-orange-50 text-orange-700 border-orange-200',
+  },
+] as const
+
 // ── Papéis disponíveis (consumidos do FGA) ────────────────────
 //
 // Em produção, esta lista seria obtida via API do OpenFGA para a
