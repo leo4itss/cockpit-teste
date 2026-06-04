@@ -696,6 +696,7 @@ app.post('/api/grupos', async (c) => {
  * Body: campos parciais de grupo (nome, descricao, status)
  */
 app.put('/api/grupos/:id', async (c) => {
+  const grupoId = c.req.param('id')
   const body = await c.req.json()
   const updates: Record<string, any> = {
     nome: body.nome,
@@ -703,11 +704,36 @@ app.put('/api/grupos/:id', async (c) => {
     papel: body.papel,
     status: body.status,
   }
-  if (body.parentId !== undefined) updates.parentId = body.parentId || null
+  if (body.parentId !== undefined) {
+    const novoParent: string | null = body.parentId || null
+
+    // Validação anti-ciclo: não pode apontar para si mesmo ou para descendente.
+    if (novoParent === grupoId) {
+      return c.json({ error: 'Um grupo não pode ser pai de si mesmo.' }, 400)
+    }
+    if (novoParent) {
+      // Caminha pela cadeia ancestral a partir do novoParent.
+      // Se encontrarmos o próprio grupoId, é ciclo.
+      const todos = await db.select({ id: grupos.id, parentId: grupos.parentId }).from(grupos)
+      const byId = new Map(todos.map(g => [g.id, g.parentId]))
+      const visitados = new Set<string>()
+      let cursor: string | null | undefined = novoParent
+      while (cursor) {
+        if (cursor === grupoId) {
+          return c.json({ error: 'Mudança criaria um ciclo na hierarquia de grupos.' }, 400)
+        }
+        if (visitados.has(cursor)) break // proteção contra dados já corrompidos
+        visitados.add(cursor)
+        cursor = byId.get(cursor) ?? null
+      }
+    }
+
+    updates.parentId = novoParent
+  }
   const [row] = await db
     .update(grupos)
     .set(updates)
-    .where(eq(grupos.id, c.req.param('id')))
+    .where(eq(grupos.id, grupoId))
     .returning()
   if (!row) return c.json({ error: 'Not found' }, 404)
   return c.json(row)
