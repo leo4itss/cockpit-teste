@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/Button'
 import { EtiquetaDialog } from '@/components/EtiquetaDialog'
 import { api } from '@/api/client'
 import { cn } from '@/lib/utils'
+import { NIVEIS_CONTA, getComponenteConfig } from '@/authz/mock'
 import type { User, Grupo } from '@/types'
 
 // ── Opções dos selects (espelho do EditUserSheet) ─────────────
