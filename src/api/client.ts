@@ -91,7 +91,16 @@ export const api = {
   },
   getGrupo:     (id: string)           => request<any>(`/api/grupos/${id}`),
   createGrupo:  (data: any)            => request<any>('/api/grupos', { method: 'POST', body: JSON.stringify(data) }),
-  updateGrupo:  (id: string, data: any)=> request<any>(`/api/grupos/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  updateGrupo:  (
+    id: string,
+    data: Partial<{
+      nome: string
+      descricao: string | null
+      papel: string | null
+      status: 'Ativo' | 'Inativo'
+      parentId: string | null
+    }>,
+  ) => request<any>(`/api/grupos/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteGrupo:  (id: string)           => request<{ ok: boolean }>(`/api/grupos/${id}`, { method: 'DELETE' }),
 
   // Membros de grupo
