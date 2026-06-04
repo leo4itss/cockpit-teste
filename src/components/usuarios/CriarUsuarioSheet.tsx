@@ -410,31 +410,81 @@ export function CriarUsuarioSheet({ open, onClose, onSuccess, accountId }: Props
                   </div>
 
                   {/* Preview das permissões resultantes */}
-                  {(papel || grupoId) && (
-                    <div className="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 flex flex-col gap-1.5">
-                      <p className="text-xs font-medium text-blue-700 uppercase tracking-wide">
-                        Permissões resultantes
-                      </p>
-                      <div className="flex flex-wrap gap-2 mt-0.5">
-                        {papel && (() => {
-                          const p = NIVEIS_CONTA.find(p => p.value === papel)
-                          return p ? (
-                            <span className={cn('inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border', p.cls)}>
-                              {p.label}
+                  {(papel || grupoId) && (() => {
+                    const nivelDef = papel ? NIVEIS_CONTA.find(p => p.value === papel) : null
+                    const grupoDef = grupoId ? grupos.find(g => g.id === grupoId) : null
+                    // Tenta derivar ações do papel do grupo via getComponenteConfig
+                    const grupoPapelAcoes: { componenteLabel: string; papelLabel: string; acoes: string[] }[] = []
+                    if (grupoDef?.papel) {
+                      // Para cada componente único existente na conta (baseado nos grupos disponíveis)
+                      // tentamos resolução via config do grupo.papel. Como não temos componentesAtivos aqui,
+                      // tentamos resolver pelo nome do grupo como fallback.
+                      const config = getComponenteConfig(grupoDef.nome)
+                      const papelDef = config.papeis.find(p => p.value === grupoDef.papel)
+                      if (papelDef) {
+                        const acoes = papelDef.atribuicaoNomes?.length
+                          ? papelDef.atribuicaoNomes
+                          : papelDef.defaultAcoes ?? []
+                        if (acoes.length > 0) {
+                          const MAX = 6
+                          const visiveis = acoes.slice(0, MAX)
+                          const extra = acoes.length - MAX
+                          grupoPapelAcoes.push({
+                            componenteLabel: config.label,
+                            papelLabel: papelDef.label,
+                            acoes: extra > 0 ? [...visiveis, `+ ${extra} mais`] : visiveis,
+                          })
+                        }
+                      }
+                    }
+
+                    return (
+                      <div className="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 flex flex-col gap-2">
+                        <p className="text-xs font-medium text-blue-700 uppercase tracking-wide">
+                          Permissões resultantes
+                        </p>
+
+                        {/* Nível de conta */}
+                        {nivelDef && (
+                          <span className={cn('inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border w-fit', nivelDef.cls)}>
+                            {nivelDef.label}
+                          </span>
+                        )}
+
+                        {/* Grupo + ações */}
+                        {grupoDef && (
+                          <div className="flex flex-col gap-1">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-purple-50 text-purple-700 border-purple-200 w-fit">
+                              Grupo: {grupoDef.nome}
                             </span>
-                          ) : null
-                        })()}
-                        {grupoId && (() => {
-                          const g = grupos.find(g => g.id === grupoId)
-                          return g ? (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-purple-50 text-purple-700 border-purple-200">
-                              Grupo: {g.nome}
-                            </span>
-                          ) : null
-                        })()}
+                            {grupoPapelAcoes.length > 0 ? (
+                              grupoPapelAcoes.map(({ componenteLabel, papelLabel, acoes }) => (
+                                <div key={componenteLabel} className="mt-1">
+                                  <p className="text-xs text-blue-700 font-medium">
+                                    {componenteLabel} — {papelLabel}:
+                                  </p>
+                                  <p className="text-xs text-blue-600 leading-relaxed">
+                                    {acoes.join(', ')}
+                                  </p>
+                                </div>
+                              ))
+                            ) : (
+                              <p className="text-xs text-blue-600 mt-0.5">
+                                Acesso a instâncias configurado pelo papel do grupo.
+                              </p>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Sem grupo — hint */}
+                        {!grupoDef && nivelDef && (
+                          <p className="text-xs text-blue-600">
+                            Acesso a instâncias é definido após a criação.
+                          </p>
+                        )}
                       </div>
-                    </div>
-                  )}
+                    )
+                  })()}
                 </div>
               </>
             )}
