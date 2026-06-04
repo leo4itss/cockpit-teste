@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Check } from 'lucide-react'
+import { useState, useEffect, useMemo } from 'react'
+import { Check, Shield, Layers } from 'lucide-react'
 import {
   NestedSheet,
   NestedSheetHeader,
@@ -9,7 +9,11 @@ import {
 } from '@/components/ui/nested-sheet'
 import { Button } from '@/components/ui/Button'
 import { AtribuirPermissoesSheet } from '@/components/permissoes/AtribuirPermissoesSheet'
-import type { User } from '@/types'
+import { PermissoesMembroSheet } from '@/components/instancias/PermissoesMembroSheet'
+import { NIVEIS_CONTA, getComponenteConfig } from '@/authz/mock'
+import { cn } from '@/lib/utils'
+import { api } from '@/api/client'
+import type { User, Instancia, InstanciaMembro, UserAccountMembership } from '@/types'
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -34,6 +38,24 @@ function Field({ label, value, required }: { label: string; value?: string; requ
   )
 }
 
+/** Badge de papel de instância — colorido por componente. */
+function InstanciaPapelBadge({ papel, componenteNome }: { papel: string; componenteNome: string }) {
+  const config = getComponenteConfig(componenteNome)
+  const def = config.papeis.find(p => p.value === papel)
+  if (!def) {
+    return (
+      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">
+        {papel}
+      </span>
+    )
+  }
+  return (
+    <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border', def.cls)}>
+      {def.label}
+    </span>
+  )
+}
+
 // ── Props ─────────────────────────────────────────────────────
 
 interface Props {
@@ -50,12 +72,80 @@ interface Props {
 export function UsuarioDetailAccountSheet({
   open, onClose, user, accountId, accountNome, onEdit,
 }: Props) {
-  const [showPermissoes, setShowPermissoes] = useState(false)
+  const [showPermissoes, setShowPermissoes]   = useState(false)
+
+  // Dados de acesso à conta
+  const [membership, setMembership]           = useState<UserAccountMembership | null>(null)
+
+  // Instâncias onde o usuário é membro
+  const [instancias, setInstancias]           = useState<Instancia[]>([])
+  const [membroInstancias, setMembroInstancias] = useState<InstanciaMembro[]>([])
+  const [componenteNomes, setComponenteNomes] = useState<Record<string, string>>({})
+  const [loadingAcesso, setLoadingAcesso]     = useState(false)
+
+  // Permissões de instância selecionada
+  const [instanciaAberta, setInstanciaAberta] = useState<{
+    instancia: Instancia
+    membro: InstanciaMembro
+  } | null>(null)
+
+  useEffect(() => {
+    if (!open || !user) return
+    setLoadingAcesso(true)
+
+    Promise.all([
+      // Membership na conta
+      api.getAccountMembros(accountId).catch(() => [] as any[]),
+      // Instâncias da conta
+      api.getInstancias({ accountId }).catch(() => [] as Instancia[]),
+      // Componentes (para resolver nomes)
+      api.getComponentes().catch(() => [] as any[]),
+    ]).then(async ([membros, insts, comps]) => {
+      // Nível de acesso na conta
+      const m = (membros as any[]).find((mb: any) => mb.userId === user.id)
+      setMembership(m ?? null)
+
+      // Nomes de componente indexados por id
+      const nomesMap: Record<string, string> = {}
+      for (const c of comps as any[]) nomesMap[c.id] = c.nome
+      setComponenteNomes(nomesMap)
+      setInstancias(insts)
+
+      // Membros das instâncias — carrega em paralelo
+      const todosOsMembros: InstanciaMembro[] = []
+      await Promise.all(
+        insts.map(inst =>
+          api.getInstanciaMembros(inst.id).then(mems => {
+            for (const mb of mems as InstanciaMembro[]) {
+              if (mb.entidadeId === user.id && mb.entidadeTipo === 'user') {
+                todosOsMembros.push(mb)
+              }
+            }
+          }).catch(() => {})
+        )
+      )
+      setMembroInstancias(todosOsMembros)
+    }).finally(() => setLoadingAcesso(false))
+  }, [open, user?.id, accountId])
+
+  // Instâncias onde o usuário é membro, com dados unidos
+  const instanciasComAcesso = useMemo(() => {
+    return membroInstancias.map(mb => ({
+      membro: mb,
+      instancia: instancias.find(i => i.id === mb.instanciaId),
+    })).filter(x => x.instancia !== undefined) as { membro: InstanciaMembro; instancia: Instancia }[]
+  }, [membroInstancias, instancias])
 
   if (!user) return null
 
+  const nivelDef = NIVEIS_CONTA.find(n => n.value === membership?.papel)
+
   function handleClose() {
     setShowPermissoes(false)
+    setInstanciaAberta(null)
+    setMembership(null)
+    setInstancias([])
+    setMembroInstancias([])
     onClose()
   }
 
@@ -135,9 +225,84 @@ export function UsuarioDetailAccountSheet({
             <Field label="Fuso horário pessoal" value={user.fusoHorario} />
           </div>
 
+          <Divider />
+
+          {/* ── Acesso ao Cockpit nesta conta ─────────────────── */}
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-2">
+              <Shield className="w-4 h-4 text-[#6b7280] shrink-0" />
+              <SectionTitle>Acesso ao Cockpit{accountNome ? ` — ${accountNome}` : ''}</SectionTitle>
+            </div>
+            {loadingAcesso ? (
+              <p className="text-sm text-[#6b7280]">Carregando…</p>
+            ) : nivelDef ? (
+              <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-gray-200 bg-gray-50">
+                <div className="flex-1 min-w-0">
+                  <span className={cn('inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border', nivelDef.cls)}>
+                    {nivelDef.label}
+                  </span>
+                  <p className="text-xs text-[#6b7280] mt-1.5">{nivelDef.desc}</p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-[#6b7280]">Sem vínculo direto com esta conta.</p>
+            )}
+            <p className="text-xs text-[#9ca3af]">
+              A promoção a Administrador de conta é feita pelo Org Admin.
+            </p>
+          </div>
+
+          <Divider />
+
+          {/* ── Acesso às soluções (instâncias) ──────────────── */}
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-2">
+              <Layers className="w-4 h-4 text-[#6b7280] shrink-0" />
+              <SectionTitle>Acesso às soluções</SectionTitle>
+            </div>
+
+            {loadingAcesso ? (
+              <p className="text-sm text-[#6b7280]">Carregando…</p>
+            ) : instanciasComAcesso.length === 0 ? (
+              <div className="flex items-center gap-3 px-4 py-3 rounded-lg border border-dashed border-gray-200 bg-gray-50">
+                <p className="text-sm text-[#6b7280]">
+                  Sem acesso a instâncias nesta conta. Use "Atribuir permissões" ou adicione-o
+                  diretamente nas instâncias desejadas.
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {instanciasComAcesso.map(({ instancia, membro }) => {
+                  const compNome = componenteNomes[instancia.componenteId] ?? ''
+                  return (
+                    <div
+                      key={instancia.id}
+                      className="flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-[#030712] truncate">{instancia.nome}</p>
+                        {compNome && (
+                          <p className="text-xs text-[#6b7280]">{compNome}</p>
+                        )}
+                      </div>
+                      <InstanciaPapelBadge papel={membro.papel} componenteNome={compNome} />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setInstanciaAberta({ instancia, membro })}
+                      >
+                        Editar permissões
+                      </Button>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+
         </div>
 
-        {/* Sheet aninhada nível 2 — renderizada dentro do body para herdar o contexto de nível */}
+        {/* Sheet nível 2 — AtribuirPermissoes */}
         <AtribuirPermissoesSheet
           open={showPermissoes}
           onClose={() => setShowPermissoes(false)}
@@ -147,6 +312,20 @@ export function UsuarioDetailAccountSheet({
           accountId={accountId}
           accountNome={accountNome}
         />
+
+        {/* Sheet nível 2 — PermissoesMembroSheet por instância */}
+        {instanciaAberta && (
+          <PermissoesMembroSheet
+            open={!!instanciaAberta}
+            onClose={() => setInstanciaAberta(null)}
+            instanciaId={instanciaAberta.instancia.id}
+            instanciaNome={instanciaAberta.instancia.nome}
+            componenteId={instanciaAberta.instancia.componenteId}
+            componenteNome={componenteNomes[instanciaAberta.instancia.componenteId] ?? ''}
+            membro={instanciaAberta.membro}
+            onSaved={() => setInstanciaAberta(null)}
+          />
+        )}
       </NestedSheetBody>
 
       <NestedSheetFooter>
