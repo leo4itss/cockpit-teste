@@ -104,7 +104,8 @@ export function UsuarioDetailAccountSheet({
         api.getPermissions({ entidade_tipo: 'user', entidade_id: user.id, instancia_id: null }).catch(() => [] as any[]),
       ])
 
-      const m = (membros as any[]).find((mb: any) => mb.userId === user.id)
+      // A API retorna { ...user, papel } — o id do usuário fica em mb.id, não mb.userId
+      const m = (membros as any[]).find((mb: any) => mb.id === user.id)
       setMembership(m ?? null)
 
       const nomesMap: Record<string, string> = {}
