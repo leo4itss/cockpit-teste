@@ -282,7 +282,7 @@ export function UsuarioDetailOrgSheet({
                           <span className="text-sm font-medium text-[#030712] truncate">{account.name}</span>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
-                          <PapelBadge papel={papel} />
+                          <PerfilBadge papel={papel} />
                           {/* Ação de promoção/rebaixamento — visível no hover */}
                           <button
                             onClick={() => handleTogglePapel(account.id, papel)}
