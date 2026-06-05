@@ -341,31 +341,6 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
           </div>
         )}
 
-        {/* Grupo Pai — editável */}
-        {grupos.length > 0 && (
-          <div className="mt-1.5">
-            <ParentEditor
-              currentParentId={grupo.parentId ?? null}
-              grupo={grupo}
-              grupos={grupos}
-              onSave={handleSaveParent}
-            />
-          </div>
-        )}
-
-        {/* Subgrupos */}
-        {gruposFilhos.length > 0 && (
-          <div className="mt-2">
-            <p className="text-xs text-[#9ca3af] mb-1.5">Subgrupos:</p>
-            <div className="flex flex-wrap gap-1.5">
-              {gruposFilhos.map(g => (
-                <span key={g.id} className="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 text-xs text-gray-700">
-                  {g.nome}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
       </NestedSheetHeader>
 
       <NestedSheetBody noPadding>
