@@ -735,7 +735,7 @@ export function InstanciaDetailSheet({
                             title="Ver e editar permissões"
                           >
                             <Shield className="w-3.5 h-3.5" />
-                            Permissões
+                            Ações
                           </button>
                           {canManage && (
                             <button
