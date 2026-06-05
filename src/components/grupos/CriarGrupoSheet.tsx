@@ -102,7 +102,6 @@ export function CriarGrupoSheet({ open, onClose, accountId, grupos = [], compone
   const [nome, setNome]           = useState('')
   const [descricao, setDescricao] = useState('')
   const [papel, setPapel]         = useState(defaultPapelKey)
-  const [parentId, setParentId]   = useState<string | null>(null)
   const [searchMembro, setSearchMembro] = useState('')
   const [allUsers, setAllUsers]   = useState<User[]>([])
   const [membros, setMembros]     = useState<User[]>([])
