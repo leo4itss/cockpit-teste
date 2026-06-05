@@ -569,10 +569,10 @@ export function AtribuirPermissoesSheet({
                         </div>
                       </div>
 
-                      {/* Seletor de papel — atalho para definir ações em bloco (só para FGA) */}
-                      {!locked && (() => {
-                        const cfg = getComponenteConfig(comp.nome)
-                        if (cfg.permissaoMode !== 'component_permissions') return null
+                      {/* Seletor de papel — atalho para definir ações em bloco */}
+                      {/* Oculto quando DocNix sem catálogo (mostra mensagem alternativa abaixo) */}
+                      {!locked && !(comp.tipoModelo === 'docnix' && acoes === ACOES['default']) && (() => {
+                        const cfg        = getComponenteConfig(comp.nome)
                         const papelAtual = papelSelecionado[comp.id]
                         return (
                           <div className="pl-8 mb-3">
