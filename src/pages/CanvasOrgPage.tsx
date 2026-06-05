@@ -548,7 +548,7 @@ function UsuarioPanel({ userId, accountId, accountData, theme, onClose, onOpenPe
         <button onClick={() => onOpenPermissoes({ entityType: 'usuario', entityId: userId, entityNome: nome, accountId })}
           className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors"
           style={{ background: theme.btnPermBg, border: `1px solid ${theme.btnPermBorder}`, color: theme.btnPermText }}>
-          <Lock className="w-3.5 h-3.5" /> Permissões diretas
+          <Lock className="w-3.5 h-3.5" /> Ações diretas
         </button>
       </div>
       <div className="flex-1 overflow-y-auto px-5 py-4">
