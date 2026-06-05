@@ -287,7 +287,7 @@ export function UsuarioDetailOrgSheet({
                           <button
                             onClick={() => handleTogglePapel(account.id, papel)}
                             disabled={isChanging}
-                            title={papel === 'account_admin' ? 'Rebaixar a Member' : 'Promover a Account Admin'}
+                            title={papel === 'account_admin' ? 'Alterar perfil para Membro' : 'Alterar perfil para Administrador de Conta'}
                             className="invisible group-hover:visible inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors disabled:opacity-50 shrink-0"
                             style={papel === 'account_admin'
                               ? { color: '#b45309', background: '#fef3c7' }
