@@ -171,7 +171,7 @@ export function CriarGrupoSheet({ open, onClose, accountId, grupos = [], compone
         ...localGrupo,
         descricao: descricao.trim() || null,
         orgId: null,
-        parentId: parentId ?? null,
+        parentId: null,
       })
       if (membros.length > 0) {
         await Promise.all(membros.map(m => api.addGrupoMembro(grupo.id, m.id))).catch(() => {})
