@@ -231,9 +231,6 @@ export function AtribuirPermissoesSheet({
         if (!hasExistingPerms && defaults) {
           let anyDefaultApplied = false
           ativos.forEach(c => {
-            // Só pula componentes DocNix — esses têm catálogo próprio de atribuições
-            // Componentes FGA podem ter atribuições extras no banco, mas ainda usam os defaults por papel
-            if (c.tipoModelo === 'docnix') return
             const tipo = inferirTipo(c.nome)
             const acoesDefault = defaults[tipo] ?? []
             // Só pré-seleciona ações que existem no catálogo daquele tipo
