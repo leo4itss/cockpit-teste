@@ -170,7 +170,7 @@ export function MembroAtribuicoesSheet({
   return (
     <NestedSheet open={open} onClose={handleClose} width="w-[520px]">
       <NestedSheetHeader onClose={handleClose}>
-        <NestedSheetTitle>Atribuições — {entityNome}</NestedSheetTitle>
+        <NestedSheetTitle>Ações — {entityNome}</NestedSheetTitle>
         <NestedSheetDescription>
           {instanciaNome}
           {isUser ? (
