@@ -781,7 +781,7 @@ export function InstanciaDetailSheet({
                       <>
                         {gruposMembros.length > 0 && (
                           <div className="flex items-center gap-2 px-6 py-2 bg-gray-50 border-b border-gray-100 border-t border-t-gray-200">
-                            <User className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                            <UserIcon className="w-3.5 h-3.5 text-gray-400 shrink-0" />
                             <span className="text-xs font-medium text-gray-600">
                               Usuários ({usuariosMembros.length})
                             </span>
