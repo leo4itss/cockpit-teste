@@ -320,12 +320,25 @@ export function AtribuirPermissoesSheet({
   }
 
   function handleSelectPapel(compId: string, compNome: string, papelValue: string) {
-    const cfg = getComponenteConfig(compNome)
+    const cfg    = getComponenteConfig(compNome)
+    const papelDef = cfg.papeis.find(p => p.value === papelValue)
+
     if (cfg.permissaoMode === 'component_permissions') {
-      const papelDef   = cfg.papeis.find(p => p.value === papelValue)
+      // FGA: usa defaultAcoes direto
       const defaultAcoes = papelDef?.defaultAcoes ?? []
       setDraft(prev => ({ ...prev, [compId]: defaultAcoes }))
+
+    } else if (cfg.permissaoMode === 'atribuicoes') {
+      // DocNix: match atribuicaoNomes contra o catálogo carregado
+      const atribs          = atribuicoesMap[compId] ?? []
+      const nomesDesejados  = papelDef?.atribuicaoNomes ?? []
+      // [] = todas as atribuições ativas (ex: Administrador)
+      const matchedIds = nomesDesejados.length === 0
+        ? atribs.map(a => a.acao)
+        : atribs.filter(a => nomesDesejados.includes(a.label)).map(a => a.acao)
+      setDraft(prev => ({ ...prev, [compId]: matchedIds }))
     }
+
     setPapelSelecionado(prev => ({ ...prev, [compId]: papelValue }))
   }
 
