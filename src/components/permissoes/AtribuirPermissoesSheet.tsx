@@ -361,23 +361,16 @@ export function AtribuirPermissoesSheet({
   }
 
   function handleSelectPapel(compId: string, compNome: string, papelValue: string) {
-    const cfg    = getComponenteConfig(compNome)
+    const cfg      = getComponenteConfig(compNome)
     const papelDef = cfg.papeis.find(p => p.value === papelValue)
+    const defaults = papelDef?.defaultAcoes ?? []
 
-    if (cfg.permissaoMode === 'component_permissions') {
-      // FGA: usa defaultAcoes direto
-      const defaultAcoes = papelDef?.defaultAcoes ?? []
-      setDraft(prev => ({ ...prev, [compId]: defaultAcoes }))
-
-    } else if (cfg.permissaoMode === 'atribuicoes') {
-      // DocNix: match atribuicaoNomes contra o catálogo carregado
-      const atribs          = atribuicoesMap[compId] ?? []
-      const nomesDesejados  = papelDef?.atribuicaoNomes ?? []
-      // [] = todas as atribuições ativas (ex: Administrador)
-      const matchedIds = nomesDesejados.length === 0
-        ? atribs.map(a => a.acao)
-        : atribs.filter(a => nomesDesejados.includes(a.label)).map(a => a.acao)
-      setDraft(prev => ({ ...prev, [compId]: matchedIds }))
+    if (defaults.length === 0) {
+      // [] = todas as ações do catálogo (ex: Administrador)
+      const allAcoes = (cfg.acoes ?? atribuicoesMap[compId] ?? []).map(a => a.acao)
+      setDraft(prev => ({ ...prev, [compId]: allAcoes }))
+    } else {
+      setDraft(prev => ({ ...prev, [compId]: defaults }))
     }
 
     setPapelSelecionado(prev => ({ ...prev, [compId]: papelValue }))
