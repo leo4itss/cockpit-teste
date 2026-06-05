@@ -329,13 +329,9 @@ export const mockDocNixPapeis: {
 
 // ── Configuração unificada por tipo de componente ─────────────
 //
-// Cada componente define seus próprios papéis e ações.
-// permissaoMode determina como as permissões são armazenadas:
-//   'atribuicoes'          → instancia_membro_atribuicoes (DocNix)
-//   'component_permissions'→ component_permissions (FGA genérico)
-//
-// Todos seguem a mesma metodologia FGA — o que varia é o contrato
-// de papéis/ações de cada tipo de componente.
+// Todos os componentes usam component_permissions (FGA puro).
+// Cada config define os papéis disponíveis e o catálogo completo
+// de ações (acoes). defaultAcoes: [] = todas as ações do catálogo.
 
 export type PapelDef = {
   value: string
