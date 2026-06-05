@@ -129,12 +129,11 @@ export function CriarUsuarioSheet({ open, onClose, onSuccess, accountId }: Props
     setSaving(true)
     setSaveError(null)
     try {
-      const payload: Omit<User, 'avatar'> = {
+      const payload: Omit<User, 'avatar' | 'senha'> = {
         id:           crypto.randomUUID(),
         nomeCompleto: form.nomeCompleto.trim(),
         usuario:      form.usuario.trim(),
         email:        form.email.trim(),
-        senha:        '',   // senha definida pelo usuário após criação
         pais:         form.pais,
         telefone:     form.telefone.trim(),
         area:         form.area,
