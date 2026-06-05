@@ -89,32 +89,31 @@ export function UsuarioDetailAccountSheet({
     membro: InstanciaMembro
   } | null>(null)
 
-  useEffect(() => {
-    if (!open || !user) return
+  // Recarrega dados de acesso — chamado no mount e após salvar permissões
+  async function reloadAcesso(insts?: Instancia[]) {
+    if (!user) return
     setLoadingAcesso(true)
+    try {
+      const [membros, fetchedInsts, comps] = await Promise.all([
+        api.getAccountMembros(accountId).catch(() => [] as any[]),
+        insts ? Promise.resolve(insts) : api.getInstancias({ accountId }).catch(() => [] as Instancia[]),
+        api.getComponentes().catch(() => [] as any[]),
+      ])
 
-    Promise.all([
-      // Membership na conta
-      api.getAccountMembros(accountId).catch(() => [] as any[]),
-      // Instâncias da conta
-      api.getInstancias({ accountId }).catch(() => [] as Instancia[]),
-      // Componentes (para resolver nomes)
-      api.getComponentes().catch(() => [] as any[]),
-    ]).then(async ([membros, insts, comps]) => {
-      // Nível de acesso na conta
       const m = (membros as any[]).find((mb: any) => mb.userId === user.id)
       setMembership(m ?? null)
 
-      // Nomes de componente indexados por id
       const nomesMap: Record<string, string> = {}
       for (const c of comps as any[]) nomesMap[c.id] = c.nome
       setComponenteNomes(nomesMap)
-      setInstancias(insts)
+
+      const activeInsts = (fetchedInsts as Instancia[])
+      if (!insts) setInstancias(activeInsts)
 
       // Membros das instâncias — carrega em paralelo
       const todosOsMembros: InstanciaMembro[] = []
       await Promise.all(
-        insts.map(inst =>
+        activeInsts.map(inst =>
           api.getInstanciaMembros(inst.id).then(mems => {
             for (const mb of mems as InstanciaMembro[]) {
               if (mb.entidadeId === user.id && mb.entidadeTipo === 'user') {
@@ -125,7 +124,15 @@ export function UsuarioDetailAccountSheet({
         )
       )
       setMembroInstancias(todosOsMembros)
-    }).finally(() => setLoadingAcesso(false))
+    } finally {
+      setLoadingAcesso(false)
+    }
+  }
+
+  useEffect(() => {
+    if (!open || !user) return
+    reloadAcesso()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, user?.id, accountId])
 
   // Instâncias onde o usuário é membro, com dados unidos
