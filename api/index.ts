@@ -348,7 +348,7 @@ app.post('/users', async (c) => {
         return c.json({ error: 'Este nome de usuário já está em uso.' }, 409)
       return c.json({ error: 'E-mail ou usuário já cadastrado.' }, 409)
     }
-    throw e
+    return c.json({ error: 'Não foi possível criar o usuário. Tente novamente.' }, 500)
   }
 })
 app.put('/users/:id', async (c) => {
