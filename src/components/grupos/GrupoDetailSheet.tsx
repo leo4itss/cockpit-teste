@@ -309,22 +309,6 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
     } catch { /* silencioso — mudança já aplicada localmente */ }
   }
 
-  // ── Editar grupo pai ─────────────────────────────────────
-  async function handleSaveParent(novoParentId: string | null) {
-    if (!grupo) return
-    // Optimistic update
-    const atualizado: Grupo = { ...grupo, parentId: novoParentId ?? undefined }
-    onUpdate?.(atualizado)
-    try {
-      await api.updateGrupo(grupo.id, { parentId: novoParentId })
-    } catch (err) {
-      // Reverte propagando o estado anterior
-      onUpdate?.(grupo)
-      const msg = err instanceof Error ? err.message : 'Erro ao atualizar grupo pai.'
-      alert(msg)
-    }
-  }
-
   function handleClose() {
     setMembros([]); setAllUsers([]); setShowAdd(false)
     onClose()
