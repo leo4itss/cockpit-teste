@@ -269,7 +269,7 @@ export function UsuarioDetailAccountSheet({
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4 text-[#6b7280] shrink-0" />
-              <SectionTitle>Acesso ao Cockpit{accountNome ? ` — ${accountNome}` : ''}</SectionTitle>
+              <SectionTitle>Perfil no Cockpit{accountNome ? ` — ${accountNome}` : ''}</SectionTitle>
             </div>
             {loadingAcesso ? (
               <p className="text-sm text-[#6b7280]">Carregando…</p>
