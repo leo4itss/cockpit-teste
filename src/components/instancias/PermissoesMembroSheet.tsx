@@ -207,10 +207,15 @@ export function PermissoesMembroSheet({
 
     try {
       if (usaAtrib) {
+        // 1. Salva/remove atribuições granulares
         await Promise.all([
           ...toAdd.map(id => api.addMembroAtribuicao(instanciaId, membro.id, id)),
           ...toRemove.map(id => api.removeMembroAtribuicao(instanciaId, membro.id, id)),
         ])
+        // 2. Persiste o papel selecionado no InstanciaMembro (atualiza badge na lista)
+        if (selectedPapel && selectedPapel !== membro.papel) {
+          await api.updateInstanciaMembro(instanciaId, membro.id, selectedPapel).catch(() => null)
+        }
       } else {
         // Salva papel no membership
         await api.addInstanciaMembro(instanciaId, {
