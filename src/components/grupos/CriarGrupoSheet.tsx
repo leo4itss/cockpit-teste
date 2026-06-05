@@ -161,7 +161,6 @@ export function CriarGrupoSheet({ open, onClose, accountId, grupos = [], compone
       papel:     papelValor,
       escopo:    'conta',
       accountId,
-      parentId:  parentId ?? undefined,
       status:    'Ativo',
       createdAt: now,
       qtdMembros: membros.length,
