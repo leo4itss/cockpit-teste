@@ -10,7 +10,7 @@
  */
 
 import { useState, useEffect, useMemo } from 'react'
-import { Search, UserPlus, UserMinus, User, Users, Loader2, Check, X, Shield } from 'lucide-react'
+import { Search, UserPlus, UserMinus, User as UserIcon, Users, Loader2, Check, X, Shield } from 'lucide-react'
 import {
   NestedSheet,
   NestedSheetHeader,
