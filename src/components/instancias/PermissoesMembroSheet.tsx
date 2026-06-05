@@ -180,7 +180,7 @@ export function PermissoesMembroSheet({
   return (
     <NestedSheet open={open} onClose={handleClose} width="w-[520px]">
       <NestedSheetHeader onClose={handleClose}>
-        <NestedSheetTitle>Permissões — {entityNome}</NestedSheetTitle>
+        <NestedSheetTitle>Ações — {entityNome}</NestedSheetTitle>
         <NestedSheetDescription>
           {membro.entidadeTipo === 'group' ? `Grupo · ${instanciaNome}` : instanciaNome}
         </NestedSheetDescription>
