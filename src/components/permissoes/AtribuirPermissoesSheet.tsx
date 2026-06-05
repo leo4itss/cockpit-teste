@@ -259,34 +259,19 @@ export function AtribuirPermissoesSheet({
             const currentSet = new Set(draftMap[c.id] ?? [])
             if (currentSet.size === 0) return
 
-            if (cfg.permissaoMode === 'component_permissions') {
-              let matched = false
-              for (const p of cfg.papeis) {
-                const papelSet = new Set(p.defaultAcoes ?? [])
-                if (papelSet.size === currentSet.size && [...papelSet].every(a => currentSet.has(a))) {
-                  inferredPapeis[c.id] = p.value; matched = true; break
-                }
+            // Todos os componentes usam component_permissions (FGA puro)
+            const allAcoes = (cfg.acoes ?? newAtribMap[c.id] ?? []).map(a => a.acao)
+            let matched = false
+            for (const p of cfg.papeis) {
+              const defaults = p.defaultAcoes ?? []
+              // [] = todas as ações do catálogo (Administrador)
+              const papelAcoes = defaults.length === 0 ? allAcoes : defaults
+              const papelSet   = new Set(papelAcoes)
+              if (papelSet.size > 0 && papelSet.size === currentSet.size && [...papelSet].every(a => currentSet.has(a))) {
+                inferredPapeis[c.id] = p.value; matched = true; break
               }
-              if (!matched) inferredPapeis[c.id] = 'personalizado'
-
-            } else {
-              // atribuicoes (DocNix) — usa newAtribMap (local) antes do setState
-              const atribs = newAtribMap[c.id] ?? []
-              if (atribs.length === 0) return
-              let matched = false
-              for (const p of cfg.papeis) {
-                const nomes = p.atribuicaoNomes ?? []
-                const expectedIds = new Set(
-                  nomes.length === 0
-                    ? atribs.map(a => a.acao)
-                    : atribs.filter(a => nomes.includes(a.label)).map(a => a.acao)
-                )
-                if (expectedIds.size > 0 && expectedIds.size === currentSet.size && [...expectedIds].every(id => currentSet.has(id))) {
-                  inferredPapeis[c.id] = p.value; matched = true; break
-                }
-              }
-              if (!matched) inferredPapeis[c.id] = 'personalizado'
             }
+            if (!matched) inferredPapeis[c.id] = 'personalizado'
           })
           setPapelSelecionado(inferredPapeis)
         }
