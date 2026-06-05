@@ -256,15 +256,17 @@ export function CriarGrupoSheet({ open, onClose, accountId, grupos = [], compone
                     <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-1.5">{label}</p>
                   )}
                   <div className="grid grid-cols-3 gap-2">
-                    {cfg.papeis.map(p => (
+                    {cfg.papeis.map(p => {
+                      const chave = `${label}::${p.value}`
+                      return (
                       <button
                         key={p.value}
                         type="button"
-                        onClick={() => setPapel(p.value)}
+                        onClick={() => setPapel(chave)}
                         disabled={saving}
                         className={cn(
                           'flex flex-col items-start px-3 py-2.5 rounded-lg border text-left transition-colors',
-                          papel === p.value
+                          papel === chave
                             ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
                             : 'border-gray-200 bg-white hover:bg-gray-50'
                         )}
