@@ -97,10 +97,11 @@ export function UsuarioDetailAccountSheet({
     if (!user) return
     setLoadingAcesso(true)
     try {
-      const [membros, fetchedInsts, comps] = await Promise.all([
+      const [membros, fetchedInsts, comps, contaPerms] = await Promise.all([
         api.getAccountMembros(accountId).catch(() => [] as any[]),
         insts ? Promise.resolve(insts) : api.getInstancias({ accountId }).catch(() => [] as Instancia[]),
         api.getComponentes().catch(() => [] as any[]),
+        api.getPermissions({ entidade_tipo: 'user', entidade_id: user.id, instancia_id: null }).catch(() => [] as any[]),
       ])
 
       const m = (membros as any[]).find((mb: any) => mb.userId === user.id)
@@ -127,6 +128,32 @@ export function UsuarioDetailAccountSheet({
         )
       )
       setMembroInstancias(todosOsMembros)
+
+      // ── Infere papeis de component_permissions (nível conta) ──
+      const permsByComp: Record<string, Set<string>> = {}
+      for (const p of contaPerms as any[]) {
+        const cid = p.componenteId ?? p.componente_id
+        if (!cid) continue
+        if (!permsByComp[cid]) permsByComp[cid] = new Set()
+        permsByComp[cid].add(p.acao)
+      }
+      const inferedComps: { compId: string; compNome: string; papel: string }[] = []
+      for (const [cid, acoes] of Object.entries(permsByComp)) {
+        const compNome = nomesMap[cid]
+        if (!compNome) continue
+        const cfg = getComponenteConfig(compNome)
+        if (cfg.permissaoMode !== 'component_permissions') continue
+        let papelLabel = 'Personalizado'
+        for (const p of cfg.papeis) {
+          const papelSet = new Set(p.defaultAcoes ?? [])
+          if (papelSet.size === acoes.size && [...papelSet].every(a => acoes.has(a))) {
+            papelLabel = p.label; break
+          }
+        }
+        inferedComps.push({ compId: cid, compNome, papel: papelLabel })
+      }
+      setPermComponentes(inferedComps)
+
     } finally {
       setLoadingAcesso(false)
     }
