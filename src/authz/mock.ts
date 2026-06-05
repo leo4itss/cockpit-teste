@@ -342,10 +342,8 @@ export type PapelDef = {
   label: string
   desc: string
   cls: string
-  // Modo 'atribuicoes': nomes das atribuições incluídas neste papel
-  // [] = TODAS as atribuições ativas (padrão Administrador)
-  atribuicaoNomes?: string[]
-  // Modo 'component_permissions': ações padrão concedidas por este papel
+  // Ações padrão concedidas por este papel.
+  // [] = TODAS as ações de config.acoes (padrão Administrador)
   defaultAcoes?: string[]
 }
 
