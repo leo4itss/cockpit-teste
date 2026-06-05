@@ -448,7 +448,7 @@ export function AcessosPage() {
               </span>
             ) : null}
           </div>
-          <h1 className="text-2xl font-bold leading-8 text-[#030712]">Permissões</h1>
+          <h1 className="text-2xl font-bold leading-8 text-[#030712]">Acessos</h1>
           <p className="text-sm text-[#6b7280] mt-1 max-w-[1080px]">
             Gerencie quem acessa <strong className="font-medium text-[#374151]">esta conta</strong> e com quais permissões.
             Diferente de <strong className="font-medium text-[#374151]">Usuários</strong> (visão da organização), aqui você vê apenas os membros e grupos desta conta específica.
