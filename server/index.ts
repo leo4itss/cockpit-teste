@@ -389,9 +389,21 @@ app.get('/api/users/:id', async (c) => {
 })
 
 app.post('/api/users', async (c) => {
-  const body = await c.req.json()
-  const [row] = await db.insert(users).values(body).returning()
-  return c.json(row, 201)
+  try {
+    const body = await c.req.json()
+    const [row] = await db.insert(users).values(body).returning()
+    return c.json(row, 201)
+  } catch (e: any) {
+    const msg: string = e?.message ?? ''
+    if (msg.includes('unique') || msg.includes('duplicate')) {
+      if (msg.includes('"email"') || msg.includes('email'))
+        return c.json({ error: 'Este e-mail já está cadastrado na plataforma.' }, 409)
+      if (msg.includes('"usuario"') || msg.includes('usuario'))
+        return c.json({ error: 'Este nome de usuário já está em uso.' }, 409)
+      return c.json({ error: 'E-mail ou usuário já cadastrado.' }, 409)
+    }
+    throw e
+  }
 })
 
 app.put('/api/users/:id', async (c) => {
