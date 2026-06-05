@@ -236,14 +236,18 @@ export const api = {
     request<void>(`/api/instancias/${instanciaId}/perfil-slots/${slotId}/nomeacoes/${nomeacaoId}`, { method: 'DELETE' }),
 
   // Atribuições de Membro de Instância
+  // @deprecated FGA unificado — usar addPermission/removePermission (component_permissions)
   getMembroAtribuicoes: (instanciaId: string, membroId: string) =>
     request<any[]>(`/api/instancias/${instanciaId}/membros/${membroId}/atribuicoes`),
+  // @deprecated FGA unificado — usar addPermission (component_permissions)
   addMembroAtribuicao: (instanciaId: string, membroId: string, atribuicaoId: string) =>
     request<any>(`/api/instancias/${instanciaId}/membros/${membroId}/atribuicoes`, { method: 'POST', body: JSON.stringify({ atribuicaoId }) }),
+  // @deprecated FGA unificado — usar removePermission (component_permissions)
   removeMembroAtribuicao: (instanciaId: string, membroId: string, atribuicaoId: string) =>
     request<void>(`/api/instancias/${instanciaId}/membros/${membroId}/atribuicoes/${atribuicaoId}`, { method: 'DELETE' }),
 
-  // Permissões Efetivas
+  // Permissões Efetivas (legado DocNix — retorna atribuicaoIds, não acao strings)
+  // @deprecated Endpoint legado — permissões agora em component_permissions
   getPermissoesEfetivas: (instanciaId: string, userId: string) =>
     request<{ atribuicoes: string[]; fontes: { atribuicaoId: string; fonte: string; entidadeId: string }[] }>(
       `/api/instancias/${instanciaId}/permissoes-efetivas?userId=${userId}`
