@@ -330,8 +330,20 @@ app.get('/users/:id', async (c) => {
   return row ? c.json(row) : c.json({ error: 'Not found' }, 404)
 })
 app.post('/users', async (c) => {
-  const [row] = await db.insert(users).values(await c.req.json()).returning()
-  return c.json(row, 201)
+  try {
+    const [row] = await db.insert(users).values(await c.req.json()).returning()
+    return c.json(row, 201)
+  } catch (e: any) {
+    const msg: string = e?.message ?? ''
+    if (msg.includes('unique') || msg.includes('duplicate')) {
+      if (msg.includes('"email"') || msg.includes('email'))
+        return c.json({ error: 'Este e-mail já está cadastrado na plataforma.' }, 409)
+      if (msg.includes('"usuario"') || msg.includes('usuario'))
+        return c.json({ error: 'Este nome de usuário já está em uso.' }, 409)
+      return c.json({ error: 'E-mail ou usuário já cadastrado.' }, 409)
+    }
+    throw e
+  }
 })
 app.put('/users/:id', async (c) => {
   const [row] = await db.update(users).set(await c.req.json()).where(eq(users.id, c.req.param('id'))).returning()
