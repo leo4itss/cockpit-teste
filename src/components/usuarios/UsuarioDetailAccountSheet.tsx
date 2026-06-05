@@ -83,6 +83,9 @@ export function UsuarioDetailAccountSheet({
   const [componenteNomes, setComponenteNomes] = useState<Record<string, string>>({})
   const [loadingAcesso, setLoadingAcesso]     = useState(false)
 
+  // Permissões por componente (nível conta — FGA, instancia_id null)
+  const [permComponentes, setPermComponentes] = useState<{ compId: string; compNome: string; papel: string }[]>([])
+
   // Permissões de instância selecionada
   const [instanciaAberta, setInstanciaAberta] = useState<{
     instancia: Instancia
