@@ -361,7 +361,7 @@ export function CriarUsuarioSheet({ open, onClose, onSuccess, accountId }: Props
                   {/* Nível de acesso na conta */}
                   <div className="flex flex-col gap-2">
                     <p className="text-sm font-medium text-[#030712]">
-                      Perfil na conta
+                      Papel na conta
                       <span className="ml-1 text-xs text-[#6b7280] font-normal">
                         — opcional; define o vínculo com esta conta
                       </span>
