@@ -439,7 +439,7 @@ export function CriarUsuarioSheet({ open, onClose, onSuccess, accountId }: Props
                     return (
                       <div className="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 flex flex-col gap-2">
                         <p className="text-xs font-medium text-blue-700 uppercase tracking-wide">
-                          Permissões resultantes
+                          Ações resultantes
                         </p>
 
                         {/* Nível de conta */}
