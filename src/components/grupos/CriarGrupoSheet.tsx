@@ -108,12 +108,6 @@ export function CriarGrupoSheet({ open, onClose, accountId, grupos = [], compone
   const [saving, setSaving]       = useState(false)
   const [error, setError]         = useState<string | null>(null)
 
-  // Grupos disponíveis como pai: mesma conta, excluindo o próprio (não existe ainda na criação)
-  const gruposDisponiveis = useMemo(
-    () => grupos.filter(g => g.escopo === 'conta' && g.accountId === accountId && g.status === 'Ativo'),
-    [grupos, accountId]
-  )
-
   // Reset papel ao default correto quando o sheet abre
   useEffect(() => {
     if (!open) return
