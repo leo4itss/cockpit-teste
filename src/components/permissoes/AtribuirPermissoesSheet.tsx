@@ -380,6 +380,7 @@ export function AtribuirPermissoesSheet({
   function handleClose() {
     setSearch(''); setOriginal({}); setDraft({}); setComponentes([])
     setActiveCapabilities(new Set()); setSaveError(null); setInherited({})
+    setPapelSelecionado({})
     onClose()
   }
 
