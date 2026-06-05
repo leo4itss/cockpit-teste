@@ -105,11 +105,12 @@ export function CriarGrupoSheet({ open, onClose, accountId, componentesAtivos = 
   const [saving, setSaving]       = useState(false)
   const [error, setError]         = useState<string | null>(null)
 
-  // Reset papel ao default correto quando o sheet abre
+  // Reset ao abrir
   useEffect(() => {
     if (!open) return
-    setPapel(defaultPapelKey)
-  }, [open, defaultPapelKey])
+    setSecaoSelecionada(multiSecao ? null : defaultSecao)
+    setPapel('')
+  }, [open, multiSecao, defaultSecao])
 
   // Carrega usuários para busca de membros
   useEffect(() => {
