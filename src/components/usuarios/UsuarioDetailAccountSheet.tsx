@@ -338,6 +338,35 @@ export function UsuarioDetailAccountSheet({
             )}
           </div>
 
+          {/* ── Permissões por componente (FGA, nível conta) ── */}
+          {!loadingAcesso && permComponentes.length > 0 && (
+            <>
+              <div className="border-t border-gray-100" />
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-[#6b7280] shrink-0" />
+                  <SectionTitle>Permissões por componente</SectionTitle>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  {permComponentes.map(({ compId, compNome, papel }) => (
+                    <div
+                      key={compId}
+                      className="flex items-center justify-between px-4 py-2.5 rounded-lg border border-gray-200 bg-white"
+                    >
+                      <p className="text-sm font-medium text-[#030712]">{compNome}</p>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-blue-50 text-blue-700 border-blue-200">
+                        {papel}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-[#9ca3af]">
+                  Atribuídas a nível de conta — válidas em todas as instâncias deste componente.
+                </p>
+              </div>
+            </>
+          )}
+
         </div>
 
         {/* Sheet nível 2 — AtribuirPermissoes */}
