@@ -157,12 +157,15 @@ export function CriarGrupoSheet({ open, onClose, accountId, grupos = [], compone
     setSaving(true)
     setError(null)
 
+    // Extrai o valor real do papel (remove prefixo "Label::")
+    const papelValor = papel.includes('::') ? papel.split('::').slice(1).join('::') : papel
+
     const now = new Date().toLocaleDateString('pt-BR')
     const localGrupo: Grupo = {
       id:        crypto.randomUUID(),
       nome:      nome.trim(),
       descricao: descricao.trim() || undefined,
-      papel,
+      papel:     papelValor,
       escopo:    'conta',
       accountId,
       parentId:  parentId ?? undefined,
