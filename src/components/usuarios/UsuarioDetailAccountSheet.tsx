@@ -293,80 +293,110 @@ export function UsuarioDetailAccountSheet({
 
           <Divider />
 
-          {/* ── Acesso às soluções (instâncias) ──────────────── */}
-          <div className="flex flex-col gap-3">
+          {/* ── Permissões ───────────────────────────────────── */}
+          <div className="flex flex-col gap-5">
             <div className="flex items-center gap-2">
               <Layers className="w-4 h-4 text-[#6b7280] shrink-0" />
-              <SectionTitle>Acesso às soluções</SectionTitle>
+              <SectionTitle>Permissões</SectionTitle>
             </div>
 
-            {loadingAcesso ? (
-              <p className="text-sm text-[#6b7280]">Carregando…</p>
-            ) : instanciasComAcesso.length === 0 ? (
-              <div className="flex items-center gap-3 px-4 py-3 rounded-lg border border-dashed border-gray-200 bg-gray-50">
-                <p className="text-sm text-[#6b7280]">
-                  Sem acesso a instâncias nesta conta. Use "Atribuir permissões" ou adicione-o
-                  diretamente nas instâncias desejadas.
+            {/* Sub-seção: Globais (nível conta, instancia_id = null) */}
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">
+                  Globais — nível de conta
                 </p>
+                <button
+                  onClick={() => setShowPermissoes(true)}
+                  className="text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                >
+                  + Atribuir
+                </button>
               </div>
-            ) : (
-              <div className="flex flex-col gap-2">
-                {instanciasComAcesso.map(({ instancia, membro }) => {
-                  const compNome = componenteNomes[instancia.componenteId] ?? ''
-                  return (
-                    <div
-                      key={instancia.id}
-                      className="flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-[#030712] truncate">{instancia.nome}</p>
-                        {compNome && (
-                          <p className="text-xs text-[#6b7280]">{compNome}</p>
-                        )}
-                      </div>
-                      <InstanciaPapelBadge papel={membro.papel} componenteNome={compNome} />
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setInstanciaAberta({ instancia, membro })}
-                      >
-                        Editar permissões
-                      </Button>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </div>
 
-          {/* ── Permissões por componente (FGA, nível conta) ── */}
-          {!loadingAcesso && permComponentes.length > 0 && (
-            <>
-              <div className="border-t border-gray-100" />
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center gap-2">
-                  <Lock className="w-4 h-4 text-[#6b7280] shrink-0" />
-                  <SectionTitle>Permissões por componente</SectionTitle>
+              {loadingAcesso ? (
+                <p className="text-sm text-[#6b7280]">Carregando…</p>
+              ) : permComponentes.length === 0 ? (
+                <div className="px-4 py-3 rounded-lg border border-dashed border-gray-200 bg-gray-50">
+                  <p className="text-sm text-[#6b7280]">
+                    Nenhuma permissão global atribuída.
+                  </p>
                 </div>
+              ) : (
                 <div className="flex flex-col gap-1.5">
                   {permComponentes.map(({ compId, compNome, papel }) => (
                     <div
                       key={compId}
-                      className="flex items-center justify-between px-4 py-2.5 rounded-lg border border-gray-200 bg-white"
+                      className="flex items-center justify-between px-4 py-2.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
                     >
                       <p className="text-sm font-medium text-[#030712]">{compNome}</p>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-blue-50 text-blue-700 border-blue-200">
-                        {papel}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-blue-50 text-blue-700 border-blue-200">
+                          {papel}
+                        </span>
+                        <button
+                          onClick={() => setShowPermissoes(true)}
+                          className="text-xs font-medium text-gray-500 hover:text-gray-700 transition-colors"
+                        >
+                          Editar
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
-                <p className="text-xs text-[#9ca3af]">
-                  Atribuídas a nível de conta — válidas em todas as instâncias deste componente.
-                </p>
-              </div>
-            </>
-          )}
+              )}
+              <p className="text-xs text-[#9ca3af]">
+                Válidas em todos os contextos do componente nesta conta (ex: PAS Core, Analytics).
+              </p>
+            </div>
+
+            {/* Sub-seção: Por instância */}
+            <div className="flex flex-col gap-2">
+              <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">
+                Por instância
+              </p>
+
+              {loadingAcesso ? (
+                <p className="text-sm text-[#6b7280]">Carregando…</p>
+              ) : instanciasComAcesso.length === 0 ? (
+                <div className="px-4 py-3 rounded-lg border border-dashed border-gray-200 bg-gray-50">
+                  <p className="text-sm text-[#6b7280]">
+                    Sem acesso a instâncias nesta conta. Adicione o usuário diretamente nas instâncias desejadas.
+                  </p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-1.5">
+                  {instanciasComAcesso.map(({ instancia, membro }) => {
+                    const compNome = componenteNomes[instancia.componenteId] ?? ''
+                    return (
+                      <div
+                        key={instancia.id}
+                        className="flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-[#030712] truncate">{instancia.nome}</p>
+                          {compNome && (
+                            <p className="text-xs text-[#6b7280]">{compNome}</p>
+                          )}
+                        </div>
+                        <InstanciaPapelBadge papel={membro.papel} componenteNome={compNome} />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setInstanciaAberta({ instancia, membro })}
+                        >
+                          Editar
+                        </Button>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+              <p className="text-xs text-[#9ca3af]">
+                Permissões granulares dentro de instâncias específicas (ex: MaxDoc, DocAction).
+              </p>
+            </div>
+          </div>
 
         </div>
 
