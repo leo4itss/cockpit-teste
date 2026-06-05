@@ -311,7 +311,7 @@ export function AtribuirPermissoesSheet({
       .finally(() => { if (!cancelled) setLoading(false) })
 
     return () => { cancelled = true }
-  }, [open, entityId, entityType, accountId, instanciaId, instanciaComponenteId, papel]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [open, entityId, entityType, accountId, instanciaId, instanciaComponenteId, papel])
 
   const filtered = useMemo(() => {
     if (!search.trim()) return componentes
