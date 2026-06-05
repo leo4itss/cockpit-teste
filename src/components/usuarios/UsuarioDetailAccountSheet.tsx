@@ -297,7 +297,7 @@ export function UsuarioDetailAccountSheet({
           <div className="flex flex-col gap-5">
             <div className="flex items-center gap-2">
               <Layers className="w-4 h-4 text-[#6b7280] shrink-0" />
-              <SectionTitle>Permissões</SectionTitle>
+              <SectionTitle>Ações</SectionTitle>
             </div>
 
             {/* Sub-seção: Globais (nível conta, instancia_id = null) */}
