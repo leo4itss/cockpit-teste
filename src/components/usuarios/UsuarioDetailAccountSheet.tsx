@@ -327,20 +327,12 @@ export function UsuarioDetailAccountSheet({
                   {permComponentes.map(({ compId, compNome, papel }) => (
                     <div
                       key={compId}
-                      className="flex items-center justify-between px-4 py-2.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
+                      className="flex items-center justify-between px-4 py-2.5 rounded-lg border border-gray-200 bg-white"
                     >
                       <p className="text-sm font-medium text-[#030712]">{compNome}</p>
-                      <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-blue-50 text-blue-700 border-blue-200">
-                          {papel}
-                        </span>
-                        <button
-                          onClick={() => setShowPermissoes(true)}
-                          className="text-xs font-medium text-gray-500 hover:text-gray-700 transition-colors"
-                        >
-                          Editar
-                        </button>
-                      </div>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-blue-50 text-blue-700 border-blue-200">
+                        {papel}
+                      </span>
                     </div>
                   ))}
                 </div>
