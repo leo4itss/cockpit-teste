@@ -39,7 +39,6 @@ interface Props {
   accountId:      string
   accountNome?:   string   // nome da conta (escopo='conta') ou da org (escopo='org')
   contextoLabel?: string   // 'Conta' | 'Org'
-  grupos?:        Grupo[]  // lista de grupos para resolver nomes de pai e filhos
   onUpdate?:      (updated: Grupo) => void  // callback para sincronizar papel na lista pai
 }
 
