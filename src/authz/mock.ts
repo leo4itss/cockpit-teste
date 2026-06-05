@@ -426,28 +426,44 @@ const COMPONENTE_CONFIGS: Record<string, ComponenteTypeConfig> = {
   // ── DocAction ─────────────────────────────────────────────────
   'docaction': {
     label: 'DocAction',
-    permissaoMode: 'atribuicoes',
+    permissaoMode: 'component_permissions',
     papeis: [
       {
         value: 'colaborador', label: 'Colaborador', desc: 'Cria e acompanha ocorrências',
         cls: 'bg-green-50 text-green-700 border-green-200',
-        atribuicaoNomes: ['Visualizar','Criar Ocorrência','Criar Ocorrência 8D','Editar Ocorrência','Vincular Ocorrência','Acompanhar Ocorrência'],
+        defaultAcoes: ['Visualizar','Criar Ocorrência','Criar Ocorrência 8D','Editar Ocorrência','Vincular Ocorrência','Acompanhar Ocorrência'],
       },
       {
         value: 'analista', label: 'Analista', desc: 'Categoriza, analisa e cria planos de ação',
         cls: 'bg-blue-50 text-blue-700 border-blue-200',
-        atribuicaoNomes: ['Visualizar','Criar Ocorrência','Criar Ocorrência 8D','Editar Ocorrência','Vincular Ocorrência','Acompanhar Ocorrência','Categorizar Ocorrência','Analisar Causa','Criar Plano de Ação','Verificar Eficácia','Encaminhar Ocorrência'],
+        defaultAcoes: ['Visualizar','Criar Ocorrência','Criar Ocorrência 8D','Editar Ocorrência','Vincular Ocorrência','Acompanhar Ocorrência','Categorizar Ocorrência','Analisar Causa','Criar Plano de Ação','Verificar Eficácia','Encaminhar Ocorrência'],
       },
       {
         value: 'aprovador-docaction', label: 'Aprovador', desc: 'Aprova análises e encerra ocorrências',
         cls: 'bg-orange-50 text-orange-700 border-orange-200',
-        atribuicaoNomes: ['Visualizar','Criar Ocorrência','Criar Ocorrência 8D','Editar Ocorrência','Vincular Ocorrência','Acompanhar Ocorrência','Categorizar Ocorrência','Analisar Causa','Criar Plano de Ação','Verificar Eficácia','Encaminhar Ocorrência','Aprovar Análise de Causa','Encerrar Ocorrência','Reprogramar Prazo/Responsável'],
+        defaultAcoes: ['Visualizar','Criar Ocorrência','Criar Ocorrência 8D','Editar Ocorrência','Vincular Ocorrência','Acompanhar Ocorrência','Categorizar Ocorrência','Analisar Causa','Criar Plano de Ação','Verificar Eficácia','Encaminhar Ocorrência','Aprovar Análise de Causa','Encerrar Ocorrência','Reprogramar Prazo/Responsável'],
       },
       {
         value: 'admin-docaction', label: 'Administrador', desc: 'Acesso completo ao DocAction',
         cls: 'bg-red-50 text-red-700 border-red-200',
-        atribuicaoNomes: [],
+        defaultAcoes: [], // [] = todas as ações de config.acoes
       },
+    ],
+    acoes: [
+      { acao: 'Visualizar',                    label: 'Visualizar' },
+      { acao: 'Criar Ocorrência',              label: 'Criar Ocorrência' },
+      { acao: 'Criar Ocorrência 8D',           label: 'Criar Ocorrência 8D' },
+      { acao: 'Editar Ocorrência',             label: 'Editar Ocorrência' },
+      { acao: 'Vincular Ocorrência',           label: 'Vincular Ocorrência' },
+      { acao: 'Acompanhar Ocorrência',         label: 'Acompanhar Ocorrência' },
+      { acao: 'Categorizar Ocorrência',        label: 'Categorizar Ocorrência' },
+      { acao: 'Analisar Causa',                label: 'Analisar Causa' },
+      { acao: 'Criar Plano de Ação',           label: 'Criar Plano de Ação' },
+      { acao: 'Verificar Eficácia',            label: 'Verificar Eficácia' },
+      { acao: 'Encaminhar Ocorrência',         label: 'Encaminhar Ocorrência' },
+      { acao: 'Aprovar Análise de Causa',      label: 'Aprovar Análise de Causa' },
+      { acao: 'Encerrar Ocorrência',           label: 'Encerrar Ocorrência' },
+      { acao: 'Reprogramar Prazo/Responsável', label: 'Reprogramar Prazo/Responsável' },
     ],
   },
 
