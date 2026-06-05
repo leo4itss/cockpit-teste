@@ -318,6 +318,7 @@ export function UsuarioDetailAccountSheet({
           entityNome={user.nomeCompleto}
           accountId={accountId}
           accountNome={accountNome}
+          onSuccess={() => reloadAcesso(instancias)}
         />
 
         {/* Sheet nível 2 — PermissoesMembroSheet por instância */}
@@ -330,7 +331,10 @@ export function UsuarioDetailAccountSheet({
             componenteId={instanciaAberta.instancia.componenteId}
             componenteNome={componenteNomes[instanciaAberta.instancia.componenteId] ?? ''}
             membro={instanciaAberta.membro}
-            onSaved={() => setInstanciaAberta(null)}
+            onSaved={() => {
+              reloadAcesso(instancias)
+              setInstanciaAberta(null)
+            }}
           />
         )}
       </NestedSheetBody>
