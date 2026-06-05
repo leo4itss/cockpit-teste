@@ -35,7 +35,6 @@ interface Props {
   open:              boolean
   onClose:           () => void
   accountId:         string
-  grupos?:           Grupo[]    // lista de grupos existentes (mesma conta) para seleção de grupo pai
   // Nomes dos componentes ativos na conta (ex: ['MaxDoc','DocAction'] ou ['Assistente IA'])
   componentesAtivos?: string[]
   onSuccess:         (grupo: Grupo) => void
