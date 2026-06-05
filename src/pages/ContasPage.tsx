@@ -441,7 +441,7 @@ function ContaDetailSheet({ open, onClose, account }: ContaDetailProps) {
                           </div>
                         </td>
                         <td className="px-3 py-3 whitespace-nowrap">
-                          <PapelBadge papel={membro.papel} />
+                          <PerfilBadge papel={membro.papel} />
                         </td>
                         <td className="pr-6 pl-3 py-3 text-right">
                           <div className="invisible group-hover:visible">
