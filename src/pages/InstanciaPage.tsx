@@ -645,7 +645,7 @@ export function InstanciaPage() {
                               title="Ver permissões"
                             >
                               <Shield className="w-3.5 h-3.5" />
-                              Permissões
+                              Ações
                             </button>
                             <button
                               onClick={() => handleRemove(membro)}
