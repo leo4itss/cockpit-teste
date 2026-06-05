@@ -754,6 +754,20 @@ app.post('/instancias/:id/membros', async (c) => {
   return c.json(row, 201)
 })
 
+app.put('/instancias/:id/membros/:membroId', async (c) => {
+  const instanciaId = c.req.param('id')
+  const membroId    = c.req.param('membroId')
+  const { papel }   = await c.req.json()
+  if (!papel) return c.json({ error: 'papel é obrigatório' }, 400)
+  const [row] = await db
+    .update(instanciaMembros)
+    .set({ papel })
+    .where(and(eq(instanciaMembros.id, membroId), eq(instanciaMembros.instanciaId, instanciaId)))
+    .returning()
+  if (!row) return c.json({ error: 'Membro não encontrado' }, 404)
+  return c.json(row)
+})
+
 app.delete('/instancias/:id/membros/:membroId', async (c) => {
   await db.delete(instanciaMembros).where(eq(instanciaMembros.id, c.req.param('membroId')))
   return c.json({ ok: true })
