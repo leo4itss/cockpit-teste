@@ -3,7 +3,17 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     ...options,
   })
-  if (!res.ok) throw new Error(`API error ${res.status}: ${await res.text()}`)
+  if (!res.ok) {
+    const text = await res.text()
+    try {
+      const json = JSON.parse(text)
+      if (json.error) throw new Error(json.error)
+    } catch (e) {
+      if (e instanceof SyntaxError) throw new Error(`API error ${res.status}: ${text}`)
+      throw e
+    }
+    throw new Error(`API error ${res.status}: ${text}`)
+  }
   return res.json()
 }
 
