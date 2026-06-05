@@ -148,8 +148,7 @@ export function CriarGrupoSheet({ open, onClose, accountId, componentesAtivos = 
     setSaving(true)
     setError(null)
 
-    // Extrai o valor real do papel (remove prefixo "Label::")
-    const papelValor = papel.includes('::') ? papel.split('::').slice(1).join('::') : papel
+    const papelValor = papel
 
     const now = new Date().toLocaleDateString('pt-BR')
     const localGrupo: Grupo = {
