@@ -91,16 +91,14 @@ export function CriarGrupoSheet({ open, onClose, accountId, componentesAtivos = 
 
   const multiSecao = secoesConfig.length > 1
 
-  // Chave composta "Label::value" garante unicidade entre seções que compartilham
-  // nomes de valor (ex: 'viewer' aparece em Assistente IA, Analytics e Base de Conhecimento).
-  // Na hora de salvar, extraímos apenas a parte após "::".
-  const defaultPapelKey = secoesConfig[0]
-    ? `${secoesConfig[0].label}::${secoesConfig[0].config.papeis[0]?.value ?? 'viewer'}`
-    : '::viewer'
+  // Passo 1: componente selecionado (null = nenhum ainda)
+  // Passo 2: papel dentro do componente selecionado
+  const defaultSecao = secoesConfig[0]?.label ?? null
 
   const [nome, setNome]           = useState('')
   const [descricao, setDescricao] = useState('')
-  const [papel, setPapel]         = useState(defaultPapelKey)
+  const [secaoSelecionada, setSecaoSelecionada] = useState<string | null>(multiSecao ? null : defaultSecao)
+  const [papel, setPapel]         = useState('')
   const [searchMembro, setSearchMembro] = useState('')
   const [allUsers, setAllUsers]   = useState<User[]>([])
   const [membros, setMembros]     = useState<User[]>([])
