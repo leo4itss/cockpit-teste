@@ -130,7 +130,7 @@ export function PermissoesEfetivasSheet({
   return (
     <NestedSheet open={open} onClose={onClose} width="w-[520px]">
       <NestedSheetHeader>
-        <NestedSheetTitle>Permissões Efetivas</NestedSheetTitle>
+        <NestedSheetTitle>Ações Efetivas</NestedSheetTitle>
         <NestedSheetDescription>
           {userName} · {instanciaNome}
         </NestedSheetDescription>
