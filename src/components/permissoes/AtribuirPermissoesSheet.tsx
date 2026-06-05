@@ -250,6 +250,46 @@ export function AtribuirPermissoesSheet({
         setOriginal(permMap)
         setDraft(draftMap)
 
+        // ── Infere papelSelecionado a partir das permissões carregadas ──
+        if (!cancelled) {
+          const inferredPapeis: Record<string, string> = {}
+          ativos.forEach(c => {
+            const cfg        = getComponenteConfig(c.nome)
+            const currentSet = new Set(draftMap[c.id] ?? [])
+            if (currentSet.size === 0) return
+
+            if (cfg.permissaoMode === 'component_permissions') {
+              let matched = false
+              for (const p of cfg.papeis) {
+                const papelSet = new Set(p.defaultAcoes ?? [])
+                if (papelSet.size === currentSet.size && [...papelSet].every(a => currentSet.has(a))) {
+                  inferredPapeis[c.id] = p.value; matched = true; break
+                }
+              }
+              if (!matched) inferredPapeis[c.id] = 'personalizado'
+
+            } else {
+              // atribuicoes (DocNix) — usa newAtribMap (local) antes do setState
+              const atribs = newAtribMap[c.id] ?? []
+              if (atribs.length === 0) return
+              let matched = false
+              for (const p of cfg.papeis) {
+                const nomes = p.atribuicaoNomes ?? []
+                const expectedIds = new Set(
+                  nomes.length === 0
+                    ? atribs.map(a => a.acao)
+                    : atribs.filter(a => nomes.includes(a.label)).map(a => a.acao)
+                )
+                if (expectedIds.size > 0 && expectedIds.size === currentSet.size && [...expectedIds].every(id => currentSet.has(id))) {
+                  inferredPapeis[c.id] = p.value; matched = true; break
+                }
+              }
+              if (!matched) inferredPapeis[c.id] = 'personalizado'
+            }
+          })
+          setPapelSelecionado(inferredPapeis)
+        }
+
         // ── Permissões herdadas via grupos (só para usuários, fora do modo instância) ──
         if (entityType === 'usuario' && accountId && !modoInstancia) {
           api.getUserGrupos(entityId, accountId)
