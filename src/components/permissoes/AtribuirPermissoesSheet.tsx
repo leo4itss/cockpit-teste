@@ -556,6 +556,41 @@ export function AtribuirPermissoesSheet({
                         </div>
                       </div>
 
+                      {/* Seletor de papel — atalho para definir ações em bloco (só para FGA) */}
+                      {!locked && (() => {
+                        const cfg = getComponenteConfig(comp.nome)
+                        if (cfg.permissaoMode !== 'component_permissions') return null
+                        const papelAtual = papelSelecionado[comp.id]
+                        return (
+                          <div className="pl-8 mb-3">
+                            <p className="text-[11px] font-medium text-[#6b7280] mb-1.5 uppercase tracking-wide">Papel</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {cfg.papeis.map(p => (
+                                <button
+                                  key={p.value}
+                                  type="button"
+                                  disabled={saving}
+                                  onClick={() => handleSelectPapel(comp.id, comp.nome, p.value)}
+                                  className={cn(
+                                    'px-3 py-1 rounded-full text-xs font-medium border transition-colors',
+                                    papelAtual === p.value
+                                      ? 'border-blue-500 bg-blue-50 text-blue-700 ring-1 ring-blue-500'
+                                      : 'border-gray-200 bg-white text-[#6b7280] hover:bg-gray-50 hover:text-[#030712]',
+                                  )}
+                                >
+                                  {p.label}
+                                </button>
+                              ))}
+                              {papelAtual === 'personalizado' && (
+                                <span className="px-3 py-1 rounded-full text-xs font-medium border border-amber-200 bg-amber-50 text-amber-700">
+                                  Personalizado
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        )
+                      })()}
+
                       {/* DocNix sem atribuições carregadas: permissões gerenciadas por objeto */}
                       {comp.tipoModelo === 'docnix' && acoes === ACOES['default'] && (
                         <div className="pl-8">
