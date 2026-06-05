@@ -265,7 +265,7 @@ export function ConvidarUsuarioSheet({ open, onClose, modo = 'conta', accountId,
           {/* Papel — apenas para modo='conta' */}
           {!isOrg && (lookupState === 'found' || lookupState === 'not-found') && (
             <div className="flex flex-col gap-1.5">
-              <FieldLabel>Perfil na conta</FieldLabel>
+              <FieldLabel>Papel na conta</FieldLabel>
               <div className="flex items-center gap-2 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-md">
                 <UserPlus className="w-4 h-4 text-gray-400 shrink-0" />
                 <span className="text-sm font-medium text-[#030712]">Membro</span>
