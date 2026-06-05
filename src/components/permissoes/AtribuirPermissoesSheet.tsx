@@ -139,6 +139,8 @@ export function AtribuirPermissoesSheet({
   // componenteId → string[] de ações ativas (diretas)
   const [original, setOriginal] = useState<Record<string, string[]>>({})
   const [draft, setDraft]       = useState<Record<string, string[]>>({})
+  // componenteId → papel selecionado ('personalizado' se editado manualmente)
+  const [papelSelecionado, setPapelSelecionado] = useState<Record<string, string>>({})
   // componenteId → { acao → nome do grupo que concede } (permissões herdadas via grupo)
   const [inherited, setInherited] = useState<Record<string, Record<string, string>>>({})
   // componenteId → AcaoItem[] vindas do catálogo DocNix (substitui ACOES['default'] quando presente)
