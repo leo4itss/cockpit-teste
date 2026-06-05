@@ -192,13 +192,14 @@ export function AtribuirPermissoesSheet({
               .catch(() => ({ id: c.id, atribs: [] }))
           )
         )
+        // newAtribMap declarado fora do if(!cancelled) para uso na inferência de papelSelecionado
+        const newAtribMap: Record<string, AcaoItem[]> = {}
+        atribResults.forEach(({ id, atribs }) => {
+          if (atribs.length > 0) {
+            newAtribMap[id] = (atribs as any[]).map((a: any) => ({ acao: a.id as string, label: a.nome as string }))
+          }
+        })
         if (!cancelled) {
-          const newAtribMap: Record<string, AcaoItem[]> = {}
-          atribResults.forEach(({ id, atribs }) => {
-            if (atribs.length > 0) {
-              newAtribMap[id] = atribs.map((a: any) => ({ acao: a.id, label: a.nome }))
-            }
-          })
           setAtribuicoesMap(newAtribMap)
         }
 
