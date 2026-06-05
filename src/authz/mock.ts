@@ -354,9 +354,9 @@ export type AcaoDef = {
 
 export type ComponenteTypeConfig = {
   label: string
-  permissaoMode: 'component_permissions' | 'atribuicoes'
+  permissaoMode: 'component_permissions'
   papeis: PapelDef[]
-  acoes?: AcaoDef[]   // somente para permissaoMode === 'component_permissions'
+  acoes?: AcaoDef[]
 }
 
 const COMPONENTE_CONFIGS: Record<string, ComponenteTypeConfig> = {
