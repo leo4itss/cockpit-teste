@@ -141,7 +141,7 @@ export function CriarGrupoSheet({ open, onClose, accountId, componentesAtivos = 
     setMembros(prev => prev.filter(m => m.id !== userId))
   }
 
-  const canSave = nome.trim().length > 0
+  const canSave = nome.trim().length > 0 && papel.length > 0
 
   async function handleSave() {
     if (!canSave) return
