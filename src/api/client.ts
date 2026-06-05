@@ -172,7 +172,7 @@ export const api = {
   addInstanciaMembro:    (instanciaId: string, data: { entidadeTipo: string; entidadeId: string; papel: string }) =>
     request<any>(`/api/instancias/${instanciaId}/membros`, { method: 'POST', body: JSON.stringify(data) }),
   updateInstanciaMembro: (instanciaId: string, membroId: string, papel: string) =>
-    request<any>(`/api/instancias/${instanciaId}/membros`, { method: 'POST', body: JSON.stringify({ entidadeTipo: '_update', entidadeId: membroId, papel }) }),
+    request<any>(`/api/instancias/${instanciaId}/membros/${membroId}`, { method: 'PUT', body: JSON.stringify({ papel }) }),
   removeInstanciaMembro: (instanciaId: string, membroId: string) =>
     request<any>(`/api/instancias/${instanciaId}/membros/${membroId}`, { method: 'DELETE' }),
 
