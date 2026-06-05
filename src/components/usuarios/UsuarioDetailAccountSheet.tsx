@@ -286,7 +286,7 @@ export function UsuarioDetailAccountSheet({
               <p className="text-sm text-[#6b7280]">Sem vínculo direto com esta conta.</p>
             )}
             <p className="text-xs text-[#9ca3af]">
-              A promoção a Administrador de conta é feita pelo Org Admin.
+              A alteração de perfil é feita pelo Org Admin.
             </p>
           </div>
 
