@@ -315,6 +315,18 @@ export function AtribuirPermissoesSheet({
         : [...current, acao]
       return { ...prev, [componenteId]: next }
     })
+    // Edição manual → marca como personalizado
+    setPapelSelecionado(prev => ({ ...prev, [componenteId]: 'personalizado' }))
+  }
+
+  function handleSelectPapel(compId: string, compNome: string, papelValue: string) {
+    const cfg = getComponenteConfig(compNome)
+    if (cfg.permissaoMode === 'component_permissions') {
+      const papelDef   = cfg.papeis.find(p => p.value === papelValue)
+      const defaultAcoes = papelDef?.defaultAcoes ?? []
+      setDraft(prev => ({ ...prev, [compId]: defaultAcoes }))
+    }
+    setPapelSelecionado(prev => ({ ...prev, [compId]: papelValue }))
   }
 
   const hasChanges = componentes.some(c => {
