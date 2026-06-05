@@ -71,7 +71,7 @@ function FieldLabel({ children, required, hint }: {
 
 // ── Componente principal ──────────────────────────────────────
 
-export function CriarGrupoSheet({ open, onClose, accountId, grupos = [], componentesAtivos = [], onSuccess }: Props) {
+export function CriarGrupoSheet({ open, onClose, accountId, componentesAtivos = [], onSuccess }: Props) {
   // Obtém configs únicas para cada componente ativo (deduplicadas por tipo)
   const secoesConfig = useMemo(() => {
     if (componentesAtivos.length === 0) {
