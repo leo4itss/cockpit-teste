@@ -431,8 +431,7 @@ export function UsuarioDetailAccountSheet({
       </NestedSheetBody>
 
       <NestedSheetFooter>
-        <Button variant="outline" onClick={handleClose}>Cancelar</Button>
-        <Button onClick={() => setShowPermissoes(true)}>Atribuir permissões</Button>
+        <Button variant="outline" onClick={handleClose}>Fechar</Button>
       </NestedSheetFooter>
     </NestedSheet>
   )
