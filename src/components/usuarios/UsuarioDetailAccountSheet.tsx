@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Check, Shield, Layers } from 'lucide-react'
+import { Check, Shield, Layers, Lock } from 'lucide-react'
 import {
   NestedSheet,
   NestedSheetHeader,
