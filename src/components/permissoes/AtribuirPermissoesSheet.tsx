@@ -196,7 +196,7 @@ export function AtribuirPermissoesSheet({
         const newAtribMap: Record<string, AcaoItem[]> = {}
         atribResults.forEach(({ id, atribs }) => {
           if (atribs.length > 0) {
-            newAtribMap[id] = (atribs as any[]).map((a: any) => ({ acao: a.id as string, label: a.nome as string }))
+            newAtribMap[id] = (atribs as any[]).map((a: any) => ({ acao: a.nome as string, label: a.nome as string }))
           }
         })
         if (!cancelled) {
