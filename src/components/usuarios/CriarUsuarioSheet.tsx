@@ -422,9 +422,7 @@ export function CriarUsuarioSheet({ open, onClose, onSuccess, accountId }: Props
                       const config = getComponenteConfig(grupoDef.nome)
                       const papelDef = config.papeis.find(p => p.value === grupoDef.papel)
                       if (papelDef) {
-                        const acoes = papelDef.atribuicaoNomes?.length
-                          ? papelDef.atribuicaoNomes
-                          : papelDef.defaultAcoes ?? []
+                        const acoes = papelDef.defaultAcoes ?? []
                         if (acoes.length > 0) {
                           const MAX = 6
                           const visiveis = acoes.slice(0, MAX)
