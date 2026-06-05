@@ -385,7 +385,7 @@ export function UsuarioDetailAccountSheet({
                 </div>
               )}
               <p className="text-xs text-[#9ca3af]">
-                Permissões granulares dentro de instâncias específicas (ex: MaxDoc, DocAction).
+                Ações granulares dentro de instâncias específicas (ex: MaxDoc, DocAction).
               </p>
             </div>
           </div>
