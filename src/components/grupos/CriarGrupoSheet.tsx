@@ -233,42 +233,71 @@ export function CriarGrupoSheet({ open, onClose, accountId, componentesAtivos = 
             />
           </div>
 
-          {/* Papel */}
-          <div className="flex flex-col gap-2">
+          {/* Papel — dois passos: componente → papel */}
+          <div className="flex flex-col gap-3">
             <FieldLabel required hint="Define o papel padrão dos membros deste grupo.">
               Papel
             </FieldLabel>
 
-            <div className="space-y-4">
-              {secoesConfig.map(({ label, config: cfg }) => (
-                <div key={label}>
-                  {multiSecao && (
-                    <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-1.5">{label}</p>
-                  )}
-                  <div className="grid grid-cols-3 gap-2">
-                    {cfg.papeis.map(p => {
-                      const chave = `${label}::${p.value}`
-                      return (
-                      <button
-                        key={p.value}
-                        type="button"
-                        onClick={() => setPapel(chave)}
-                        disabled={saving}
-                        className={cn(
-                          'flex flex-col items-start px-3 py-2.5 rounded-lg border text-left transition-colors',
-                          papel === chave
-                            ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
-                            : 'border-gray-200 bg-white hover:bg-gray-50'
-                        )}
-                      >
-                        <span className="text-sm font-medium text-[#030712]">{p.label}</span>
-                        <span className="text-xs text-[#6b7280] mt-0.5 leading-tight">{p.desc}</span>
-                      </button>
-                    )})}
-                  </div>
+            {/* Passo 1: seleção de componente (só quando há múltiplos) */}
+            {multiSecao && (
+              <div className="flex flex-col gap-1.5">
+                <p className="text-xs text-[#6b7280]">Selecione o componente:</p>
+                <div className="flex flex-wrap gap-2">
+                  {secoesConfig.map(({ label }) => (
+                    <button
+                      key={label}
+                      type="button"
+                      disabled={saving}
+                      onClick={() => {
+                        setSecaoSelecionada(label)
+                        setPapel('') // limpa papel ao trocar componente
+                      }}
+                      className={cn(
+                        'px-3 py-1.5 rounded-full text-xs font-medium border transition-colors',
+                        secaoSelecionada === label
+                          ? 'border-blue-500 bg-blue-50 text-blue-700 ring-1 ring-blue-500'
+                          : 'border-gray-200 bg-white text-[#6b7280] hover:bg-gray-50 hover:text-[#030712]'
+                      )}
+                    >
+                      {label}
+                    </button>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
+
+            {/* Passo 2: cards de papel do componente selecionado */}
+            {secaoSelecionada && (() => {
+              const cfg = secoesConfig.find(s => s.label === secaoSelecionada)?.config
+              if (!cfg) return null
+              return (
+                <div className="grid grid-cols-3 gap-2">
+                  {cfg.papeis.map(p => (
+                    <button
+                      key={p.value}
+                      type="button"
+                      onClick={() => setPapel(p.value)}
+                      disabled={saving}
+                      className={cn(
+                        'flex flex-col items-start px-3 py-2.5 rounded-lg border text-left transition-colors',
+                        papel === p.value
+                          ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
+                          : 'border-gray-200 bg-white hover:bg-gray-50'
+                      )}
+                    >
+                      <span className="text-sm font-medium text-[#030712]">{p.label}</span>
+                      <span className="text-xs text-[#6b7280] mt-0.5 leading-tight">{p.desc}</span>
+                    </button>
+                  ))}
+                </div>
+              )
+            })()}
+
+            {/* Hint quando nenhum componente foi selecionado ainda */}
+            {multiSecao && !secaoSelecionada && (
+              <p className="text-xs text-[#9ca3af]">Selecione um componente acima para ver os papéis disponíveis.</p>
+            )}
           </div>
 
           {/* Escopo — read-only para Account Admin */}
