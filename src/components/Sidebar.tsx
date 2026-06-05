@@ -148,12 +148,12 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
             </>
           )}
 
-          {/* ── Permissões ── */}
+          {/* ── Acessos ── */}
           {showAcessos && (
             <>
-              <SectionLabel label="Permissões" collapsed={collapsed} />
+              <SectionLabel label="Acessos" collapsed={collapsed} />
               <div className="flex flex-col gap-1">
-                <NavItem to="/acessos" icon={Users} label="Permissões" collapsed={collapsed} />
+                <NavItem to="/acessos" icon={Users} label="Acessos" collapsed={collapsed} />
               </div>
             </>
           )}
