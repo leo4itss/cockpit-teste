@@ -184,8 +184,8 @@ Validar as regras de acesso ao Assistente IA: papéis simples (Viewer/User/Admin
 
 1. Navegar para Acessos > Papéis
 2. Selecionar/criar grupo com **Thiago Martins** (`usr-thiago`)
-3. Em Acessos > Objetos > Atendimento > "Adicionar Membro" → aba Grupos
-4. Selecionar o grupo de Thiago → papel **Viewer**
+3. Em Acessos > Objetos > Atendimento > **"Adicionar Membro"**
+4. No campo **"Buscar usuário ou grupo..."**, buscar o grupo de Thiago → selecionar → papel **Visualizador**
 5. **Verificar:** Ação `can_use_assistant` atribuída ao grupo
 6. Salvar
 7. Em Acessos > Usuários, clicar em **Thiago** → UsuarioDetailAccountSheet
