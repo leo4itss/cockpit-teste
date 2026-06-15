@@ -116,6 +116,8 @@ function inferirTipo(nome: string): ComponenteTipo {
   if (n.includes('assistente') || n.includes('pas core')) return 'assistente-ia'
   if (n.includes('base') || n.includes('knowledge') || n.includes('kb') || n.includes('jurídic')) return 'base-conhecimento'
   if (n.includes('analytics') || n.includes('analytic')) return 'analytics'
+  if (n.includes('maxdoc')) return 'maxdoc'
+  if (n.includes('docaction')) return 'docaction'
   return 'default'
 }
 
