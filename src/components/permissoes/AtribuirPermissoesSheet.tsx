@@ -65,6 +65,8 @@ const CAPABILITY_MAP: Partial<Record<ComponenteTipo, string>> = {
   'assistente-ia':    'assistant.use',
   'base-conhecimento':'knowledge.use',
   'analytics':        'analytics.use',
+  'maxdoc':           'maxdoc.use',
+  'docaction':        'docaction.use',
 }
 
 // ── Permissões padrão por papel ────────────────────────────────
