@@ -195,13 +195,13 @@ Validar as regras de acesso ao Assistente IA: papéis simples (Viewer/User/Admin
 
 #### 3.4 — Testar bloqueio por entitlement
 
-Para testar em conta sem entitlement (ex: Apple Main `a1`, que não tem `assistant.use` para MaxDoc):
-
 1. Trocar para persona **Ana Lima** (`2`) — Org Admin Apple
 2. Navegar para Acessos → selecionar conta **Apple Main** (`a1`)
-3. Aba Objetos
-4. **Verificar:** Componente MaxDoc aparece com badge "Capability inativa" (conta não tem `maxdoc.use`)
-5. Tentar atribuir permissão no MaxDoc → **Verificar:** Seleção bloqueada
+3. Aba **Objetos**
+4. **Verificar:** MaxDoc **não aparece** na lista — Apple Main não tem `maxdoc.use`, portanto não há objetos MaxDoc criados para esta conta
+5. Os únicos objetos visíveis são os módulos efetivamente contratados pela Apple (PAS Core, Knowledge Base, Assistente)
+
+> **Como funciona:** a aba Objetos exibe apenas instâncias existentes. Sem entitlement, não é possível criar instâncias do módulo, então ele simplesmente não aparece. O badge "Capability inativa" é exibido na seção de permissões globais (GLOBAIS — NÍVEL DE CONTA) quando se tenta atribuir ações de um componente sem entitlement.
 
 #### 3.5 — Testar o PersonaSwitcher com todos os papéis
 
