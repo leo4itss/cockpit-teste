@@ -306,11 +306,12 @@ Quando uma ação é atribuída a um **grupo**, todos os membros do grupo herdam
 **1.4 — Adicionar grupo com papel Aprovador**
 
 1. No painel do MaxDoc Comgas, clicar em **"Adicionar Membro"**
-2. Mudar para a aba **Grupos**
-3. Selecionar um grupo disponível (ex: grupo da área de qualidade)
+2. No campo **"Buscar usuário ou grupo..."**, digitar o nome do grupo desejado
+3. Selecionar o grupo nos resultados
 4. Selecionar o papel **Aprovador**
-5. ✅ **Verificar:** Ações pré-selecionadas: *Visualizar, Aprovar Documento, Rejeitar Documento, Ciclo de Aprovação Documentos, Emitir Cópia Controlada*
-6. Salvar
+5. ✅ **Verificar:** Ações pré-selecionadas: Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Download Documento, Imprimir, Assinatura Eletrônica, Revisar Documento, Aprovar Documento, Aprovador Documento, Aprovador Substituto Documento, Obsoletetar Documento, Emitir Cópia Controlada, Emitir Cópia Não Controlada, Cópia Controlada Anexos, Ciclo de Aprovação Documentos
+6. ✅ **Verificar:** Aprovador NÃO tem Criar Documento nem Editar Documento
+7. Salvar
 
 ---
 
