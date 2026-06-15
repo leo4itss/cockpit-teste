@@ -421,8 +421,8 @@ Quando uma ação é atribuída a um **grupo**, todos os membros do grupo herdam
 
 1. Navegar para **Acessos > Papéis**
 2. Verificar se **Thiago Martins** está em algum grupo. Se não, criar um grupo e adicioná-lo
-3. Voltar para Acessos > Objetos > Atendimento > **"Adicionar Membro"** → aba Grupos
-4. Selecionar o grupo de Thiago → papel **Viewer**
+3. Voltar para Acessos > Objetos > Atendimento > **"Adicionar Membro"**
+4. No campo **"Buscar usuário ou grupo..."**, buscar o grupo de Thiago → selecionar → papel **Visualizador**
 5. Salvar
 6. Ir para **Acessos > Usuários** → clicar em **Thiago Martins**
 7. ✅ **Verificar na seção Ações:** `can_use_assistant` aparece em verde ("via grupo: [nome do grupo]")
