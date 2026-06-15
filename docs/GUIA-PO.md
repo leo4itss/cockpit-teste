@@ -327,13 +327,14 @@ Quando uma ação é atribuída a um **grupo**, todos os membros do grupo herdam
 
 ---
 
-**1.6 — Verificar ações efetivas (diretas + via grupo)**
+**1.6 — Verificar acesso por instância**
 
 1. Ir para **Acessos > Usuários**
 2. Clicar em **Fernando**
-3. Na seção **Ações**, verificar:
-4. ✅ **Ações diretas** de Fernando aparecem em azul
-5. ✅ **Ações herdadas** via o grupo Aprovador aparecem em verde, com o nome do grupo
+3. Na seção **Ações > POR INSTÂNCIA**, verificar:
+4. ✅ **"Gestão Documental Comgas"** aparece uma única vez com o badge do papel atual (ex: "Personalizado", "Revisor")
+5. ✅ Clicar em **"Editar"** ao lado da instância para abrir o painel de ações e ver quais ações estão selecionadas
+6. ✅ No painel de ações do membro, as ações herdadas via grupo aparecem desabilitadas (não podem ser desmarcadas individualmente)
 
 ---
 
