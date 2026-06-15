@@ -22,6 +22,9 @@ type ComponenteTipo = 'assistente-ia' | 'base-conhecimento' | 'analytics' | 'max
 interface AcaoItem { acao: string; label: string }
 
 const ACOES: Record<ComponenteTipo, AcaoItem[]> = {
+  // MaxDoc e DocAction: ações vêm de atribuicoesMap (API), este array é fallback vazio
+  'maxdoc':    [],
+  'docaction': [],
   // Ordem: do mais básico (uso) ao mais privilegiado (administração)
   // Alinhado com o modelo FGA oficial: openfga/authorization-model.fga
   'assistente-ia': [
