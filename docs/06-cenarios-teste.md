@@ -105,17 +105,16 @@ Validar a gestão de ocorrências de qualidade via DocAction: papéis independen
 1. Navegar para Acessos > Objetos > **DocAction Comgas**
 2. **"Adicionar Membro"** → buscar **Neide** (`usr-neide`)
 3. Selecionar papel **Analista**
-4. **Verificar:** Ações pré-selecionadas: Visualizar, Criar Ocorrência, Analisar Causa, Criar Plano de Ação, Atribuir Responsável, Comentar
-5. **Verificar:** Ações de Aprovador (Aprovar Análise de Causa, Encerrar) NÃO estão selecionadas
+4. **Verificar:** Ações pré-selecionadas (11): Visualizar, Criar Ocorrência, Criar Ocorrência 8D, Editar Ocorrência, Vincular Ocorrência, Acompanhar Ocorrência, Categorizar Ocorrência, Analisar Causa, Criar Plano de Ação, Verificar Eficácia, Encaminhar Ocorrência
+5. **Verificar:** Ações de Aprovador (Aprovar Análise de Causa, Encerrar Ocorrência, Reprogramar Prazo/Responsável) NÃO estão selecionadas
 6. Salvar
 
 #### 2.2 — Adicionar Aprovador (usuário diferente)
 
 1. **"Adicionar Membro"** → buscar **Leo** (`usr-leo`)
 2. Selecionar papel **Aprovador**
-3. **Verificar:** Ações: Visualizar, Aprovar Análise de Causa, Aprovar Plano de Ação, Encerrar
-4. **Verificar:** Ações de Analista (Analisar Causa, Criar Plano de Ação) NÃO estão selecionadas
-5. Salvar
+3. **Verificar:** Ações (14 — todas as do Analista + 3): inclui Aprovar Análise de Causa, Encerrar Ocorrência, Reprogramar Prazo/Responsável
+4. Salvar
 
 #### 2.3 — Verificar independência dos papéis
 
