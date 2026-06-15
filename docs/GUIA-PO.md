@@ -436,8 +436,9 @@ Quando uma ação é atribuída a um **grupo**, todos os membros do grupo herdam
 1. Trocar para persona **Ana Lima** (persona 2, Org Admin Apple)
 2. Navegar para Acessos → conta **Apple Main**
 3. Aba **Objetos**
-4. ✅ **Verificar:** Se algum componente MaxDoc aparecer, deve ter badge de "Capability inativa" (Apple Main não tem `maxdoc.use`)
-5. Tentar clicar para atribuir permissão → ✅ **Verificar:** Seleção está bloqueada
+4. ✅ **Verificar:** MaxDoc **não aparece** na lista de objetos — a conta Apple não tem o entitlement `maxdoc.use`, portanto não há instâncias MaxDoc criadas para ela
+
+> **Por que não aparece?** Quando uma conta não tem o entitlement de um módulo, não é possível criar instâncias desse módulo para ela. A aba Objetos mostra apenas os módulos efetivamente contratados e configurados. O badge "Capability inativa" aparece no fluxo de permissões globais (seção GLOBAIS — NÍVEL DE CONTA), não na aba Objetos.
 
 ---
 
