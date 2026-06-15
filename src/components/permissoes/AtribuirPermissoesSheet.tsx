@@ -17,7 +17,7 @@ import type { Componente } from '@/types'
 
 // ── Tipos ──────────────────────────────────────────────────────
 
-type ComponenteTipo = 'assistente-ia' | 'base-conhecimento' | 'analytics' | 'default'
+type ComponenteTipo = 'assistente-ia' | 'base-conhecimento' | 'analytics' | 'maxdoc' | 'docaction' | 'default'
 
 interface AcaoItem { acao: string; label: string }
 
