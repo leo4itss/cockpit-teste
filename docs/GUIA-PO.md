@@ -207,14 +207,14 @@ Módulo de assistente inteligente. Controla quem pode usar, configurar e adminis
 
 **3 papéis disponíveis:**
 
-| Papel | O que pode fazer |
-|-------|-----------------|
-| **Viewer** | Usar o assistente e ver fontes consultadas |
-| **User** | Viewer + compartilhar resultados, fazer upload de documentos (RAG) |
-| **Admin** | Tudo — criar assistentes, configurar agentes, gerenciar usuários |
+| Papel | Ações incluídas |
+|-------|----------------|
+| **Visualizador** | `can_use_assistant` |
+| **Usuário** | `can_use_assistant`, `can_share_conversation_results`, `can_view_consulted_sources`, `can_upload_rag_sources` |
+| **Administrador** | Todas as 8 ações |
 
-**8 ações disponíveis:**
-`can_use_assistant`, `can_view_consulted_sources`, `can_share_conversation_results`, `can_upload_rag_sources`, `can_create_assistant`, `can_configure_agents`, `can_customize_ai`, `can_manage_users`.
+**8 ações disponíveis** (selecionáveis individualmente no modo Personalizado):
+`can_use_assistant` (Usar o assistente), `can_share_conversation_results` (Compartilhar resultados), `can_view_consulted_sources` (Ver fontes consultadas), `can_upload_rag_sources` (Upload de fontes RAG), `can_create_assistant` (Criar assistente), `can_configure_agents` (Configurar agentes), `can_manage_business_scenarios` (Gerenciar cenários de negócio), `can_manage_users` (Gerenciar usuários).
 
 ---
 
