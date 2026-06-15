@@ -101,37 +101,35 @@ Além dos papéis de plataforma, cada componente (módulo) pode definir seus pr�
 
 ### DocAction (Módulo de Ações de Qualidade)
 
-5 papéis, 14 ações.
+4 papéis, 14 ações.
 
 **Papéis e suas ações:**
 
 | Papel | Ações |
 |-------|-------|
-| **Colaborador** | Visualizar, Criar Ocorrência, Comentar |
-| **Analista** | Colaborador + Analisar Causa, Criar Plano de Ação, Atribuir Responsável |
-| **Aprovador** | Visualizar + Aprovar Análise de Causa, Aprovar Plano de Ação, Encerrar |
+| **Colaborador** | Visualizar, Criar Ocorrência, Criar Ocorrência 8D, Editar Ocorrência, Vincular Ocorrência, Acompanhar Ocorrência |
+| **Analista** | Colaborador + Categorizar Ocorrência, Analisar Causa, Criar Plano de Ação, Verificar Eficácia, Encaminhar Ocorrência |
+| **Aprovador** | Analista + Aprovar Análise de Causa, Encerrar Ocorrência, Reprogramar Prazo/Responsável |
 | **Administrador** | Todas as 14 ações |
-
-> **Nota:** DocAction não tem papel "Revisor" distinto — a validação é feita pelo Aprovador.
 
 **Catálogo completo de ações DocAction:**
 
-| Ação | Descrição |
-|------|-----------|
-| Visualizar | Ver ocorrências e ações |
-| Criar Ocorrência | Registrar nova não conformidade |
-| Comentar | Adicionar comentários |
-| Analisar Causa | Registrar análise de causa raiz |
-| Criar Plano de Ação | Criar plano de ação corretiva |
-| Atribuir Responsável | Designar responsável pela ação |
-| Aprovar Análise de Causa | Aprovar análise registrada |
-| Aprovar Plano de Ação | Aprovar plano criado |
-| Verificar Eficácia | Verificar se ação foi eficaz |
-| Encerrar | Encerrar ocorrência |
-| Reabrir | Reabrir ocorrência encerrada |
-| Exportar | Exportar relatório de ocorrências |
-| Configurar | Configurar parâmetros do módulo |
-| Administrar | Acesso administrativo completo |
+| # | Ação |
+|---|------|
+| 1 | Visualizar |
+| 2 | Criar Ocorrência |
+| 3 | Criar Ocorrência 8D |
+| 4 | Editar Ocorrência |
+| 5 | Vincular Ocorrência |
+| 6 | Acompanhar Ocorrência |
+| 7 | Categorizar Ocorrência |
+| 8 | Analisar Causa |
+| 9 | Criar Plano de Ação |
+| 10 | Verificar Eficácia |
+| 11 | Encaminhar Ocorrência |
+| 12 | Aprovar Análise de Causa |
+| 13 | Encerrar Ocorrência |
+| 14 | Reprogramar Prazo/Responsável |
 
 ---
 
