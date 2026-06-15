@@ -487,7 +487,7 @@ export function AcessosPage() {
         <div className="flex">
           {([
             { id: 'usuarios',   label: 'Usuários' },
-            { id: 'grupos',     label: 'Papéis' },
+            { id: 'grupos',     label: 'Grupos' },
             { id: 'instancias', label: 'Objetos' },
           ] as const).map(({ id, label }) => (
             <button
