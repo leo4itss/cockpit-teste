@@ -142,8 +142,9 @@ export function PermissoesMembroSheet({
 
     try {
       // Atualiza papel no membership (para exibição no badge)
-      if (selectedPapel && selectedPapel !== 'personalizado' && selectedPapel !== membro.papel) {
-        await api.updateInstanciaMembro(instanciaId, membro.id, selectedPapel).catch(() => null)
+      const papelParaSalvar = selectedPapel === 'personalizado' ? 'personalizado' : selectedPapel
+      if (papelParaSalvar && papelParaSalvar !== membro.papel) {
+        await api.updateInstanciaMembro(instanciaId, membro.id, papelParaSalvar).catch(() => null)
       }
 
       // Sincroniza permissões granulares em component_permissions
