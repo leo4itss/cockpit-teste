@@ -48,8 +48,8 @@ Validar o ciclo completo de gerenciamento de acesso ao módulo MaxDoc: atribuiç
 #### 1.4 — Adicionar grupo com papel Aprovador
 
 1. Voltar para InstanciaDetailSheet do MaxDoc Comgas
-2. **"Adicionar Membro"** → trocar para aba Grupos
-3. Selecionar grupo **Grupo AQ Comgas** (ou criar grupo se não existir)
+2. **"Adicionar Membro"**
+3. No campo **"Buscar usuário ou grupo..."**, digitar o nome do grupo (ex: Grupo AQ Comgas)
 4. Selecionar papel **Aprovador**
 5. **Verificar:** Ações pré-selecionadas: Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Download Documento, Imprimir, Assinatura Eletrônica, Revisar Documento, Aprovar Documento, Aprovador Documento, Aprovador Substituto Documento, Obsoletetar Documento, Emitir Cópia Controlada, Emitir Cópia Não Controlada, Cópia Controlada Anexos, Ciclo de Aprovação Documentos
 6. **Verificar:** Aprovador NÃO tem Criar Documento nem Editar Documento (papel diferente de Editor)
