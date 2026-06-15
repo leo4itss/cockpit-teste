@@ -141,22 +141,22 @@ Além dos papéis de plataforma, cada componente (módulo) pode definir seus pr�
 
 | Papel | Ações |
 |-------|-------|
-| **Viewer** | can_use_assistant, can_view_consulted_sources |
-| **User** | Viewer + can_share_conversation_results, can_upload_rag_sources |
-| **Admin** | Todas as 8 ações |
+| **Visualizador** | `can_use_assistant` |
+| **Usuário** | `can_use_assistant`, `can_share_conversation_results`, `can_view_consulted_sources`, `can_upload_rag_sources` |
+| **Administrador** | Todas as 8 ações |
 
 **Catálogo completo de ações do Assistente:**
 
-| Ação | Descrição |
-|------|-----------|
-| `can_use_assistant` | Usar o assistente de IA |
-| `can_view_consulted_sources` | Ver fontes consultadas nas respostas |
-| `can_share_conversation_results` | Compartilhar resultados de conversa |
-| `can_upload_rag_sources` | Fazer upload de documentos para RAG |
-| `can_create_assistant` | Criar novo assistente |
-| `can_configure_agents` | Configurar agentes de IA |
-| `can_customize_ai` | Customizar parâmetros de IA |
-| `can_manage_users` | Gerenciar usuários do assistente |
+| Ação | Label |
+|------|-------|
+| `can_use_assistant` | Usar o assistente |
+| `can_share_conversation_results` | Compartilhar resultados |
+| `can_view_consulted_sources` | Ver fontes consultadas |
+| `can_upload_rag_sources` | Upload de fontes RAG |
+| `can_create_assistant` | Criar assistente |
+| `can_configure_agents` | Configurar agentes |
+| `can_manage_business_scenarios` | Gerenciar cenários de negócio |
+| `can_manage_users` | Gerenciar usuários |
 
 ---
 
