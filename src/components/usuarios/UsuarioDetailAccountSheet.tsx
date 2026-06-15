@@ -166,12 +166,18 @@ export function UsuarioDetailAccountSheet({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, user?.id, accountId])
 
-  // Instâncias onde o usuário é membro, com dados unidos
+  // Instâncias onde o usuário é membro, com dados unidos.
+  // Deduplica por instanciaId — se houver múltiplos registros para a mesma
+  // instância (ex: adicionado duas vezes com papéis diferentes), mantém o último.
   const instanciasComAcesso = useMemo(() => {
-    return membroInstancias.map(mb => ({
+    const all = membroInstancias.map(mb => ({
       membro: mb,
       instancia: instancias.find(i => i.id === mb.instanciaId),
     })).filter(x => x.instancia !== undefined) as { membro: InstanciaMembro; instancia: Instancia }[]
+
+    const byInstancia = new Map<string, { membro: InstanciaMembro; instancia: Instancia }>()
+    for (const entry of all) byInstancia.set(entry.instancia.id, entry)
+    return [...byInstancia.values()]
   }, [membroInstancias, instancias])
 
   if (!user) return null
