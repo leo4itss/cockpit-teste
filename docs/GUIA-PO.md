@@ -166,20 +166,20 @@ Define quais módulos uma conta tem **direito de usar**. Se a conta não tem o e
 
 MaxDoc é o módulo de gestão documental da plataforma DocNix. Controla quem pode criar, revisar, aprovar e publicar documentos.
 
-**5 papéis disponíveis:**
+**4 papéis disponíveis:**
 
-| Papel | O que pode fazer |
-|-------|-----------------|
-| **Leitor** | Visualizar, baixar, imprimir documentos |
-| **Editor** | Leitor + criar, editar, criar novas versões |
-| **Revisor** | Leitor + revisar e submeter para aprovação |
-| **Aprovador** | Leitor + aprovar, rejeitar, emitir cópia controlada |
-| **Administrador** | Tudo — acesso completo |
+| Papel | Ações incluídas |
+|-------|----------------|
+| **Leitor** | Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Download Documento, Imprimir |
+| **Editor** | Leitor + Criar Documento, Editar Documento, Nova Versão, Upload Documento, Editor Documento, Criar Anexo, Editar Anexo, Anexar Arquivos |
+| **Revisor** | Editor + Revisar Documento, Submeter para Aprovação, Revisor Documento, Revisar como Substituto Documento |
+| **Aprovador** | Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Download Documento, Imprimir, Assinatura Eletrônica, Revisar Documento, Aprovar Documento, Aprovador Documento, Aprovador Substituto Documento, Obsoletetar Documento, Emitir Cópia Controlada, Emitir Cópia Não Controlada, Cópia Controlada Anexos, Ciclo de Aprovação Documentos |
+| **Administrador** | Todas as 27 ações |
 
-**Regra importante:** Os papéis são independentes. Um Revisor não pode aprovar; um Aprovador não pode criar documentos. Para um usuário ter capacidades de múltiplos papéis, é necessário usar o modo **Personalizado** (seleção manual de ações).
+**Regra importante:** Aprovador não herda as ações de Editor — ele tem seu próprio conjunto. Para um usuário ter capacidades de múltiplos papéis, use o modo **Personalizado** (seleção manual de ações).
 
 **27 ações disponíveis** (selecionáveis individualmente no modo Personalizado):
-Visualizar, Criar Documento, Editar, Nova Versão, Revisar Documento, Submeter para Aprovação, Aprovar Documento, Rejeitar Documento, Ciclo de Aprovação, Emitir Cópia Controlada, Baixar Documento, Mover, Cancelar Edição, Solicitar Revisão, Visualizar Histórico de Versões, Restaurar Versão, Imprimir, Arquivar, Configurar Acesso, Gerenciar Categorias, Configurar Fluxo de Aprovação, Gerenciar Templates, Exportar Relatório, Gerenciar Metadados, Excluir Documento, Auditoria, Administrar.
+Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Download Documento, Imprimir, Criar Documento, Editar Documento, Nova Versão, Upload Documento, Editor Documento, Criar Anexo, Editar Anexo, Anexar Arquivos, Assinatura Eletrônica, Revisar Documento, Submeter para Aprovação, Revisor Documento, Revisar como Substituto Documento, Aprovar Documento, Aprovador Documento, Aprovador Substituto Documento, Obsoletetar Documento, Emitir Cópia Controlada, Emitir Cópia Não Controlada, Cópia Controlada Anexos, Ciclo de Aprovação Documentos.
 
 ---
 
