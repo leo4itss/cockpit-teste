@@ -65,14 +65,14 @@ Validar o ciclo completo de gerenciamento de acesso ao módulo MaxDoc: atribuiç
 6. Fechar e reabrir PermissoesMembroSheet de Fernando
 7. **Verificar:** Seleção personalizada persiste (Revisar + Criar Documento, sem Submeter para Aprovação)
 
-#### 1.6 — Verificar ações efetivas
+#### 1.6 — Verificar acesso por instância
 
 1. Em Acessos > Usuários, localizar **Fernando**
 2. Clicar → UsuarioDetailAccountSheet
-3. Na seção **Ações**, verificar:
-   - Ações diretas de Fernando (badge azul)
-   - Ações herdadas via grupo Aprovador (badge verde, com nome do grupo)
-4. **Verificar:** `can_approve` não aparece como ação direta de Fernando (é do grupo)
+3. Na seção **Ações > POR INSTÂNCIA**, verificar:
+   - **"Gestão Documental Comgas"** aparece **uma única vez** com o badge do papel atual
+   - O badge mostra "Personalizado" se as ações foram customizadas
+4. Clicar em **"Editar"** ao lado da instância para abrir o painel de ações e ver as ações selecionadas individualmente
 
 ### Resultados Esperados
 
