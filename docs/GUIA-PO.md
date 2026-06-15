@@ -189,15 +189,15 @@ DocAction gerencia ocorrências de qualidade (não conformidades) e o ciclo de v
 
 **4 papéis disponíveis:**
 
-| Papel | O que pode fazer |
-|-------|-----------------|
-| **Colaborador** | Registrar ocorrências, comentar |
-| **Analista** | Colaborador + analisar causa, criar plano de ação |
-| **Aprovador** | Aprovar análise, encerrar ocorrência |
-| **Administrador** | Tudo |
+| Papel | Ações incluídas |
+|-------|----------------|
+| **Colaborador** | Visualizar, Criar Ocorrência, Criar Ocorrência 8D, Editar Ocorrência, Vincular Ocorrência, Acompanhar Ocorrência |
+| **Analista** | Colaborador + Categorizar Ocorrência, Analisar Causa, Criar Plano de Ação, Verificar Eficácia, Encaminhar Ocorrência |
+| **Aprovador** | Analista + Aprovar Análise de Causa, Encerrar Ocorrência, Reprogramar Prazo/Responsável |
+| **Administrador** | Todas as 14 ações |
 
-**14 ações disponíveis:**
-Visualizar, Criar Ocorrência, Comentar, Analisar Causa, Criar Plano de Ação, Atribuir Responsável, Aprovar Análise de Causa, Aprovar Plano de Ação, Verificar Eficácia, Encerrar, Reabrir, Exportar, Configurar, Administrar.
+**14 ações disponíveis** (selecionáveis individualmente no modo Personalizado):
+Visualizar, Criar Ocorrência, Criar Ocorrência 8D, Editar Ocorrência, Vincular Ocorrência, Acompanhar Ocorrência, Categorizar Ocorrência, Analisar Causa, Criar Plano de Ação, Verificar Eficácia, Encaminhar Ocorrência, Aprovar Análise de Causa, Encerrar Ocorrência, Reprogramar Prazo/Responsável.
 
 ---
 
