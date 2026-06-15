@@ -51,49 +51,51 @@ Além dos papéis de plataforma, cada componente (módulo) pode definir seus pr�
 
 ### MaxDoc (Gestão de Documentos)
 
-5 papéis, 27 ações.
+4 papéis, 27 ações.
 
 **Papéis e suas ações:**
 
 | Papel | Ações |
 |-------|-------|
-| **Leitor** | Visualizar, Baixar Documento, Visualizar Histórico de Versões, Imprimir |
-| **Editor** | Leitor + Criar Documento, Editar, Nova Versão, Mover, Cancelar Edição |
-| **Revisor** | Leitor + Revisar Documento, Submeter para Aprovação, Solicitar Revisão |
-| **Aprovador** | Leitor + Aprovar Documento, Rejeitar Documento, Ciclo de Aprovação Documentos, Emitir Cópia Controlada |
+| **Leitor** | Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Download Documento, Imprimir |
+| **Editor** | Leitor + Criar Documento, Editar Documento, Nova Versão, Upload Documento, Editor Documento, Criar Anexo, Editar Anexo, Anexar Arquivos |
+| **Revisor** | Editor + Revisar Documento, Submeter para Aprovação, Revisor Documento, Revisar como Substituto Documento |
+| **Aprovador** | Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Download Documento, Imprimir, Assinatura Eletrônica, Revisar Documento, Aprovar Documento, Aprovador Documento, Aprovador Substituto Documento, Obsoletetar Documento, Emitir Cópia Controlada, Emitir Cópia Não Controlada, Cópia Controlada Anexos, Ciclo de Aprovação Documentos |
 | **Administrador** | Todas as 27 ações |
+
+> **Nota:** Aprovador não herda ações de Editor — tem seu próprio conjunto focado em aprovação e emissão.
 
 **Catálogo completo de ações MaxDoc:**
 
-| Ação | Descrição |
-|------|-----------|
-| Visualizar | Ver documentos |
-| Criar Documento | Criar novo documento |
-| Editar | Editar documento existente |
-| Nova Versão | Criar nova versão |
-| Revisar Documento | Marcar como revisado |
-| Submeter para Aprovação | Enviar para fluxo de aprovação |
-| Aprovar Documento | Aprovar no fluxo |
-| Rejeitar Documento | Rejeitar no fluxo |
-| Ciclo de Aprovação Documentos | Gerenciar ciclo completo |
-| Emitir Cópia Controlada | Emitir cópia oficial |
-| Baixar Documento | Download do arquivo |
-| Mover | Mover entre pastas/categorias |
-| Cancelar Edição | Desfazer checkout |
-| Solicitar Revisão | Solicitar revisão a outro usuário |
-| Visualizar Histórico de Versões | Ver histórico |
-| Restaurar Versão | Reverter para versão anterior |
-| Imprimir | Imprimir documento |
-| Arquivar | Arquivar documento |
-| Configurar Acesso | Configurar permissões do documento |
-| Gerenciar Categorias | CRUD de categorias |
-| Configurar Fluxo de Aprovação | Configurar workflow |
-| Gerenciar Templates | CRUD de templates |
-| Exportar Relatório | Exportar relatórios |
-| Gerenciar Metadados | Configurar campos de metadados |
-| Excluir Documento | Excluir permanentemente |
-| Auditoria | Visualizar logs de auditoria |
-| Administrar | Acesso administrativo completo |
+| # | Ação |
+|---|------|
+| 1 | Visualizar |
+| 2 | Ler Todos |
+| 3 | Leitor Documento |
+| 4 | Leitor Anexos |
+| 5 | Download Documento |
+| 6 | Imprimir |
+| 7 | Criar Documento |
+| 8 | Editar Documento |
+| 9 | Nova Versão |
+| 10 | Upload Documento |
+| 11 | Editor Documento |
+| 12 | Criar Anexo |
+| 13 | Editar Anexo |
+| 14 | Anexar Arquivos |
+| 15 | Assinatura Eletrônica |
+| 16 | Revisar Documento |
+| 17 | Submeter para Aprovação |
+| 18 | Revisor Documento |
+| 19 | Revisar como Substituto Documento |
+| 20 | Aprovar Documento |
+| 21 | Aprovador Documento |
+| 22 | Aprovador Substituto Documento |
+| 23 | Obsoletetar Documento |
+| 24 | Emitir Cópia Controlada |
+| 25 | Emitir Cópia Não Controlada |
+| 26 | Cópia Controlada Anexos |
+| 27 | Ciclo de Aprovação Documentos |
 
 ---
 
