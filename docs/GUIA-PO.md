@@ -513,7 +513,7 @@ Trocar o PersonaSwitcher para cada persona e verificar o sidebar:
 
 | # | Critério | Como verificar |
 |---|---------|----------------|
-| MX-01 | Papel **Leitor** tem exatamente 4 ações: Visualizar, Baixar, Imprimir, Ver Histórico | Adicionar membro com papel Leitor e conferir seleção |
+| MX-01 | Papel **Leitor** tem exatamente 6 ações: Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Baixar Documento, Imprimir | Adicionar membro com papel Leitor e conferir seleção |
 | MX-02 | Papel **Editor** não inclui Aprovar ou Publicar | Adicionar membro com papel Editor e conferir ausência |
 | MX-03 | Trocar papel atualiza ações automaticamente | Mudar Editor → Revisor e verificar mudança |
 | MX-04 | Modo Personalizado persiste ao reabrir | Salvar seleção manual, fechar e reabrir |
