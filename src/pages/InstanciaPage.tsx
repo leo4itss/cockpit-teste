@@ -249,7 +249,6 @@ function AddMembroPanel({
                       : 'border-gray-200 bg-white hover:bg-gray-50'
                   )}>
                   <span className="text-sm font-semibold text-gray-900">{p.label}</span>
-                  <span className="text-xs text-gray-500 mt-0.5 leading-tight">{p.desc}</span>
                 </button>
               ))}
               <button type="button"
