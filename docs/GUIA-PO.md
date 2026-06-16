@@ -256,13 +256,13 @@ Quando uma ação é atribuída a um **grupo**, todos os membros do grupo herdam
 - **Ação:** capacidade individual (ex: "Aprovar Documento")
 - **Personalizado:** quando nenhum papel predefinido é adequado — o administrador seleciona as ações manualmente
 
-### Comportamento ao trocar de papel
+### Comportamento ao adicionar membro e ao trocar de papel
 
-Quando um papel é alterado para um usuário em uma instância, o sistema automaticamente:
-1. Remove todas as permissões anteriores daquele usuário naquela instância
-2. Aplica as ações padrão do novo papel
+Tanto ao **adicionar um novo membro** quanto ao **trocar o papel de um membro existente**, o sistema automaticamente:
+1. Remove todas as permissões anteriores daquele usuário/grupo naquela instância
+2. Aplica as ações padrão do papel escolhido
 
-Isso garante que as ações exibidas no `PermissoesMembroSheet` sempre refletem o papel atual — nunca sobras de papéis anteriores.
+Isso garante que as ações exibidas no `PermissoesMembroSheet` sempre refletem o papel atual — nunca sobras de papéis anteriores ou de execuções de teste anteriores.
 
 ### Comportamento ao remover membro
 
