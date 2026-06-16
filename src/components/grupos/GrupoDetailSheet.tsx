@@ -122,7 +122,7 @@ function PapelEditor({ papel, onSave }: PapelEditorProps) {
       >
         <option value="">— sem papel —</option>
         {PAPEIS_OPCOES.map(p => (
-          <option key={p.value} value={p.value}>{p.label} — {p.desc}</option>
+          <option key={p.value} value={p.value}>{p.label}</option>
         ))}
       </select>
       <button
