@@ -210,7 +210,7 @@ Módulo de assistente inteligente. Controla quem pode usar, configurar e adminis
 | Papel | Ações incluídas |
 |-------|----------------|
 | **Visualizador** | `can_use_assistant` |
-| **Usuário** | `can_use_assistant`, `can_share_conversation_results`, `can_view_consulted_sources`, `can_upload_rag_sources` |
+| **Membro** | `can_use_assistant`, `can_share_conversation_results`, `can_view_consulted_sources`, `can_upload_rag_sources` |
 | **Administrador** | Todas as 8 ações |
 
 **8 ações disponíveis** (selecionáveis individualmente no modo Personalizado):
