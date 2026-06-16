@@ -162,7 +162,7 @@ Validar as regras de acesso ao Assistente IA: papéis simples (Viewer/User/Admin
 
 ### Passo a Passo
 
-#### 3.1 — Adicionar usuário com papel Usuário
+#### 3.1 — Adicionar usuário com papel Membro
 
 1. Trocar para persona **Carla Santos** (PersonaSwitcher)
 2. Navegar para Acessos > Objetos > **Assistente Suporte**
