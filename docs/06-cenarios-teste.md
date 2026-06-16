@@ -199,9 +199,9 @@ Validar as regras de acesso ao Assistente IA: papéis simples (Viewer/User/Admin
 #### 3.4 — Testar bloqueio por entitlement
 
 1. Trocar para persona **Ana Lima** (`2`) — Org Admin Apple
-2. Navegar para Acessos → selecionar conta **Apple Main** (`a1`)
+2. Navegar para Acessos → selecionar conta **Apple** (`a1`)
 3. Aba **Objetos**
-4. **Verificar:** MaxDoc **não aparece** na lista — Apple Main não tem `maxdoc.use`, portanto não há objetos MaxDoc criados para esta conta
+4. **Verificar:** MaxDoc **não aparece** na lista — Apple não tem `maxdoc.use`, portanto não há objetos MaxDoc criados para esta conta
 5. Os únicos objetos visíveis são os módulos efetivamente contratados pela Apple (PAS Core, Knowledge Base, Assistente)
 
 > **Como funciona:** a aba Objetos exibe apenas instâncias existentes. Sem entitlement, não é possível criar instâncias do módulo, então ele simplesmente não aparece. O badge "Capability inativa" é exibido na seção de permissões globais (GLOBAIS — NÍVEL DE CONTA) quando se tenta atribuir ações de um componente sem entitlement.
