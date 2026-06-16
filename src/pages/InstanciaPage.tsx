@@ -134,7 +134,7 @@ function PapelEditorDocNix({
           <option value="personalizado" disabled>Personalizado (selecione um papel)</option>
         )}
         {papeis.map(p => (
-          <option key={p.value} value={p.value}>{p.label} — {p.desc}</option>
+          <option key={p.value} value={p.value}>{p.label}</option>
         ))}
       </select>
       <button onClick={async () => { setSaving(true); try { await onSave(draft) } finally { setSaving(false); setEditing(false) } }}
