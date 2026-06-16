@@ -166,15 +166,15 @@ Define quais módulos uma conta tem **direito de usar**. Se a conta não tem o e
 
 MaxDoc é o módulo de gestão documental da plataforma DocNix. Controla quem pode criar, revisar, aprovar e publicar documentos.
 
-**4 papéis disponíveis:**
+**5 papéis disponíveis:**
 
-| Papel | Ações incluídas |
-|-------|----------------|
-| **Leitor** | Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Baixar Documento, Imprimir |
-| **Editor** | Visualizar, Criar Documento, Editar, Nova Versão, Mover, Cancelar Edição, Baixar Documento, Imprimir, Visualizar Histórico de Versões |
-| **Revisor** | Visualizar, Revisar Documento, Submeter para Aprovação, Solicitar Revisão |
-| **Aprovador** | Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Baixar Documento, Imprimir, Assinatura Eletrônica, Revisar Documento, Aprovar Documento, Rejeitar Documento, Aprovador Documento, Aprovador Substituto Documento, Obsoletetar Documento, Emitir Cópia Controlada, Emitir Cópia Não Controlada, Cópia Controlada Anexos, Ciclo de Aprovação Documentos |
-| **Administrador** | Todas as ações do catálogo |
+| Papel | Nº de ações | Ações incluídas |
+|-------|-------------|----------------|
+| **Leitor** | 6 | Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Baixar Documento, Imprimir |
+| **Editor** | 9 | Visualizar, Criar Documento, Editar, Nova Versão, Mover, Cancelar Edição, Baixar Documento, Imprimir, Visualizar Histórico de Versões |
+| **Revisor** | 4 | Visualizar, Revisar Documento, Submeter para Aprovação, Solicitar Revisão |
+| **Aprovador** | 17 | Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Baixar Documento, Imprimir, Assinatura Eletrônica, Revisar Documento, Aprovar Documento, Rejeitar Documento, Aprovador Documento, Aprovador Substituto Documento, Obsoletetar Documento, Emitir Cópia Controlada, Emitir Cópia Não Controlada, Cópia Controlada Anexos, Ciclo de Aprovação Documentos |
+| **Administrador** | Todas | Todas as ações do catálogo MaxDoc |
 
 **Regra importante:** Os papéis do MaxDoc têm conjuntos independentes — Revisor não herda as ações de Editor, Aprovador não herda de Revisor. Para combinar ações de múltiplos papéis, use o modo **Personalizado** (seleção manual).
 
