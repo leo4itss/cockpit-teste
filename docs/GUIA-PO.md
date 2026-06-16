@@ -226,14 +226,23 @@ Permissões no Cockpit seguem o modelo **FGA (Fine-Grained Authorization)** — 
 
 > **Quem** (usuário ou grupo) **pode fazer o quê** (ação) **em qual módulo/objeto**
 
+### Dois tipos de módulo — onde cada um é gerenciado
+
+Os módulos da plataforma se dividem em dois grupos, e isso determina **onde** as permissões são configuradas:
+
+| Tipo | Módulos | Onde gerenciar |
+|------|---------|----------------|
+| **Por instância** | MaxDoc, DocAction, Assistente IA | Somente na aba **Objetos** → instância específica |
+| **Conta inteira** | PAS Core, Analytics, Base de Conhecimento | Seção **GLOBAIS** em Acessos |
+
+> **Por que essa separação?** MaxDoc, DocAction e Assistente IA funcionam em instâncias — cada "MaxDoc Comgas" ou "Assistente Vanessa" é um objeto independente, com seus próprios membros e papéis. Não faz sentido atribuir permissão "global" para esses módulos, pois o acesso a cada instância é configurado individualmente.
+
 ### Dois escopos de permissão
 
-| Escopo | O que significa |
-|--------|----------------|
-| **Global (nível conta)** | A permissão vale para TODOS os objetos daquele módulo na conta |
-| **Específico (nível objeto)** | A permissão vale apenas para aquele objeto específico |
-
-**Exemplo:** Um usuário com ação `can_use_assistant` no escopo global acessa TODOS os assistentes da conta. Um usuário com a mesma ação apenas no objeto "Assistente Vanessa" só acessa aquele assistente.
+| Escopo | O que significa | Onde configurar |
+|--------|----------------|----------------|
+| **Global (nível conta)** | Vale para PAS Core, Analytics, Base de Conhecimento em toda a conta | Acessos → seção GLOBAIS |
+| **Por instância** | Vale apenas para aquela instância específica (MaxDoc, DocAction, Assistente IA) | Acessos → Objetos → instância |
 
 ### Herança via grupo
 
@@ -247,10 +256,27 @@ Quando uma ação é atribuída a um **grupo**, todos os membros do grupo herdam
 - **Ação:** capacidade individual (ex: "Aprovar Documento")
 - **Personalizado:** quando nenhum papel predefinido é adequado — o administrador seleciona as ações manualmente
 
+### Comportamento ao trocar de papel
+
+Quando um papel é alterado para um usuário em uma instância, o sistema automaticamente:
+1. Remove todas as permissões anteriores daquele usuário naquela instância
+2. Aplica as ações padrão do novo papel
+
+Isso garante que as ações exibidas no `PermissoesMembroSheet` sempre refletem o papel atual — nunca sobras de papéis anteriores.
+
+### Comportamento ao remover membro
+
+Ao remover um membro de uma instância, o sistema limpa automaticamente:
+- O vínculo de membro (`instancia_membros`)
+- As atribuições DocNix associadas (`instancia_membro_atribuicoes`)
+- Todas as permissões FGA daquele usuário/grupo naquela instância (`component_permissions`)
+
+A operação é irreversível, mas pode ser refeita adicionando o membro novamente.
+
 ### Onde verificar permissões
 
 - **PermissoesMembroSheet:** abre ao clicar em um membro dentro de um objeto — mostra as ações daquele usuário naquele objeto específico
-- **UsuarioDetailAccountSheet → seção Ações:** mostra todas as ações do usuário na conta (diretas + via grupos)
+- **UsuarioDetailAccountSheet → seção Ações:** mostra todas as ações do usuário na conta; a subseção **POR INSTÂNCIA** lista as instâncias onde o usuário é membro direto
 - **PermissoesEfetivasSheet:** lista completa com a origem de cada ação (direto / via grupo)
 
 ---
