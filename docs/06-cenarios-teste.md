@@ -103,8 +103,7 @@ Validar a gestão de ocorrências de qualidade via DocAction: papéis independen
 #### 2.1 — Adicionar Analista
 
 1. Navegar para Acessos > Objetos > **DocAction Comgas**
-2. **"Adicionar Membro"** → buscar **Neide** (`usr-neide`)
-3. Selecionar papel **Analista**
+2. **"Adicionar Membro"** → **[Passo 1]** buscar e selecionar **Neide** (`usr-neide`) → **[Passo 2]** selecionar papel **Analista** → **Confirmar**
 4. **Verificar:** Ações pré-selecionadas (11): Visualizar, Criar Ocorrência, Criar Ocorrência 8D, Editar Ocorrência, Vincular Ocorrência, Acompanhar Ocorrência, Categorizar Ocorrência, Analisar Causa, Criar Plano de Ação, Verificar Eficácia, Encaminhar Ocorrência
 5. **Verificar:** Ações de Aprovador (Aprovar Análise de Causa, Encerrar Ocorrência, Reprogramar Prazo/Responsável) NÃO estão selecionadas
 6. Salvar
