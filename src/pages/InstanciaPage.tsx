@@ -66,6 +66,11 @@ function PapelBadge({ papel }: { papel: string }) {
       {dnx.label}
     </span>
   )
+  if (papel === 'personalizado') return (
+    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-purple-50 text-purple-700 border-purple-200">
+      Personalizado
+    </span>
+  )
   return <span className="text-sm text-gray-400">—</span>
 }
 
