@@ -401,7 +401,7 @@ Quando uma ação é atribuída a um **grupo**, todos os membros do grupo herdam
 
 **3.1 — Adicionar usuário com papel User**
 
-1. Acessos > Objetos > clicar em **"Atendimento"** (instância do Assistente IA)
+1. Acessos > Objetos > clicar em **"Assistente Suporte"** (instância do Assistente IA)
 2. **"Adicionar Membro"** → selecionar **Lucas Oliveira**
 3. Papel: **User**
 4. ✅ **Verificar 4 ações:** `can_use_assistant`, `can_share_conversation_results`, `can_view_consulted_sources`, `can_upload_rag_sources`
@@ -423,7 +423,7 @@ Quando uma ação é atribuída a um **grupo**, todos os membros do grupo herdam
 
 1. Navegar para **Acessos > Papéis**
 2. Verificar se **Thiago Martins** está em algum grupo. Se não, criar um grupo e adicioná-lo
-3. Voltar para Acessos > Objetos > Atendimento > **"Adicionar Membro"**
+3. Voltar para Acessos > Objetos > Assistente Suporte > **"Adicionar Membro"**
 4. No campo **"Buscar usuário ou grupo..."**, buscar o grupo de Thiago → selecionar → papel **Visualizador**
 5. Salvar
 6. Ir para **Acessos > Usuários** → clicar em **Thiago Martins**
@@ -588,7 +588,7 @@ Trocar o PersonaSwitcher para cada persona e verificar o sidebar:
 | Assistente CEO | Assistente IA | Comgas |
 | MaxDoc Santacruz | MaxDoc | Santacruz |
 | DocAction Santacruz | DocAction | Santacruz |
-| Atendimento | Assistente IA | Santacruz |
+| Assistente Suporte | Assistente IA | Santacruz |
 
 ---
 
