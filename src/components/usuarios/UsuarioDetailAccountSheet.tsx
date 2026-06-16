@@ -312,8 +312,6 @@ export function UsuarioDetailAccountSheet({
               const globaisContaInteira = permComponentes.filter(
                 ({ compNome }) => !getComponenteConfig(compNome).acessoViaInstancia
               )
-              const hasAtribuiveis = globaisContaInteira.length > 0 ||
-                permComponentes.length !== globaisContaInteira.length // há globais filtrados
               return (
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between">
