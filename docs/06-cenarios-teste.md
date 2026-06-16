@@ -118,18 +118,18 @@ Validar a gestão de ocorrências de qualidade via DocAction: papéis independen
 
 #### 2.3 — Verificar independência dos papéis
 
-1. Abrir PermissoesMembroSheet de **Neide** → confirmar papel Analista com suas ações
-2. Abrir PermissoesMembroSheet de **Leo** → confirmar papel Aprovador com suas ações
-3. **Verificar:** Os dois papéis são completamente independentes — Neide não tem Encerrar, Leo não tem Analisar Causa
+1. Abrir PermissoesMembroSheet de **Neide** → confirmar papel Analista com suas 11 ações
+2. Abrir PermissoesMembroSheet de **Leo** → confirmar papel Aprovador com suas 14 ações
+3. **Verificar:** Neide NÃO tem Aprovar Análise de Causa, Encerrar Ocorrência, Reprogramar Prazo/Responsável
+4. **Verificar:** Leo tem todas as ações do Analista + as 3 acima (Aprovador é cumulativo)
 
 #### 2.4 — Alterar Neide para papel Personalizado
 
 1. PermissoesMembroSheet de Neide
 2. Ativar **"Personalizado"**
-3. Manter apenas: **Analisar Causa** + **Verificar Eficácia** (marcar manualmente)
-4. Desmarcar: Criar Ocorrência, Criar Plano de Ação, Atribuir Responsável
-5. Salvar
-6. Reabrir sheet → **Verificar:** Apenas Visualizar + Analisar Causa + Verificar Eficácia estão marcadas
+3. Manter apenas: **Analisar Causa** + **Verificar Eficácia** (desmarcar todo o resto exceto esses dois)
+4. Salvar
+5. Reabrir sheet → **Verificar:** Apenas Analisar Causa + Verificar Eficácia estão marcadas
 
 #### 2.5 — Verificar persistência em banco
 
