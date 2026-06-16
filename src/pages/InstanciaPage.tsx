@@ -242,51 +242,47 @@ function AddMembroPanel({
 
       {/* ── Passo 1: buscar membro ──────────────────────────── */}
       {step === 1 && (
-        <div className="flex-1 px-6 py-4">
-          <p className="text-sm font-medium text-gray-700 mb-3">Buscar usuário ou grupo</p>
-          <div className="relative">
-            <div className="flex items-center gap-2 px-3 py-2.5 bg-white border border-gray-300 rounded-xl focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-colors">
-              <Search className="w-4 h-4 text-gray-400 shrink-0" />
-              <input
-                type="text" value={search} onChange={e => setSearch(e.target.value)}
-                placeholder="Buscar por nome ou e-mail..."
-                autoFocus
-                className="flex-1 bg-transparent text-sm outline-none text-gray-900 placeholder:text-gray-400"
-              />
-              {search && (
-                <button onClick={() => setSearch('')} className="text-gray-400 hover:text-gray-600">
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-
-            {sugestoes.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 overflow-hidden">
-                {sugestoes.map(item => (
-                  <button key={`${item.tipo}-${item.id}`} onClick={() => handleSelectItem(item)}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left border-b border-gray-50 last:border-0">
-                    <Avatar nome={item.nome} isGroup={item.tipo === 'group'} />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-gray-900 truncate">{item.nome}</p>
-                      <p className="text-xs text-gray-500 truncate">{item.sub}</p>
-                    </div>
-                    <span className={cn(
-                      'text-xs px-2 py-0.5 rounded-full font-medium shrink-0',
-                      item.tipo === 'group' ? 'bg-violet-50 text-violet-600' : 'bg-gray-100 text-gray-500'
-                    )}>
-                      {item.tipo === 'group' ? 'grupo' : 'usuário'}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {search.trim().length > 0 && sugestoes.length === 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 px-4 py-3">
-                <p className="text-sm text-gray-500">Nenhum resultado encontrado.</p>
-              </div>
+        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-2">
+          <p className="text-sm font-medium text-gray-700">Buscar usuário ou grupo</p>
+          <div className="flex items-center gap-2 px-3 py-2.5 bg-white border border-gray-300 rounded-xl focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-colors">
+            <Search className="w-4 h-4 text-gray-400 shrink-0" />
+            <input
+              type="text" value={search} onChange={e => setSearch(e.target.value)}
+              placeholder="Buscar por nome ou e-mail..."
+              autoFocus
+              className="flex-1 bg-transparent text-sm outline-none text-gray-900 placeholder:text-gray-400"
+            />
+            {search && (
+              <button onClick={() => setSearch('')} className="text-gray-400 hover:text-gray-600">
+                <X className="w-4 h-4" />
+              </button>
             )}
           </div>
+
+          {sugestoes.length > 0 && (
+            <div className="border border-gray-200 rounded-xl bg-white overflow-hidden">
+              {sugestoes.map(item => (
+                <button key={`${item.tipo}-${item.id}`} onClick={() => handleSelectItem(item)}
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left border-b border-gray-100 last:border-0">
+                  <Avatar nome={item.nome} isGroup={item.tipo === 'group'} />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-gray-900 truncate">{item.nome}</p>
+                    <p className="text-xs text-gray-500 truncate">{item.sub}</p>
+                  </div>
+                  <span className={cn(
+                    'text-xs px-2 py-0.5 rounded-full font-medium shrink-0',
+                    item.tipo === 'group' ? 'bg-violet-50 text-violet-600' : 'bg-gray-100 text-gray-500'
+                  )}>
+                    {item.tipo === 'group' ? 'grupo' : 'usuário'}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {search.trim().length > 0 && sugestoes.length === 0 && (
+            <p className="text-sm text-gray-500 px-1">Nenhum resultado encontrado.</p>
+          )}
         </div>
       )}
 
