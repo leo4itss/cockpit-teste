@@ -94,7 +94,7 @@ function PapelEditorFGA({
       <select value={draft} onChange={e => setDraft(e.target.value)} disabled={saving} autoFocus
         className="text-xs border border-gray-300 rounded-md px-2 py-1 outline-none focus:ring-2 focus:ring-blue-500 bg-white">
         {PAPEIS_FGA.map(p => (
-          <option key={p.value} value={p.value}>{p.label} — {p.desc}</option>
+          <option key={p.value} value={p.value}>{p.label}</option>
         ))}
       </select>
       <button onClick={async () => { setSaving(true); try { await onSave(draft) } finally { setSaving(false); setEditing(false) } }}
