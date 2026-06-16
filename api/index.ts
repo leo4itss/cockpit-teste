@@ -338,12 +338,15 @@ app.post('/users', async (c) => {
     const detail: string     = e?.detail     ?? e?.cause?.detail     ?? ''
     const constraint: string = e?.constraint ?? e?.cause?.constraint ?? ''
     const msg: string        = e?.message    ?? ''
-    const haystack = constraint + detail + msg
-    const isUnique = code === '23505' || haystack.includes('unique') || haystack.includes('duplicate')
+    // Usa apenas constraint+detail para detectar a coluna violada — msg contém
+    // a query SQL completa (ex: "INSERT INTO users (id, email, usuario, ...)"),
+    // o que tornaria haystack.includes('email') sempre verdadeiro.
+    const colHaystack = constraint + detail
+    const isUnique = code === '23505' || colHaystack.includes('unique') || colHaystack.includes('duplicate') || msg.includes('unique') || msg.includes('duplicate')
     if (isUnique) {
-      if (haystack.includes('email'))
+      if (colHaystack.includes('email'))
         return c.json({ error: 'Este e-mail já está cadastrado na plataforma.' }, 409)
-      if (haystack.includes('usuario'))
+      if (colHaystack.includes('usuario'))
         return c.json({ error: 'Este nome de usuário já está em uso.' }, 409)
       return c.json({ error: 'E-mail ou usuário já cadastrado.' }, 409)
     }
