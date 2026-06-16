@@ -569,7 +569,7 @@ const COMPONENTE_CONFIGS: Record<string, ComponenteTypeConfig> = {
         defaultAcoes: ['can_view'],
       },
       {
-        value: 'member', label: 'Usuário', desc: 'Uso padrão da solução',
+        value: 'member', label: 'Membro', desc: 'Uso padrão da solução',
         cls: 'bg-blue-50 text-blue-700 border-blue-200',
         defaultAcoes: ['can_view','can_edit'],
       },
