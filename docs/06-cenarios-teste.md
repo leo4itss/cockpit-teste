@@ -164,14 +164,14 @@ Validar as regras de acesso ao Assistente IA: papéis simples (Viewer/User/Admin
 
 ### Passo a Passo
 
-#### 3.1 — Adicionar usuário com papel User
+#### 3.1 — Adicionar usuário com papel Usuário
 
 1. Trocar para persona **Carla Santos** (PersonaSwitcher)
 2. Navegar para Acessos > Objetos > **Assistente Suporte**
 3. **"Adicionar Membro"** → buscar **Lucas Oliveira** (`usr-lucas`)
-4. Selecionar papel **User**
-5. **Verificar:** Ações pré-selecionadas: `can_use_assistant`, `can_share_conversation_results`, `can_view_consulted_sources`, `can_upload_rag_sources`
-6. **Verificar:** NÃO incluídas: `can_create_assistant`, `can_configure_agents`, `can_customize_ai`, `can_manage_users`
+4. Selecionar papel **Usuário**
+5. **Verificar:** Ações pré-selecionadas (4): Usar o assistente, Compartilhar resultados, Ver fontes consultadas, Upload de fontes RAG
+6. **Verificar:** NÃO incluídas: Criar assistente, Configurar agentes, Gerenciar cenários de negócio, Gerenciar usuários
 7. Salvar
 
 #### 3.2 — Adicionar Admin (todas as ações)
