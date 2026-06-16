@@ -787,7 +787,26 @@ app.put('/instancias/:id/membros/:membroId', async (c) => {
 })
 
 app.delete('/instancias/:id/membros/:membroId', async (c) => {
-  await db.delete(instanciaMembros).where(eq(instanciaMembros.id, c.req.param('membroId')))
+  const instanciaId = c.req.param('id')
+  const membroId    = c.req.param('membroId')
+
+  const [membro] = await db.select().from(instanciaMembros).where(eq(instanciaMembros.id, membroId))
+
+  // Remover atribuições DocNix (FK: membro_id → instancia_membros.id)
+  await db.delete(instanciaMembroAtribuicoes).where(eq(instanciaMembroAtribuicoes.membroId, membroId))
+
+  // Remover permissões FGA do membro nesta instância
+  if (membro) {
+    await db.delete(componentPermissions).where(
+      and(
+        eq(componentPermissions.entidadeTipo, membro.entidadeTipo as 'user' | 'group'),
+        eq(componentPermissions.entidadeId,   membro.entidadeId),
+        eq(componentPermissions.instanciaId,  instanciaId),
+      )
+    )
+  }
+
+  await db.delete(instanciaMembros).where(eq(instanciaMembros.id, membroId))
   return c.json({ ok: true })
 })
 
