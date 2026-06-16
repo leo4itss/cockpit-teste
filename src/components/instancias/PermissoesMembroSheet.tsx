@@ -250,7 +250,6 @@ export function PermissoesMembroSheet({
                   )}
                 >
                   <span className="text-xs font-medium text-gray-900">{p.label}</span>
-                  <span className="text-[10px] text-gray-500 mt-0.5 leading-tight">{p.desc}</span>
                 </button>
               ))}
 
