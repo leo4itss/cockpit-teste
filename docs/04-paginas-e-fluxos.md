@@ -288,14 +288,15 @@ Detalhe de uma instância (objeto). Abre em Acessos > Objetos ao clicar em um ob
 Sheet aninhada que mostra e edita as ações de um usuário/grupo em uma instância específica.
 
 **Exibe:**
-- Papel atual (com selector de papel)
-- Ações incluídas no papel (pré-selecionadas)
-- Toggle para "Personalizado" → permite selecionar ações manualmente
+- Papel atual (cards de papel — sem descrição, apenas o nome)
+- Ações incluídas no papel (pré-selecionadas automaticamente conforme o papel)
+- Card "Personalizado" → permite selecionar ações manualmente sem papel predefinido
 - Ações herdadas de grupo (read-only, badge verde)
 
 **Comportamento:**
-- Ao trocar o papel: ações são atualizadas automaticamente
-- Papel "Personalizado": sem pré-seleção, seleção manual livre
+- Ao abrir: se o papel for um papel nomeado (ex: Editor), exibe as ações padrão daquele papel — nunca dados desatualizados do banco
+- Ao trocar o papel: o sistema remove todas as permissões anteriores da instância e aplica as ações padrão do novo papel
+- Papel "Personalizado": seleção manual livre — persiste exatamente o que foi marcado
 - Salvar: persiste em `component_permissions`
 
 ---
