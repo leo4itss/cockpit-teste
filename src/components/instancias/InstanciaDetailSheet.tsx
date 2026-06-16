@@ -199,7 +199,7 @@ function PapelEditorDocNix({
   )
 }
 
-// Seção de busca para adicionar usuário ou grupo
+// Seção de busca para adicionar usuário ou grupo — wizard de 2 passos
 function AddMembroSection({
   allUsers, allGrupos, membros, onAdd, disabled, atribuicoes,
 }: {
@@ -210,21 +210,23 @@ function AddMembroSection({
   disabled?:   boolean
   atribuicoes: Atribuicao[]
 }) {
-  const [search, setSearch]                     = useState('')
-  const [papel, setPapel]                       = useState<'viewer' | 'member' | 'admin'>('viewer')
+  type SugestaoItem = { id: string; nome: string; sub: string; tipo: 'user' | 'group' }
+
+  const [step, setStep]                               = useState<1 | 2>(1)
+  const [search, setSearch]                           = useState('')
+  const [selectedItem, setSelectedItem]               = useState<SugestaoItem | null>(null)
+  const [papel, setPapel]                             = useState<'viewer' | 'member' | 'admin'>('viewer')
   const [selectedAtribuicoes, setSelectedAtribuicoes] = useState<string[]>([])
-  const [papelDocNix, setPapelDocNix]           = useState<string>('personalizado')
+  const [papelDocNix, setPapelDocNix]                 = useState<string>('')
 
-  const jaMembroIds = new Set(membros.map(m => m.entidadeId))
+  const jaMembroIds    = new Set(membros.map(m => m.entidadeId))
   const atribuicoesAtivas = atribuicoes.filter(a => a.status === 'Ativo')
-
-  // Detecta o módulo (MaxDoc / DocAction) a partir das atribuições ativas
-  const moduloDetectado = atribuicoesAtivas.find(a => a.modulo)?.modulo ?? null
-  const papeisDocNix = moduloDetectado
+  const moduloDetectado   = atribuicoesAtivas.find(a => a.modulo)?.modulo ?? null
+  const papeisDocNix      = moduloDetectado
     ? mockDocNixPapeis.filter(p => p.modulo === moduloDetectado)
     : []
 
-  function handlePapelDocNix(valor: string) {
+  function applyPapelDocNix(valor: string) {
     setPapelDocNix(valor)
     const p = mockDocNixPapeis.find(x => x.value === valor)
     if (!p) { setSelectedAtribuicoes([]); return }
@@ -234,89 +236,179 @@ function AddMembroSection({
     setSelectedAtribuicoes(ids)
   }
 
-  const sugestoes = useMemo(() => {
+  const sugestoes = useMemo<SugestaoItem[]>(() => {
     const q = search.trim().toLowerCase()
     if (!q) return []
-    const users: Array<{ id: string; nome: string; sub: string; tipo: 'user' | 'group' }> = allUsers
+    const users = allUsers
       .filter(u => !jaMembroIds.has(u.id) && (
         u.nomeCompleto.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)
       ))
       .slice(0, 3)
       .map(u => ({ id: u.id, nome: u.nomeCompleto, sub: u.email, tipo: 'user' as const }))
-
-    const grupos: Array<{ id: string; nome: string; sub: string; tipo: 'user' | 'group' }> = allGrupos
+    const grupos = allGrupos
       .filter(g => !jaMembroIds.has(g.id) && g.nome.toLowerCase().includes(q))
       .slice(0, 3)
       .map(g => ({ id: g.id, nome: g.nome, sub: 'Grupo', tipo: 'group' as const }))
-
     return [...users, ...grupos].slice(0, 6)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, allUsers, allGrupos, membros.length])
 
-  function select(item: { id: string; nome: string; tipo: 'user' | 'group' }) {
-    onAdd(item.tipo, item.id, item.nome, papel, selectedAtribuicoes)
+  function handleSelectItem(item: SugestaoItem) {
+    setSelectedItem(item)
     setSearch('')
-    setSelectedAtribuicoes([])
-    setPapelDocNix('personalizado')
+    // Pré-seleciona o primeiro papel disponível
+    if (papeisDocNix.length > 0) {
+      applyPapelDocNix(papeisDocNix[0].value)
+    } else {
+      setPapel('viewer')
+    }
+    setStep(2)
   }
 
+  function handleBack() {
+    setStep(1)
+    setSelectedItem(null)
+    setSelectedAtribuicoes([])
+    setPapelDocNix('')
+  }
+
+  function handleConfirm() {
+    if (!selectedItem) return
+    const papelFinal = atribuicoesAtivas.length > 0 ? papelDocNix : papel
+    onAdd(selectedItem.tipo, selectedItem.id, selectedItem.nome, papelFinal, selectedAtribuicoes)
+    setStep(1)
+    setSelectedItem(null)
+    setSelectedAtribuicoes([])
+    setPapelDocNix('')
+  }
+
+  // ── Passo 1: buscar membro ────────────────────────────────────
+  if (step === 1) {
+    return (
+      <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/60">
+        <div className="relative">
+          <div className="flex items-center gap-2 px-3 py-2.5 bg-white border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-colors">
+            <Search className="w-4 h-4 text-gray-400 shrink-0" />
+            <input
+              type="text"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Buscar usuário ou grupo..."
+              disabled={disabled}
+              autoFocus
+              className="flex-1 bg-transparent text-sm outline-none text-[#030712] placeholder:text-[#6b7280]"
+            />
+            {search && (
+              <button onClick={() => setSearch('')} className="text-gray-400 hover:text-gray-600 leading-none text-base">×</button>
+            )}
+          </div>
+
+          {sugestoes.length > 0 && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-hidden">
+              {sugestoes.map(item => (
+                <button
+                  key={`${item.tipo}-${item.id}`}
+                  onClick={() => handleSelectItem(item)}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 transition-colors text-left"
+                >
+                  <Avatar nome={item.nome} isGroup={item.tipo === 'group'} />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-[#030712] truncate">{item.nome}</p>
+                    <p className="text-xs text-[#6b7280] truncate">{item.sub}</p>
+                  </div>
+                  <span className={cn(
+                    'ml-auto shrink-0 text-[10px] px-1.5 py-0.5 rounded font-medium',
+                    item.tipo === 'group' ? 'bg-violet-50 text-violet-600' : 'bg-gray-100 text-gray-500'
+                  )}>
+                    {item.tipo === 'group' ? 'grupo' : 'usuário'}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {search.trim().length > 0 && sugestoes.length === 0 && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 px-4 py-3">
+              <p className="text-sm text-[#6b7280]">Nenhum usuário ou grupo encontrado.</p>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  // ── Passo 2: escolher papel ───────────────────────────────────
   return (
-    <div className="px-6 py-3 border-t border-gray-100 bg-gray-50/60 space-y-2">
-      {/* Seletor de papel / ações */}
+    <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/60 space-y-4">
+      {/* Membro selecionado */}
+      <div className="flex items-center gap-3 px-3 py-2.5 bg-white rounded-lg border border-gray-200">
+        <Avatar nome={selectedItem!.nome} isGroup={selectedItem!.tipo === 'group'} />
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium text-[#030712] truncate">{selectedItem!.nome}</p>
+          <p className="text-xs text-[#6b7280] truncate">{selectedItem!.sub}</p>
+        </div>
+        <button
+          onClick={handleBack}
+          className="shrink-0 text-xs text-gray-400 hover:text-gray-600 px-2 py-1 rounded hover:bg-gray-100 transition-colors"
+        >
+          Trocar
+        </button>
+      </div>
+
+      {/* Seletor de papel */}
       {atribuicoesAtivas.length === 0 ? (
-        /* FGA — seletor de papel fixo */
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-500">Papel:</span>
-          {PAPEIS_INSTANCIA.map(p => (
-            <button
-              key={p.value}
-              onClick={() => setPapel(p.value as 'viewer' | 'member' | 'admin')}
-              className={cn(
-                'px-2.5 py-1 rounded-full text-xs font-medium border transition-colors',
-                papel === p.value ? p.cls : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
-              )}
-            >
-              {p.label}
-            </button>
-          ))}
+        /* FGA */
+        <div className="space-y-1.5">
+          <p className="text-xs font-medium text-gray-500">Papel</p>
+          <div className="flex flex-wrap gap-2">
+            {PAPEIS_INSTANCIA.map(p => (
+              <button
+                key={p.value}
+                onClick={() => setPapel(p.value as 'viewer' | 'member' | 'admin')}
+                className={cn(
+                  'px-3 py-1.5 rounded-full text-xs font-medium border transition-colors',
+                  papel === p.value ? p.cls : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
+                )}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
         </div>
       ) : papeisDocNix.length > 0 ? (
-        /* DocNix — role cards + checkboxes colapsáveis */
+        /* DocNix — role cards + checkboxes */
         <div className="space-y-2">
-          <p className="text-xs text-gray-500 font-medium">Papel</p>
+          <p className="text-xs font-medium text-gray-500">Papel</p>
           <div className="grid grid-cols-3 gap-1.5">
             {papeisDocNix.map(p => (
               <button
                 key={p.value}
                 type="button"
-                onClick={() => handlePapelDocNix(p.value)}
+                onClick={() => applyPapelDocNix(p.value)}
                 className={cn(
-                  'flex flex-col items-start px-2.5 py-2 rounded-lg border text-left transition-colors',
+                  'px-2.5 py-2 rounded-lg border text-left transition-colors text-xs font-medium',
                   papelDocNix === p.value
-                    ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
-                    : 'border-gray-200 bg-white hover:bg-gray-50'
+                    ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500 text-blue-700'
+                    : 'border-gray-200 bg-white hover:bg-gray-50 text-[#030712]'
                 )}
               >
-                <span className="text-xs font-medium text-[#030712]">{p.label}</span>
+                {p.label}
               </button>
             ))}
-            {/* Card Personalizado */}
             <button
               type="button"
               onClick={() => { setPapelDocNix('personalizado'); setSelectedAtribuicoes([]) }}
               className={cn(
-                'flex flex-col items-start px-2.5 py-2 rounded-lg border text-left transition-colors',
+                'px-2.5 py-2 rounded-lg border text-left transition-colors text-xs font-medium',
                 papelDocNix === 'personalizado'
-                  ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
-                  : 'border-gray-200 bg-white hover:bg-gray-50'
+                  ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500 text-blue-700'
+                  : 'border-gray-200 bg-white hover:bg-gray-50 text-[#030712]'
               )}
             >
-              <span className="text-xs font-medium text-[#030712]">Personalizado</span>
-              <span className="text-[10px] text-[#6b7280] mt-0.5 leading-tight">Selecionar manualmente</span>
+              Personalizado
             </button>
           </div>
 
-          {/* Checkboxes colapsáveis — abertos no modo Personalizado */}
           <details open={papelDocNix === 'personalizado'}>
             <summary className="text-xs text-blue-600 cursor-pointer hover:underline select-none">
               {selectedAtribuicoes.length > 0
@@ -347,12 +439,12 @@ function AddMembroSection({
           </details>
         </div>
       ) : (
-        /* DocNix sem módulo reconhecido — fallback checkboxes */
-        <div>
-          <label className="text-xs text-gray-500 font-medium">Ações</label>
-          <div className="mt-1 space-y-1 max-h-48 overflow-y-auto border border-gray-200 rounded-md p-2 bg-white">
+        /* DocNix sem módulo — fallback checkboxes */
+        <div className="space-y-1.5">
+          <p className="text-xs font-medium text-gray-500">Ações</p>
+          <div className="space-y-0.5 max-h-48 overflow-y-auto border border-gray-200 rounded-md p-2 bg-white">
             {atribuicoesAtivas.map(a => (
-              <label key={a.id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 rounded px-1 py-0.5">
+              <label key={a.id} className="flex items-center gap-2 text-xs cursor-pointer hover:bg-gray-50 rounded px-1 py-0.5">
                 <input
                   type="checkbox"
                   checked={selectedAtribuicoes.includes(a.id)}
@@ -366,59 +458,29 @@ function AddMembroSection({
                   className="rounded"
                 />
                 <span>{a.nome}</span>
-                {a.modulo && <span className="text-xs text-gray-400">({a.modulo})</span>}
+                {a.modulo && <span className="text-[#9ca3af]">({a.modulo})</span>}
               </label>
             ))}
           </div>
         </div>
       )}
 
-      {/* Busca de usuário ou grupo */}
-      <div className="relative">
-        <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-colors">
-          <Search className="w-4 h-4 text-gray-400 shrink-0" />
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Buscar usuário ou grupo..."
-            disabled={disabled}
-            className="flex-1 bg-transparent text-sm outline-none text-[#030712] placeholder:text-[#6b7280]"
-          />
-          {search && (
-            <button onClick={() => setSearch('')} className="text-gray-400 hover:text-gray-600 leading-none text-base">×</button>
-          )}
-        </div>
-
-        {sugestoes.length > 0 && (
-          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-hidden">
-            {sugestoes.map(item => (
-              <button
-                key={`${item.tipo}-${item.id}`}
-                onClick={() => select(item)}
-                className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 transition-colors text-left"
-              >
-                <Avatar nome={item.nome} isGroup={item.tipo === 'group'} />
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-[#030712] truncate">{item.nome}</p>
-                  <p className="text-xs text-[#6b7280] truncate">{item.sub}</p>
-                </div>
-                <span className={cn(
-                  'ml-auto shrink-0 text-[10px] px-1.5 py-0.5 rounded font-medium',
-                  item.tipo === 'group' ? 'bg-violet-50 text-violet-600' : 'bg-gray-100 text-gray-500'
-                )}>
-                  {item.tipo === 'group' ? 'grupo' : 'usuário'}
-                </span>
-              </button>
-            ))}
-          </div>
-        )}
-
-        {search.trim().length > 0 && sugestoes.length === 0 && (
-          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 px-4 py-3">
-            <p className="text-sm text-[#6b7280]">Nenhum usuário ou grupo encontrado.</p>
-          </div>
-        )}
+      {/* Ações do wizard */}
+      <div className="flex items-center justify-between pt-1">
+        <button
+          onClick={handleBack}
+          className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+        >
+          ← Voltar
+        </button>
+        <button
+          onClick={handleConfirm}
+          disabled={disabled}
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium transition-colors disabled:opacity-50"
+        >
+          {disabled ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+          Confirmar
+        </button>
       </div>
     </div>
   )
