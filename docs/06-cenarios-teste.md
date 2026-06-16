@@ -179,7 +179,7 @@ Validar as regras de acesso ao Assistente IA: papéis simples (Viewer/User/Admin
 
 #### 3.3 — Testar herança via grupo
 
-> **Setup:** Lucas Oliveira (`usr-lucas`) já foi adicionado como **Usuário** em 3.1 (entrada direta). Este passo adiciona o grupo de Lucas à mesma instância para demonstrar herança via grupo no PermissoesMembroSheet.
+> **Setup:** Lucas Oliveira (`usr-lucas`) já foi adicionado como **Membro** em 3.1 (entrada direta). Este passo adiciona o grupo de Lucas à mesma instância para demonstrar herança via grupo no PermissoesMembroSheet.
 
 1. Em Acessos > Papéis, verificar em qual grupo **Lucas Oliveira** está (ex: `grp-a2-leitura`). Se necessário, adicioná-lo a um grupo.
 2. Ainda em Acessos > Objetos > **Assistente Suporte** → **"Adicionar Membro"**
