@@ -514,9 +514,12 @@ export function InstanciaDetailSheet({
             api.addMembroAtribuicao(instancia.id, row.id, atribId).catch(() => null)
           )
         )
-      } else if (instancia.componenteId) {
-        // FGA: auto-criar component_permissions com as ações do papel
-        const config = getComponenteConfig(componenteNome ?? '')
+      }
+
+      // Sempre criar component_permissions com os defaults do papel (FGA e DocNix)
+      // Isso garante que PermissoesMembroSheet exiba as ações corretas ao abrir.
+      if (instancia.componenteId && papel !== 'personalizado') {
+        const config   = getComponenteConfig(componenteNome ?? '')
         const papelDef = config.papeis.find(p => p.value === papel)
         if (papelDef) {
           const defaults = papelDef.defaultAcoes ?? []
