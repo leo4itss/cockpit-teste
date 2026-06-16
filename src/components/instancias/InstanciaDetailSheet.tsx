@@ -590,6 +590,7 @@ export function InstanciaDetailSheet({
     // Não limpa `membros` para preservar edições locais ao reabrir a mesma instância
     setShowAdd(false)
     setShowPermissoes(false); setMembroPermissoes(null)
+    setRemoveError(null)
     onClose()
   }
 
