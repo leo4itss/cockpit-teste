@@ -134,7 +134,7 @@ function PapelEditor({
         className="text-xs border border-gray-300 rounded-md px-2 py-1 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
       >
         {PAPEIS_INSTANCIA.map(p => (
-          <option key={p.value} value={p.value}>{p.label} — {p.desc}</option>
+          <option key={p.value} value={p.value}>{p.label}</option>
         ))}
       </select>
       <button onClick={handleSave} disabled={saving} className="p-1 rounded text-green-600 hover:bg-green-50 transition-colors disabled:opacity-50" title="Confirmar">
