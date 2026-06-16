@@ -353,8 +353,8 @@ Quando uma ação é atribuída a um **grupo**, todos os membros do grupo herdam
 1. Acessos > Objetos > clicar em **"DocAction Comgas"**
 2. **"Adicionar Membro"** → selecionar **Neide**
 3. Papel: **Analista**
-4. ✅ **Verificar ações pré-selecionadas:** Visualizar, Criar Ocorrência, Analisar Causa, Criar Plano de Ação, Atribuir Responsável, Comentar
-5. ✅ **Verificar que NÃO estão:** Aprovar Análise de Causa, Encerrar
+4. ✅ **Verificar ações pré-selecionadas (11):** Visualizar, Criar Ocorrência, Criar Ocorrência 8D, Editar Ocorrência, Vincular Ocorrência, Acompanhar Ocorrência, Categorizar Ocorrência, Analisar Causa, Criar Plano de Ação, Verificar Eficácia, Encaminhar Ocorrência
+5. ✅ **Verificar que NÃO estão:** Aprovar Análise de Causa, Encerrar Ocorrência, Reprogramar Prazo/Responsável
 6. Salvar
 
 ---
@@ -363,17 +363,18 @@ Quando uma ação é atribuída a um **grupo**, todos os membros do grupo herdam
 
 1. **"Adicionar Membro"** → selecionar **Leo**
 2. Papel: **Aprovador**
-3. ✅ **Verificar ações:** Visualizar, Aprovar Análise de Causa, Aprovar Plano de Ação, Encerrar
-4. ✅ **Verificar que NÃO estão:** Criar Ocorrência, Analisar Causa
+3. ✅ **Verificar ações (14):** todas as 11 do Analista + Aprovar Análise de Causa, Encerrar Ocorrência, Reprogramar Prazo/Responsável
+4. ✅ **Verificar:** Criar Ocorrência e Analisar Causa **estão** selecionadas (Aprovador é cumulativo — inclui tudo do Analista)
 5. Salvar
 
 ---
 
 **2.3 — Confirmar independência dos papéis**
 
-1. Clicar em **Neide** → verificar papel Analista com suas ações
-2. Clicar em **Leo** → verificar papel Aprovador com suas ações
-3. ✅ **Verificar:** Alterar o papel de Neide não afeta o papel de Leo, e vice-versa
+1. Clicar em **Neide** → confirmar papel Analista com 11 ações
+2. Clicar em **Leo** → confirmar papel Aprovador com 14 ações
+3. ✅ **Verificar:** Neide NÃO tem Aprovar Análise de Causa, Encerrar Ocorrência, Reprogramar Prazo/Responsável
+4. ✅ **Verificar:** Leo TEM todas as ações do Analista + as 3 exclusivas acima
 
 ---
 
