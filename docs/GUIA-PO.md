@@ -434,8 +434,7 @@ A operação é irreversível, mas pode ser refeita adicionando o membro novamen
 
 **3.2 — Adicionar Admin (todas as ações)**
 
-1. **"Adicionar Membro"** → selecionar **Beatriz Lima**
-2. Papel: **Admin**
+1. **"Adicionar Membro"** → **Passo 1:** buscar e selecionar **Beatriz Lima** → **Passo 2:** selecionar papel **Admin**
 3. ✅ **Verificar:** Todas as 8 ações estão selecionadas
 4. Salvar
 
