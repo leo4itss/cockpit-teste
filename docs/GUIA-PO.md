@@ -385,8 +385,7 @@ A operação é irreversível, mas pode ser refeita adicionando o membro novamen
 
 **2.2 — Adicionar Aprovador (usuário diferente)**
 
-1. **"Adicionar Membro"** → selecionar **Leo**
-2. Papel: **Aprovador**
+1. **"Adicionar Membro"** → **Passo 1:** buscar e selecionar **Leo** → **Passo 2:** selecionar papel **Aprovador**
 3. ✅ **Verificar ações (14):** todas as 11 do Analista + Aprovar Análise de Causa, Encerrar Ocorrência, Reprogramar Prazo/Responsável
 4. ✅ **Verificar:** Criar Ocorrência e Analisar Causa **estão** selecionadas (Aprovador é cumulativo — inclui tudo do Analista)
 5. Salvar
