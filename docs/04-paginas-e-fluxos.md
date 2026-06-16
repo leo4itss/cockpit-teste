@@ -305,9 +305,9 @@ Sheet aninhada que mostra e edita as ações de um usuário/grupo em uma instân
 
 Sheet para atribuir ações de escopo global (`instancia_id = null`) a um usuário ou grupo.
 
-**Exibe:**
-- Lista de componentes disponíveis na conta (com entitlements ativos)
-- Para cada componente: ações disponíveis
+**Exibe apenas módulos de conta inteira:**
+- PAS Core, Analytics, Base de Conhecimento
+- MaxDoc, DocAction e Assistente IA **não aparecem aqui** — são gerenciados exclusivamente via instância
 - Se entitlement inativo: exibe badge "Capability inativa" e bloqueia seleção
 
 ---
