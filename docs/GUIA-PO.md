@@ -532,10 +532,10 @@ Trocar o PersonaSwitcher para cada persona e verificar o sidebar:
 
 | # | Critério | Como verificar |
 |---|---------|----------------|
-| AS-01 | Papel **User** tem exatamente 4 ações | Verificar seleção ao adicionar membro com papel User |
-| AS-02 | Papel **User** não tem `can_create_assistant` nem `can_configure_agents` | Confirmar ausência |
+| AS-01 | Papel **Usuário** tem exatamente 4 ações | Verificar seleção ao adicionar membro com papel Usuário |
+| AS-02 | Papel **Usuário** não tem Criar assistente nem Configurar agentes | Confirmar ausência |
 | AS-03 | Papel **Admin** tem todas as 8 ações | Adicionar Admin e verificar |
-| AS-04 | Herança via grupo funciona | Thiago herda `can_use_assistant` do grupo (verde) |
+| AS-04 | Herança via grupo funciona | Thiago herda "Usar o assistente" do grupo (verde) |
 | AS-05 | Entitlement inativo bloqueia o componente | Acessar conta sem `assistant.use` e verificar badge |
 
 ### Gerais
