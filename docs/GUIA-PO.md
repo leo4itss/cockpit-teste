@@ -309,8 +309,8 @@ Quando uma ação é atribuída a um **grupo**, todos os membros do grupo herdam
 2. No campo **"Buscar usuário ou grupo..."**, digitar o nome do grupo desejado
 3. Selecionar o grupo nos resultados
 4. Selecionar o papel **Aprovador**
-5. ✅ **Verificar:** Ações pré-selecionadas: Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Download Documento, Imprimir, Assinatura Eletrônica, Revisar Documento, Aprovar Documento, Aprovador Documento, Aprovador Substituto Documento, Obsoletetar Documento, Emitir Cópia Controlada, Emitir Cópia Não Controlada, Cópia Controlada Anexos, Ciclo de Aprovação Documentos
-6. ✅ **Verificar:** Aprovador NÃO tem Criar Documento nem Editar Documento
+5. ✅ **Verificar:** Ações pré-selecionadas (17): Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Baixar Documento, Imprimir, Assinatura Eletrônica, Revisar Documento, Aprovar Documento, Rejeitar Documento, Aprovador Documento, Aprovador Substituto Documento, Obsoletetar Documento, Emitir Cópia Controlada, Emitir Cópia Não Controlada, Cópia Controlada Anexos, Ciclo de Aprovação Documentos
+6. ✅ **Verificar:** Aprovador NÃO tem Criar Documento nem Editar (papéis independentes)
 7. Salvar
 
 ---
