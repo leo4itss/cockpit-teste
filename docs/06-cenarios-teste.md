@@ -128,9 +128,9 @@ Validar a gestão de ocorrências de qualidade via DocAction: papéis independen
 
 1. PermissoesMembroSheet de Neide
 2. Ativar **"Personalizado"**
-3. Manter apenas: **Analisar Causa** + **Verificar Eficácia** (desmarcar todo o resto exceto esses dois)
+3. Manter apenas: **Visualizar** + **Analisar Causa** + **Verificar Eficácia** (desmarcar todo o resto)
 4. Salvar
-5. Reabrir sheet → **Verificar:** Apenas Analisar Causa + Verificar Eficácia estão marcadas
+5. Reabrir sheet → **Verificar:** Apenas Visualizar + Analisar Causa + Verificar Eficácia estão marcadas
 
 #### 2.5 — Verificar persistência em banco
 
