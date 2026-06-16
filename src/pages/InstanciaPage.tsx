@@ -709,7 +709,15 @@ export function InstanciaPage() {
           componenteTipoModelo={componente.tipoModelo}
           membro={membroPermissoes}
           accountId={instancia.accountId}
-          onSaved={() => setShowPermissoes(false)}
+          onSaved={async () => {
+            setShowPermissoes(false)
+            setMembroPermissoes(null)
+            // Recarregar membros para refletir mudança de papel salva no sheet
+            if (instancia) {
+              const mems = await api.getInstanciaMembros(instancia.id).catch(() => null)
+              if (mems) setMembros(mems)
+            }
+          }}
         />
       )}
     </div>
