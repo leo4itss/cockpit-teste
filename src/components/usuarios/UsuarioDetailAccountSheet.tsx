@@ -307,46 +307,56 @@ export function UsuarioDetailAccountSheet({
             </div>
 
             {/* Sub-seção: Globais (nível conta, instancia_id = null) */}
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">
-                  Globais — nível de conta
-                </p>
-                <button
-                  onClick={() => setShowPermissoes(true)}
-                  className="text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
-                >
-                  + Atribuir
-                </button>
-              </div>
+            {/* Exibe apenas componentes de conta-inteira (sem acessoViaInstancia) */}
+            {(() => {
+              const globaisContaInteira = permComponentes.filter(
+                ({ compNome }) => !getComponenteConfig(compNome).acessoViaInstancia
+              )
+              const hasAtribuiveis = globaisContaInteira.length > 0 ||
+                permComponentes.length !== globaisContaInteira.length // há globais filtrados
+              return (
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">
+                      Globais — nível de conta
+                    </p>
+                    <button
+                      onClick={() => setShowPermissoes(true)}
+                      className="text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                    >
+                      + Atribuir
+                    </button>
+                  </div>
 
-              {loadingAcesso ? (
-                <p className="text-sm text-[#6b7280]">Carregando…</p>
-              ) : permComponentes.length === 0 ? (
-                <div className="px-4 py-3 rounded-lg border border-dashed border-gray-200 bg-gray-50">
-                  <p className="text-sm text-[#6b7280]">
-                    Nenhuma permissão global atribuída.
+                  {loadingAcesso ? (
+                    <p className="text-sm text-[#6b7280]">Carregando…</p>
+                  ) : globaisContaInteira.length === 0 ? (
+                    <div className="px-4 py-3 rounded-lg border border-dashed border-gray-200 bg-gray-50">
+                      <p className="text-sm text-[#6b7280]">
+                        Nenhuma permissão global atribuída.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-1.5">
+                      {globaisContaInteira.map(({ compId, compNome, papel }) => (
+                        <div
+                          key={compId}
+                          className="flex items-center justify-between px-4 py-2.5 rounded-lg border border-gray-200 bg-white"
+                        >
+                          <p className="text-sm font-medium text-[#030712]">{compNome}</p>
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-blue-50 text-blue-700 border-blue-200">
+                            {papel}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-xs text-[#9ca3af]">
+                    Para módulos de conta inteira (ex: PAS Core, Analytics). Acesso a MaxDoc, DocAction e Assistente IA é gerenciado por instância, na seção abaixo.
                   </p>
                 </div>
-              ) : (
-                <div className="flex flex-col gap-1.5">
-                  {permComponentes.map(({ compId, compNome, papel }) => (
-                    <div
-                      key={compId}
-                      className="flex items-center justify-between px-4 py-2.5 rounded-lg border border-gray-200 bg-white"
-                    >
-                      <p className="text-sm font-medium text-[#030712]">{compNome}</p>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-blue-50 text-blue-700 border-blue-200">
-                        {papel}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <p className="text-xs text-[#9ca3af]">
-                Válidas em todos os contextos do componente nesta conta (ex: PAS Core, Analytics).
-              </p>
-            </div>
+              )
+            })()}
 
             {/* Sub-seção: Por instância */}
             <div className="flex flex-col gap-2">
