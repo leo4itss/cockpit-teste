@@ -38,11 +38,11 @@ Validar o ciclo completo de gerenciamento de acesso ao módulo MaxDoc: atribuiç
 
 #### 1.3 — Alterar papel para Revisor
 
-1. Com InstanciaDetailSheet aberta, clicar em **Fernando**
+1. Com InstanciaDetailSheet aberta, clicar em **Ações** ao lado de Fernando
 2. PermissoesMembroSheet abre
-3. Trocar papel de **Editor** para **Revisor** no selector
-4. **Verificar:** Ações atualizam para apenas (4 ações): Visualizar, Revisar Documento, Submeter para Aprovação, Solicitar Revisão
-5. **Verificar:** Criar Documento e Editar NÃO estão selecionadas (Revisor tem conjunto próprio, independente do Editor)
+3. Clicar no card **Revisor** no seletor de papel
+4. **Verificar:** Ações atualizam automaticamente para (4 ações): Visualizar, Revisar Documento, Submeter para Aprovação, Solicitar Revisão
+5. **Verificar:** Criar Documento e Editar NÃO estão (o sistema apaga as permissões do papel anterior e aplica as do novo)
 6. Salvar
 
 #### 1.4 — Adicionar grupo com papel Aprovador
