@@ -32,8 +32,8 @@ Validar o ciclo completo de gerenciamento de acesso ao módulo MaxDoc: atribuiç
 2. Clicar em **"Adicionar Membro"**
 3. Buscar usuário **Fernando** (`usr-fernando`)
 4. Selecionar papel **Editor**
-5. **Verificar:** Ações pré-selecionadas incluem: Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Download Documento, Imprimir, Criar Documento, Editar Documento, Nova Versão, Upload Documento, Editor Documento, Criar Anexo, Editar Anexo, Anexar Arquivos
-6. **Verificar:** Ações de Aprovador (Aprovar Documento, Ciclo de Aprovação Documentos) NÃO estão selecionadas
+5. **Verificar:** Ações pré-selecionadas (9 ações): Visualizar, Criar Documento, Editar, Nova Versão, Mover, Cancelar Edição, Baixar Documento, Imprimir, Visualizar Histórico de Versões
+6. **Verificar:** Ações de Aprovador (Aprovar Documento, Rejeitar Documento) NÃO estão selecionadas
 7. Salvar
 
 #### 1.3 — Alterar papel para Revisor
@@ -41,8 +41,8 @@ Validar o ciclo completo de gerenciamento de acesso ao módulo MaxDoc: atribuiç
 1. Com InstanciaDetailSheet aberta, clicar em **Fernando**
 2. PermissoesMembroSheet abre
 3. Trocar papel de **Editor** para **Revisor** no selector
-4. **Verificar:** Ações atualizam automaticamente — agora incluem também: Revisar Documento, Submeter para Aprovação, Revisor Documento, Revisar como Substituto Documento
-5. **Verificar:** As ações base do Editor continuam (Criar Documento, Editar Documento, etc. fazem parte do Revisor)
+4. **Verificar:** Ações atualizam para apenas (4 ações): Visualizar, Revisar Documento, Submeter para Aprovação, Solicitar Revisão
+5. **Verificar:** Criar Documento e Editar NÃO estão selecionadas (Revisor tem conjunto próprio, independente do Editor)
 6. Salvar
 
 #### 1.4 — Adicionar grupo com papel Aprovador
@@ -51,8 +51,8 @@ Validar o ciclo completo de gerenciamento de acesso ao módulo MaxDoc: atribuiç
 2. **"Adicionar Membro"**
 3. No campo **"Buscar usuário ou grupo..."**, digitar o nome do grupo (ex: Grupo AQ Comgas)
 4. Selecionar papel **Aprovador**
-5. **Verificar:** Ações pré-selecionadas: Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Download Documento, Imprimir, Assinatura Eletrônica, Revisar Documento, Aprovar Documento, Aprovador Documento, Aprovador Substituto Documento, Obsoletetar Documento, Emitir Cópia Controlada, Emitir Cópia Não Controlada, Cópia Controlada Anexos, Ciclo de Aprovação Documentos
-6. **Verificar:** Aprovador NÃO tem Criar Documento nem Editar Documento (papel diferente de Editor)
+5. **Verificar:** Ações pré-selecionadas incluem: Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Baixar Documento, Imprimir, Assinatura Eletrônica, Revisar Documento, Aprovar Documento, Rejeitar Documento, Aprovador Documento, Aprovador Substituto Documento, Obsoletetar Documento, Emitir Cópia Controlada, Emitir Cópia Não Controlada, Cópia Controlada Anexos, Ciclo de Aprovação Documentos
+6. **Verificar:** Aprovador NÃO tem Criar Documento nem Editar (papel diferente de Editor)
 7. Salvar
 
 #### 1.5 — Verificar ações personalizadas
