@@ -298,7 +298,6 @@ function AddMembroSection({
                 )}
               >
                 <span className="text-xs font-medium text-[#030712]">{p.label}</span>
-                <span className="text-[10px] text-[#6b7280] mt-0.5 leading-tight">{p.desc}</span>
               </button>
             ))}
             {/* Card Personalizado */}
