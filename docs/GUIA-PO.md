@@ -421,14 +421,16 @@ Quando uma ação é atribuída a um **grupo**, todos os membros do grupo herdam
 
 **3.3 — Herança via grupo**
 
-1. Navegar para **Acessos > Papéis**
-2. Verificar se **Thiago Martins** está em algum grupo. Se não, criar um grupo e adicioná-lo
-3. Voltar para Acessos > Objetos > Assistente Suporte > **"Adicionar Membro"**
-4. No campo **"Buscar usuário ou grupo..."**, buscar o grupo de Thiago → selecionar → papel **Visualizador**
-5. Salvar
-6. Ir para **Acessos > Usuários** → clicar em **Thiago Martins**
-7. ✅ **Verificar na seção Ações:** **Usar o assistente** aparece em verde ("via grupo: [nome do grupo]")
-8. ✅ **Verificar:** Nenhuma ação direta para Thiago — a ação vem do grupo
+> **Setup:** Lucas Oliveira já tem entrada direta como Usuário (passo 3.1). Aqui adicionamos o grupo de Lucas para demonstrar a herança no PermissoesMembroSheet.
+
+1. Em **Acessos > Papéis**, verificar em qual grupo Lucas Oliveira está (ex: `grp-a2-leitura`). Se necessário, adicionar Lucas a um grupo.
+2. Em Acessos > Objetos > **Assistente Suporte** → **"Adicionar Membro"**
+3. Buscar o **grupo de Lucas** → selecionar → papel **Visualizador** → Salvar
+4. Na lista de membros da instância, clicar em **Lucas Oliveira**
+5. ✅ **Verificar no PermissoesMembroSheet:** Banner verde "Ações herdadas de grupos" aparece
+6. ✅ **Verificar:** "Usar o assistente" com badge verde do grupo (herdada — não editável diretamente)
+
+> **Importante:** A herança de grupo é visível no **PermissoesMembroSheet** — não na listagem "POR INSTÂNCIA" do painel do usuário (que exibe apenas membros diretos). Para acessar via UsuarioDetailAccountSheet: Acessos > Usuários > Lucas > **Editar** ao lado de Assistente Suporte.
 
 ---
 
