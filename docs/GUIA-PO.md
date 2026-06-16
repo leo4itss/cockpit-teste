@@ -524,7 +524,7 @@ Trocar o PersonaSwitcher para cada persona e verificar o sidebar:
 | # | Critério | Como verificar |
 |---|---------|----------------|
 | DA-01 | Papel **Analista** não inclui Aprovar ou Encerrar | Adicionar Analista e conferir ações |
-| DA-02 | Papel **Aprovador** não inclui Criar Ocorrência ou Analisar Causa | Adicionar Aprovador e conferir ações |
+| DA-02 | Papel **Aprovador** inclui todas as ações do Analista + Aprovar Análise de Causa, Encerrar Ocorrência, Reprogramar Prazo/Responsável | Adicionar Aprovador e conferir 14 ações |
 | DA-03 | Alterar papel de Neide não afeta o papel de Leo | Conferir PermissoesMembroSheet de cada um |
 | DA-04 | Papel Personalizado em DocAction persiste | Salvar seleção, fechar, reabrir |
 
