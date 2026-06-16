@@ -159,7 +159,7 @@ Validar as regras de acesso ao Assistente IA: papéis simples (Viewer/User/Admin
 ### Pré-condições
 - Persona ativa: **Carla Santos** (`4`) — Account Admin da Santacruz
 - Conta: **Santacruz** (`a2`)
-- Instância: **Atendimento** (`inst-a2-atend`) — componente Assistente IA
+- Instância: **Assistente Suporte** (`inst-a2-suporte`) — componente Assistente IA
 - Entitlement `assistant.use` ativo na conta Santacruz
 
 ### Passo a Passo
