@@ -381,7 +381,7 @@ Quando uma ação é atribuída a um **grupo**, todos os membros do grupo herdam
 **2.4 — Personalizar ações de Neide**
 
 1. Clicar em **Neide** → ativar **"Personalizado"**
-2. Manter apenas: **Analisar Causa** + **Verificar Eficácia**
+2. Manter apenas: **Visualizar** + **Analisar Causa** + **Verificar Eficácia**
 3. Desmarcar todo o resto
 4. Salvar
 5. Fechar e reabrir o painel de Neide
