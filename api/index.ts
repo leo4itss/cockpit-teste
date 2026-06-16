@@ -715,6 +715,13 @@ app.get('/instancias/:id', async (c) => {
 app.post('/instancias', async (c) => {
   const { componenteId, accountId, nome, descricao } = await c.req.json()
   if (!componenteId || !accountId || !nome) return c.json({ error: 'componenteId, accountId e nome obrigatórios' }, 400)
+
+  // Impede criação de instância com nome duplicado para o mesmo componente e conta
+  const duplicate = await db.select().from(instancias).where(
+    and(eq(instancias.accountId, accountId), eq(instancias.componenteId, componenteId), eq(instancias.nome, nome))
+  )
+  if (duplicate.length > 0) return c.json({ error: `Já existe uma instância chamada "${nome}" para este componente nesta conta.` }, 409)
+
   const [row] = await db.insert(instancias).values({
     id: crypto.randomUUID(), componenteId, accountId, nome,
     descricao: descricao ?? null, status: 'Ativo',
