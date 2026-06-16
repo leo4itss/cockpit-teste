@@ -697,6 +697,7 @@ export function InstanciaPage() {
           componenteNome={componente.nome}
           componenteTipoModelo={componente.tipoModelo}
           membro={membroPermissoes}
+          accountId={instancia.accountId}
           onSaved={() => setShowPermissoes(false)}
         />
       )}
