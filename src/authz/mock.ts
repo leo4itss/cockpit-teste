@@ -423,6 +423,7 @@ const COMPONENTE_CONFIGS: Record<string, ComponenteTypeConfig> = {
   'docaction': {
     label: 'DocAction',
     permissaoMode: 'component_permissions',
+    acessoViaInstancia: true,
     papeis: [
       {
         value: 'colaborador', label: 'Colaborador', desc: 'Cria e acompanha ocorrências',
