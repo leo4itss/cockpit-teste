@@ -831,6 +831,9 @@ export function InstanciaDetailSheet({
         </NestedSheetBody>
 
       <NestedSheetFooter className="justify-end">
+        {removeError && (
+          <p className="text-xs text-red-600 flex-1 mr-2">{removeError}</p>
+        )}
         <Button variant="ghost" onClick={handleClose}>Fechar</Button>
       </NestedSheetFooter>
 
