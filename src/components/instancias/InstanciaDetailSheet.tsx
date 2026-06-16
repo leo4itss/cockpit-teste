@@ -568,6 +568,44 @@ export function InstanciaDetailSheet({
           ])
         }
       }
+
+      // 3. Resetar component_permissions para os defaults do novo papel (para todos os tipos)
+      //    Isso garante que PermissoesMembroSheet mostre as ações corretas ao abrir.
+      //    Não resetar se for 'personalizado' (preservar seleção manual).
+      if (novoPapel !== 'personalizado' && instancia.componenteId) {
+        const entidadeTipo = membro.entidadeTipo === 'user' ? 'user' as const : 'group' as const
+        const config   = getComponenteConfig(componenteNome ?? '')
+        const papelDef = config.papeis.find(p => p.value === novoPapel)
+        if (papelDef) {
+          // Remover todas as permissões atuais na instância
+          const currentPerms = await api.getPermissions({
+            entidade_tipo: entidadeTipo,
+            entidade_id:   membro.entidadeId,
+            instancia_id:  instancia.id,
+          }).catch(() => [] as any[])
+          await Promise.all((currentPerms as any[]).map((p: any) =>
+            api.removePermission({
+              entidade_tipo: entidadeTipo,
+              entidade_id:   membro.entidadeId,
+              componente_id: instancia.componenteId!,
+              acao:          p.acao,
+              instancia_id:  instancia.id,
+            }).catch(() => null)
+          ))
+          // Adicionar os defaults do novo papel
+          const defaults = papelDef.defaultAcoes ?? []
+          const acoes = defaults.length > 0 ? defaults : (config.acoes ?? []).map(a => a.acao)
+          await Promise.all(acoes.map(acao =>
+            api.addPermission({
+              entidade_tipo: entidadeTipo,
+              entidade_id:   membro.entidadeId,
+              componente_id: instancia.componenteId!,
+              acao,
+              instancia_id:  instancia.id,
+            }).catch(() => null)
+          ))
+        }
+      }
     } catch { /* silencioso — mudança já aplicada localmente */ }
   }
 
