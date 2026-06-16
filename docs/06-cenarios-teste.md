@@ -187,11 +187,11 @@ Validar as regras de acesso ao Assistente IA: papéis simples (Viewer/User/Admin
 2. Selecionar/criar grupo com **Thiago Martins** (`usr-thiago`)
 3. Em Acessos > Objetos > Assistente Suporte > **"Adicionar Membro"**
 4. No campo **"Buscar usuário ou grupo..."**, buscar o grupo de Thiago → selecionar → papel **Visualizador**
-5. **Verificar:** Ação `can_use_assistant` atribuída ao grupo
+5. **Verificar:** Ação **Usar o assistente** atribuída ao grupo
 6. Salvar
 7. Em Acessos > Usuários, clicar em **Thiago** → UsuarioDetailAccountSheet
 8. Na seção **Ações**:
-   - **Verificar:** `can_use_assistant` aparece com badge verde (via grupo)
+   - **Verificar:** **Usar o assistente** aparece com badge verde (via grupo)
    - **Verificar:** Sem ação direta para Thiago
 
 #### 3.4 — Testar bloqueio por entitlement
