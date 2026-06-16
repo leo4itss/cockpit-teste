@@ -110,8 +110,7 @@ Validar a gestão de ocorrências de qualidade via DocAction: papéis independen
 
 #### 2.2 — Adicionar Aprovador (usuário diferente)
 
-1. **"Adicionar Membro"** → buscar **Leo** (`usr-leo`)
-2. Selecionar papel **Aprovador**
+1. **"Adicionar Membro"** → **[Passo 1]** buscar e selecionar **Leo** (`usr-leo`) → **[Passo 2]** selecionar papel **Aprovador** → **Confirmar**
 3. **Verificar:** 14 ações selecionadas — todas as 11 do Analista (Visualizar, Criar Ocorrência, Criar Ocorrência 8D, Editar Ocorrência, Vincular Ocorrência, Acompanhar Ocorrência, Categorizar Ocorrência, Analisar Causa, Criar Plano de Ação, Verificar Eficácia, Encaminhar Ocorrência) **mais** as 3 exclusivas do Aprovador: Aprovar Análise de Causa, Encerrar Ocorrência, Reprogramar Prazo/Responsável
 4. **Verificar:** Criar Ocorrência e Analisar Causa **estão** selecionadas (Aprovador é cumulativo — inclui todas as ações do Analista)
 5. Salvar
