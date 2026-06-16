@@ -477,10 +477,13 @@ export function InstanciaPage() {
 
   async function handleRemove(membro: InstanciaMembro) {
     if (!instancia) return
+    if (!confirm(`Remover ${membro.displayName ?? membro.entidadeId} desta instância?`)) return
     setRemovingId(membro.id)
     try {
       await api.removeInstanciaMembro(instancia.id, membro.id)
       setMembros(prev => prev.filter(m => m.id !== membro.id))
+    } catch {
+      alert(`Não foi possível remover ${membro.displayName ?? membro.entidadeId}. Tente novamente.`)
     } finally {
       setRemovingId(null)
     }
