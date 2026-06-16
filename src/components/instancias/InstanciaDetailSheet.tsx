@@ -506,13 +506,31 @@ export function InstanciaDetailSheet({
         if (already) return prev.map(m => m.entidadeId === entidadeId ? { ...m, papel: row.papel } : m)
         return [...prev, { ...row, displayName }]
       })
-      // Adicionar atribuições selecionadas
+      // Adicionar atribuições selecionadas (DocNix)
       if (atribuicaoIds.length > 0 && row.id) {
         await Promise.all(
           atribuicaoIds.map(atribId =>
             api.addMembroAtribuicao(instancia.id, row.id, atribId).catch(() => null)
           )
         )
+      } else if (instancia.componenteId) {
+        // FGA: auto-criar component_permissions com as ações do papel
+        const config = getComponenteConfig(componenteNome ?? '')
+        const papelDef = config.papeis.find(p => p.value === papel)
+        if (papelDef) {
+          const acoes = papelDef.defaultAcoes.length > 0
+            ? papelDef.defaultAcoes
+            : (config.acoes ?? []).map(a => a.acao)
+          await Promise.all(acoes.map(acao =>
+            api.addPermission({
+              entidade_tipo: entidadeTipo,
+              entidade_id:   entidadeId,
+              componente_id: instancia.componenteId,
+              acao,
+              instancia_id:  instancia.id,
+            }).catch(() => null)
+          ))
+        }
       }
     } finally {
       setAddingId(null)
