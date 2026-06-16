@@ -7,7 +7,7 @@
  */
 
 import { useState, useEffect, useMemo } from 'react'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Users } from 'lucide-react'
 import {
   NestedSheet,
   NestedSheetHeader,
@@ -33,6 +33,7 @@ interface Props {
   componenteNome?: string
   componenteTipoModelo?: string
   membro: InstanciaMembro
+  accountId?: string
   grupoNomes?: Record<string, string>
   onSaved?: () => void
 }
@@ -47,6 +48,7 @@ export function PermissoesMembroSheet({
   componenteId,
   componenteNome = '',
   membro,
+  accountId,
   onSaved,
 }: Props) {
   const config     = useMemo(() => getComponenteConfig(componenteNome), [componenteNome])
@@ -63,6 +65,10 @@ export function PermissoesMembroSheet({
   const [saving,    setSaving]    = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
 
+  // ── Herança via grupos ────────────────────────────────────
+  // acao → nome do grupo que concede a ação
+  const [inherited, setInherited] = useState<Record<string, string>>({})
+
   // ── Helpers ───────────────────────────────────────────────
   /** Expande defaultAcoes: [] (= Administrador) para todas as ações do catálogo */
   function expandDefaults(defaults: string[]): string[] {
@@ -73,8 +79,10 @@ export function PermissoesMembroSheet({
   // ── Carregamento ao abrir ─────────────────────────────────
   useEffect(() => {
     if (!open) return
+    let cancelled = false
     setPapelError(null)
     setSaveError(null)
+    setInherited({})
     setSelectedPapel(membro.papel ?? config.papeis[0]?.value ?? '')
     setLoading(true)
 
@@ -89,7 +97,6 @@ export function PermissoesMembroSheet({
           setSaved(existing)
           setDraft(existing)
         } else {
-          // Sem permissões salvas: aplica defaults do papel atual
           const papelDef = config.papeis.find(p => p.value === membro.papel)
           const defaults = expandDefaults(papelDef?.defaultAcoes ?? [])
           setSaved([])
@@ -101,7 +108,32 @@ export function PermissoesMembroSheet({
         setSaved([])
         setDraft(expandDefaults(papelDef?.defaultAcoes ?? []))
       })
-      .finally(() => setLoading(false))
+      .finally(() => { if (!cancelled) setLoading(false) })
+
+    // ── Permissões herdadas via grupos (só para usuários) ──
+    if (membro.entidadeTipo === 'user' && accountId) {
+      api.getUserGrupos(membro.entidadeId, accountId)
+        .then(async (userGrupos: any[]) => {
+          if (cancelled || userGrupos.length === 0) return
+          const grupoPerms = await Promise.all(
+            userGrupos.map((g: any) =>
+              api.getPermissions({ entidade_tipo: 'group', entidade_id: g.id, instancia_id: instanciaId })
+                .then((perms: any[]) => ({ grupo: g, perms }))
+                .catch(() => ({ grupo: g, perms: [] as any[] }))
+            )
+          )
+          const inheritedMap: Record<string, string> = {}
+          for (const { grupo, perms } of grupoPerms) {
+            for (const p of perms) {
+              if (!inheritedMap[p.acao]) inheritedMap[p.acao] = grupo.nome
+            }
+          }
+          if (!cancelled) setInherited(inheritedMap)
+        })
+        .catch(() => {/* silencia — herdadas são informativas */})
+    }
+
+    return () => { cancelled = true }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, membro.id])
 
@@ -114,6 +146,7 @@ export function PermissoesMembroSheet({
   }
 
   function toggleItem(acao: string) {
+    if (inherited[acao]) return // herdadas são read-only
     setSelectedPapel('personalizado')
     setDraft(prev => prev.includes(acao) ? prev.filter(x => x !== acao) : [...prev, acao])
   }
@@ -141,13 +174,11 @@ export function PermissoesMembroSheet({
     const toRemove = saved.filter(a => !draftSet.has(a))
 
     try {
-      // Atualiza papel no membership (para exibição no badge)
       const papelParaSalvar = selectedPapel === 'personalizado' ? 'personalizado' : selectedPapel
       if (papelParaSalvar && papelParaSalvar !== membro.papel) {
         await api.updateInstanciaMembro(instanciaId, membro.id, papelParaSalvar).catch(() => null)
       }
 
-      // Sincroniza permissões granulares em component_permissions
       const entidadeTipo = membro.entidadeTipo === 'user' ? 'user' : 'group'
       await Promise.all([
         ...toAdd.map(acao => api.addPermission({
@@ -176,7 +207,8 @@ export function PermissoesMembroSheet({
     }
   }
 
-  const diretasCount = draft.length
+  const hasInherited = Object.keys(inherited).length > 0
+  const diretasCount = draft.filter(a => !inherited[a]).length
 
   return (
     <NestedSheet open={open} onClose={handleClose} width="w-[520px]">
@@ -189,6 +221,16 @@ export function PermissoesMembroSheet({
 
       <NestedSheetBody noPadding>
         <div className="px-6 py-5 space-y-5">
+
+          {/* ── Banner herança via grupo ────────────────────── */}
+          {!loading && hasInherited && (
+            <div className="flex items-start gap-3 p-3.5 rounded-xl border border-emerald-200 bg-emerald-50">
+              <Users className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              <p className="text-sm text-emerald-800">
+                Algumas ações estão marcadas via <strong>grupo</strong> — são somente leitura.
+              </p>
+            </div>
+          )}
 
           {/* ── Cards de papel ─────────────────────────────── */}
           <div className="space-y-2">
@@ -244,32 +286,65 @@ export function PermissoesMembroSheet({
             ) : (
               <>
                 <div className="border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100 max-h-[min(50vh,380px)] overflow-y-auto">
-                  {(config.acoes ?? []).map(({ acao, label }) => (
-                    <label
-                      key={acao}
-                      className={cn(
-                        'flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors',
-                        saving && 'opacity-60 pointer-events-none',
-                      )}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={draft.includes(acao)}
-                        disabled={saving}
-                        onChange={() => toggleItem(acao)}
-                        className="w-4 h-4 rounded border-gray-300 accent-blue-600 shrink-0"
-                      />
-                      <span className={cn(
-                        'text-sm flex-1',
-                        draft.includes(acao) ? 'font-medium text-gray-900' : 'text-gray-500',
-                      )}>
-                        {label}
-                      </span>
-                    </label>
-                  ))}
+                  {(config.acoes ?? []).map(({ acao, label }) => {
+                    const isInherited = !!inherited[acao]
+                    const grupoNome   = inherited[acao]
+
+                    if (isInherited) {
+                      return (
+                        <div
+                          key={acao}
+                          className="flex items-center gap-3 px-4 py-2.5 bg-emerald-50/60 select-none"
+                          title={`Herdado do grupo "${grupoNome}"`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked
+                            readOnly
+                            disabled
+                            className="w-4 h-4 rounded border-gray-300 cursor-default accent-emerald-600 shrink-0"
+                          />
+                          <span className="text-sm font-medium text-gray-900 flex-1">{label}</span>
+                          <span className="shrink-0 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-emerald-100 text-emerald-700 border border-emerald-200">
+                            <Users className="w-2.5 h-2.5" />
+                            {grupoNome}
+                          </span>
+                        </div>
+                      )
+                    }
+
+                    return (
+                      <label
+                        key={acao}
+                        className={cn(
+                          'flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors',
+                          saving && 'opacity-60 pointer-events-none',
+                        )}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={draft.includes(acao)}
+                          disabled={saving}
+                          onChange={() => toggleItem(acao)}
+                          className="w-4 h-4 rounded border-gray-300 accent-blue-600 shrink-0"
+                        />
+                        <span className={cn(
+                          'text-sm flex-1',
+                          draft.includes(acao) ? 'font-medium text-gray-900' : 'text-gray-500',
+                        )}>
+                          {label}
+                        </span>
+                      </label>
+                    )
+                  })}
                 </div>
                 <p className="text-xs text-gray-400">
-                  <strong className="text-gray-600">{diretasCount}</strong> ação{diretasCount !== 1 ? 'ões' : ''} selecionada{diretasCount !== 1 ? 's' : ''}
+                  <strong className="text-gray-600">{diretasCount}</strong> ação{diretasCount !== 1 ? 'ões' : ''} direta{diretasCount !== 1 ? 's' : ''}
+                  {hasInherited && (
+                    <span className="text-emerald-600 ml-1">
+                      + <strong>{Object.keys(inherited).length}</strong> via grupo
+                    </span>
+                  )}
                 </p>
               </>
             )}
