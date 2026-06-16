@@ -253,7 +253,6 @@ export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, grupos 
                   )}
                 >
                   <span className="text-sm font-medium text-[#030712]">{p.label}</span>
-                  <span className="text-xs text-[#6b7280] mt-0.5 leading-tight">{p.desc}</span>
                 </button>
               ))}
             </div>
