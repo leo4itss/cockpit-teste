@@ -355,6 +355,7 @@ const COMPONENTE_CONFIGS: Record<string, ComponenteTypeConfig> = {
   'maxdoc': {
     label: 'MaxDoc',
     permissaoMode: 'component_permissions',
+    acessoViaInstancia: true,
     papeis: [
       {
         value: 'leitor', label: 'Leitor', desc: 'Leitura e download de documentos',
