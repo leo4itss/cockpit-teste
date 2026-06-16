@@ -573,12 +573,27 @@ export function InstanciaDetailSheet({
         )
       }
 
-      // Sempre criar component_permissions com os defaults do papel (FGA e DocNix)
-      // Isso garante que PermissoesMembroSheet exiba as ações corretas ao abrir.
+      // Sincronizar component_permissions com os defaults do papel (FGA e DocNix)
+      // Limpar primeiro para evitar acumulação de permissões de testes anteriores.
       if (instancia.componenteId && papel !== 'personalizado') {
         const config   = getComponenteConfig(componenteNome ?? '')
         const papelDef = config.papeis.find(p => p.value === papel)
         if (papelDef) {
+          // Remover permissões existentes antes de inserir os novos defaults
+          const currentPerms = await api.getPermissions({
+            entidade_tipo: entidadeTipo,
+            entidade_id:   entidadeId,
+            instancia_id:  instancia.id,
+          }).catch(() => [] as any[])
+          await Promise.all((currentPerms as any[]).map((p: any) =>
+            api.removePermission({
+              entidade_tipo: entidadeTipo,
+              entidade_id:   entidadeId,
+              componente_id: instancia.componenteId!,
+              acao:          p.acao,
+              instancia_id:  instancia.id,
+            }).catch(() => null)
+          ))
           const defaults = papelDef.defaultAcoes ?? []
           const acoes = defaults.length > 0
             ? defaults
