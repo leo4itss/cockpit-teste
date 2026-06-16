@@ -440,6 +440,7 @@ export function InstanciaDetailSheet({
   const [showAdd, setShowAdd]                   = useState(false)
   const [addingId, setAddingId]                 = useState<string | null>(null)
   const [removingId, setRemovingId]             = useState<string | null>(null)
+  const [removeError, setRemoveError]           = useState<string | null>(null)
   // Sheet unificado de permissões por membro (FGA ou DocNix)
   const [showPermissoes, setShowPermissoes]     = useState(false)
   const [membroPermissoes, setMembroPermissoes] = useState<InstanciaMembro | null>(null)
