@@ -427,7 +427,7 @@ Quando uma ação é atribuída a um **grupo**, todos os membros do grupo herdam
 4. No campo **"Buscar usuário ou grupo..."**, buscar o grupo de Thiago → selecionar → papel **Visualizador**
 5. Salvar
 6. Ir para **Acessos > Usuários** → clicar em **Thiago Martins**
-7. ✅ **Verificar na seção Ações:** `can_use_assistant` aparece em verde ("via grupo: [nome do grupo]")
+7. ✅ **Verificar na seção Ações:** **Usar o assistente** aparece em verde ("via grupo: [nome do grupo]")
 8. ✅ **Verificar:** Nenhuma ação direta para Thiago — a ação vem do grupo
 
 ---
