@@ -167,7 +167,7 @@ Validar as regras de acesso ao Assistente IA: papéis simples (Viewer/User/Admin
 #### 3.1 — Adicionar usuário com papel User
 
 1. Trocar para persona **Carla Santos** (PersonaSwitcher)
-2. Navegar para Acessos > Objetos > **Atendimento**
+2. Navegar para Acessos > Objetos > **Assistente Suporte**
 3. **"Adicionar Membro"** → buscar **Lucas Oliveira** (`usr-lucas`)
 4. Selecionar papel **User**
 5. **Verificar:** Ações pré-selecionadas: `can_use_assistant`, `can_share_conversation_results`, `can_view_consulted_sources`, `can_upload_rag_sources`
@@ -185,7 +185,7 @@ Validar as regras de acesso ao Assistente IA: papéis simples (Viewer/User/Admin
 
 1. Navegar para Acessos > Papéis
 2. Selecionar/criar grupo com **Thiago Martins** (`usr-thiago`)
-3. Em Acessos > Objetos > Atendimento > **"Adicionar Membro"**
+3. Em Acessos > Objetos > Assistente Suporte > **"Adicionar Membro"**
 4. No campo **"Buscar usuário ou grupo..."**, buscar o grupo de Thiago → selecionar → papel **Visualizador**
 5. **Verificar:** Ação `can_use_assistant` atribuída ao grupo
 6. Salvar
