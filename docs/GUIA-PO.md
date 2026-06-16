@@ -501,7 +501,7 @@ Trocar o PersonaSwitcher para cada persona e verificar o sidebar:
 1. Acessos > Objetos > **MaxDoc Comgas**
 2. **"Adicionar Membro"** → buscar **João Teste**
 3. Papel: **Leitor**
-4. ✅ **Verificar ações pré-selecionadas:** Visualizar, Baixar Documento, Imprimir, Visualizar Histórico de Versões
+4. ✅ **Verificar 6 ações pré-selecionadas:** Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Baixar Documento, Imprimir
 5. Salvar
 6. ✅ **Verificar:** João Teste aparece na lista de membros do MaxDoc Comgas
 
