@@ -334,22 +334,24 @@ Mostra todas as ações efetivas de um usuário — diretas + herdadas de grupos
 
 2. Acessos → Objetos → selecionar "MaxDoc Comgas"
    → Clique no objeto → InstanciaDetailSheet abre
-   → "Adicionar Membro" → buscar usuário criado
-   → Selecionar papel (ex: Editor) → Salvar
+   → "Adicionar Membro"
+     [Passo 1] buscar e clicar no usuário
+     [Passo 2] clicar no card de papel (ex: Editor) → Confirmar
 
 3. Verificar em PermissoesMembroSheet:
-   → Ações do Editor pré-selecionadas
+   → Ações do Editor pré-selecionadas automaticamente
    → Persistidas em component_permissions
 ```
 
 ### Fluxo: Alterar papel de usuário em instância
 
 ```
-1. Acessos → Objetos → instância → PermissoesMembroSheet do usuário
-2. Trocar papel no selector (ex: Editor → Revisor)
-3. Ações atualizam automaticamente
-4. Opção: ativar "Personalizado" para ajuste fino
-5. Salvar → component_permissions atualizado
+1. Acessos → Objetos → instância → clicar em "Ações" do usuário
+2. PermissoesMembroSheet abre — exibe ações padrão do papel atual
+3. Clicar no card do novo papel (ex: Revisor)
+4. Sistema apaga permissões antigas e aplica as do novo papel
+5. Opção: clicar em "Personalizado" para ajuste fino
+6. Salvar → component_permissions atualizado
 ```
 
 ### Fluxo: Verificar ações efetivas
