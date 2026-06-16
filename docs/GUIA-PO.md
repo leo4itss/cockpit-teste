@@ -399,13 +399,13 @@ Quando uma ação é atribuída a um **grupo**, todos os membros do grupo herdam
 
 ---
 
-**3.1 — Adicionar usuário com papel User**
+**3.1 — Adicionar usuário com papel Usuário**
 
 1. Acessos > Objetos > clicar em **"Assistente Suporte"** (instância do Assistente IA)
 2. **"Adicionar Membro"** → selecionar **Lucas Oliveira**
-3. Papel: **User**
-4. ✅ **Verificar 4 ações:** `can_use_assistant`, `can_share_conversation_results`, `can_view_consulted_sources`, `can_upload_rag_sources`
-5. ✅ **Verificar que NÃO estão:** `can_create_assistant`, `can_configure_agents`, `can_customize_ai`, `can_manage_users`
+3. Papel: **Usuário**
+4. ✅ **Verificar 4 ações:** Usar o assistente, Compartilhar resultados, Ver fontes consultadas, Upload de fontes RAG
+5. ✅ **Verificar que NÃO estão:** Criar assistente, Configurar agentes, Gerenciar cenários de negócio, Gerenciar usuários
 6. Salvar
 
 ---
