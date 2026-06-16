@@ -332,9 +332,8 @@ A operação é irreversível, mas pode ser refeita adicionando o membro novamen
 **1.4 — Adicionar grupo com papel Aprovador**
 
 1. No painel do MaxDoc Comgas, clicar em **"Adicionar Membro"**
-2. No campo **"Buscar usuário ou grupo..."**, digitar o nome do grupo desejado
-3. Selecionar o grupo nos resultados
-4. Selecionar o papel **Aprovador**
+2. **Passo 1 do wizard:** Digitar o nome do grupo no campo de busca → clicar no resultado
+3. **Passo 2 do wizard:** Selecionar o papel **Aprovador** nos cards
 5. ✅ **Verificar:** Ações pré-selecionadas (17): Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Baixar Documento, Imprimir, Assinatura Eletrônica, Revisar Documento, Aprovar Documento, Rejeitar Documento, Aprovador Documento, Aprovador Substituto Documento, Obsoletetar Documento, Emitir Cópia Controlada, Emitir Cópia Não Controlada, Cópia Controlada Anexos, Ciclo de Aprovação Documentos
 6. ✅ **Verificar:** Aprovador NÃO tem Criar Documento nem Editar (papéis independentes)
 7. Salvar
