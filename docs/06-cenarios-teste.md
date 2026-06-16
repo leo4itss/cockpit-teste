@@ -173,8 +173,7 @@ Validar as regras de acesso ao Assistente IA: papéis simples (Viewer/User/Admin
 
 #### 3.2 — Adicionar Admin (todas as ações)
 
-1. **"Adicionar Membro"** → buscar **Beatriz Lima** (`usr-beatriz`)
-2. Selecionar papel **Admin**
+1. **"Adicionar Membro"** → **[Passo 1]** buscar e selecionar **Beatriz Lima** (`usr-beatriz`) → **[Passo 2]** selecionar papel **Admin** → **Confirmar**
 3. **Verificar:** Todas as 8 ações estão selecionadas
 4. Salvar
 
