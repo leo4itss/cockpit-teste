@@ -170,16 +170,16 @@ MaxDoc é o módulo de gestão documental da plataforma DocNix. Controla quem po
 
 | Papel | Ações incluídas |
 |-------|----------------|
-| **Leitor** | Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Download Documento, Imprimir |
-| **Editor** | Leitor + Criar Documento, Editar Documento, Nova Versão, Upload Documento, Editor Documento, Criar Anexo, Editar Anexo, Anexar Arquivos |
-| **Revisor** | Editor + Revisar Documento, Submeter para Aprovação, Revisor Documento, Revisar como Substituto Documento |
-| **Aprovador** | Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Download Documento, Imprimir, Assinatura Eletrônica, Revisar Documento, Aprovar Documento, Aprovador Documento, Aprovador Substituto Documento, Obsoletetar Documento, Emitir Cópia Controlada, Emitir Cópia Não Controlada, Cópia Controlada Anexos, Ciclo de Aprovação Documentos |
-| **Administrador** | Todas as 27 ações |
+| **Leitor** | Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Baixar Documento, Imprimir |
+| **Editor** | Visualizar, Criar Documento, Editar, Nova Versão, Mover, Cancelar Edição, Baixar Documento, Imprimir, Visualizar Histórico de Versões |
+| **Revisor** | Visualizar, Revisar Documento, Submeter para Aprovação, Solicitar Revisão |
+| **Aprovador** | Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Baixar Documento, Imprimir, Assinatura Eletrônica, Revisar Documento, Aprovar Documento, Rejeitar Documento, Aprovador Documento, Aprovador Substituto Documento, Obsoletetar Documento, Emitir Cópia Controlada, Emitir Cópia Não Controlada, Cópia Controlada Anexos, Ciclo de Aprovação Documentos |
+| **Administrador** | Todas as ações do catálogo |
 
-**Regra importante:** Aprovador não herda as ações de Editor — ele tem seu próprio conjunto. Para um usuário ter capacidades de múltiplos papéis, use o modo **Personalizado** (seleção manual de ações).
+**Regra importante:** Os papéis do MaxDoc têm conjuntos independentes — Revisor não herda as ações de Editor, Aprovador não herda de Revisor. Para combinar ações de múltiplos papéis, use o modo **Personalizado** (seleção manual).
 
-**27 ações disponíveis** (selecionáveis individualmente no modo Personalizado):
-Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Download Documento, Imprimir, Criar Documento, Editar Documento, Nova Versão, Upload Documento, Editor Documento, Criar Anexo, Editar Anexo, Anexar Arquivos, Assinatura Eletrônica, Revisar Documento, Submeter para Aprovação, Revisor Documento, Revisar como Substituto Documento, Aprovar Documento, Aprovador Documento, Aprovador Substituto Documento, Obsoletetar Documento, Emitir Cópia Controlada, Emitir Cópia Não Controlada, Cópia Controlada Anexos, Ciclo de Aprovação Documentos.
+**Ações disponíveis no catálogo MaxDoc** (selecionáveis individualmente no modo Personalizado):
+Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Baixar Documento, Imprimir, Criar Documento, Editar, Nova Versão, Mover, Cancelar Edição, Visualizar Histórico de Versões, Upload Documento, Editor Documento, Criar Anexo, Editar Anexo, Anexar Arquivos, Assinatura Eletrônica, Revisar Documento, Submeter para Aprovação, Solicitar Revisão, Revisor Documento, Revisar como Substituto Documento, Aprovar Documento, Rejeitar Documento, Aprovador Documento, Aprovador Substituto Documento, Obsoletetar Documento, Emitir Cópia Controlada, Emitir Cópia Não Controlada, Cópia Controlada Anexos, Ciclo de Aprovação Documentos.
 
 ---
 
