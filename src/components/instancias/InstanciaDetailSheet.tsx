@@ -518,14 +518,15 @@ export function InstanciaDetailSheet({
         const config = getComponenteConfig(componenteNome ?? '')
         const papelDef = config.papeis.find(p => p.value === papel)
         if (papelDef) {
-          const acoes = papelDef.defaultAcoes.length > 0
-            ? papelDef.defaultAcoes
+          const defaults = papelDef.defaultAcoes ?? []
+          const acoes = defaults.length > 0
+            ? defaults
             : (config.acoes ?? []).map(a => a.acao)
           await Promise.all(acoes.map(acao =>
             api.addPermission({
               entidade_tipo: entidadeTipo,
               entidade_id:   entidadeId,
-              componente_id: instancia.componenteId,
+              componente_id: instancia.componenteId!,
               acao,
               instancia_id:  instancia.id,
             }).catch(() => null)
