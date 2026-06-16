@@ -130,6 +130,9 @@ function PapelEditorDocNix({
     <div className="flex items-center gap-1.5">
       <select value={draft} onChange={e => setDraft(e.target.value)} disabled={saving} autoFocus
         className="text-sm border border-gray-300 rounded-md px-2 py-1.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+        {draft === 'personalizado' && (
+          <option value="personalizado" disabled>Personalizado (selecione um papel)</option>
+        )}
         {papeis.map(p => (
           <option key={p.value} value={p.value}>{p.label} — {p.desc}</option>
         ))}
