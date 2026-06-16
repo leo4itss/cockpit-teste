@@ -394,13 +394,14 @@ app.post('/api/users', async (c) => {
     const [row] = await db.insert(users).values(body).returning()
     return c.json(row, 201)
   } catch (e: any) {
-    // Neon HTTP driver coloca o código PG diretamente em e.code ('23505' = unique_violation)
-    // O e.message é sempre "Failed query: {sql}" e nunca contém 'unique'/'duplicate'
-    const code: string = e?.code ?? ''
-    const msg: string  = e?.message ?? ''
-    const detail: string = e?.detail ?? ''
-    const haystack = msg + detail
-    const isUnique = code === '23505' || msg.includes('unique') || msg.includes('duplicate')
+    // Neon HTTP driver: e.code = PG code, e.constraint = nome da constraint violada
+    const code: string       = e?.code       ?? e?.cause?.code       ?? ''
+    const detail: string     = e?.detail     ?? e?.cause?.detail     ?? ''
+    const constraint: string = e?.constraint ?? e?.cause?.constraint ?? ''
+    const msg: string        = e?.message    ?? ''
+    const haystack = constraint + detail + msg
+
+    const isUnique = code === '23505' || haystack.includes('unique') || haystack.includes('duplicate')
     if (isUnique) {
       if (haystack.includes('email'))
         return c.json({ error: 'Este e-mail já está cadastrado na plataforma.' }, 409)
@@ -408,7 +409,11 @@ app.post('/api/users', async (c) => {
         return c.json({ error: 'Este nome de usuário já está em uso.' }, 409)
       return c.json({ error: 'E-mail ou usuário já cadastrado.' }, 409)
     }
-    return c.json({ error: 'Não foi possível criar o usuário. Tente novamente.' }, 500)
+
+    // Expõe o detalhe real do erro para facilitar diagnóstico no PoC
+    const reason = detail || constraint || msg || 'Erro desconhecido'
+    console.error('[POST /api/users] DB error:', { code, detail, constraint, msg })
+    return c.json({ error: `Não foi possível criar o usuário. Motivo: ${reason}` }, 500)
   }
 })
 
