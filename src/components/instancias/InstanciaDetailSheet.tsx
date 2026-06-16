@@ -285,54 +285,50 @@ function AddMembroSection({
   // ── Passo 1: buscar membro ────────────────────────────────────
   if (step === 1) {
     return (
-      <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/60">
-        <div className="relative">
-          <div className="flex items-center gap-2 px-3 py-2.5 bg-white border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-colors">
-            <Search className="w-4 h-4 text-gray-400 shrink-0" />
-            <input
-              type="text"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Buscar usuário ou grupo..."
-              disabled={disabled}
-              autoFocus
-              className="flex-1 bg-transparent text-sm outline-none text-[#030712] placeholder:text-[#6b7280]"
-            />
-            {search && (
-              <button onClick={() => setSearch('')} className="text-gray-400 hover:text-gray-600 leading-none text-base">×</button>
-            )}
-          </div>
-
-          {sugestoes.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-hidden">
-              {sugestoes.map(item => (
-                <button
-                  key={`${item.tipo}-${item.id}`}
-                  onClick={() => handleSelectItem(item)}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 transition-colors text-left"
-                >
-                  <Avatar nome={item.nome} isGroup={item.tipo === 'group'} />
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-[#030712] truncate">{item.nome}</p>
-                    <p className="text-xs text-[#6b7280] truncate">{item.sub}</p>
-                  </div>
-                  <span className={cn(
-                    'ml-auto shrink-0 text-[10px] px-1.5 py-0.5 rounded font-medium',
-                    item.tipo === 'group' ? 'bg-violet-50 text-violet-600' : 'bg-gray-100 text-gray-500'
-                  )}>
-                    {item.tipo === 'group' ? 'grupo' : 'usuário'}
-                  </span>
-                </button>
-              ))}
-            </div>
-          )}
-
-          {search.trim().length > 0 && sugestoes.length === 0 && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 px-4 py-3">
-              <p className="text-sm text-[#6b7280]">Nenhum usuário ou grupo encontrado.</p>
-            </div>
+      <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/60 space-y-2">
+        <div className="flex items-center gap-2 px-3 py-2.5 bg-white border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-colors">
+          <Search className="w-4 h-4 text-gray-400 shrink-0" />
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Buscar usuário ou grupo..."
+            disabled={disabled}
+            autoFocus
+            className="flex-1 bg-transparent text-sm outline-none text-[#030712] placeholder:text-[#6b7280]"
+          />
+          {search && (
+            <button onClick={() => setSearch('')} className="text-gray-400 hover:text-gray-600 leading-none text-base">×</button>
           )}
         </div>
+
+        {sugestoes.length > 0 && (
+          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+            {sugestoes.map(item => (
+              <button
+                key={`${item.tipo}-${item.id}`}
+                onClick={() => handleSelectItem(item)}
+                className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 transition-colors text-left border-b border-gray-100 last:border-0"
+              >
+                <Avatar nome={item.nome} isGroup={item.tipo === 'group'} />
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-[#030712] truncate">{item.nome}</p>
+                  <p className="text-xs text-[#6b7280] truncate">{item.sub}</p>
+                </div>
+                <span className={cn(
+                  'ml-auto shrink-0 text-[10px] px-1.5 py-0.5 rounded font-medium',
+                  item.tipo === 'group' ? 'bg-violet-50 text-violet-600' : 'bg-gray-100 text-gray-500'
+                )}>
+                  {item.tipo === 'group' ? 'grupo' : 'usuário'}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {search.trim().length > 0 && sugestoes.length === 0 && (
+          <p className="text-sm text-[#6b7280] px-1">Nenhum usuário ou grupo encontrado.</p>
+        )}
       </div>
     )
   }
