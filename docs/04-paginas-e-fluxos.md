@@ -272,8 +272,14 @@ Detalhe de uma instância (objeto). Abre em Acessos > Objetos ao clicar em um ob
 - Membros com papel
 
 **Ações:**
-- Botão "Ações" → abre `PermissoesMembroSheet` ou `AtribuirPermissoesSheet`
-- Botão "Editar" → edita nome/descrição da instância
+- Botão "Ações" → abre `PermissoesMembroSheet` para ver/editar ações do membro
+- Botão "Remover" → remove membro e limpa automaticamente todas as permissões e atribuições associadas
+
+**Fluxo "Adicionar Membro" — wizard de 2 passos:**
+1. Clicar em **"Adicionar Membro"**
+2. **Passo 1:** Campo de busca — digitar nome ou e-mail → clicar no resultado (usuário ou grupo)
+3. **Passo 2:** Seletor de papel — clicar no card do papel desejado; opcionalmente expandir "Ver ações" para ajuste fino → clicar em **Confirmar**
+4. Botão **"← Voltar"** permite retornar ao passo 1 para trocar o membro selecionado
 
 ---
 
