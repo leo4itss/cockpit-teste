@@ -420,6 +420,7 @@ export function UsuarioDetailAccountSheet({
             componenteId={instanciaAberta.instancia.componenteId}
             componenteNome={componenteNomes[instanciaAberta.instancia.componenteId] ?? ''}
             membro={instanciaAberta.membro}
+            accountId={accountId}
             onSaved={() => {
               reloadAcesso(instancias)
               setInstanciaAberta(null)
