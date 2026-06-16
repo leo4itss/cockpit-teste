@@ -183,16 +183,18 @@ Validar as regras de acesso ao Assistente IA: papéis simples (Viewer/User/Admin
 
 #### 3.3 — Testar herança via grupo
 
-1. Navegar para Acessos > Papéis
-2. Selecionar/criar grupo com **Thiago Martins** (`usr-thiago`)
-3. Em Acessos > Objetos > Assistente Suporte > **"Adicionar Membro"**
-4. No campo **"Buscar usuário ou grupo..."**, buscar o grupo de Thiago → selecionar → papel **Visualizador**
-5. **Verificar:** Ação **Usar o assistente** atribuída ao grupo
-6. Salvar
-7. Em Acessos > Usuários, clicar em **Thiago** → UsuarioDetailAccountSheet
-8. Na seção **Ações**:
-   - **Verificar:** **Usar o assistente** aparece com badge verde (via grupo)
-   - **Verificar:** Sem ação direta para Thiago
+> **Setup:** Lucas Oliveira (`usr-lucas`) já foi adicionado como **Usuário** em 3.1 (entrada direta). Este passo adiciona o grupo de Lucas à mesma instância para demonstrar herança via grupo no PermissoesMembroSheet.
+
+1. Em Acessos > Papéis, verificar em qual grupo **Lucas Oliveira** está (ex: `grp-a2-leitura`). Se necessário, adicioná-lo a um grupo.
+2. Ainda em Acessos > Objetos > **Assistente Suporte** → **"Adicionar Membro"**
+3. No campo **"Buscar usuário ou grupo..."**, buscar o **grupo de Lucas** → selecionar → papel **Visualizador**
+4. **Verificar:** Ação "Usar o assistente" pré-selecionada para o grupo
+5. Salvar
+6. Na lista de membros da instância, clicar em **Lucas Oliveira** → PermissoesMembroSheet abre
+7. **Verificar:** Banner verde "Ações herdadas de grupos" aparece no topo do painel
+8. **Verificar:** A ação "Usar o assistente" aparece com badge verde do grupo (herdada — não editável diretamente)
+
+> **Nota:** A herança de grupo é visível no **PermissoesMembroSheet** (acessado clicando no usuário dentro da InstanciaDetailSheet, ou via Acessos > Usuários > Editar ao lado da instância). A seção "POR INSTÂNCIA" do painel do usuário exibe apenas membros diretos — acesso exclusivamente via grupo não aparece nessa listagem.
 
 #### 3.4 — Testar bloqueio por entitlement
 
