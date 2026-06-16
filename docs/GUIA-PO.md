@@ -425,8 +425,7 @@ A operação é irreversível, mas pode ser refeita adicionando o membro novamen
 **3.1 — Adicionar usuário com papel Usuário**
 
 1. Acessos > Objetos > clicar em **"Assistente Suporte"** (instância do Assistente IA)
-2. **"Adicionar Membro"** → selecionar **Lucas Oliveira**
-3. Papel: **Usuário**
+2. **"Adicionar Membro"** → **Passo 1:** buscar e selecionar **Lucas Oliveira** → **Passo 2:** selecionar papel **Usuário**
 4. ✅ **Verificar 4 ações:** Usar o assistente, Compartilhar resultados, Ver fontes consultadas, Upload de fontes RAG
 5. ✅ **Verificar que NÃO estão:** Criar assistente, Configurar agentes, Gerenciar cenários de negócio, Gerenciar usuários
 6. Salvar
