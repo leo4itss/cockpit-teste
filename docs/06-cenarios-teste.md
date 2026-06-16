@@ -78,9 +78,9 @@ Validar o ciclo completo de gerenciamento de acesso ao módulo MaxDoc: atribuiç
 
 | Verificação | Esperado |
 |------------|---------|
-| Papel Editor tem 14 ações | Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Download Documento, Imprimir + 8 ações de edição |
-| Revisor inclui ações de Editor + 4 ações de revisão | Total de 18 ações |
-| Aprovador tem conjunto próprio (16 ações) | Sem Criar Documento ou Editar Documento |
+| Papel Editor tem 9 ações | Visualizar, Criar Documento, Editar, Nova Versão, Mover, Cancelar Edição, Baixar Documento, Imprimir, Visualizar Histórico de Versões |
+| Revisor tem conjunto próprio (4 ações) | Visualizar, Revisar Documento, Submeter para Aprovação, Solicitar Revisão — sem Criar Documento ou Editar |
+| Aprovador tem conjunto próprio (17 ações) | Inclui Aprovar Documento, Rejeitar Documento — sem Criar Documento ou Editar |
 | Personalizado persiste ao reabrir | Seleção manual mantida |
 | Herança de grupo visível | Ações via grupo marcadas como read-only (verde) |
 | `component_permissions.acao` | String com nome da ação (ex: `"Visualizar"`) — nunca UUID |
