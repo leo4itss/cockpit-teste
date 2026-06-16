@@ -20,6 +20,7 @@ import {
   grupos as mockGrupos,
   grupoMembrosMap,
   accountMembrosIds,
+  accountEntitlements as mockAccountEntitlements,
   instancias as mockInstancias,
   instanciaMembros as mockInstanciaMembros,
 } from '../src/data/mock'
