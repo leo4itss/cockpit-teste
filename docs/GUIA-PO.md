@@ -437,7 +437,7 @@ Quando uma ação é atribuída a um **grupo**, todos os membros do grupo herdam
 **3.4 — Verificar bloqueio por entitlement ausente**
 
 1. Trocar para persona **Ana Lima** (persona 2, Org Admin Apple)
-2. Navegar para Acessos → conta **Apple Main**
+2. Navegar para Acessos → conta **Apple** (`a1`)
 3. Aba **Objetos**
 4. ✅ **Verificar:** MaxDoc **não aparece** na lista de objetos — a conta Apple não tem o entitlement `maxdoc.use`, portanto não há instâncias MaxDoc criadas para ela
 
