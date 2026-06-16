@@ -220,7 +220,7 @@ export const mockDocNixPapeis: {
     cls: 'bg-gray-100 text-gray-600 border-gray-200',
     atribuicaoNomes: [
       'Visualizar', 'Ler Todos', 'Leitor Documento', 'Leitor Anexos',
-      'Download Documento', 'Imprimir',
+      'Baixar Documento', 'Imprimir',
     ],
   },
   {
@@ -230,11 +230,9 @@ export const mockDocNixPapeis: {
     desc: 'Cria e edita documentos e anexos',
     cls: 'bg-blue-50 text-blue-700 border-blue-200',
     atribuicaoNomes: [
-      'Visualizar', 'Ler Todos', 'Leitor Documento', 'Leitor Anexos',
-      'Download Documento', 'Imprimir',
-      'Criar Documento', 'Editar Documento', 'Nova Versão',
-      'Upload Documento', 'Editor Documento',
-      'Criar Anexo', 'Editar Anexo', 'Anexar Arquivos',
+      'Visualizar', 'Criar Documento', 'Editar', 'Nova Versão',
+      'Mover', 'Cancelar Edição', 'Baixar Documento', 'Imprimir',
+      'Visualizar Histórico de Versões',
     ],
   },
   {
@@ -244,13 +242,7 @@ export const mockDocNixPapeis: {
     desc: 'Revisa e submete documentos para aprovação',
     cls: 'bg-indigo-50 text-indigo-700 border-indigo-200',
     atribuicaoNomes: [
-      'Visualizar', 'Ler Todos', 'Leitor Documento', 'Leitor Anexos',
-      'Download Documento', 'Imprimir',
-      'Criar Documento', 'Editar Documento', 'Nova Versão',
-      'Upload Documento', 'Editor Documento',
-      'Criar Anexo', 'Editar Anexo', 'Anexar Arquivos',
-      'Revisar Documento', 'Submeter para Aprovação',
-      'Revisor Documento', 'Revisar como Substituto Documento',
+      'Visualizar', 'Revisar Documento', 'Submeter para Aprovação', 'Solicitar Revisão',
     ],
   },
   {
@@ -261,8 +253,8 @@ export const mockDocNixPapeis: {
     cls: 'bg-orange-50 text-orange-700 border-orange-200',
     atribuicaoNomes: [
       'Visualizar', 'Ler Todos', 'Leitor Documento', 'Leitor Anexos',
-      'Download Documento', 'Imprimir', 'Assinatura Eletrônica',
-      'Revisar Documento', 'Aprovar Documento',
+      'Baixar Documento', 'Imprimir', 'Assinatura Eletrônica',
+      'Revisar Documento', 'Aprovar Documento', 'Rejeitar Documento',
       'Aprovador Documento', 'Aprovador Substituto Documento',
       'Obsoletetar Documento',
       'Emitir Cópia Controlada', 'Emitir Cópia Não Controlada',
