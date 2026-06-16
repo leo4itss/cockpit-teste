@@ -442,7 +442,7 @@ A operação é irreversível, mas pode ser refeita adicionando o membro novamen
 
 **3.3 — Herança via grupo**
 
-> **Setup:** Lucas Oliveira já tem entrada direta como Usuário (passo 3.1). Aqui adicionamos o grupo de Lucas para demonstrar a herança no PermissoesMembroSheet.
+> **Setup:** Lucas Oliveira já tem entrada direta como Membro (passo 3.1). Aqui adicionamos o grupo de Lucas para demonstrar a herança no PermissoesMembroSheet.
 
 1. Em **Acessos > Papéis**, verificar em qual grupo Lucas Oliveira está (ex: `grp-a2-leitura`). Se necessário, adicionar Lucas a um grupo.
 2. Em Acessos > Objetos > **Assistente Suporte** → **"Adicionar Membro"**
