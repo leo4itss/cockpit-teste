@@ -30,11 +30,11 @@ Validar o ciclo completo de gerenciamento de acesso ao módulo MaxDoc: atribuiç
 
 1. Clicar em **MaxDoc Comgas** → InstanciaDetailSheet abre
 2. Clicar em **"Adicionar Membro"**
-3. Buscar usuário **Fernando** (`usr-fernando`)
-4. Selecionar papel **Editor**
+3. **[Passo 1 — Wizard]** Digitar "Fernando" no campo de busca → clicar em **Fernando** (`usr-fernando`) nos resultados
+4. **[Passo 2 — Wizard]** Clicar no card **Editor** no seletor de papel
 5. **Verificar:** Ações pré-selecionadas (9 ações): Visualizar, Criar Documento, Editar, Nova Versão, Mover, Cancelar Edição, Baixar Documento, Imprimir, Visualizar Histórico de Versões
 6. **Verificar:** Ações de Aprovador (Aprovar Documento, Rejeitar Documento) NÃO estão selecionadas
-7. Salvar
+7. Clicar em **Confirmar**
 
 #### 1.3 — Alterar papel para Revisor
 
