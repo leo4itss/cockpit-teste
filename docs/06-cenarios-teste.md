@@ -142,8 +142,10 @@ Usando Drizzle Studio (`npm run db:studio`):
 
 | Verificação | Esperado |
 |------------|---------|
-| Analista vs Aprovador | Conjuntos de ações distintos e independentes |
-| Personalizado para Neide | Apenas Analisar Causa + Verificar Eficácia |
+| Analista (11 ações) | Visualizar, Criar Ocorrência, Criar Ocorrência 8D, Editar Ocorrência, Vincular Ocorrência, Acompanhar Ocorrência, Categorizar Ocorrência, Analisar Causa, Criar Plano de Ação, Verificar Eficácia, Encaminhar Ocorrência |
+| Aprovador (14 ações) | Todas as do Analista + Aprovar Análise de Causa, Encerrar Ocorrência, Reprogramar Prazo/Responsável |
+| Aprovador é cumulativo | Inclui Criar Ocorrência e Analisar Causa — papéis são independentes por membro, não por ação |
+| Personalizado para Neide | Apenas Visualizar + Analisar Causa + Verificar Eficácia |
 | Persistência | `acao` é string, não UUID |
 | `instancia_membro_atribuicoes` | Não recebe novas escritas (modelo FGA puro) |
 
