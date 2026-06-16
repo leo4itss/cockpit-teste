@@ -59,13 +59,13 @@ Clique nele para escolher qual perfil (persona) você quer simular. A página at
 
 **Personas disponíveis para teste:**
 
-| Persona | Nome | Perfil | O que vê |
-|---------|------|--------|---------|
-| 1 | Leonardo Lins | Platform Admin | Tudo |
-| 2 | Ana Lima | Org Admin (Apple) | Organizações, Acessos, Canvas |
-| 3 | Marcelo Gomes | PAS Architect | Apenas Componentes |
-| 4 | Carla Santos | Account Admin (Santacruz) | Acessos, Canvas |
-| Marcelo Ribeiro | Org Admin (Comgas/DocNix) | Organizações, Acessos, Canvas |
+| ID | Nome | Perfil | O que vê |
+|----|------|--------|---------|
+| `1` | Leonardo Lins | Platform Admin | Tudo |
+| `2` | Ana Lima | Org Admin (Apple) | Organizações, Acessos, Canvas |
+| `3` | Marcelo Gomes | PAS Architect | Apenas Componentes |
+| `4` | Carla Santos | Account Admin (Santacruz) | Acessos, Canvas |
+| `usr-marcelo-c` | Marcelo Ribeiro | Org Admin (Comgas/DocNix) | Organizações, Acessos, Canvas |
 
 > **Para testar DocNix (MaxDoc e DocAction):** use a persona **Marcelo Ribeiro** — ela é o Org Admin da organização Comgas, que tem os dois módulos contratados.
 >
