@@ -815,6 +815,7 @@ export function InstanciaDetailSheet({
           componenteNome={componenteNome}
           componenteTipoModelo={componenteTipoModelo}
           membro={membroPermissoes}
+          accountId={accountId}
           grupoNomes={grupoNomes}
           onSaved={() => {
             // Recarregar membros após salvar permissões
