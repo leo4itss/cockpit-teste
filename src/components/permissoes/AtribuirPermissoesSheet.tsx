@@ -188,6 +188,9 @@ export function AtribuirPermissoesSheet({
         // Modo instância: exibe apenas o componente da instância
         if (modoInstancia && instanciaComponenteId) {
           ativos = ativos.filter(c => c.id === instanciaComponenteId)
+        } else if (!modoInstancia) {
+          // Modo global (conta inteira): exclui componentes que operam por instância
+          ativos = ativos.filter(c => !getComponenteConfig(c.nome).acessoViaInstancia)
         }
         setComponentes(ativos)
 
