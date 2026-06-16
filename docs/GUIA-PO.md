@@ -320,11 +320,11 @@ A operação é irreversível, mas pode ser refeita adicionando o membro novamen
 
 **1.3 — Trocar o papel do usuário para Revisor**
 
-1. Com o painel do MaxDoc Comgas aberto, clicar no nome de **Fernando**
-2. O painel de ações do membro abre
-3. Trocar o papel de **Editor** para **Revisor** no selector
-4. ✅ **Verificar:** As ações atualizam automaticamente — aparecem: *Visualizar, Revisar Documento, Submeter para Aprovação, Solicitar Revisão*
-5. ✅ **Verificar:** *Criar Documento* e *Editar* **não** aparecem mais
+1. Com o painel do MaxDoc Comgas aberto, clicar em **Ações** ao lado de Fernando
+2. O painel de ações do membro (PermissoesMembroSheet) abre
+3. Clicar no card **Revisor** no seletor de papel
+4. ✅ **Verificar:** As ações atualizam automaticamente para: *Visualizar, Revisar Documento, Submeter para Aprovação, Solicitar Revisão*
+5. ✅ **Verificar:** *Criar Documento* e *Editar* **não** aparecem (o sistema limpa as ações anteriores e aplica as do novo papel)
 6. Salvar
 
 ---
