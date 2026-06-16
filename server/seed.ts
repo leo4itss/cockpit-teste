@@ -266,6 +266,24 @@ async function seed() {
     console.log(`✓ userAccountMemberships (${membershipRows.length} vínculos)`)
   }
 
+  // ── Entitlements (capabilities por conta) ────────────────────
+  const entitlementRows: { id: string; accountId: string; capability: string; enabledAt: string }[] = []
+  for (const [accountId, capabilities] of Object.entries(mockAccountEntitlements)) {
+    for (const cap of capabilities) {
+      const slug = cap.replace(/\./g, '-')
+      entitlementRows.push({
+        id: `ent-${accountId}-${slug}`,
+        accountId,
+        capability: cap,
+        enabledAt: '01/01/2026',
+      })
+    }
+  }
+  if (entitlementRows.length > 0) {
+    await db.insert(accountEntitlements).values(entitlementRows)
+    console.log(`✓ accountEntitlements (${entitlementRows.length})`)
+  }
+
   // ── Instâncias ────────────────────────────────────────────────
   if (mockInstancias.length > 0) {
     await db.insert(instancias).values(
