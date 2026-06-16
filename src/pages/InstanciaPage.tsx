@@ -163,17 +163,20 @@ function AddMembroPanel({
   onAdd:       (tipo: 'user' | 'group', id: string, nome: string, papel: string) => void
   onClose:     () => void
 }) {
+  type SugestaoItem = { id: string; nome: string; sub: string; tipo: 'user' | 'group' }
+
+  const [step, setStep]                               = useState<1 | 2>(1)
   const [search, setSearch]                           = useState('')
+  const [selectedItem, setSelectedItem]               = useState<SugestaoItem | null>(null)
   const [papelFGA, setPapelFGA]                       = useState<string>('viewer')
-  const [papelDocNix, setPapelDocNix]                 = useState<string>('personalizado')
+  const [papelDocNix, setPapelDocNix]                 = useState<string>('')
   const [selectedAtribuicoes, setSelectedAtribuicoes] = useState<string[]>([])
 
   const atribuicoesAtivas = atribuicoes.filter(a => a.status === 'Ativo')
-  const papeisDocNix = modulo ? mockDocNixPapeis.filter(p => p.modulo === modulo) : []
+  const papeisDocNix      = modulo ? mockDocNixPapeis.filter(p => p.modulo === modulo) : []
+  const jaMembroIds       = new Set(membros.map(m => m.entidadeId))
 
-  const jaMembroIds = new Set(membros.map(m => m.entidadeId))
-
-  function handlePapelDocNix(valor: string) {
+  function applyPapelDocNix(valor: string) {
     setPapelDocNix(valor)
     const p = mockDocNixPapeis.find(x => x.value === valor)
     if (!p) { setSelectedAtribuicoes([]); return }
@@ -200,11 +203,31 @@ function AddMembroPanel({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, allUsers, allGrupos, membros.length])
 
-  function select(item: { id: string; nome: string; tipo: 'user' | 'group' }) {
-    onAdd(item.tipo, item.id, item.nome, isDocNix ? papelDocNix : papelFGA)
+  function handleSelectItem(item: SugestaoItem) {
+    setSelectedItem(item)
     setSearch('')
+    if (isDocNix && papeisDocNix.length > 0) {
+      applyPapelDocNix(papeisDocNix[0].value)
+    } else {
+      setPapelFGA('viewer')
+    }
+    setStep(2)
+  }
+
+  function handleBack() {
+    setStep(1)
+    setSelectedItem(null)
     setSelectedAtribuicoes([])
-    setPapelDocNix('personalizado')
+    setPapelDocNix('')
+  }
+
+  function handleConfirm() {
+    if (!selectedItem) return
+    onAdd(selectedItem.tipo, selectedItem.id, selectedItem.nome, isDocNix ? papelDocNix : papelFGA)
+    setStep(1)
+    setSelectedItem(null)
+    setSelectedAtribuicoes([])
+    setPapelDocNix('')
   }
 
   return (
@@ -217,120 +240,17 @@ function AddMembroPanel({
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5">
-        {/* Seletor de papel */}
-        {!isDocNix ? (
-          /* FGA */
-          <div>
-            <p className="text-sm font-medium text-gray-700 mb-2">Papel</p>
-            <div className="flex flex-wrap gap-2">
-              {PAPEIS_FGA.map(p => (
-                <button key={p.value} onClick={() => setPapelFGA(p.value)}
-                  className={cn(
-                    'px-3 py-1.5 rounded-full text-sm font-medium border transition-colors',
-                    papelFGA === p.value ? p.cls : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
-                  )}>
-                  {p.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        ) : papeisDocNix.length > 0 ? (
-          /* DocNix com módulo reconhecido */
-          <div>
-            <p className="text-sm font-medium text-gray-700 mb-3">Papel</p>
-            <div className="grid grid-cols-2 gap-2">
-              {papeisDocNix.map(p => (
-                <button key={p.value} type="button" onClick={() => handlePapelDocNix(p.value)}
-                  className={cn(
-                    'flex flex-col items-start px-3 py-2.5 rounded-xl border text-left transition-colors',
-                    papelDocNix === p.value
-                      ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
-                      : 'border-gray-200 bg-white hover:bg-gray-50'
-                  )}>
-                  <span className="text-sm font-semibold text-gray-900">{p.label}</span>
-                </button>
-              ))}
-              <button type="button"
-                onClick={() => { setPapelDocNix('personalizado'); setSelectedAtribuicoes([]) }}
-                className={cn(
-                  'flex flex-col items-start px-3 py-2.5 rounded-xl border text-left transition-colors',
-                  papelDocNix === 'personalizado'
-                    ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
-                    : 'border-gray-200 bg-white hover:bg-gray-50'
-                )}>
-                <span className="text-sm font-semibold text-gray-900">Personalizado</span>
-                <span className="text-xs text-gray-500 mt-0.5 leading-tight">Selecionar manualmente</span>
-              </button>
-            </div>
-
-            {/* Atribuições colapsáveis */}
-            {atribuicoesAtivas.length > 0 && (
-              <details open={papelDocNix === 'personalizado'} className="mt-3">
-                <summary className="text-sm text-blue-600 cursor-pointer hover:underline select-none font-medium">
-                  {selectedAtribuicoes.length > 0
-                    ? `${selectedAtribuicoes.length} ações selecionadas`
-                    : 'Ver ações detalhadas'}
-                </summary>
-                <div className="mt-2 border border-gray-200 rounded-xl bg-white overflow-hidden">
-                  <div className="max-h-52 overflow-y-auto divide-y divide-gray-50">
-                    {atribuicoesAtivas.map(a => (
-                      <label key={a.id}
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors">
-                        <input type="checkbox"
-                          checked={selectedAtribuicoes.includes(a.id)}
-                          onChange={e => {
-                            setPapelDocNix('personalizado')
-                            if (e.target.checked) setSelectedAtribuicoes(prev => [...prev, a.id])
-                            else setSelectedAtribuicoes(prev => prev.filter(id => id !== a.id))
-                          }}
-                          className="rounded border-gray-300"
-                        />
-                        <span className="text-sm text-gray-800">{a.nome}</span>
-                        {a.modulo && (
-                          <span className="ml-auto text-xs text-gray-400 shrink-0">({a.modulo})</span>
-                        )}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              </details>
-            )}
-          </div>
-        ) : (
-          /* DocNix sem módulo */
-          <div>
-            <p className="text-sm font-medium text-gray-700 mb-2">Ações</p>
-            <div className="border border-gray-200 rounded-xl bg-white overflow-hidden">
-              <div className="max-h-52 overflow-y-auto divide-y divide-gray-50">
-                {atribuicoesAtivas.map(a => (
-                  <label key={a.id}
-                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors">
-                    <input type="checkbox"
-                      checked={selectedAtribuicoes.includes(a.id)}
-                      onChange={e => {
-                        if (e.target.checked) setSelectedAtribuicoes(prev => [...prev, a.id])
-                        else setSelectedAtribuicoes(prev => prev.filter(id => id !== a.id))
-                      }}
-                      className="rounded border-gray-300"
-                    />
-                    <span className="text-sm text-gray-800">{a.nome}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Busca */}
-        <div>
-          <p className="text-sm font-medium text-gray-700 mb-2">Usuário ou grupo</p>
+      {/* ── Passo 1: buscar membro ──────────────────────────── */}
+      {step === 1 && (
+        <div className="flex-1 px-6 py-4">
+          <p className="text-sm font-medium text-gray-700 mb-3">Buscar usuário ou grupo</p>
           <div className="relative">
             <div className="flex items-center gap-2 px-3 py-2.5 bg-white border border-gray-300 rounded-xl focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-colors">
               <Search className="w-4 h-4 text-gray-400 shrink-0" />
               <input
                 type="text" value={search} onChange={e => setSearch(e.target.value)}
                 placeholder="Buscar por nome ou e-mail..."
+                autoFocus
                 className="flex-1 bg-transparent text-sm outline-none text-gray-900 placeholder:text-gray-400"
               />
               {search && (
@@ -343,7 +263,7 @@ function AddMembroPanel({
             {sugestoes.length > 0 && (
               <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 overflow-hidden">
                 {sugestoes.map(item => (
-                  <button key={`${item.tipo}-${item.id}`} onClick={() => select(item)}
+                  <button key={`${item.tipo}-${item.id}`} onClick={() => handleSelectItem(item)}
                     className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left border-b border-gray-50 last:border-0">
                     <Avatar nome={item.nome} isGroup={item.tipo === 'group'} />
                     <div className="min-w-0 flex-1">
@@ -368,7 +288,142 @@ function AddMembroPanel({
             )}
           </div>
         </div>
-      </div>
+      )}
+
+      {/* ── Passo 2: escolher papel ─────────────────────────── */}
+      {step === 2 && selectedItem && (
+        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5">
+          {/* Membro selecionado */}
+          <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl border border-gray-200">
+            <Avatar nome={selectedItem.nome} isGroup={selectedItem.tipo === 'group'} />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-gray-900 truncate">{selectedItem.nome}</p>
+              <p className="text-xs text-gray-500 truncate">{selectedItem.sub}</p>
+            </div>
+            <button
+              onClick={handleBack}
+              className="shrink-0 text-xs text-gray-400 hover:text-gray-600 px-2 py-1 rounded hover:bg-gray-100 transition-colors"
+            >
+              Trocar
+            </button>
+          </div>
+
+          {/* Seletor de papel */}
+          {!isDocNix ? (
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-2">Papel</p>
+              <div className="flex flex-wrap gap-2">
+                {PAPEIS_FGA.map(p => (
+                  <button key={p.value} onClick={() => setPapelFGA(p.value)}
+                    className={cn(
+                      'px-3 py-1.5 rounded-full text-sm font-medium border transition-colors',
+                      papelFGA === p.value ? p.cls : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
+                    )}>
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : papeisDocNix.length > 0 ? (
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-3">Papel</p>
+              <div className="grid grid-cols-2 gap-2">
+                {papeisDocNix.map(p => (
+                  <button key={p.value} type="button" onClick={() => applyPapelDocNix(p.value)}
+                    className={cn(
+                      'px-3 py-2.5 rounded-xl border text-left text-sm font-semibold transition-colors',
+                      papelDocNix === p.value
+                        ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500 text-blue-700'
+                        : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-900'
+                    )}>
+                    {p.label}
+                  </button>
+                ))}
+                <button type="button"
+                  onClick={() => { setPapelDocNix('personalizado'); setSelectedAtribuicoes([]) }}
+                  className={cn(
+                    'px-3 py-2.5 rounded-xl border text-left text-sm font-semibold transition-colors',
+                    papelDocNix === 'personalizado'
+                      ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500 text-blue-700'
+                      : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-900'
+                  )}>
+                  Personalizado
+                </button>
+              </div>
+
+              {atribuicoesAtivas.length > 0 && (
+                <details open={papelDocNix === 'personalizado'} className="mt-3">
+                  <summary className="text-sm text-blue-600 cursor-pointer hover:underline select-none font-medium">
+                    {selectedAtribuicoes.length > 0
+                      ? `${selectedAtribuicoes.length} ações selecionadas`
+                      : 'Ver ações detalhadas'}
+                  </summary>
+                  <div className="mt-2 border border-gray-200 rounded-xl bg-white overflow-hidden">
+                    <div className="max-h-52 overflow-y-auto divide-y divide-gray-50">
+                      {atribuicoesAtivas.map(a => (
+                        <label key={a.id}
+                          className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors">
+                          <input type="checkbox"
+                            checked={selectedAtribuicoes.includes(a.id)}
+                            onChange={e => {
+                              setPapelDocNix('personalizado')
+                              if (e.target.checked) setSelectedAtribuicoes(prev => [...prev, a.id])
+                              else setSelectedAtribuicoes(prev => prev.filter(id => id !== a.id))
+                            }}
+                            className="rounded border-gray-300"
+                          />
+                          <span className="text-sm text-gray-800">{a.nome}</span>
+                          {a.modulo && (
+                            <span className="ml-auto text-xs text-gray-400 shrink-0">({a.modulo})</span>
+                          )}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </details>
+              )}
+            </div>
+          ) : (
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-2">Ações</p>
+              <div className="border border-gray-200 rounded-xl bg-white overflow-hidden">
+                <div className="max-h-52 overflow-y-auto divide-y divide-gray-50">
+                  {atribuicoesAtivas.map(a => (
+                    <label key={a.id}
+                      className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors">
+                      <input type="checkbox"
+                        checked={selectedAtribuicoes.includes(a.id)}
+                        onChange={e => {
+                          if (e.target.checked) setSelectedAtribuicoes(prev => [...prev, a.id])
+                          else setSelectedAtribuicoes(prev => prev.filter(id => id !== a.id))
+                        }}
+                        className="rounded border-gray-300"
+                      />
+                      <span className="text-sm text-gray-800">{a.nome}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Ações do wizard */}
+          <div className="flex items-center justify-between pt-1">
+            <button
+              onClick={handleBack}
+              className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              ← Voltar
+            </button>
+            <button
+              onClick={handleConfirm}
+              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors"
+            >
+              Confirmar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
