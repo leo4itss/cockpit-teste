@@ -345,6 +345,8 @@ export type ComponenteTypeConfig = {
   permissaoMode: 'component_permissions'
   papeis: PapelDef[]
   acoes?: AcaoDef[]
+  /** true = acesso gerenciado por instância; false/ausente = permissão a nível de conta */
+  acessoViaInstancia?: boolean
 }
 
 const COMPONENTE_CONFIGS: Record<string, ComponenteTypeConfig> = {
