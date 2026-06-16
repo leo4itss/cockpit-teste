@@ -310,11 +310,11 @@ A operação é irreversível, mas pode ser refeita adicionando o membro novamen
 
 1. Clicar no objeto **MaxDoc Comgas**
 2. No painel que abre, clicar em **"Adicionar Membro"**
-3. Buscar e selecionar o usuário **Fernando**
-4. Selecionar o papel **Editor** no dropdown
-5. ✅ **Verificar antes de salvar:** As ações pré-selecionadas devem incluir: *Visualizar, Criar Documento, Editar, Nova Versão, Mover, Cancelar Edição, Baixar Documento, Imprimir, Visualizar Histórico de Versões*
+3. **Passo 1 do wizard:** Digitar "Fernando" no campo de busca → clicar no resultado
+4. **Passo 2 do wizard:** Selecionar o papel **Editor** nos cards de papel
+5. ✅ **Verificar antes de confirmar:** As ações pré-selecionadas (9): *Visualizar, Criar Documento, Editar, Nova Versão, Mover, Cancelar Edição, Baixar Documento, Imprimir, Visualizar Histórico de Versões*
 6. ✅ **Verificar:** As ações de Aprovador (*Aprovar Documento, Rejeitar Documento*) **não** estão selecionadas
-7. Clicar em **Salvar**
+7. Clicar em **Confirmar**
 
 ---
 
