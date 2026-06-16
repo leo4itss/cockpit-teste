@@ -247,5 +247,5 @@ Testar o fluxo de onboarding de novo usuário: criar conta, adicionar à conta, 
    - **Verificar:** Mensagem "Este nome de usuário já está em uso."
 7. Com usuário criado, ir para Acessos > Objetos > MaxDoc Comgas
 8. Adicionar **João Teste** como **Leitor**
-9. **Verificar:** Ações de Leitor pré-selecionadas: Visualizar, Baixar Documento, Imprimir, Visualizar Histórico de Versões
+9. **Verificar:** Ações de Leitor pré-selecionadas (6 ações): Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Baixar Documento, Imprimir
 10. Salvar
