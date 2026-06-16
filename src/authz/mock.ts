@@ -476,7 +476,7 @@ const COMPONENTE_CONFIGS: Record<string, ComponenteTypeConfig> = {
         defaultAcoes: ['can_use_assistant'],
       },
       {
-        value: 'member', label: 'Usuário', desc: 'Usa o assistente e compartilha resultados',
+        value: 'member', label: 'Membro', desc: 'Usa o assistente e compartilha resultados',
         cls: 'bg-blue-50 text-blue-700 border-blue-200',
         defaultAcoes: ['can_use_assistant','can_share_conversation_results','can_view_consulted_sources','can_upload_rag_sources'],
       },
