@@ -221,7 +221,7 @@ Validar as regras de acesso ao Assistente IA: papéis simples (Viewer/User/Admin
 | Papel Usuário tem 4 ações | Usar o assistente, Compartilhar resultados, Ver fontes consultadas, Upload de fontes RAG |
 | Papel Usuário não tem admin | Criar assistente, Configurar agentes ausentes |
 | Papel Admin tem 8 ações | Todas marcadas sem exceção |
-| Herança via grupo | can_use_assistant de Thiago aparece como "via grupo" (verde) |
+| Herança via grupo | "Usar o assistente" de Thiago aparece como "via grupo" (verde) |
 | Entitlement inativo | Badge "Capability inativa" bloqueia atribuição |
 | PersonaSwitcher | Sidebar correto para cada papel |
 
