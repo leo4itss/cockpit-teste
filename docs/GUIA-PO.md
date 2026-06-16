@@ -376,8 +376,7 @@ A operação é irreversível, mas pode ser refeita adicionando o membro novamen
 **2.1 — Adicionar Analista**
 
 1. Acessos > Objetos > clicar em **"DocAction Comgas"**
-2. **"Adicionar Membro"** → selecionar **Neide**
-3. Papel: **Analista**
+2. **"Adicionar Membro"** → **Passo 1:** buscar e selecionar **Neide** → **Passo 2:** selecionar papel **Analista**
 4. ✅ **Verificar ações pré-selecionadas (11):** Visualizar, Criar Ocorrência, Criar Ocorrência 8D, Editar Ocorrência, Vincular Ocorrência, Acompanhar Ocorrência, Categorizar Ocorrência, Analisar Causa, Criar Plano de Ação, Verificar Eficácia, Encaminhar Ocorrência
 5. ✅ **Verificar que NÃO estão:** Aprovar Análise de Causa, Encerrar Ocorrência, Reprogramar Prazo/Responsável
 6. Salvar
