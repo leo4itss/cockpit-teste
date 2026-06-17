@@ -6,7 +6,7 @@
  * O papel selecionado é salvo em instancia_membros para exibição no badge.
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Loader2, Users } from 'lucide-react'
 import {
   NestedSheet,
