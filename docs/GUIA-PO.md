@@ -451,16 +451,19 @@ A operação é irreversível, mas pode ser refeita adicionando o membro novamen
 
 **3.3 — Herança via grupo**
 
-> **Setup:** Lucas Oliveira já tem entrada direta como Membro (passo 3.1). Aqui adicionamos o grupo de Lucas para demonstrar a herança no PermissoesMembroSheet.
+> **Conceito validado aqui:** pertencer a um grupo não concede acesso automaticamente. O grupo precisa ser **explicitamente adicionado ao objeto** para que seus membros herdem as ações.
 
-1. Em **Acessos > Papéis**, verificar em qual grupo Lucas Oliveira está (ex: `grp-a2-leitura`). Se necessário, adicionar Lucas a um grupo.
-2. Em Acessos > Objetos > **Assistente Suporte** → **"Adicionar Membro"**
-3. Buscar o **grupo de Lucas** → selecionar → papel **Visualizador** → Salvar
-4. Na lista de membros da instância, clicar em **Lucas Oliveira**
-5. ✅ **Verificar no PermissoesMembroSheet:** Banner verde "Ações herdadas de grupos" aparece
-6. ✅ **Verificar:** "Usar o assistente" com badge verde do grupo (herdada — não editável diretamente)
+> **Setup:** Lucas Oliveira já tem entrada direta como Membro (passo 3.1). Lucas pertence ao grupo **Farmacêuticos** (verificável em Acessos > Grupos). Este passo adiciona Farmacêuticos ao objeto para demonstrar a herança.
 
-> **Importante:** A herança de grupo é visível no **PermissoesMembroSheet** — não na listagem "POR INSTÂNCIA" do painel do usuário (que exibe apenas membros diretos). Para acessar via UsuarioDetailAccountSheet: Acessos > Usuários > Lucas > **Editar** ao lado de Assistente Suporte.
+1. Em Acessos > **Grupos**, confirmar que **Lucas Oliveira** aparece no grupo **Farmacêuticos**
+2. Em Acessos > **Objetos** > **Assistente Suporte** → **"Adicionar Membro"**
+3. No campo de busca, digitar **"Farmacêuticos"** → selecionar o grupo → papel **Visualizador** → Confirmar
+4. ✅ **Verificar:** Farmacêuticos aparece na seção "Grupos" da instância com badge **Visualizador**
+5. Na lista de membros, clicar em **Lucas Oliveira**
+6. ✅ **Verificar no PermissoesMembroSheet:** Banner verde "Ações marcadas via grupo — são somente leitura" aparece no topo
+7. ✅ **Verificar:** "Usar o assistente" exibe badge verde **Farmacêuticos** (herdada — não editável diretamente)
+
+> **Importante:** A herança é visível no **PermissoesMembroSheet** do usuário — não na listagem "POR INSTÂNCIA" (que exibe apenas membros diretos). Para acessar: Acessos > Usuários > Lucas > **Editar** ao lado de Assistente Suporte.
 
 ---
 
