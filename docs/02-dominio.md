@@ -103,6 +103,37 @@ Módulo da plataforma (MaxDoc, DocAction, Assistente IA, etc.). Definido pela IT
 
 > **Regra:** Componente vinculado a uma solução ativa é **inativado** (não hard-deletado) ao ser removido.
 
+### ComponentePapeis (Catálogo de Papéis)
+
+Catálogo de papéis disponíveis para cada componente. Alimentado via seed para produtos reais (MaxDoc, DocAction, Assistente IA). Consultado pelo endpoint `GET /api/componentes/:id/config`.
+
+| Campo | Descrição |
+|-------|-----------|
+| id | UUID |
+| componenteId | Referência ao componente |
+| value | Identificador do papel (ex: `editor`, `aprovador`) |
+| label | Rótulo exibido na UI (ex: `Editor`, `Aprovador`) |
+| descricao | Descrição opcional do papel |
+| defaultAcoes | JSONB — lista de ações padrão do papel; `[]` = todas as ações (Administrador) |
+| cls | Classe CSS para badge de cor (opcional) |
+| ordem | Posição na listagem |
+| status | `'Ativo'` \| `'Inativo'` |
+
+### ComponenteAcoes (Catálogo de Ações FGA)
+
+Catálogo completo de ações FGA disponíveis para cada componente. Os valores de `acao` são os strings persistidos em `component_permissions.acao`.
+
+| Campo | Descrição |
+|-------|-----------|
+| id | UUID |
+| componenteId | Referência ao componente |
+| acao | String da ação (ex: `visualizar`, `aprovar_documento`) |
+| label | Rótulo exibido na UI (ex: `Visualizar`, `Aprovar Documento`) |
+| ordem | Posição na listagem |
+| status | `'Ativo'` \| `'Inativo'` |
+
+> **Componentes com catálogo no banco:** MaxDoc (32 ações, 5 papéis), DocAction (14 ações, 4 papéis), Assistente IA (8 ações, 3 papéis). Componentes sem catálogo (Analytics, Base de Conhecimento) usam fallback do `mock.ts`.
+
 ### Instancia (Objeto)
 
 Cópia configurada de um componente dentro de uma conta. Por exemplo: "MaxDoc — Gestão de Documentos Contábeis" é uma instância do componente MaxDoc.
