@@ -20,7 +20,9 @@ User
   └─ UsuarioGrupo                 → grupos aos quais pertence
 
 Componente (plataforma)
-  ├─ ComponenteAtribuicao         → catálogo de ações disponíveis (MaxDoc, DocAction)
+  ├─ ComponentePapeis             → catálogo de papéis do componente (Leitor, Editor, Aprovador…)
+  ├─ ComponenteAcoes              → catálogo de ações FGA do componente (visualizar, editar, aprovar…)
+  ├─ ComponenteAtribuicao         → atribuições de workflow DocNix (slots de fase)
   └─ ComponentPermission          → permissão FGA: quem → faz o quê → em qual componente/instância
 
 ── Workflow DocNix ──
