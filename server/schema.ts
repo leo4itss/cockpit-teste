@@ -304,6 +304,24 @@ export const componentePapeis = pgTable('componente_papeis', {
   index('idx_comp_papeis_lookup').on(t.componenteId, t.value),
 ])
 
+// ── Catálogo de Ações por Componente (FGA) ───────────────────
+// Lista completa de ações FGA disponíveis por componente.
+// 'acao' é a chave usada em component_permissions.acao.
+// 'label' é o texto exibido na UI.
+// Complementa componente_papeis: o Administrador (defaultAcoes:[]) expande
+// para todas as ações listadas aqui.
+export const componenteAcoes = pgTable('componente_acoes', {
+  id:           text('id').primaryKey(),
+  componenteId: text('componente_id').notNull().references(() => componentes.id),
+  acao:         text('acao').notNull(),     // chave FGA (ex: 'Visualizar', 'can_use_assistant')
+  label:        text('label').notNull(),    // texto para exibição
+  ordem:        integer('ordem').notNull().default(0),
+  status:       text('status').notNull().default('Ativo'),
+  createdAt:    text('created_at').notNull(),
+}, (t) => [
+  index('idx_comp_acoes_lookup').on(t.componenteId, t.acao),
+])
+
 // ── Atribuições por Componente ────────────────────────────────
 // Define ações disponíveis por componente (ex: 'Criar Documento', 'Aprovar').
 // modulo=null → atribuição geral; modulo='MaxDoc' → específica do MaxDoc.
