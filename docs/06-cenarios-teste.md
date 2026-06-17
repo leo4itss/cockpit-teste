@@ -181,18 +181,23 @@ Validar as regras de acesso ao Assistente IA: papéis simples (Viewer/User/Admin
 
 #### 3.3 — Testar herança via grupo
 
-> **Setup:** Lucas Oliveira (`usr-lucas`) já foi adicionado como **Membro** em 3.1 (entrada direta). Este passo adiciona o grupo de Lucas à mesma instância para demonstrar herança via grupo no PermissoesMembroSheet.
+> **Conceito validado aqui:** no modelo FGA, pertencer a um grupo **não concede acesso automaticamente** a nenhum objeto. O grupo precisa ser **adicionado explicitamente ao objeto** para que seus membros herdem as ações naquele objeto específico.
 
-1. Em Acessos > Papéis, verificar em qual grupo **Lucas Oliveira** está (ex: `grp-a2-leitura`). Se necessário, adicioná-lo a um grupo.
-2. Ainda em Acessos > Objetos > **Assistente Suporte** → **"Adicionar Membro"**
-3. No campo **"Buscar usuário ou grupo..."**, buscar o **grupo de Lucas** → selecionar → papel **Visualizador**
+> **Setup:** Lucas Oliveira (`usr-lucas`) já foi adicionado como **Membro** em 3.1 (entrada direta). Lucas pertence ao grupo **Farmacêuticos** (`grp-santa-farma`), verificável em Acessos > Grupos.
+
+1. Em Acessos > **Grupos**, confirmar que **Lucas Oliveira** aparece como membro de **Farmacêuticos**
+2. Ainda em Acessos > **Objetos** > **Assistente Suporte** → **"Adicionar Membro"**
+3. No campo **"Buscar usuário ou grupo..."**, buscar **"Farmacêuticos"** → selecionar → papel **Visualizador**
 4. **Verificar:** Ação "Usar o assistente" pré-selecionada para o grupo
-5. Salvar
-6. Na lista de membros da instância, clicar em **Lucas Oliveira** → PermissoesMembroSheet abre
-7. **Verificar:** Banner verde "Ações herdadas de grupos" aparece no topo do painel
-8. **Verificar:** A ação "Usar o assistente" aparece com badge verde do grupo (herdada — não editável diretamente)
+5. Confirmar
+6. **Verificar:** Farmacêuticos aparece na seção "Grupos" da instância com badge **Visualizador**
+7. Na lista de membros, clicar em **Lucas Oliveira** → PermissoesMembroSheet abre
+8. **Verificar:** Banner verde "Ações marcadas via grupo — são somente leitura" aparece no topo
+9. **Verificar:** A ação "Usar o assistente" aparece com badge verde **Farmacêuticos** (herdada — não editável diretamente)
 
-> **Nota:** A herança de grupo é visível no **PermissoesMembroSheet** (acessado clicando no usuário dentro da InstanciaDetailSheet, ou via Acessos > Usuários > Editar ao lado da instância). A seção "POR INSTÂNCIA" do painel do usuário exibe apenas membros diretos — acesso exclusivamente via grupo não aparece nessa listagem.
+> **Comportamento esperado:** antes do passo 2 (adicionar Farmacêuticos ao objeto), Lucas **não herda nada** do grupo neste objeto — mesmo sendo membro de Farmacêuticos. A herança só acontece objeto a objeto, explicitamente. Isso é por design: o mesmo grupo pode ter papéis diferentes em objetos diferentes, ou não ter acesso a alguns objetos.
+
+> **Nota:** A herança é visível no **PermissoesMembroSheet** (clicando no usuário na InstanciaDetailSheet, ou via Acessos > Usuários > Editar ao lado da instância). A seção "POR INSTÂNCIA" do painel do usuário exibe apenas membros diretos — acesso exclusivamente via grupo não aparece nessa listagem.
 
 #### 3.4 — Testar bloqueio por entitlement
 
