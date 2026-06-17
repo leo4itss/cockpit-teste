@@ -214,7 +214,7 @@ export function PermissoesEfetivasSheet({
                   return fontesDoAtrib.map((f, idx) => (
                     <tr key={`${atribId}-${idx}`} className="border-b border-gray-200 last:border-0 hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3 text-gray-900 font-medium">
-                        {idx === 0 ? nomeAtrib : ''}
+                        {nomeAtrib}
                       </td>
                       <td className="px-4 py-3">
                         <FonteBadge fonte={f.fonte} entidadeId={f.entidadeId} />
