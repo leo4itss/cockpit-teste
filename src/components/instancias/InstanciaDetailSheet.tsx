@@ -508,6 +508,7 @@ export function InstanciaDetailSheet({
   const [restringirAcesso, setRestringirAcesso] = useState(instancia?.restringirAcesso ?? false)
 
   const canManage = useCanManageInstanciaMembros(instancia?.id ?? '', accountId)
+  const { config: componenteConfig } = useComponenteConfig(instancia?.componenteId, componenteNome)
 
   // Só rebusca quando a instância ou conta muda — não ao abrir/fechar.
   useEffect(() => {
