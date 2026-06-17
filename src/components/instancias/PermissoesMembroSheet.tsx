@@ -20,7 +20,7 @@ import { Button } from '@/components/ui/Button'
 import { api } from '@/api/client'
 import { cn } from '@/lib/utils'
 import type { InstanciaMembro } from '@/types'
-import { getComponenteConfig } from '@/authz/mock'
+import { useComponenteConfig } from '@/authz/hooks'
 
 // ── Props ─────────────────────────────────────────────────────
 
