@@ -137,3 +137,13 @@ O CORS em `server/index.ts` está hardcoded para `http://localhost:5173`. Se a p
 - Relações FGA seriam carregadas do OpenFGA SDK
 - `reloadRelations()` faria chamada ao servidor OpenFGA
 - A interface dos hooks (`useCanXxx`, `useIsPlatformAdmin`, etc.) permaneceria igual — apenas a implementação do engine mudaria
+
+### Catálogo de Componentes (híbrido mock + banco)
+
+O hook `useComponenteConfig(componenteId, componenteNome)` em `src/authz/hooks.ts` busca papéis e ações de um componente de forma assíncrona via `GET /api/componentes/:id/config`, inicializando com o mock como fallback (sem flash de carregamento).
+
+Produtos reais têm catálogo no banco (tabelas `componente_papeis` e `componente_acoes`), populado pelos scripts de seed:
+- `server/seed-papeis.ts` — papéis (MaxDoc: 5, DocAction: 4, Assistente IA: 3)
+- `server/seed-acoes.ts` — ações (MaxDoc: 32, DocAction: 14, Assistente IA: 8)
+
+Componentes sem catálogo no banco (Analytics, Base de Conhecimento) usam silenciosamente o `COMPONENTE_CONFIGS` definido em `src/authz/mock.ts`.
