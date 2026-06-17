@@ -252,13 +252,26 @@ src/authz/
 │                  useIsPlatformAdmin() → boolean
 │                  useCanManageAccount(accountId) → boolean
 │                  useGetComponentPermissions(componenteId) → PermissaoFGA[]
+│                  useComponenteConfig(componenteId, componenteNome) → { config, loading }
 └── mock.ts     — Dados estáticos para PoC
                    mockFGARelations: lista de relações
                    mockPersonas: array de { id, nome, papel, ... }
-                   COMPONENTE_CONFIGS: catálogo de papéis e ações por componente
+                   COMPONENTE_CONFIGS: catálogo de fallback para componentes sem registro no banco
+                                       (Analytics, Base de Conhecimento, PAS Core)
 ```
 
 **Regra de uso:** **Sempre use hooks em componentes React.** Nunca chame `engine.ts` diretamente de dentro de componentes — use os hooks de `hooks.ts`.
+
+### Catálogo de Papéis e Ações por Componente
+
+O hook `useComponenteConfig(componenteId, componenteNome)` centraliza a obtenção do catálogo de um componente:
+
+1. **Inicializa** com o valor do `COMPONENTE_CONFIGS` do mock (sem flash de carregamento).
+2. **Busca assincronamente** via `GET /api/componentes/:id/config` o catálogo persistido no banco.
+3. **Se o banco retornar dados** (papéis e ações), substitui o mock.
+4. **Se o banco não tiver catálogo** (componente sem registro em `componente_papeis`), mantém o mock silenciosamente.
+
+Isso garante que produtos reais (MaxDoc, DocAction, Assistente IA) usem dados precisos do banco, enquanto componentes de teste (Analytics, Base de Conhecimento) continuam funcionando via mock.
 
 ---
 
