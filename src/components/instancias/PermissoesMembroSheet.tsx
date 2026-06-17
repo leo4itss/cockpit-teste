@@ -2,11 +2,11 @@
  * PermissoesMembroSheet — painel de permissões por membro (FGA puro).
  *
  * Todos os componentes usam component_permissions como backend de permissões.
- * A lista de ações disponíveis vem de config.acoes (getComponenteConfig).
+ * A lista de ações disponíveis vem do banco via useComponenteConfig (papeis + acoes).
  * O papel selecionado é salvo em instancia_membros para exibição no badge.
  */
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { Loader2, Users } from 'lucide-react'
 import {
   NestedSheet,
