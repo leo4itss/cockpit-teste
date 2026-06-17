@@ -28,6 +28,8 @@ const {
   instancias,
   instanciaMembros,
   componenteAtribuicoes,
+  componentePapeis,
+  componenteAcoes,
   instanciaMembroAtribuicoes,
   instanciaFases,
   faseResponsaveis,
