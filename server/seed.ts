@@ -2,7 +2,7 @@ import 'dotenv/config'
 import { db } from './db'
 import {
   organizations, accounts, solutions, contracts, users, tiposLicenca, componentes,
-  grupos, usuarioGrupos, componentPermissions, componenteAtribuicoes,
+  grupos, usuarioGrupos, componentPermissions, componenteAtribuicoes, componentePapeis,
   userAccountMemberships, accountEntitlements,
   instancias, instanciaMembros, instanciaMembroAtribuicoes,
   instanciaFases, faseResponsaveis, faseAtribuicoesPermitidas,
