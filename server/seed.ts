@@ -414,6 +414,106 @@ async function seed() {
       )
       console.log(`✓ instanciaMembros (${mockInstanciaMembros.length})`)
     }
+
+    // ── Component Permissions (FGA) para todos os instanciaMembros ──
+    // Gera as permissões granulares baseadas no papel de cada membro,
+    // garantindo que grupos e usuários seedados tenham acesso correto.
+    {
+      const ALL_MAXDOC = [
+        'Visualizar','Ler Todos','Leitor Documento','Leitor Anexos','Baixar Documento','Imprimir',
+        'Criar Documento','Editar','Nova Versão','Mover','Cancelar Edição',
+        'Visualizar Histórico de Versões','Upload Documento','Editor Documento',
+        'Criar Anexo','Editar Anexo','Anexar Arquivos','Assinatura Eletrônica',
+        'Revisar Documento','Submeter para Aprovação','Solicitar Revisão','Revisor Documento',
+        'Revisar como Substituto Documento','Aprovar Documento','Rejeitar Documento',
+        'Aprovador Documento','Aprovador Substituto Documento','Obsoletetar Documento',
+        'Emitir Cópia Controlada','Emitir Cópia Não Controlada','Cópia Controlada Anexos',
+        'Ciclo de Aprovação Documentos',
+      ]
+      const ALL_DOCACTION = [
+        'Visualizar','Criar Ocorrência','Criar Ocorrência 8D','Editar Ocorrência',
+        'Vincular Ocorrência','Acompanhar Ocorrência','Categorizar Ocorrência','Analisar Causa',
+        'Criar Plano de Ação','Verificar Eficácia','Encaminhar Ocorrência',
+        'Aprovar Análise de Causa','Encerrar Ocorrência','Reprogramar Prazo/Responsável',
+      ]
+      const ALL_ASSISTENTE = [
+        'can_use_assistant','can_share_conversation_results','can_view_consulted_sources',
+        'can_upload_rag_sources','can_create_assistant','can_configure_agents',
+        'can_manage_business_scenarios','can_manage_users',
+      ]
+      const ALL_KB       = ['can_view','can_edit','can_manage']
+      const ALL_ANALYTICS = ['can_view_dashboards','can_export_reports','can_manage_analytics']
+
+      const PAPEL_ACOES: Record<string, Record<string, string[]>> = {
+        'comp-maxdoc': {
+          'leitor':       ['Visualizar','Ler Todos','Leitor Documento','Leitor Anexos','Baixar Documento','Imprimir'],
+          'editor':       ['Visualizar','Criar Documento','Editar','Nova Versão','Mover','Cancelar Edição','Baixar Documento','Imprimir','Visualizar Histórico de Versões'],
+          'revisor':      ['Visualizar','Revisar Documento','Submeter para Aprovação','Solicitar Revisão'],
+          'aprovador':    ['Visualizar','Ler Todos','Leitor Documento','Leitor Anexos','Baixar Documento','Imprimir','Assinatura Eletrônica','Revisar Documento','Aprovar Documento','Rejeitar Documento','Aprovador Documento','Aprovador Substituto Documento','Obsoletetar Documento','Emitir Cópia Controlada','Emitir Cópia Não Controlada','Cópia Controlada Anexos','Ciclo de Aprovação Documentos'],
+          'admin-maxdoc': ALL_MAXDOC,
+          'admin':        ALL_MAXDOC,
+          'member':       ['Visualizar','Criar Documento','Editar','Nova Versão','Mover','Cancelar Edição','Baixar Documento','Imprimir','Visualizar Histórico de Versões'],
+          'viewer':       ['Visualizar','Ler Todos','Leitor Documento','Leitor Anexos','Baixar Documento','Imprimir'],
+        },
+        'comp-docaction': {
+          'colaborador':         ['Visualizar','Criar Ocorrência','Criar Ocorrência 8D','Editar Ocorrência','Vincular Ocorrência','Acompanhar Ocorrência'],
+          'analista':            ['Visualizar','Criar Ocorrência','Criar Ocorrência 8D','Editar Ocorrência','Vincular Ocorrência','Acompanhar Ocorrência','Categorizar Ocorrência','Analisar Causa','Criar Plano de Ação','Verificar Eficácia','Encaminhar Ocorrência'],
+          'aprovador-docaction': ALL_DOCACTION,
+          'admin-docaction':     ALL_DOCACTION,
+          'admin':               ALL_DOCACTION,
+          'member':              ['Visualizar','Criar Ocorrência','Criar Ocorrência 8D','Editar Ocorrência','Vincular Ocorrência','Acompanhar Ocorrência'],
+          'viewer':              ['Visualizar','Acompanhar Ocorrência'],
+        },
+        'comp-assistente-ia': {
+          'viewer': ['can_use_assistant'],
+          'member': ['can_use_assistant','can_share_conversation_results','can_view_consulted_sources','can_upload_rag_sources'],
+          'admin':  ALL_ASSISTENTE,
+        },
+        'comp-base-conhecimento': {
+          'viewer': ['can_view'],
+          'member': ['can_view','can_edit'],
+          'admin':  ALL_KB,
+        },
+        'comp-analytics': {
+          'viewer': ['can_view_dashboards'],
+          'member': ['can_view_dashboards','can_export_reports'],
+          'admin':  ALL_ANALYTICS,
+        },
+      }
+
+      const instanciaMap = new Map(mockInstancias.map(i => [i.id, i]))
+      const now = new Date().toISOString()
+      const permRows: {
+        id: string; entidadeTipo: string; entidadeId: string;
+        componenteId: string; acao: string; instanciaId: string; createdAt: string
+      }[] = []
+
+      for (const membro of mockInstanciaMembros) {
+        const instancia = instanciaMap.get(membro.instanciaId)
+        if (!instancia?.componenteId) continue
+        const acoesPorPapel = PAPEL_ACOES[instancia.componenteId]
+        if (!acoesPorPapel) continue
+        const acoes = acoesPorPapel[membro.papel]
+        if (!acoes?.length) continue
+        for (const acao of acoes) {
+          const slug = `${membro.id}-${acao}`.replace(/[^a-z0-9-]/gi, '_').toLowerCase()
+          permRows.push({
+            id: `perm-${slug}`,
+            entidadeTipo: membro.entidadeTipo,
+            entidadeId:   membro.entidadeId,
+            componenteId: instancia.componenteId,
+            acao,
+            instanciaId:  membro.instanciaId,
+            createdAt:    now,
+          })
+        }
+      }
+
+      if (permRows.length > 0) {
+        await db.insert(componentPermissions).values(permRows)
+        console.log(`✓ componentPermissions (${permRows.length} registros de ${mockInstanciaMembros.length} membros)`)
+      }
+    }
   }
 
   console.log('\n🎉 Seed completo!')
