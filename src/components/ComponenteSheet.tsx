@@ -189,7 +189,7 @@ export function ComponenteSheet({ open, onClose, onSave, onDelete, isLinked, ini
         descricao: descricao.trim() || undefined,
         metadataUrl: metadataUrl.trim() || undefined,
         tiposLicenca: selectedTipos,
-        tipoModelo,
+        tipoModelo: 'fga',
       })
       doClose()
     } finally {
