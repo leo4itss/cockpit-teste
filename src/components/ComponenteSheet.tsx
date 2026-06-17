@@ -50,7 +50,6 @@ export function ComponenteSheet({ open, onClose, onSave, onDelete, isLinked, ini
   const [metadataTestado, setMetadataTestado]     = useState(false)
   const [testedUrl, setTestedUrl]                 = useState('')
   const [selectedTipos, setSelectedTipos]         = useState<string[]>([])
-  const [tipoModelo, setTipoModelo]               = useState<'fga' | 'docnix' | 'custom'>('fga')
   const [saving, setSaving]                       = useState(false)
   const [unsavedDialogOpen, setUnsavedDialogOpen] = useState(false)
 
