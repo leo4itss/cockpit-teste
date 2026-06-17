@@ -199,6 +199,68 @@ async function seed() {
   )
   console.log(`✓ componentes (${mockComponentes.length})`)
 
+  // ── Papéis por Componente (produtos reais) ────────────────────
+  const papeisSeed: {
+    id: string; componenteId: string; value: string; label: string
+    descricao: string; defaultAcoes: string[]; cls: string; ordem: number; createdAt: string
+  }[] = [
+    // ── MaxDoc ──────────────────────────────────────────────────
+    { id: 'papel-maxdoc-leitor',    componenteId: 'comp-maxdoc', value: 'leitor',      label: 'Leitor',
+      descricao: 'Leitura e download de documentos',
+      defaultAcoes: ['Visualizar','Ler Todos','Leitor Documento','Leitor Anexos','Baixar Documento','Imprimir'],
+      cls: 'bg-gray-100 text-gray-600 border-gray-200',    ordem: 1, createdAt: '01/01/2026' },
+    { id: 'papel-maxdoc-editor',    componenteId: 'comp-maxdoc', value: 'editor',      label: 'Editor',
+      descricao: 'Cria e edita documentos e anexos',
+      defaultAcoes: ['Visualizar','Criar Documento','Editar','Nova Versão','Mover','Cancelar Edição','Baixar Documento','Imprimir','Visualizar Histórico de Versões'],
+      cls: 'bg-blue-50 text-blue-700 border-blue-200',     ordem: 2, createdAt: '01/01/2026' },
+    { id: 'papel-maxdoc-revisor',   componenteId: 'comp-maxdoc', value: 'revisor',     label: 'Revisor',
+      descricao: 'Revisa e submete documentos para aprovação',
+      defaultAcoes: ['Visualizar','Revisar Documento','Submeter para Aprovação','Solicitar Revisão'],
+      cls: 'bg-indigo-50 text-indigo-700 border-indigo-200', ordem: 3, createdAt: '01/01/2026' },
+    { id: 'papel-maxdoc-aprovador', componenteId: 'comp-maxdoc', value: 'aprovador',   label: 'Aprovador',
+      descricao: 'Aprova, obsoleta e emite cópias controladas',
+      defaultAcoes: ['Visualizar','Ler Todos','Leitor Documento','Leitor Anexos','Baixar Documento','Imprimir','Assinatura Eletrônica','Revisar Documento','Aprovar Documento','Rejeitar Documento','Aprovador Documento','Aprovador Substituto Documento','Obsoletetar Documento','Emitir Cópia Controlada','Emitir Cópia Não Controlada','Cópia Controlada Anexos','Ciclo de Aprovação Documentos'],
+      cls: 'bg-orange-50 text-orange-700 border-orange-200', ordem: 4, createdAt: '01/01/2026' },
+    { id: 'papel-maxdoc-admin',     componenteId: 'comp-maxdoc', value: 'admin-maxdoc', label: 'Administrador',
+      descricao: 'Acesso completo ao MaxDoc',
+      defaultAcoes: [], // [] = todas as ações do catálogo
+      cls: 'bg-red-50 text-red-700 border-red-200',        ordem: 5, createdAt: '01/01/2026' },
+
+    // ── DocAction ────────────────────────────────────────────────
+    { id: 'papel-da-colaborador',   componenteId: 'comp-docaction', value: 'colaborador',        label: 'Colaborador',
+      descricao: 'Cria e acompanha ocorrências',
+      defaultAcoes: ['Visualizar','Criar Ocorrência','Criar Ocorrência 8D','Editar Ocorrência','Vincular Ocorrência','Acompanhar Ocorrência'],
+      cls: 'bg-green-50 text-green-700 border-green-200',  ordem: 1, createdAt: '01/01/2026' },
+    { id: 'papel-da-analista',      componenteId: 'comp-docaction', value: 'analista',           label: 'Analista',
+      descricao: 'Categoriza, analisa e cria planos de ação',
+      defaultAcoes: ['Visualizar','Criar Ocorrência','Criar Ocorrência 8D','Editar Ocorrência','Vincular Ocorrência','Acompanhar Ocorrência','Categorizar Ocorrência','Analisar Causa','Criar Plano de Ação','Verificar Eficácia','Encaminhar Ocorrência'],
+      cls: 'bg-blue-50 text-blue-700 border-blue-200',     ordem: 2, createdAt: '01/01/2026' },
+    { id: 'papel-da-aprovador',     componenteId: 'comp-docaction', value: 'aprovador-docaction', label: 'Aprovador',
+      descricao: 'Aprova análises e encerra ocorrências',
+      defaultAcoes: ['Visualizar','Criar Ocorrência','Criar Ocorrência 8D','Editar Ocorrência','Vincular Ocorrência','Acompanhar Ocorrência','Categorizar Ocorrência','Analisar Causa','Criar Plano de Ação','Verificar Eficácia','Encaminhar Ocorrência','Aprovar Análise de Causa','Encerrar Ocorrência','Reprogramar Prazo/Responsável'],
+      cls: 'bg-orange-50 text-orange-700 border-orange-200', ordem: 3, createdAt: '01/01/2026' },
+    { id: 'papel-da-admin',         componenteId: 'comp-docaction', value: 'admin-docaction',    label: 'Administrador',
+      descricao: 'Acesso completo ao DocAction',
+      defaultAcoes: [],
+      cls: 'bg-red-50 text-red-700 border-red-200',        ordem: 4, createdAt: '01/01/2026' },
+
+    // ── Assistente IA ────────────────────────────────────────────
+    { id: 'papel-ass-viewer',  componenteId: 'comp-assistente-ia', value: 'viewer',  label: 'Visualizador',
+      descricao: 'Acesso somente leitura às conversas',
+      defaultAcoes: ['can_use_assistant'],
+      cls: 'bg-gray-100 text-gray-600 border-gray-200',    ordem: 1, createdAt: '01/01/2026' },
+    { id: 'papel-ass-member',  componenteId: 'comp-assistente-ia', value: 'member',  label: 'Membro',
+      descricao: 'Usa o assistente e compartilha resultados',
+      defaultAcoes: ['can_use_assistant','can_share_conversation_results','can_view_consulted_sources','can_upload_rag_sources'],
+      cls: 'bg-blue-50 text-blue-700 border-blue-200',     ordem: 2, createdAt: '01/01/2026' },
+    { id: 'papel-ass-admin',   componenteId: 'comp-assistente-ia', value: 'admin',   label: 'Administrador',
+      descricao: 'Acesso completo — configura e gerencia',
+      defaultAcoes: ['can_use_assistant','can_share_conversation_results','can_view_consulted_sources','can_upload_rag_sources','can_create_assistant','can_configure_agents','can_manage_business_scenarios','can_manage_users'],
+      cls: 'bg-red-50 text-red-700 border-red-200',        ordem: 3, createdAt: '01/01/2026' },
+  ]
+  await db.insert(componentePapeis).values(papeisSeed)
+  console.log(`✓ componentePapeis (${papeisSeed.length})`)
+
   // ── Atribuições de Componentes DocNix ─────────────────────────
   if (componenteAtribuicoesMock.length > 0) {
     await db.insert(componenteAtribuicoes).values(
