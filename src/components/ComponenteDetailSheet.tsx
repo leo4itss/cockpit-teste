@@ -1,10 +1,8 @@
-import { useState, useEffect } from 'react'
 import { Sheet } from './ui/Sheet'
 import { Button } from './ui/Button'
 import { METADATA_MOCK_TIPOS } from './ComponenteSheet'
-import { api } from '@/api/client'
-import { useIsPlatformAdmin, useIsPasArchitect } from '@/authz/hooks'
-import type { Componente, Atribuicao } from '@/types'
+import { useIsPlatformAdmin, useIsPasArchitect, useComponenteConfig } from '@/authz/hooks'
+import type { Componente } from '@/types'
 
 interface Props {
   open: boolean
@@ -32,39 +30,20 @@ function ReadonlyField({ label, value, required }: { label: string; value?: stri
  * Clicar em "Editar" no header abre o ComponenteSheet em modo edição.
  */
 export function ComponenteDetailSheet({ open, onClose, componente, onEdit }: Props) {
-  const isPlatformAdmin  = useIsPlatformAdmin()
-  const isPasArchitect   = useIsPasArchitect()
-  const canManageAtribuicoes = isPlatformAdmin || isPasArchitect
+  const isPlatformAdmin = useIsPlatformAdmin()
+  const isPasArchitect  = useIsPasArchitect()
+  const canViewCatalog  = isPlatformAdmin || isPasArchitect
 
-  const [atribuicoes, setAtribuicoes]           = useState<Atribuicao[]>([])
-  const [atribuicoesLoaded, setAtribuicoesLoaded] = useState(false)
-  const [novaAtribNome, setNovaAtribNome]       = useState('')
-  const [novaAtribModulo, setNovaAtribModulo]   = useState('')
-
-  useEffect(() => {
-    if (componente?.id && canManageAtribuicoes && !atribuicoesLoaded) {
-      api.getAtribuicoes(componente.id).then(data => {
-        setAtribuicoes(data)
-        setAtribuicoesLoaded(true)
-      }).catch(() => setAtribuicoesLoaded(true))
-    }
-  }, [componente?.id, canManageAtribuicoes, atribuicoesLoaded])
-
-  // Reset ao mudar de componente
-  useEffect(() => {
-    setAtribuicoes([])
-    setAtribuicoesLoaded(false)
-    setNovaAtribNome('')
-    setNovaAtribModulo('')
-  }, [componente?.id])
+  const { config, loading } = useComponenteConfig(
+    componente?.id ?? undefined,
+    componente?.nome ?? undefined,
+  )
 
   if (!componente) return null
 
-  // Resolve os tipos do componente contra os tipos mockados
   const tiposVinculados = METADATA_MOCK_TIPOS.filter(t =>
     componente.tiposLicenca.includes(t.id)
   )
-  // Fallback: se IDs não batem com o mock, mostra os IDs como texto
   const tiposParaExibir = tiposVinculados.length > 0
     ? tiposVinculados
     : componente.tiposLicenca.map(id => ({ id, nome: id, unidade: '—' }))
@@ -155,119 +134,67 @@ export function ComponenteDetailSheet({ open, onClose, componente, onEdit }: Pro
           </>
         )}
 
-        {/* ── Ações do Componente ─────────────────── */}
-        {canManageAtribuicoes && (
+        {/* ── Catálogo FGA ──────────────────────────────── */}
+        {canViewCatalog && (
           <>
             <div className="border-t border-[#e5e7eb]" />
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-6">
               <div>
-                <p className="text-base font-bold text-[#030712] leading-6">Ações do Componente</p>
+                <p className="text-base font-bold text-[#030712] leading-6">Catálogo de Permissões</p>
                 <p className="text-sm text-[#6b7280] mt-1">
-                  Defina as ações disponíveis para membros deste objeto.
-                  Ações ativas aparecem como opções ao adicionar membros.
+                  Papéis e ações FGA disponíveis para este componente.
                 </p>
               </div>
 
-              {/* Lista de ações ativas */}
-              <div className="flex flex-col gap-2">
-                {atribuicoes.filter(a => a.status === 'Ativo').length === 0 && atribuicoesLoaded && (
-                  <p className="text-xs text-gray-400">Nenhuma ação ativa.</p>
-                )}
-                {atribuicoes.filter(a => a.status === 'Ativo').map(a => (
-                  <div key={a.id} className="flex items-center gap-2 px-3 py-2 border border-[#e5e7eb] rounded-md">
-                    <span className="text-sm flex-1 text-[#030712]">{a.nome}</span>
-                    {a.modulo && (
-                      <span className="text-xs text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">{a.modulo}</span>
-                    )}
-                    <button
-                      onClick={async () => {
-                        await api.updateAtribuicao(componente.id, a.id, { status: 'Inativo' })
-                        setAtribuicoes(prev => prev.map(x => x.id === a.id ? { ...x, status: 'Inativo' as const } : x))
-                      }}
-                      className="text-xs text-amber-600 hover:text-amber-800 ml-2"
-                    >
-                      Inativar
-                    </button>
-                    <button
-                      onClick={async () => {
-                        if (!confirm(`Remover "${a.nome}" permanentemente?`)) return
-                        await api.deleteAtribuicao(componente.id, a.id)
-                        setAtribuicoes(prev => prev.filter(x => x.id !== a.id))
-                      }}
-                      className="text-xs text-red-500 hover:text-red-700"
-                    >
-                      Remover
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              {/* Lista de ações inativas */}
-              {atribuicoes.filter(a => a.status === 'Inativo').length > 0 && (
-                <div className="flex flex-col gap-2">
-                  <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Inativas</p>
-                  {atribuicoes.filter(a => a.status === 'Inativo').map(a => (
-                    <div key={a.id} className="flex items-center gap-2 px-3 py-2 border border-dashed border-[#e5e7eb] rounded-md bg-gray-50/60 opacity-70">
-                      <span className="text-sm flex-1 text-gray-400 line-through">{a.nome}</span>
-                      {a.modulo && (
-                        <span className="text-xs text-gray-300 bg-gray-100 px-1.5 py-0.5 rounded">{a.modulo}</span>
-                      )}
-                      <button
-                        onClick={async () => {
-                          await api.updateAtribuicao(componente.id, a.id, { status: 'Ativo' })
-                          setAtribuicoes(prev => prev.map(x => x.id === a.id ? { ...x, status: 'Ativo' as const } : x))
-                        }}
-                        className="text-xs text-emerald-600 hover:text-emerald-800"
-                      >
-                        Ativar
-                      </button>
-                      <button
-                        onClick={async () => {
-                          if (!confirm(`Remover "${a.nome}" permanentemente?`)) return
-                          await api.deleteAtribuicao(componente.id, a.id)
-                          setAtribuicoes(prev => prev.filter(x => x.id !== a.id))
-                        }}
-                        className="text-xs text-red-400 hover:text-red-600"
-                      >
-                        Remover
-                      </button>
+              {loading ? (
+                <p className="text-sm text-gray-400">Carregando catálogo…</p>
+              ) : (
+                <>
+                  {/* Papéis */}
+                  {config.papeis.length > 0 && (
+                    <div className="flex flex-col gap-2">
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Papéis ({config.papeis.length})
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {config.papeis.map(p => (
+                          <span
+                            key={p.value}
+                            className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200"
+                          >
+                            {p.label}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  ))}
-                </div>
-              )}
+                  )}
 
-              {/* Adicionar nova ação */}
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Nome da ação"
-                  value={novaAtribNome}
-                  onChange={e => setNovaAtribNome(e.target.value)}
-                  className="flex-1 text-sm border border-gray-300 rounded-md px-2 py-1.5 outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="text"
-                  placeholder="Módulo (opcional)"
-                  value={novaAtribModulo}
-                  onChange={e => setNovaAtribModulo(e.target.value)}
-                  className="w-32 text-sm border border-gray-300 rounded-md px-2 py-1.5 outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <button
-                  onClick={async () => {
-                    if (!novaAtribNome.trim()) return
-                    const nova = await api.createAtribuicao(componente.id, {
-                      nome: novaAtribNome,
-                      modulo: novaAtribModulo || undefined,
-                    })
-                    setAtribuicoes(prev => [...prev, nova])
-                    setNovaAtribNome('')
-                    setNovaAtribModulo('')
-                  }}
-                  className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 shrink-0"
-                >
-                  + Adicionar
-                </button>
-              </div>
+                  {/* Ações */}
+                  {(config.acoes ?? []).length > 0 && (
+                    <div className="flex flex-col gap-2">
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Ações ({(config.acoes ?? []).length})
+                      </p>
+                      <div className="border border-[#e5e7eb] rounded-xl overflow-hidden divide-y divide-gray-100">
+                        {(config.acoes ?? []).map(a => (
+                          <div key={a.acao} className="flex items-center gap-3 px-4 py-2.5">
+                            <span className="text-sm text-[#030712] flex-1">{a.label}</span>
+                            <span className="text-[10px] font-mono text-gray-400 bg-gray-50 px-1.5 py-0.5 rounded border border-gray-200 shrink-0">
+                              {a.acao}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {config.papeis.length === 0 && (config.acoes ?? []).length === 0 && (
+                    <p className="text-sm text-gray-400">
+                      Nenhum catálogo configurado para este componente.
+                    </p>
+                  )}
+                </>
+              )}
             </div>
           </>
         )}
