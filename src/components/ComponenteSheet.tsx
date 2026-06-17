@@ -65,14 +65,11 @@ export function ComponenteSheet({ open, onClose, onSave, onDelete, isLinked, ini
       const tl = initialComponente?.tiposLicenca ?? []
       const mu = initialComponente?.metadataUrl ?? ''
 
-      const tm = (initialComponente?.tipoModelo ?? 'fga') as 'fga' | 'docnix' | 'custom'
-
       setNome(n)
       setDescricao(d)
       setMetadataUrl(mu)
       setSelectedTipos(tl)
       setTestedUrl(mu)
-      setTipoModelo(tm)
       setUnsavedDialogOpen(false)
 
       // Em modo edição: já possui tipos configurados → exibir seção diretamente
@@ -84,7 +81,6 @@ export function ComponenteSheet({ open, onClose, onSave, onDelete, isLinked, ini
       initialNomeRef.current       = n
       initialDescricaoRef.current  = d
       initialTiposRef.current      = tl
-      initialTipoModeloRef.current = tm
     }
   }, [open, initialComponente])
 
