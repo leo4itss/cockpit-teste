@@ -650,7 +650,7 @@ export function InstanciaDetailSheet({
       //    Não resetar se for 'personalizado' (preservar seleção manual).
       if (novoPapel !== 'personalizado' && instancia.componenteId) {
         const entidadeTipo = membro.entidadeTipo === 'user' ? 'user' as const : 'group' as const
-        const config   = getComponenteConfig(componenteNome ?? '')
+        const config   = componenteConfig
         const papelDef = config.papeis.find(p => p.value === novoPapel)
         if (papelDef) {
           // Remover todas as permissões atuais na instância
