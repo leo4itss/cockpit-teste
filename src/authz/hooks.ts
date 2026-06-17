@@ -204,3 +204,39 @@ export function useCanActWithAtribuicao(
   if (!currentUser) return false
   return canActWithAtribuicao(currentUser.id, instanceId, atribuicaoId, accountId, orgId, relations)
 }
+
+// ── Catálogo de componente (papéis + ações) ───────────────────
+/**
+ * Busca o catálogo de papéis e ações de um componente via API.
+ * Enquanto carrega, usa o mock como valor inicial (sem flash de loading).
+ * Se o componente não tiver catálogo no banco (Analytics, Base de Conhecimento, etc.),
+ * mantém o mock como fallback silencioso.
+ */
+export function useComponenteConfig(
+  componenteId: string | undefined,
+  componenteNome?: string,
+): { config: ComponenteTypeConfig; loading: boolean } {
+  const [config, setConfig] = useState<ComponenteTypeConfig>(() =>
+    getComponenteConfig(componenteNome ?? '')
+  )
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (!componenteId) return
+    let cancelled = false
+    setLoading(true)
+    fetch(`/api/componentes/${componenteId}/config`)
+      .then(r => r.json())
+      .then((data: { papeis?: ComponenteTypeConfig['papeis']; acoes?: ComponenteTypeConfig['acoes'] }) => {
+        if (cancelled) return
+        if (data.papeis && data.papeis.length > 0) {
+          setConfig(prev => ({ ...prev, papeis: data.papeis!, acoes: data.acoes ?? prev.acoes }))
+        }
+      })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setLoading(false) })
+    return () => { cancelled = true }
+  }, [componenteId])
+
+  return { config, loading }
+}
