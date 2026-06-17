@@ -405,6 +405,33 @@ app.get('/componentes/:id', async (c) => {
   const [row] = await db.select().from(componentes).where(eq(componentes.id, c.req.param('id')))
   return row ? c.json(row) : c.json({ error: 'Not found' }, 404)
 })
+
+app.get('/componentes/:id/config', async (c) => {
+  const id = c.req.param('id')
+  const [papeis, acoes] = await Promise.all([
+    db.select({
+      value:        componentePapeis.value,
+      label:        componentePapeis.label,
+      descricao:    componentePapeis.descricao,
+      defaultAcoes: componentePapeis.defaultAcoes,
+      cls:          componentePapeis.cls,
+      ordem:        componentePapeis.ordem,
+    })
+      .from(componentePapeis)
+      .where(and(eq(componentePapeis.componenteId, id), eq(componentePapeis.status, 'Ativo')))
+      .orderBy(componentePapeis.ordem),
+    db.select({
+      acao:  componenteAcoes.acao,
+      label: componenteAcoes.label,
+      ordem: componenteAcoes.ordem,
+    })
+      .from(componenteAcoes)
+      .where(and(eq(componenteAcoes.componenteId, id), eq(componenteAcoes.status, 'Ativo')))
+      .orderBy(componenteAcoes.ordem),
+  ])
+  return c.json({ papeis, acoes })
+})
+
 app.post('/componentes', async (c) => {
   const [row] = await db.insert(componentes).values(await c.req.json()).returning()
   return c.json(row, 201)
