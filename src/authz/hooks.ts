@@ -10,10 +10,11 @@
  *   useAuthz()   → retorna o contexto completo (escape hatch)
  */
 
-import { useContext } from 'react'
+import { useContext, useState, useEffect } from 'react'
 import { AuthContext } from '@/context/AuthContext'
 import * as engine from './engine'
 import { getInstanciaAtribuicoes, canActWithAtribuicao } from './engine'
+import { getComponenteConfig, type ComponenteTypeConfig } from './mock'
 
 // ── Hook base ─────────────────────────────────────────────────
 
