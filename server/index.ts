@@ -528,6 +528,34 @@ app.get('/api/componentes/:id', async (c) => {
   return c.json(row)
 })
 
+// Catálogo de papéis e ações de um componente (produtos reais: MaxDoc, DocAction, Assistente IA).
+// Retorna arrays vazios quando o componente não tem catálogo no banco (fallback para mock.ts no cliente).
+app.get('/api/componentes/:id/config', async (c) => {
+  const id = c.req.param('id')
+  const [papeis, acoes] = await Promise.all([
+    db.select({
+      value:        componentePapeis.value,
+      label:        componentePapeis.label,
+      descricao:    componentePapeis.descricao,
+      defaultAcoes: componentePapeis.defaultAcoes,
+      cls:          componentePapeis.cls,
+      ordem:        componentePapeis.ordem,
+    })
+      .from(componentePapeis)
+      .where(and(eq(componentePapeis.componenteId, id), eq(componentePapeis.status, 'Ativo')))
+      .orderBy(componentePapeis.ordem),
+    db.select({
+      acao:  componenteAcoes.acao,
+      label: componenteAcoes.label,
+      ordem: componenteAcoes.ordem,
+    })
+      .from(componenteAcoes)
+      .where(and(eq(componenteAcoes.componenteId, id), eq(componenteAcoes.status, 'Ativo')))
+      .orderBy(componenteAcoes.ordem),
+  ])
+  return c.json({ papeis, acoes })
+})
+
 app.post('/api/componentes', async (c) => {
   const body = await c.req.json()
   const [row] = await db.insert(componentes).values(body).returning()
