@@ -284,6 +284,7 @@ Hoje (PoC) → Em produção (futuro):
 | Relações mockadas em `src/authz/mock.ts` | Carregadas do OpenFGA SDK |
 | `PersonaSwitcher` troca persona via `localStorage` | IdP real (Auth0, Cognito, etc.) |
 | `engine.ts` resolve arrays em memória | `engine.ts` faz chamadas ao OpenFGA |
-| Interface dos hooks (`useCanXxx`, `useIsPlatformAdmin`) | **Permanece igual** |
+| Catálogo de papéis/ações em `COMPONENTE_CONFIGS` (mock) + banco (produtos reais) | Catálogo carregado inteiramente do servidor FGA (schema de tipos por componente) |
+| Interface dos hooks (`useCanXxx`, `useIsPlatformAdmin`, `useComponenteConfig`) | **Permanece igual** |
 
-A interface pública dos hooks não muda — apenas a implementação interna do `engine.ts`.
+A interface pública dos hooks não muda — apenas a implementação interna do `engine.ts` e a origem dos dados do catálogo.
