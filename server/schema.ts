@@ -281,6 +281,29 @@ export const instanciaMembros = pgTable('instancia_membros', {
   index('idx_instancia_membros_lookup').on(t.instanciaId, t.entidadeTipo, t.entidadeId),
 ])
 
+// ── Papéis por Componente ─────────────────────────────────────
+// Catálogo de papéis disponíveis para cada componente.
+// defaultAcoes: [] → papel tem acesso a todas as ações do componente (Administrador).
+// defaultAcoes: ['Visualizar', ...] → lista das ações concedidas por default ao papel.
+//
+// Esta tabela substitui o COMPONENTE_CONFIGS hardcoded em mock.ts para os
+// produtos reais (MaxDoc, DocAction, Assistente IA). Componentes de cenário
+// (Analytics, Base de Conhecimento) continuam usando o fallback do mock.
+export const componentePapeis = pgTable('componente_papeis', {
+  id:           text('id').primaryKey(),
+  componenteId: text('componente_id').notNull().references(() => componentes.id),
+  value:        text('value').notNull(),                              // 'leitor' | 'editor' | ...
+  label:        text('label').notNull(),                             // 'Leitor' | 'Editor' | ...
+  descricao:    text('descricao'),
+  defaultAcoes: jsonb('default_acoes').notNull().default([]),        // string[] — [] = todas as ações
+  cls:          text('cls'),                                         // CSS classes para o card na UI
+  ordem:        integer('ordem').notNull().default(0),
+  status:       text('status').notNull().default('Ativo'),
+  createdAt:    text('created_at').notNull(),
+}, (t) => [
+  index('idx_comp_papeis_lookup').on(t.componenteId, t.value),
+])
+
 // ── Atribuições por Componente ────────────────────────────────
 // Define ações disponíveis por componente (ex: 'Criar Documento', 'Aprovar').
 // modulo=null → atribuição geral; modulo='MaxDoc' → específica do MaxDoc.
