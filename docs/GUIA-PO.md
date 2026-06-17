@@ -246,7 +246,16 @@ Os módulos da plataforma se dividem em dois grupos, e isso determina **onde** a
 
 ### Herança via grupo
 
-Quando uma ação é atribuída a um **grupo**, todos os membros do grupo herdam aquela ação automaticamente. Na interface:
+A herança de permissões via grupo funciona em **dois passos obrigatórios**:
+
+1. **Adicionar o usuário ao grupo** (em Acessos > Grupos)
+2. **Adicionar o grupo ao objeto/instância** com um papel (em Acessos > Objetos)
+
+Somente quando o grupo é explicitamente adicionado a um objeto é que seus membros passam a herdar as ações daquele papel **naquele objeto específico**. Pertencer a um grupo não concede automaticamente acesso a nenhum objeto — o acesso precisa ser configurado objeto a objeto.
+
+> **Exemplo:** Lucas está no grupo Farmacêuticos. O grupo Farmacêuticos é adicionado ao objeto "Assistente Suporte" com papel Visualizador. Só então Lucas herda a ação "Usar o assistente" nesse objeto. Se houver outro objeto "Assistente CEO", Lucas **não** herda nada lá — seria necessário adicionar Farmacêuticos ao "Assistente CEO" separadamente.
+
+Na interface do PermissoesMembroSheet:
 - Ações **diretas** aparecem em **azul**
 - Ações **herdadas de grupo** aparecem em **verde** (read-only — não podem ser desmarcadas individualmente)
 
