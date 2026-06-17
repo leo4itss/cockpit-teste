@@ -57,7 +57,6 @@ export function ComponenteSheet({ open, onClose, onSave, onDelete, isLinked, ini
   const initialNomeRef       = useRef('')
   const initialDescricaoRef  = useRef('')
   const initialTiposRef      = useRef<string[]>([])
-  const initialTipoModeloRef = useRef<string>('fga')
 
   useEffect(() => {
     if (open) {
