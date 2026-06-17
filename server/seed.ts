@@ -262,6 +262,43 @@ async function seed() {
   await db.insert(componentePapeis).values(papeisSeed)
   console.log(`✓ componentePapeis (${papeisSeed.length})`)
 
+  // ── Catálogo de Ações FGA por Componente ─────────────────────
+  const acoesSeed: { id: string; componenteId: string; acao: string; label: string; ordem: number; createdAt: string }[] = [
+    // MaxDoc (32 ações)
+    ...([
+      'Visualizar','Ler Todos','Leitor Documento','Leitor Anexos','Baixar Documento','Imprimir',
+      'Criar Documento','Editar','Nova Versão','Mover','Cancelar Edição','Visualizar Histórico de Versões',
+      'Upload Documento','Editor Documento','Criar Anexo','Editar Anexo','Anexar Arquivos',
+      'Assinatura Eletrônica','Revisar Documento','Submeter para Aprovação','Solicitar Revisão',
+      'Revisor Documento','Revisar como Substituto Documento',
+      'Aprovar Documento','Rejeitar Documento','Aprovador Documento','Aprovador Substituto Documento',
+      'Obsoletetar Documento','Emitir Cópia Controlada','Emitir Cópia Não Controlada',
+      'Cópia Controlada Anexos','Ciclo de Aprovação Documentos',
+    ] as string[]).map((acao, i) => ({
+      id: `acao-maxdoc-${i + 1}`, componenteId: 'comp-maxdoc', acao, label: acao, ordem: i + 1, createdAt: '01/01/2026',
+    })),
+    // DocAction (14 ações)
+    ...([
+      'Visualizar','Criar Ocorrência','Criar Ocorrência 8D','Editar Ocorrência',
+      'Vincular Ocorrência','Acompanhar Ocorrência','Categorizar Ocorrência',
+      'Analisar Causa','Criar Plano de Ação','Verificar Eficácia','Encaminhar Ocorrência',
+      'Aprovar Análise de Causa','Encerrar Ocorrência','Reprogramar Prazo/Responsável',
+    ] as string[]).map((acao, i) => ({
+      id: `acao-docaction-${i + 1}`, componenteId: 'comp-docaction', acao, label: acao, ordem: i + 1, createdAt: '01/01/2026',
+    })),
+    // Assistente IA (8 ações)
+    { id: 'acao-ass-1', componenteId: 'comp-assistente-ia', acao: 'can_use_assistant',              label: 'Usar o assistente',               ordem: 1, createdAt: '01/01/2026' },
+    { id: 'acao-ass-2', componenteId: 'comp-assistente-ia', acao: 'can_share_conversation_results', label: 'Compartilhar resultados',          ordem: 2, createdAt: '01/01/2026' },
+    { id: 'acao-ass-3', componenteId: 'comp-assistente-ia', acao: 'can_view_consulted_sources',     label: 'Ver fontes consultadas',           ordem: 3, createdAt: '01/01/2026' },
+    { id: 'acao-ass-4', componenteId: 'comp-assistente-ia', acao: 'can_upload_rag_sources',         label: 'Upload de fontes RAG',             ordem: 4, createdAt: '01/01/2026' },
+    { id: 'acao-ass-5', componenteId: 'comp-assistente-ia', acao: 'can_create_assistant',           label: 'Criar assistente',                 ordem: 5, createdAt: '01/01/2026' },
+    { id: 'acao-ass-6', componenteId: 'comp-assistente-ia', acao: 'can_configure_agents',           label: 'Configurar agentes',               ordem: 6, createdAt: '01/01/2026' },
+    { id: 'acao-ass-7', componenteId: 'comp-assistente-ia', acao: 'can_manage_business_scenarios',  label: 'Gerenciar cenários de negócio',    ordem: 7, createdAt: '01/01/2026' },
+    { id: 'acao-ass-8', componenteId: 'comp-assistente-ia', acao: 'can_manage_users',               label: 'Gerenciar usuários',               ordem: 8, createdAt: '01/01/2026' },
+  ]
+  await db.insert(componenteAcoes).values(acoesSeed)
+  console.log(`✓ componenteAcoes (${acoesSeed.length})`)
+
   // ── Atribuições de Componentes DocNix ─────────────────────────
   if (componenteAtribuicoesMock.length > 0) {
     await db.insert(componenteAtribuicoes).values(
