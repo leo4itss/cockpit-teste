@@ -577,7 +577,7 @@ export function InstanciaDetailSheet({
       // Sincronizar component_permissions com os defaults do papel (FGA e DocNix)
       // Limpar primeiro para evitar acumulação de permissões de testes anteriores.
       if (instancia.componenteId && papel !== 'personalizado') {
-        const config   = getComponenteConfig(componenteNome ?? '')
+        const config   = componenteConfig
         const papelDef = config.papeis.find(p => p.value === papel)
         if (papelDef) {
           // Remover permissões existentes antes de inserir os novos defaults
