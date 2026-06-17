@@ -51,7 +51,7 @@ export function PermissoesMembroSheet({
   accountId,
   onSaved,
 }: Props) {
-  const config     = useMemo(() => getComponenteConfig(componenteNome), [componenteNome])
+  const { config } = useComponenteConfig(componenteId, componenteNome)
   const entityNome = membro.displayName ?? membro.entidadeId
 
   // ── Papel selecionado ─────────────────────────────────────
