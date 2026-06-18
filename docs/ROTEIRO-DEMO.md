@@ -98,7 +98,7 @@
 ### Passo 8 · Navegar para o objeto Assistente
 
 - Sidebar → **Acessos** → **Objetos**
-- Selecionar **Assistente Farmacêutico**
+- Selecionar **Assistente Suporte**
 
 ---
 
