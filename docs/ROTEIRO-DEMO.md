@@ -85,7 +85,7 @@
 
 **Persona:** Account Admin (Santacruz) — Carla Santos  
 **Conta:** Santacruz  
-**Objeto:** Assistente Farmacêutico
+**Objeto:** Assistente Suporte
 
 ### Passo 7 · Trocar para Account Admin
 
