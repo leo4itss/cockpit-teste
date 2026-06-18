@@ -399,7 +399,7 @@ export function UsuarioDetailAccountSheet({
                 </div>
               )}
               <p className="text-xs text-[#9ca3af]">
-                Ações granulares dentro de instâncias específicas (ex: MaxDoc, DocAction).
+                Ações granulares dentro de objetos específicos (ex: MaxDoc, DocAction).
               </p>
             </div>
           </div>
