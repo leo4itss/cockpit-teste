@@ -1051,6 +1051,10 @@ export const instanciaMembros: InstanciaMembro[] = [
   // ── Apple — inst-apple-kb: grupo Desenvolvedores (member) ─────
   { id: 'im-akb-dev',      instanciaId: 'inst-apple-kb',     entidadeTipo: 'group', entidadeId: 'grp-apple-dev',    papel: 'member', assignedAt: '01/02/2026', displayName: 'Desenvolvedores' },
   { id: 'im-akb-sofia',    instanciaId: 'inst-apple-kb',     entidadeTipo: 'user',  entidadeId: 'usr-sofia',        papel: 'viewer', assignedAt: '01/02/2026', displayName: 'Sofia Mendes',  email: 'sofia.mendes@appletecgo.com.br' },
+  // ── Santacruz — inst-a2-suporte: Assistente Suporte ──────────
+  { id: 'im-asuporte-lucas',   instanciaId: 'inst-a2-suporte', entidadeTipo: 'user',  entidadeId: 'usr-lucas',       papel: 'member', assignedAt: '01/02/2026', displayName: 'Lucas Oliveira',  email: 'lucas.oliveira@santacruz.com.br' },
+  { id: 'im-asuporte-beatriz', instanciaId: 'inst-a2-suporte', entidadeTipo: 'user',  entidadeId: 'usr-beatriz',     papel: 'admin',  assignedAt: '01/02/2026', displayName: 'Beatriz Lima',    email: 'beatriz.lima@santacruz.com.br' },
+  { id: 'im-asuporte-farma',   instanciaId: 'inst-a2-suporte', entidadeTipo: 'group', entidadeId: 'grp-santa-farma', papel: 'viewer', assignedAt: '01/02/2026', displayName: 'Farmacêuticos' },
   // ── Santacruz — inst-a2-atend: Assistente Farmacêutico ────────
   { id: 'im-sast-farma',   instanciaId: 'inst-a2-atend',    entidadeTipo: 'group', entidadeId: 'grp-santa-farma',  papel: 'member', assignedAt: '01/02/2026', displayName: 'Farmacêuticos' },
   { id: 'im-sast-thiago',  instanciaId: 'inst-a2-atend',    entidadeTipo: 'user',  entidadeId: 'usr-thiago',       papel: 'viewer', assignedAt: '01/02/2026', displayName: 'Thiago Martins', email: 'thiago.martins@santacruz.com.br' },
