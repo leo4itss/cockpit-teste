@@ -40,7 +40,7 @@ interface PermissoesEfetivasSheetProps {
 
 // ── Badges de origem ──────────────────────────────────────────
 
-function FonteBadge({ fonte, entidadeId }: { fonte: string; entidadeId: string }) {
+function FonteBadge({ fonte, entidadeId, displayName }: { fonte: string; entidadeId: string; displayName?: string }) {
   if (fonte === 'direto') {
     return (
       <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
@@ -51,8 +51,7 @@ function FonteBadge({ fonte, entidadeId }: { fonte: string; entidadeId: string }
   if (fonte === 'grupo') {
     return (
       <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
-        Via Grupo
-        <span className="font-mono text-[10px] opacity-70">{entidadeId}</span>
+        Via Grupo · {displayName ?? entidadeId}
       </span>
     )
   }
