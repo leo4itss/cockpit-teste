@@ -147,6 +147,7 @@ export function AcessosPage() {
   const [users, setUsers]                   = useState<User[]>([])
   const [loadingUsers, setLoadingUsers]     = useState(true)
   const [searchUsers, setSearchUsers]       = useState('')
+  const [showOnboarding, setShowOnboarding] = useState(false)
   const [showCriarSheet, setShowCriarSheet]       = useState(false)
   const [showDetailSheet, setShowDetailSheet]     = useState(false)
   const [showEditSheet, setShowEditSheet]         = useState(false)
