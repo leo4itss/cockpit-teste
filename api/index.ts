@@ -1162,7 +1162,29 @@ app.get('/instancias/:id/permissoes-efetivas', async (c) => {
 
   const userGruposRows = await db.select().from(usuarioGrupos)
     .where(eq(usuarioGrupos.userId, userId))
-  const grupoIds = userGruposRows.map((g: any) => g.grupoId)
+  const gruposDiretos = userGruposRows.map((g: any) => g.grupoId)
+
+  // Expande grupoIds com ancestrais via parentId (traversal em memória)
+  const todosGrupos = gruposDiretos.length > 0
+    ? await db.select({ id: grupos.id, parentId: grupos.parentId, nome: grupos.nome }).from(grupos)
+    : []
+  const grupoById = new Map(todosGrupos.map((g: any) => [g.id, g]))
+
+  function expandirComAncestors(ids: string[]): string[] {
+    const resultado = new Set(ids)
+    for (const id of ids) {
+      let cursor = grupoById.get(id)?.parentId
+      const visitados = new Set<string>()
+      while (cursor && !visitados.has(cursor)) {
+        resultado.add(cursor)
+        visitados.add(cursor)
+        cursor = grupoById.get(cursor)?.parentId ?? null
+      }
+    }
+    return [...resultado]
+  }
+
+  const grupoIds = expandirComAncestors(gruposDiretos)
 
   const directPerms = await db.select().from(componentPermissions)
     .where(and(
@@ -1178,12 +1200,9 @@ app.get('/instancias/:id/permissoes-efetivas', async (c) => {
         ))
     : []
 
-  const gruposEnvolvidos = [...new Set(groupPerms.map((p: any) => p.entidadeId))]
-  const gruposRows = gruposEnvolvidos.length > 0
-    ? await db.select({ id: grupos.id, nome: grupos.nome }).from(grupos)
-        .where(inArray(grupos.id, gruposEnvolvidos))
-    : []
-  const grupoNomeMap: Record<string, string> = Object.fromEntries(gruposRows.map((g: any) => [g.id, g.nome]))
+  const grupoNomeMap: Record<string, string> = Object.fromEntries(
+    todosGrupos.map((g: any) => [g.id, g.nome])
+  )
 
   const fontes: { atribuicaoId: string; fonte: string; entidadeId: string; displayName?: string }[] = [
     ...directPerms.map((p: any) => ({ atribuicaoId: p.acao, fonte: 'direto', entidadeId: userId })),
