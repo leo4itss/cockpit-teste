@@ -846,6 +846,60 @@ export function AcessosPage() {
           componenteNomes={componenteNomes}
         />
       )}
+
+      {/* Modal — Onboarding contextual */}
+      <Modal
+        open={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
+        title={
+          abaAtiva === 'usuarios' ? 'Sobre esta aba — Usuários'
+          : abaAtiva === 'grupos' ? 'Sobre esta aba — Grupos'
+          : 'Sobre esta aba — Objetos'
+        }
+        footer={
+          <button
+            onClick={() => setShowOnboarding(false)}
+            className="px-4 py-2 text-sm font-medium text-white bg-[#030712] rounded-lg hover:bg-[#1f2937] transition-colors"
+          >
+            Entendi
+          </button>
+        }
+      >
+        {abaAtiva === 'usuarios' && (
+          <div className="text-sm text-[#374151] leading-relaxed space-y-3">
+            <p>Você está gerenciando os membros desta conta. Cada pessoa listada tem um papel que define o que ela pode fazer no Cockpit:</p>
+            <ul className="space-y-1.5 pl-1">
+              <li><strong className="font-semibold">Membro</strong> — pode usar os produtos contratados conforme o que for atribuído a ele nos objetos desta conta.</li>
+              <li><strong className="font-semibold">Administrador da Conta</strong> — pode gerenciar usuários e grupos dentro desta conta.</li>
+            </ul>
+            <p>Para ver ou ajustar o que um usuário pode fazer em um produto específico (como MaxDoc ou Assistente IA), acesse a aba <strong className="font-semibold">Objetos</strong>.</p>
+            <p>Para ver todas as permissões de um usuário de uma vez, use a opção <strong className="font-semibold">"Ver permissões efetivas"</strong> no menu de ações (⋯) ao lado do nome dele.</p>
+          </div>
+        )}
+        {abaAtiva === 'grupos' && (
+          <div className="text-sm text-[#374151] leading-relaxed space-y-3">
+            <p>Você está gerenciando os grupos desta conta. Grupos permitem atribuir permissões a várias pessoas de uma vez — todos os membros do grupo herdam automaticamente o acesso concedido ao grupo em qualquer objeto.</p>
+            <p>Existem dois tipos:</p>
+            <ul className="space-y-1.5 pl-1">
+              <li><strong className="font-semibold">Escopo Organização</strong> — criado pelo administrador da organização, compartilhado entre todas as contas, não editável aqui.</li>
+              <li><strong className="font-semibold">Escopo Conta</strong> — exclusivo desta conta, criado e gerenciado aqui.</li>
+            </ul>
+            <p>Para atribuir um grupo a um objeto, acesse a aba <strong className="font-semibold">Objetos</strong>.</p>
+          </div>
+        )}
+        {abaAtiva === 'instancias' && (
+          <div className="text-sm text-[#374151] leading-relaxed space-y-3">
+            <p>Você está gerenciando os objetos desta conta. Objetos são os serviços ou módulos configurados — como MaxDoc ou Assistente IA.</p>
+            <p>Cada objeto tem sua própria lista de membros com papéis que definem quais ações estão disponíveis. Ao abrir um objeto, você pode:</p>
+            <ul className="space-y-1.5 pl-1">
+              <li>Adicionar usuários ou grupos com um papel predefinido.</li>
+              <li>Personalizar manualmente as ações.</li>
+              <li>Ver quais ações um membro herda de um grupo.</li>
+            </ul>
+            <p>Papéis predefinidos selecionam automaticamente as ações correspondentes. Permissões herdadas de grupo aparecem marcadas em verde e não podem ser editadas diretamente.</p>
+          </div>
+        )}
+      </Modal>
     </div>
   )
 }
