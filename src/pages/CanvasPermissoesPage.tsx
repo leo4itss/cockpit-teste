@@ -305,10 +305,15 @@ function buildGraph(data: GraphData, selectedId: string | null, theme: Visualize
     const comp    = components.find(c => c.id === inst.componenteId)
     const compNome = comp?.nome ?? inst.componenteId
     const isDocNix = (comp as any)?.tipoModelo === 'docnix'
+    // Conta apenas membros que têm nó visível no grafo
+    const qtdMembros = mbs.filter((mb: any) => {
+      const srcId = mb.entidadeTipo === 'user' ? `usuario-${mb.entidadeId}` : `grupo-${mb.entidadeId}`
+      return nodes.some(n => n.id === srcId)
+    }).length
     nodes.push({
       id, type: 'instancia',
       position: { x: instX, y: i * (IH + INST_GAP) },
-      data: { nome: inst.nome, componenteNome: compNome, componenteId: inst.componenteId, qtdMembros: mbs.length, isDocNix },
+      data: { nome: inst.nome, componenteNome: compNome, componenteId: inst.componenteId, qtdMembros, isDocNix },
       selected: selectedId === id,
     })
     mbs.forEach((mb: any) => {
