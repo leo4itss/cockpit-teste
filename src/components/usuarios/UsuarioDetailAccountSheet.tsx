@@ -350,7 +350,7 @@ export function UsuarioDetailAccountSheet({
                     </div>
                   )}
                   <p className="text-xs text-[#9ca3af]">
-                    Para módulos de conta inteira (ex: PAS Core, Analytics). Acesso a MaxDoc, DocAction e Assistente IA é gerenciado por instância, na seção abaixo.
+                    Para módulos de conta inteira (ex: PAS Core, Analytics). Acesso a MaxDoc, DocAction e Assistente IA é gerenciado por objeto, na seção abaixo.
                   </p>
                 </div>
               )
