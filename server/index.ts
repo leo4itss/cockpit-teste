@@ -1147,6 +1147,7 @@ app.get('/api/instancias', async (c) => {
   let rows = await db.select().from(instancias)
   if (componenteId) rows = rows.filter((r: any) => r.componenteId === componenteId)
   if (accountId)    rows = rows.filter((r: any) => r.accountId    === accountId)
+  rows = rows.filter((r: any) => r.status !== 'Inativo')
 
   const allMembros = await db.select().from(instanciaMembros)
   const result = rows.map((inst: any) => ({
