@@ -832,7 +832,7 @@ export function AcessosPage() {
           onClose={() => setPermEfetivasUser(null)}
           userId={permEfetivasUser.id}
           userName={permEfetivasUser.nomeCompleto}
-          instancias={instancias.map(i => ({ id: i.id, nome: i.nome, componenteId: i.componenteId }))}
+          instancias={permEfetivasInstancias}
           componenteNomes={componenteNomes}
         />
       )}
