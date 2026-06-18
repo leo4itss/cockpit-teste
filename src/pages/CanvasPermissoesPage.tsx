@@ -22,7 +22,7 @@ import '@xyflow/react/dist/style.css'
 import {
   Users, Shield, Bot, Database, Layers, X,
   UserMinus, Loader2, Building2, ChevronRight, Lock, Search,
-  Sun, Moon,
+  Sun, Moon, HelpCircle,
 } from 'lucide-react'
 import { api } from '@/api/client'
 import { useIsPlatformAdmin, useIsOrgAdmin, useIsAccountAdmin } from '@/authz'
