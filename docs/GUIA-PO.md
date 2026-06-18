@@ -232,17 +232,17 @@ Os módulos da plataforma se dividem em dois grupos, e isso determina **onde** a
 
 | Tipo | Módulos | Onde gerenciar |
 |------|---------|----------------|
-| **Por instância** | MaxDoc, DocAction, Assistente IA | Somente na aba **Objetos** → instância específica |
+| **Por objeto** | MaxDoc, DocAction, Assistente IA | Somente na aba **Objetos** → objeto específico |
 | **Conta inteira** | PAS Core, Analytics, Base de Conhecimento | Seção **GLOBAIS** em Acessos |
 
-> **Por que essa separação?** MaxDoc, DocAction e Assistente IA funcionam em instâncias — cada "MaxDoc Comgas" ou "Assistente Vanessa" é um objeto independente, com seus próprios membros e papéis. Não faz sentido atribuir permissão "global" para esses módulos, pois o acesso a cada instância é configurado individualmente.
+> **Por que essa separação?** MaxDoc, DocAction e Assistente IA funcionam em objetos — cada "MaxDoc Comgas" ou "Assistente Suporte" é um objeto independente, com seus próprios membros e papéis. Não faz sentido atribuir permissão "global" para esses módulos, pois o acesso a cada objeto é configurado individualmente.
 
 ### Dois escopos de permissão
 
 | Escopo | O que significa | Onde configurar |
 |--------|----------------|----------------|
 | **Global (nível conta)** | Vale para PAS Core, Analytics, Base de Conhecimento em toda a conta | Acessos → seção GLOBAIS |
-| **Por instância** | Vale apenas para aquela instância específica (MaxDoc, DocAction, Assistente IA) | Acessos → Objetos → instância |
+| **Por objeto** | Vale apenas para aquele objeto específico (MaxDoc, DocAction, Assistente IA) | Acessos → Objetos → objeto |
 
 ### Herança via grupo
 
