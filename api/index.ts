@@ -1178,9 +1178,16 @@ app.get('/instancias/:id/permissoes-efetivas', async (c) => {
         ))
     : []
 
-  const fontes: { atribuicaoId: string; fonte: string; entidadeId: string }[] = [
+  const gruposEnvolvidos = [...new Set(groupPerms.map((p: any) => p.entidadeId))]
+  const gruposRows = gruposEnvolvidos.length > 0
+    ? await db.select({ id: grupos.id, nome: grupos.nome }).from(grupos)
+        .where(inArray(grupos.id, gruposEnvolvidos))
+    : []
+  const grupoNomeMap: Record<string, string> = Object.fromEntries(gruposRows.map((g: any) => [g.id, g.nome]))
+
+  const fontes: { atribuicaoId: string; fonte: string; entidadeId: string; displayName?: string }[] = [
     ...directPerms.map((p: any) => ({ atribuicaoId: p.acao, fonte: 'direto', entidadeId: userId })),
-    ...groupPerms.map((p: any) => ({ atribuicaoId: p.acao, fonte: 'grupo', entidadeId: p.entidadeId })),
+    ...groupPerms.map((p: any) => ({ atribuicaoId: p.acao, fonte: 'grupo', entidadeId: p.entidadeId, displayName: grupoNomeMap[p.entidadeId] })),
   ]
 
   const atribuicoes = [...new Set(fontes.map((f) => f.atribuicaoId))]
