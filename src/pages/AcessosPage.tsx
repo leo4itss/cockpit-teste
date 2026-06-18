@@ -480,6 +480,14 @@ export function AcessosPage() {
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0 mt-1">
+          <button
+            onClick={() => setShowOnboarding(true)}
+            title="Sobre esta aba"
+            className="flex items-center gap-1.5 px-3 py-2 text-sm text-[#6b7280] bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:text-[#030712] hover:border-gray-300 transition-colors"
+          >
+            <HelpCircle className="w-4 h-4" />
+            <span>Sobre</span>
+          </button>
           <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
             <Search className="w-4 h-4 text-gray-400 opacity-50" />
             <input
