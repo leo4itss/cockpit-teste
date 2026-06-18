@@ -14,6 +14,7 @@ interface EfetivaFonte {
   atribuicaoId: string
   fonte: string
   entidadeId: string
+  displayName?: string
 }
 
 interface InstanciaOpcao {
