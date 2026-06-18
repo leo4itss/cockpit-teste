@@ -801,10 +801,10 @@ export default function CanvasPermissoesPage() {
             ])
           )
           setGraphData({
-            account: accMock,
+            account:       accMock,
             accountMembros: membrosMock,
             groups:    gruposMock,
-            instances: instsMock,
+            instances: instsMock.filter((i: any) => i.status !== 'Inativo'),
             components: [],
             grupoMembros,
             instMembros,
