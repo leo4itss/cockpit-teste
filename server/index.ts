@@ -1671,50 +1671,31 @@ app.get('/api/instancias/:id/permissoes-efetivas', async (c) => {
   const userId = c.req.query('userId')
   if (!userId) return c.json({ error: 'userId é obrigatório' }, 400)
 
-  // Buscar membros da instância para este usuário (direto)
-  const membros = await db.select().from(instanciaMembros)
-    .where(
-      and(
-        eq(instanciaMembros.instanciaId, instanceId),
-        eq(instanciaMembros.entidadeTipo, 'user'),
-        eq(instanciaMembros.entidadeId, userId)
-      )
-    )
-
-  // Buscar grupos do usuário
+  // Grupos do usuário
   const userGrupos = await db.select().from(usuarioGrupos)
     .where(eq(usuarioGrupos.userId, userId))
   const grupoIds = userGrupos.map((g: any) => g.grupoId)
 
-  // Buscar membros do tipo grupo para esta instância
-  const membrosGrupo = grupoIds.length > 0
-    ? await db.select().from(instanciaMembros)
-        .where(
-          and(
-            eq(instanciaMembros.instanciaId, instanceId),
-            eq(instanciaMembros.entidadeTipo, 'group')
-          )
-        )
+  // component_permissions diretas do usuário nesta instância
+  const directPerms = await db.select().from(componentPermissions)
+    .where(and(
+      eq(componentPermissions.instanciaId, instanceId),
+      eq(componentPermissions.entidadeId, userId),
+    ))
+
+  // component_permissions dos grupos do usuário nesta instância
+  const groupPerms = grupoIds.length > 0
+    ? await db.select().from(componentPermissions)
+        .where(and(
+          eq(componentPermissions.instanciaId, instanceId),
+          inArray(componentPermissions.entidadeId, grupoIds),
+        ))
     : []
 
-  const membroGrupoFiltrado = membrosGrupo.filter((m: any) => grupoIds.includes(m.entidadeId))
-
-  // Coletar todos os membroIds relevantes
-  const membroIds = [
-    ...membros.map((m: any) => ({ id: m.id, fonte: 'direto' as const, entidadeId: userId })),
-    ...membroGrupoFiltrado.map((m: any) => ({ id: m.id, fonte: 'grupo' as const, entidadeId: m.entidadeId })),
+  const fontes: { atribuicaoId: string; fonte: string; entidadeId: string }[] = [
+    ...directPerms.map((p: any) => ({ atribuicaoId: p.acao, fonte: 'direto', entidadeId: userId })),
+    ...groupPerms.map((p: any) => ({ atribuicaoId: p.acao, fonte: 'grupo', entidadeId: p.entidadeId })),
   ]
-
-  // Buscar atribuições de cada membro
-  const fontes: { atribuicaoId: string; fonte: string; entidadeId: string }[] = []
-
-  for (const membro of membroIds) {
-    const atribs = await db.select().from(instanciaMembroAtribuicoes)
-      .where(eq(instanciaMembroAtribuicoes.membroId, membro.id))
-    for (const a of atribs) {
-      fontes.push({ atribuicaoId: a.atribuicaoId, fonte: membro.fonte, entidadeId: membro.entidadeId })
-    }
-  }
 
   const atribuicoes = [...new Set(fontes.map((f) => f.atribuicaoId))]
   return c.json({ atribuicoes, fontes })
