@@ -39,6 +39,7 @@ import {
 } from '@/data/mock'
 import { InstanciaDetailSheet } from '@/components/instancias/InstanciaDetailSheet'
 import { AtribuirPermissoesSheet } from '@/components/permissoes/AtribuirPermissoesSheet'
+import { Modal } from '@/components/ui/Modal'
 // import { cn } from '@/lib/utils'
 import { VisualizerThemeContext, useNodeTheme, type VisualizerTheme } from '@/lib/visualizerTheme'
 import { useVisualizerTheme } from '@/hooks/useVisualizerTheme'
