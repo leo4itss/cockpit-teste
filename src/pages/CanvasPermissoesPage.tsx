@@ -569,17 +569,17 @@ function UsuarioPanel({ userId, graphData, accountId, theme, onClose, onRefresh:
 
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: theme.sectionLabel }}>
-            Objetos com acesso direto ({userInstancias.length})
+            Acesso direto ({userInstanciasDiretas.length})
           </p>
-          {userInstancias.length === 0
+          {userInstanciasDiretas.length === 0
             ? <p className="text-xs" style={{ color: theme.panelMuted }}>Sem acesso direto a objetos.</p>
             : <div className="space-y-1">
-                {userInstancias.map(inst => {
-                  const mb        = (graphData.instMembros[inst.id] ?? []).find((m: any) => m.entidadeId === userId)
-                  const comp      = graphData.components.find(c => c.id === inst.componenteId)
-                  const compNome  = comp?.nome
-                  const tipo      = inferTipo(compNome)
-                  const isDocNix  = (comp as any)?.tipoModelo === 'docnix'
+                {userInstanciasDiretas.map(inst => {
+                  const mb       = (graphData.instMembros[inst.id] ?? []).find((m: any) => m.entidadeId === userId)
+                  const comp     = graphData.components.find(c => c.id === inst.componenteId)
+                  const compNome = comp?.nome
+                  const tipo     = inferTipo(compNome)
+                  const isDocNix = (comp as any)?.tipoModelo === 'docnix'
                   return (
                     <div key={inst.id} className="flex items-center gap-2 px-3 py-2 rounded-lg"
                       style={{ background: theme.instBg, border: `1px solid ${theme.instBorder}` }}>
@@ -595,6 +595,41 @@ function UsuarioPanel({ userId, graphData, accountId, theme, onClose, onRefresh:
               </div>
           }
         </div>
+
+        {userInstanciasViaGrupo.length > 0 && (
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: theme.sectionLabel }}>
+              Via grupo ({userInstanciasViaGrupo.length})
+            </p>
+            <div className="space-y-1">
+              {userInstanciasViaGrupo.map(inst => {
+                const grupoConcedente = userGrupos.find(g =>
+                  (graphData.instMembros[inst.id] ?? []).some((m: any) => m.entidadeTipo === 'group' && m.entidadeId === g.id)
+                )
+                const comp     = graphData.components.find(c => c.id === inst.componenteId)
+                const compNome = comp?.nome
+                const tipo     = inferTipo(compNome)
+                const isDocNix = (comp as any)?.tipoModelo === 'docnix'
+                return (
+                  <div key={inst.id} className="flex items-center gap-2 px-3 py-2 rounded-lg"
+                    style={{ background: theme.instBg, border: `1px solid ${theme.instBorder}` }}>
+                    <CompIcon tipo={tipo} size={13} color={compIconColor(tipo, theme.mode)} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs truncate" style={{ color: theme.panelText }}>{inst.nome}</p>
+                      {grupoConcedente && (
+                        <p className="text-[10px] truncate" style={{ color: theme.panelMuted }}>{grupoConcedente.nome}</p>
+                      )}
+                    </div>
+                    {isDocNix
+                      ? <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700 border border-violet-200">DocNix</span>
+                      : <span className="text-[9px] px-1.5 py-0.5 rounded-full font-medium bg-green-50 text-green-700 border border-green-200">grupo</span>
+                    }
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </>
   )
