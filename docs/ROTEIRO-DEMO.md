@@ -150,8 +150,8 @@ Verificar no banco de dados que os seguintes dados estão presentes:
 | Fernando Costa com papel em MaxDoc Comgas | Acessos → Objetos → MaxDoc (como Org Admin Docnix) |
 | Grupo Vendedores vinculado ao MaxDoc Comgas | Aba Grupos no mesmo objeto |
 | Pedro Henrique com ações diretas + via Vendedores | Ações Efetivas do Pedro |
-| Lucas Oliveira no Assistente Farmacêutico como User | Acessos → Objetos → Assistente (como Account Admin) |
-| Beatriz Lima no Assistente como Admin | Mesmo objeto |
-| Grupo Farmacêuticos vinculado ao Assistente | Aba Grupos do Assistente |
+| Lucas Oliveira no Assistente Suporte como Membro | Acessos → Objetos → Assistente Suporte (como Account Admin) |
+| Beatriz Lima no Assistente Suporte como Admin | Mesmo objeto |
+| Grupo Farmacêuticos vinculado ao Assistente Suporte | Aba Grupos do mesmo objeto |
 
-> **Dica:** rodar `npm run db:seed` antes da demo garante dados limpos e consistentes. Depois basta adicionar manualmente o grupo Farmacêuticos ao Assistente Farmacêutico (dois cliques) para o Passo 11.
+> **Dica:** rodar `npm run db:seed` antes da demo garante dados limpos e consistentes. Depois basta adicionar manualmente o grupo Farmacêuticos ao Assistente Suporte (dois cliques) para o Passo 11.
