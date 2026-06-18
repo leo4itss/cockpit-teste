@@ -1041,6 +1041,30 @@ export default function CanvasPermissoesPage() {
             {...permissoesSheet}
           />
         )}
+
+        {/* Modal — Onboarding Canvas */}
+        <Modal
+          open={showOnboarding}
+          onClose={() => setShowOnboarding(false)}
+          title="Sobre o Canvas de Permissões"
+          footer={
+            <button
+              onClick={() => setShowOnboarding(false)}
+              className="px-4 py-2 text-sm font-medium text-white bg-[#030712] rounded-lg hover:bg-[#1f2937] transition-colors"
+            >
+              Entendi
+            </button>
+          }
+        >
+          <div className="text-sm text-[#374151] leading-relaxed space-y-3">
+            <p>Você está no Canvas de Permissões. Esta tela mostra uma visão gráfica da estrutura de acessos da conta: grupos, usuários e objetos, conectados pelas relações de permissão.</p>
+            <ul className="space-y-1.5 pl-1">
+              <li><strong className="font-semibold">Linha sólida</strong> entre usuário e grupo: o usuário é membro daquele grupo.</li>
+              <li><strong className="font-semibold">Linha tracejada</strong> entre grupo/usuário e objeto: o grupo ou usuário tem acesso direto ao objeto.</li>
+            </ul>
+            <p>Clique em qualquer nó para ver detalhes no painel lateral.</p>
+          </div>
+        </Modal>
       </div>
     </VisualizerThemeContext.Provider>
   )
