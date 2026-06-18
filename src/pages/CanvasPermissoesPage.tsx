@@ -510,8 +510,13 @@ function UsuarioPanel({ userId, graphData, accountId, theme, onClose, onRefresh:
   const userGrupos = graphData.groups.filter(g =>
     (graphData.grupoMembros[g.id] ?? []).some((m: any) => (m.id ?? m.userId) === userId)
   )
-  const userInstancias = graphData.instances.filter(inst =>
+  const userGrupoIds = new Set(userGrupos.map(g => g.id))
+  const userInstanciasDiretas = graphData.instances.filter(inst =>
     (graphData.instMembros[inst.id] ?? []).some((m: any) => m.entidadeTipo === 'user' && m.entidadeId === userId)
+  )
+  const userInstanciasViaGrupo = graphData.instances.filter(inst =>
+    !userInstanciasDiretas.some(d => d.id === inst.id) &&
+    (graphData.instMembros[inst.id] ?? []).some((m: any) => m.entidadeTipo === 'group' && userGrupoIds.has(m.entidadeId))
   )
 
   if (!membro) return null
