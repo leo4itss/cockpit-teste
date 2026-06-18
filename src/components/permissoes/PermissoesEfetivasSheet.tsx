@@ -217,7 +217,7 @@ export function PermissoesEfetivasSheet({
                         {nomeAtrib}
                       </td>
                       <td className="px-4 py-3">
-                        <FonteBadge fonte={f.fonte} entidadeId={f.entidadeId} />
+                        <FonteBadge fonte={f.fonte} entidadeId={f.entidadeId} displayName={f.displayName} />
                       </td>
                     </tr>
                   ))
