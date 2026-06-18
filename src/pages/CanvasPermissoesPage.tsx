@@ -749,6 +749,7 @@ export default function CanvasPermissoesPage() {
   // accountId persiste em sessionStorage — sobrevive à navegação entre abas
   const [accountId, setAccountId] = useSessionState<string | null>('canvas-accountId', null)
 
+  const [showOnboarding, setShowOnboarding] = useState(false)
   const [allAccounts, setAllAccounts] = useState<any[]>([])
   const [graphData,   setGraphData]   = useState<GraphData | null>(null)
   const [loading,     setLoading]     = useState(false)
