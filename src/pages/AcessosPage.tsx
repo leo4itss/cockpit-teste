@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
-import { Search, Plus, Ellipsis, FilePen, UserX, UserCheck, Eye, Trash2, Building2, ChevronDown } from 'lucide-react'
+import { Search, Plus, Ellipsis, FilePen, UserX, UserCheck, Eye, Trash2, Building2, ChevronDown, HelpCircle } from 'lucide-react'
 import { useSessionState } from '@/hooks/useSessionState'
 import { useAdminOrgId } from '@/authz/hooks'
 import { Button } from '@/components/ui/Button'
