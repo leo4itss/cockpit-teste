@@ -769,7 +769,6 @@ export default function CanvasPermissoesPage() {
             api.getInstanciaMembros(inst.id).then(mbs => [inst.id, mbs] as [string, any[]]).catch(() => [inst.id, []] as [string, any[]])
           )),
         ])
-        const allUsers = await api.getUsers().catch(() => [])
         setGraphData({
           account,
           accountMembros: membros as any[],
@@ -778,7 +777,7 @@ export default function CanvasPermissoesPage() {
           components: (components as any[]).filter(c => c.status !== 'Inativo'),
           grupoMembros: Object.fromEntries(gmEntries),
           instMembros:  Object.fromEntries(imEntries),
-          allUsers: allUsers as any[],
+          allUsers: membros as any[],
         })
       } catch (e) {
         console.error(e)
