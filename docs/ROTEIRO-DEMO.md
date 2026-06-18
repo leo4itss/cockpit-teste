@@ -125,10 +125,13 @@
 
 ### Passo 11 · Herança via grupo (bônus se o tempo permitir)
 
-- Aba **Grupos** → mostrar **Farmacêuticos** com papel Member
-- Abrir Lucas → **Ações Efetivas** → mostrar badge verde "Via Grupo Farmacêuticos"
+- Aba **Grupos** (dentro do objeto Assistente Suporte) → mostrar **Farmacêuticos** com papel Visualizador
+- Voltar para aba **Usuários** → passar o mouse sobre **Lucas Oliveira**
+- Clicar nos **três pontinhos** → **Ver permissões efetivas**
+- No dropdown **Objeto**, selecionar **Assistente Suporte**
+- Mostrar badge verde **"Via Grupo · Farmacêuticos"** na linha "Usar o assistente"
 
-> "O grupo Farmacêuticos está vinculado a este objeto com papel Member. Lucas é membro do grupo — por isso herda as ações. O painel de Ações Efetivas confirma a origem."
+> "O grupo Farmacêuticos está vinculado a este objeto com papel Visualizador. Lucas é membro do grupo — por isso herda a ação. O painel de Ações Efetivas confirma a origem: ação direta aparece em azul, herdada de grupo aparece em verde."
 
 ---
 
