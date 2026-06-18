@@ -367,7 +367,7 @@ export function UsuarioDetailAccountSheet({
               ) : instanciasComAcesso.length === 0 ? (
                 <div className="px-4 py-3 rounded-lg border border-dashed border-gray-200 bg-gray-50">
                   <p className="text-sm text-[#6b7280]">
-                    Sem acesso a instâncias nesta conta. Adicione o usuário diretamente nas instâncias desejadas.
+                    Sem acesso a objetos nesta conta. Adicione o usuário diretamente nos objetos desejados.
                   </p>
                 </div>
               ) : (
