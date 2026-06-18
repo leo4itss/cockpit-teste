@@ -19,6 +19,7 @@ import { CriarGrupoSheet } from '@/components/grupos/CriarGrupoSheet'
 import { GrupoDetailSheet } from '@/components/grupos/GrupoDetailSheet'
 import { InstanciaDetailSheet } from '@/components/instancias/InstanciaDetailSheet'
 import { PermissoesEfetivasSheet } from '@/components/permissoes/PermissoesEfetivasSheet'
+import { Modal } from '@/components/ui/Modal'
 import type { Instancia } from '@/types'
 
 type Aba = 'usuarios' | 'grupos' | 'instancias'
