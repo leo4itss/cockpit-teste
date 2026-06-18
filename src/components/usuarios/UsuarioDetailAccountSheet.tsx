@@ -359,7 +359,7 @@ export function UsuarioDetailAccountSheet({
             {/* Sub-seção: Por instância */}
             <div className="flex flex-col gap-2">
               <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">
-                Por instância
+                Por objeto
               </p>
 
               {loadingAcesso ? (
