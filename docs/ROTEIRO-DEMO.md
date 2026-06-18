@@ -102,15 +102,15 @@
 
 ---
 
-### Passo 9 · Papel User: acesso básico
+### Passo 9 · Papel Membro: acesso básico
 
-- Abrir **Lucas Oliveira** → mostrar papel **User** com ações:
-  - `can_use_assistant`
-  - `can_share_conversation_results`
-  - `can_view_consulted_sources`
-  - `can_upload_rag_sources`
+- Clicar em **Lucas Oliveira** → mostrar papel **Membro** com ações:
+  - Usar o assistente
+  - Compartilhar resultados
+  - Ver fontes consultadas
+  - Upload de fontes RAG
 
-> "Para o Assistente IA, os papéis são mais simples. O papel **User** dá acesso ao uso básico: o usuário pode conversar com o assistente, compartilhar resultados e consultar fontes. Ele **não pode** criar nem configurar assistentes."
+> "Para o Assistente IA, os papéis são mais simples. O papel **Membro** dá acesso ao uso básico: o usuário pode conversar com o assistente, compartilhar resultados e consultar fontes. Ele **não pode** criar assistentes, configurar agentes, gerenciar cenários de negócio nem gerenciar usuários."
 
 ---
 
