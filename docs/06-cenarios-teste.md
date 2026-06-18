@@ -197,7 +197,7 @@ Validar as regras de acesso ao Assistente IA: papéis simples (Viewer/User/Admin
 
 > **Comportamento esperado:** antes do passo 2 (adicionar Farmacêuticos ao objeto), Lucas **não herda nada** do grupo neste objeto — mesmo sendo membro de Farmacêuticos. A herança só acontece objeto a objeto, explicitamente. Isso é por design: o mesmo grupo pode ter papéis diferentes em objetos diferentes, ou não ter acesso a alguns objetos.
 
-> **Nota:** A herança é visível no **PermissoesMembroSheet** (clicando no usuário na InstanciaDetailSheet, ou via Acessos > Usuários > Editar ao lado da instância). A seção "POR INSTÂNCIA" do painel do usuário exibe apenas membros diretos — acesso exclusivamente via grupo não aparece nessa listagem.
+> **Nota:** A herança é visível no **PermissoesMembroSheet** (clicando no usuário na InstanciaDetailSheet, ou via Acessos > Usuários > Editar ao lado do objeto). A seção "POR OBJETO" do painel do usuário exibe apenas membros diretos — acesso exclusivamente via grupo não aparece nessa listagem. Para ver a origem de cada ação (direto vs via grupo), usar **"Ver permissões efetivas"** nos três pontinhos da linha do usuário.
 
 #### 3.4 — Testar bloqueio por entitlement
 
