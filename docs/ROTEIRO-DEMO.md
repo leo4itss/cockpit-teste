@@ -73,8 +73,8 @@
 
 ### Passo 6 · Ações Efetivas: origem de cada permissão
 
-- Clicar em um usuário membro do grupo Vendedores (ex: **Pedro Henrique**)
-- Abrir **Ações Efetivas** (ícone no card do usuário)
+- Na aba **Usuários**, passar o mouse sobre a linha de **Pedro Henrique**
+- Clicar nos **três pontinhos** (menu de contexto, coluna Ações) → **Ver permissões efetivas**
 - Mostrar a tabela com duas colunas: Ação e Origem
 
 > "Aqui está o painel de auditoria. Cada ação mostra sua origem: **Direto** (badge azul) significa que foi atribuída ao usuário diretamente. **Via Grupo** (badge verde) indica herança pelo grupo Vendedores. Isso permite saber, a qualquer momento, por que um usuário tem acesso a algo."
