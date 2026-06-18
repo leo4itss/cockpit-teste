@@ -236,6 +236,28 @@ export function AcessosPage() {
     setSelectedUser(null)
   }
 
+  async function handleOpenPermEfetivas(user: User) {
+    setPermEfetivasUser(user)
+    setPermEfetivasInstancias([])
+    const userInstIds: string[] = []
+    await Promise.all(
+      instancias.map(inst =>
+        api.getInstanciaMembros(inst.id)
+          .then((mems: any[]) => {
+            if (mems.some(m => m.entidadeTipo === 'user' && m.entidadeId === user.id)) {
+              userInstIds.push(inst.id)
+            }
+          })
+          .catch(() => {})
+      )
+    )
+    setPermEfetivasInstancias(
+      instancias
+        .filter(i => userInstIds.includes(i.id))
+        .map(i => ({ id: i.id, nome: i.nome, componenteId: i.componenteId }))
+    )
+  }
+
   // ── Instâncias ──────────────────────────────────────────────
   const [instancias, setInstancias]             = useState<Instancia[]>([])
   const [loadingInstancias, setLoadingInstancias] = useState(true)
