@@ -514,6 +514,7 @@ app.get('/grupos', async (c) => {
     db.select().from(accounts),
   ])
   const filtered = rows.filter((g: any) => {
+    if (g.status === 'Inativo') return false
     if (orgId && accountId) return g.orgId === orgId || g.accountId === accountId
     if (orgId) {
       const orgAccountIds = allAccounts.filter((a: any) => a.orgId === orgId).map((a: any) => a.id)
