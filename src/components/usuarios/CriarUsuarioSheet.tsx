@@ -149,11 +149,9 @@ export function CriarUsuarioSheet({ open, onClose, onSuccess, accountId }: Props
       }
       const created = await api.createUser(payload)
 
-      // Vincula à conta com papel e/ou grupo, se fornecidos
+      // Vincula à conta — membership sempre criado quando há accountId
       if (accountId) {
-        if (papel) {
-          await api.addAccountMembro(accountId, { userId: created.id, papel }).catch(() => null)
-        }
+        await api.addAccountMembro(accountId, { userId: created.id, papel: papel || 'member' }).catch(() => null)
         if (grupoId) {
           await api.addGrupoMembro(grupoId, created.id).catch(() => null)
         }
