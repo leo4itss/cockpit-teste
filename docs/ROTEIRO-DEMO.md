@@ -154,4 +154,4 @@ Verificar no banco de dados que os seguintes dados estão presentes:
 | Beatriz Lima no Assistente Suporte como Admin | Mesmo objeto |
 | Grupo Farmacêuticos vinculado ao Assistente Suporte | Aba Grupos do mesmo objeto |
 
-> **Dica:** rodar `npm run db:seed` antes da demo garante dados limpos e consistentes. Depois basta adicionar manualmente o grupo Farmacêuticos ao Assistente Suporte (dois cliques) para o Passo 11.
+> **Dica:** rodar `npm run db:seed` antes da demo garante dados limpos e consistentes — todos os usuários, grupos e permissões (incluindo Farmacêuticos no Assistente Suporte) já estarão prontos.
