@@ -915,6 +915,17 @@ export default function CanvasPermissoesPage() {
               {mode === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               <span className="text-xs font-medium">{mode === 'dark' ? 'Claro' : 'Escuro'}</span>
             </button>
+
+            {/* Sobre o Canvas */}
+            <button
+              onClick={() => setShowOnboarding(true)}
+              title="Sobre o Canvas"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors"
+              style={{ background: theme.toggleBg, border: `1px solid ${theme.toggleBorder}`, color: theme.toggleText }}
+            >
+              <HelpCircle className="w-4 h-4" />
+              <span className="text-xs font-medium">Sobre</span>
+            </button>
           </div>
         </div>
 
