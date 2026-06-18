@@ -666,6 +666,7 @@ app.get('/api/grupos', async (c) => {
     ])
 
     const filtered = rows.filter((g: any) => {
+      if (g.status === 'Inativo') return false
       if (orgId && accountId) return g.orgId === orgId || g.accountId === accountId
       if (orgId) {
         // Inclui grupos escopo=org E grupos escopo=conta de contas pertencentes à org
