@@ -483,6 +483,60 @@ function GrupoPanel({ grupoId, graphData, accountId, theme, onClose, onRefresh, 
               })
           }
         </div>
+
+        {/* Objetos */}
+        <div>
+          <div className="flex items-center gap-1.5 mb-2">
+            <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: theme.sectionLabel }}>
+              Objetos ({graphData.instances.length})
+            </p>
+            <span title="Objetos desta conta — clique no cadeado para atribuir permissões do grupo" className="cursor-default">
+              <Info className="w-3 h-3 opacity-40 hover:opacity-70 transition-opacity" style={{ color: theme.sectionLabel }} />
+            </span>
+          </div>
+          <div className="space-y-1">
+            {graphData.instances.map(inst => {
+              const membroDoGrupo = (graphData.instMembros[inst.id] ?? []).find(
+                (m: any) => m.entidadeTipo === 'group' && m.entidadeId === grupoId
+              )
+              const comp     = graphData.components.find(c => c.id === inst.componenteId)
+              const tipo     = inferTipo(comp?.nome ?? '')
+              const isDocNix = (comp as any)?.tipoModelo === 'docnix'
+              return (
+                <div key={inst.id}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg"
+                  style={{ background: theme.instBg, border: `1px solid ${theme.instBorder}` }}
+                >
+                  <CompIcon tipo={tipo} size={13} color={compIconColor(tipo, theme.mode)} />
+                  <span className="text-xs flex-1 truncate" style={{ color: theme.panelText }}>{inst.nome}</span>
+                  {membroDoGrupo && (
+                    isDocNix
+                      ? <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700 border border-violet-200">DocNix</span>
+                      : <span className="text-[9px] font-semibold" style={{ color: theme.btnPermText }}>{membroDoGrupo.papel}</span>
+                  )}
+                  <button
+                    onClick={() => onOpenPermissoes({
+                      entityType: 'grupo',
+                      entityId: grupoId,
+                      entityNome: grupo.nome,
+                      accountId,
+                      instanciaId: inst.id,
+                      instanciaComponenteId: inst.componenteId,
+                      instanciaNome: inst.nome,
+                    })}
+                    title="Atribuir permissões neste objeto"
+                    className="p-1 rounded transition-colors shrink-0"
+                    style={{ color: membroDoGrupo ? theme.btnPermText : theme.panelMuted }}
+                    onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
+                    onMouseLeave={e => (e.currentTarget.style.opacity = membroDoGrupo ? '1' : '0.4')}
+                  >
+                    <Lock className="w-3 h-3" style={{ opacity: membroDoGrupo ? 1 : 0.4 }} />
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        </div>
       </div>
     </>
   )
