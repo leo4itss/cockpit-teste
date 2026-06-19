@@ -71,6 +71,10 @@ Clique nele para escolher qual perfil (persona) você quer simular. A página at
 >
 > **Para testar o Assistente:** pode usar **Carla Santos** (Santacruz) ou **Marcelo Ribeiro** (Comgas).
 
+### Botão "Sobre"
+
+Na página **Acessos** e no **Canvas**, há um botão **"Sobre"** no cabeçalho da tela. Ele abre um modal explicando o que a aba ou o Canvas fazem — útil para orientar gestores que acessam o Cockpit pela primeira vez.
+
 ### Navegação pelo Sidebar
 
 O sidebar lateral mostra apenas as seções que o perfil ativo tem permissão de ver:
