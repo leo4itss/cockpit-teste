@@ -28,8 +28,9 @@ export const componentes: Componente[] = [
     nome: 'Knowledge Base',
     descricao: 'Base de conhecimento vetorial',
     metadataUrl: undefined,
-    tiposLicenca: ['tl-3', 'tl-5'],  // banco de dados, workspaces
+    tiposLicenca: ['tl-3', 'tl-5'],
     createdAt: '01/01/2026',
+    status: 'Inativo',
   },
   // ── Componentes FGA (cenário Docnix/Comgas) ──────────────────
   {
