@@ -306,61 +306,8 @@ export function UsuarioDetailAccountSheet({
               <SectionTitle>Ações</SectionTitle>
             </div>
 
-            {/* Sub-seção: Globais (nível conta, instancia_id = null) */}
-            {/* Exibe apenas componentes de conta-inteira (sem acessoViaInstancia) */}
-            {(() => {
-              const globaisContaInteira = permComponentes.filter(
-                ({ compNome }) => !getComponenteConfig(compNome).acessoViaInstancia
-              )
-              return (
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">
-                      Globais — nível de conta
-                    </p>
-                    <button
-                      onClick={() => setShowPermissoes(true)}
-                      className="text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
-                    >
-                      + Atribuir
-                    </button>
-                  </div>
-
-                  {loadingAcesso ? (
-                    <p className="text-sm text-[#6b7280]">Carregando…</p>
-                  ) : globaisContaInteira.length === 0 ? (
-                    <div className="px-4 py-3 rounded-lg border border-dashed border-gray-200 bg-gray-50">
-                      <p className="text-sm text-[#6b7280]">
-                        Nenhuma permissão global atribuída.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col gap-1.5">
-                      {globaisContaInteira.map(({ compId, compNome, papel }) => (
-                        <div
-                          key={compId}
-                          className="flex items-center justify-between px-4 py-2.5 rounded-lg border border-gray-200 bg-white"
-                        >
-                          <p className="text-sm font-medium text-[#030712]">{compNome}</p>
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-blue-50 text-blue-700 border-blue-200">
-                            {papel}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  <p className="text-xs text-[#9ca3af]">
-                    Para módulos de conta inteira (ex: PAS Core, Analytics). Acesso a MaxDoc, DocAction e Assistente IA é gerenciado por objeto, na seção abaixo.
-                  </p>
-                </div>
-              )
-            })()}
-
-            {/* Sub-seção: Por instância */}
+            {/* Objetos com acesso */}
             <div className="flex flex-col gap-2">
-              <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">
-                Por objeto
-              </p>
 
               {loadingAcesso ? (
                 <p className="text-sm text-[#6b7280]">Carregando…</p>
