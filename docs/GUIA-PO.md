@@ -469,7 +469,7 @@ A operação é irreversível, mas pode ser refeita adicionando o membro novamen
 3. Aba **Objetos**
 4. ✅ **Verificar:** MaxDoc **não aparece** na lista de objetos — a conta Apple não tem o entitlement `maxdoc.use`, portanto não há instâncias MaxDoc criadas para ela
 
-> **Por que não aparece?** Quando uma conta não tem o entitlement de um módulo, não é possível criar instâncias desse módulo para ela. A aba Objetos mostra apenas os módulos efetivamente contratados e configurados. O badge "Capability inativa" aparece no fluxo de permissões globais (seção GLOBAIS — NÍVEL DE CONTA), não na aba Objetos.
+> **Por que não aparece?** Quando uma conta não tem o entitlement de um módulo, não é possível criar instâncias desse módulo para ela. A aba Objetos mostra apenas os módulos efetivamente contratados e configurados.
 
 ---
 
