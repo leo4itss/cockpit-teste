@@ -1004,7 +1004,7 @@ export default function CanvasPermissoesPage() {
                         { c: '#f59e0b', l: 'Conta (âncora)' },
                         { c: '#3b82f6', l: 'Grupo' },
                         { c: '#10b981', l: 'Usuário' },
-                        { c: '#8b5cf6', l: 'Instância' },
+                        { c: '#8b5cf6', l: 'Objeto' },
                       ].map(({ c, l }) => (
                         <div key={l} className="flex items-center gap-2">
                           <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: c }} />
