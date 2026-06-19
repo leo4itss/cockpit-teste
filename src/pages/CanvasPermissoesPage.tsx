@@ -1146,7 +1146,7 @@ export default function CanvasPermissoesPage() {
         )}
         {permissoesSheet && (
           <AtribuirPermissoesSheet
-            open={!!permissoesSheet} onClose={() => { setPermSheet(null); refresh() }}
+            open={!!permissoesSheet} onClose={() => setPermSheet(null)} onSuccess={() => refresh()}
             {...permissoesSheet}
           />
         )}
