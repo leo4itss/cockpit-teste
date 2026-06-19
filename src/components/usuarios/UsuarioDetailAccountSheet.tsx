@@ -95,11 +95,10 @@ export function UsuarioDetailAccountSheet({
     if (!user) return
     setLoadingAcesso(true)
     try {
-      const [membros, fetchedInsts, comps, contaPerms] = await Promise.all([
+      const [membros, fetchedInsts, comps] = await Promise.all([
         api.getAccountMembros(accountId).catch(() => [] as any[]),
         insts ? Promise.resolve(insts) : api.getInstancias({ accountId }).catch(() => [] as Instancia[]),
         api.getComponentes().catch(() => [] as any[]),
-        api.getPermissions({ entidade_tipo: 'user', entidade_id: user.id, instancia_id: null }).catch(() => [] as any[]),
       ])
 
       // A API retorna { ...user, papel } — o id do usuário fica em mb.id, não mb.userId
