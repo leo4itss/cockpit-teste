@@ -115,14 +115,15 @@ async function main() {
   `
 
   await sql`
-    INSERT INTO componentes (id, nome, descricao, metadata_url, tipos_licenca, created_at)
+    INSERT INTO componentes (id, nome, descricao, metadata_url, tipos_licenca, created_at, status)
     VALUES (
       'comp-2', 'Knowledge Base', 'Base de conhecimento vetorial com RAG',
       null,
-      '["tl-3","tl-5"]', '01/01/2026'
+      '["tl-3","tl-5"]', '01/01/2026', 'Inativo'
     )
     ON CONFLICT (id) DO UPDATE SET
-      descricao = EXCLUDED.descricao
+      descricao = EXCLUDED.descricao,
+      status    = 'Inativo'
   `
 
   // Componentes extras para teste
