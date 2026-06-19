@@ -637,8 +637,7 @@ Trocar o PersonaSwitcher para cada persona e verificar o sidebar:
 | **Ação** | Capacidade individual (ex: "Aprovar Documento") |
 | **Personalizado** | Modo de seleção manual de ações, sem usar papel predefinido |
 | **FGA** | Fine-Grained Authorization — modelo de permissões granulares |
-| **Escopo Global** | Permissão que vale para todos os objetos de um módulo na conta |
-| **Escopo Objeto** | Permissão que vale apenas para um objeto específico |
+| **Escopo Objeto** | Permissão que vale apenas para um objeto específico — único escopo existente na plataforma |
 | **Herança de grupo** | Membro de grupo recebe automaticamente as ações atribuídas ao grupo |
 | **PersonaSwitcher** | Componente (canto inferior direito) para trocar entre perfis de teste |
 | **PoC** | Proof of Concept — versão de validação, sem autenticação real |
