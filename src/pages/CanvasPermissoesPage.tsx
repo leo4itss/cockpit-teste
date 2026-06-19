@@ -698,6 +698,48 @@ function UsuarioPanel({ userId, graphData, accountId, theme, onClose, onRefresh:
             </div>
           </div>
         )}
+
+        {userInstanciasSemAcesso.length > 0 && (
+          <div>
+            <div className="flex items-center gap-1.5 mb-2">
+              <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: theme.sectionLabel }}>
+                Outros objetos ({userInstanciasSemAcesso.length})
+              </p>
+              <span title="Objetos desta conta onde este usuário ainda não tem acesso" className="cursor-default">
+                <Info className="w-3 h-3 opacity-40 hover:opacity-70 transition-opacity" style={{ color: theme.sectionLabel }} />
+              </span>
+            </div>
+            <div className="space-y-1">
+              {userInstanciasSemAcesso.map(inst => {
+                const comp     = graphData.components.find(c => c.id === inst.componenteId)
+                const tipo     = inferTipo(comp?.nome)
+                return (
+                  <div key={inst.id} className="flex items-center gap-2 px-3 py-2 rounded-lg"
+                    style={{ background: theme.rowBg, border: `1px solid ${theme.panelBorder}` }}>
+                    <CompIcon tipo={tipo} size={13} color={compIconColor(tipo, theme.mode)} />
+                    <span className="text-xs flex-1 truncate opacity-50" style={{ color: theme.panelText }}>{inst.nome}</span>
+                    <button
+                      onClick={() => onOpenPermissoes({
+                        entityType: 'usuario',
+                        entityId: userId,
+                        entityNome: nome,
+                        accountId,
+                        instanciaId: inst.id,
+                        instanciaComponenteId: inst.componenteId,
+                        instanciaNome: inst.nome,
+                      })}
+                      title="Adicionar a este objeto"
+                      className="p-1 rounded transition-colors shrink-0 opacity-40 hover:opacity-100"
+                      style={{ color: theme.btnPermText }}
+                    >
+                      <Lock className="w-3 h-3" />
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </>
   )
