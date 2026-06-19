@@ -546,9 +546,14 @@ function UsuarioPanel({ userId, graphData, accountId, theme, onClose, onRefresh:
 
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: theme.sectionLabel }}>
-            Grupos ({userGrupos.length})
-          </p>
+          <div className="flex items-center gap-1.5 mb-2">
+            <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: theme.sectionLabel }}>
+              Grupos ({userGrupos.length})
+            </p>
+            <span title="Grupos dos quais este usuário é membro" className="cursor-default">
+              <Info className="w-3 h-3 opacity-40 hover:opacity-70 transition-opacity" style={{ color: theme.sectionLabel }} />
+            </span>
+          </div>
           {userGrupos.length === 0
             ? <p className="text-xs" style={{ color: theme.panelMuted }}>Não pertence a nenhum grupo desta conta.</p>
             : <div className="space-y-1">
