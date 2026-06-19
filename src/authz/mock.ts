@@ -531,6 +531,7 @@ const COMPONENTE_CONFIGS: Record<string, ComponenteTypeConfig> = {
   'base-conhecimento': {
     label: 'Base de Conhecimento',
     permissaoMode: 'component_permissions',
+    acessoViaInstancia: true,
     papeis: [
       {
         value: 'viewer', label: 'Leitor', desc: 'Lê documentos publicados',
