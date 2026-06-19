@@ -502,6 +502,7 @@ const COMPONENTE_CONFIGS: Record<string, ComponenteTypeConfig> = {
   'analytics': {
     label: 'Analytics',
     permissaoMode: 'component_permissions',
+    acessoViaInstancia: true,
     papeis: [
       {
         value: 'viewer', label: 'Visualizador', desc: 'Vê dashboards publicados',
