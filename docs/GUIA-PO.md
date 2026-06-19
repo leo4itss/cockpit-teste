@@ -280,7 +280,7 @@ A operação é irreversível, mas pode ser refeita adicionando o membro novamen
 ### Onde verificar permissões
 
 - **PermissoesMembroSheet:** abre ao clicar em um membro dentro de um objeto — mostra as ações daquele usuário naquele objeto específico
-- **UsuarioDetailAccountSheet → seção Ações:** mostra todas as ações do usuário na conta; a subseção **POR OBJETO** lista os objetos onde o usuário é membro direto
+- **UsuarioDetailAccountSheet → seção Ações:** mostra todos os objetos onde o usuário é membro direto, com o papel em cada um
 - **PermissoesEfetivasSheet:** lista completa com a origem de cada ação (direto / via grupo) — acessível pelos **três pontinhos** na linha do usuário na aba Usuários → "Ver permissões efetivas"
 
 ---
