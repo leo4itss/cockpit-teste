@@ -568,22 +568,12 @@ function UsuarioPanel({ userId, graphData, accountId, theme, onClose, onRefresh:
     <>
       <PainelHeader icon={<AvatarCircle nome={nome} size={36} />} title={nome} subtitle={membro.email} onClose={onClose} theme={theme} />
 
-      <div className="px-5 py-3 shrink-0 space-y-2" style={{ borderBottom: `1px solid ${theme.panelBorder}` }}>
-        <div className="flex items-center gap-2">
-          <span className="text-xs" style={{ color: theme.panelSub }}>Papel na conta:</span>
-          <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
-            style={membro.papel === 'account_admin' ? papelBadgeStyle('Admin', theme) : papelBadgeStyle('Viewer', theme)}>
-            {membro.papel === 'account_admin' ? '★ Account Admin' : 'Membro'}
-          </span>
-        </div>
-        <button
-          onClick={() => onOpenPermissoes({ entityType: 'usuario', entityId: userId, entityNome: nome, accountId })}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors"
-          style={{ background: theme.btnPermBg, border: `1px solid ${theme.btnPermBorder}`, color: theme.btnPermText }}
-        >
-          <Lock className="w-3.5 h-3.5" />
-          Permissões diretas
-        </button>
+      <div className="px-5 py-3 shrink-0 flex items-center gap-2" style={{ borderBottom: `1px solid ${theme.panelBorder}` }}>
+        <span className="text-xs" style={{ color: theme.panelSub }}>Papel na conta:</span>
+        <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
+          style={membro.papel === 'account_admin' ? papelBadgeStyle('Admin', theme) : papelBadgeStyle('Viewer', theme)}>
+          {membro.papel === 'account_admin' ? '★ Account Admin' : 'Membro'}
+        </span>
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
