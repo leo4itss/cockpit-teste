@@ -632,6 +632,22 @@ function UsuarioPanel({ userId, graphData, accountId, theme, onClose, onRefresh:
                         ? <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700 border border-violet-200">DocNix</span>
                         : mb?.papel && <span className="text-[9px] font-semibold" style={{ color: theme.btnPermText }}>{mb.papel}</span>
                       }
+                      <button
+                        onClick={() => onOpenPermissoes({
+                          entityType: 'usuario',
+                          entityId: userId,
+                          entityNome: nome,
+                          accountId,
+                          instanciaId: inst.id,
+                          instanciaComponenteId: inst.componenteId,
+                          instanciaNome: inst.nome,
+                        })}
+                        title="Editar permissões neste objeto"
+                        className="p-1 rounded transition-colors shrink-0"
+                        style={{ color: theme.btnPermText }}
+                      >
+                        <Lock className="w-3 h-3" />
+                      </button>
                     </div>
                   )
                 })}
