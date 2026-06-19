@@ -406,20 +406,8 @@ function GrupoPanel({ grupoId, graphData, accountId, theme, onClose, onRefresh, 
         onClose={onClose} theme={theme}
       />
 
-      {/* Ação permissões */}
-      <div className="px-5 py-3 shrink-0" style={{ borderBottom: `1px solid ${theme.panelBorder}` }}>
-        <button
-          onClick={() => onOpenPermissoes({ entityType: 'grupo', entityId: grupoId, entityNome: grupo.nome, accountId, papel: grupo.papel })}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors"
-          style={{ background: theme.btnPermBg, border: `1px solid ${theme.btnPermBorder}`, color: theme.btnPermText }}
-        >
-          <Lock className="w-3.5 h-3.5" />
-          Atribuir permissões ao grupo
-        </button>
-      </div>
-
-      {/* Membros */}
-      <div className="flex-1 overflow-y-auto px-5 py-4">
+      {/* Membros + Objetos */}
+      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
         <p className="text-[10px] font-semibold uppercase tracking-wider mb-3" style={{ color: theme.sectionLabel }}>
           Membros ({membros.length})
         </p>
