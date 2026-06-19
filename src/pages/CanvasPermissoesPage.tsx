@@ -561,6 +561,10 @@ function UsuarioPanel({ userId, graphData, accountId, theme, onClose, onRefresh:
     !userInstanciasDiretas.some(d => d.id === inst.id) &&
     (graphData.instMembros[inst.id] ?? []).some((m: any) => m.entidadeTipo === 'group' && userGrupoIds.has(m.entidadeId))
   )
+  const userInstanciasSemAcesso = graphData.instances.filter(inst =>
+    !userInstanciasDiretas.some(d => d.id === inst.id) &&
+    !userInstanciasViaGrupo.some(v => v.id === inst.id)
+  )
 
   if (!membro) return null
 
