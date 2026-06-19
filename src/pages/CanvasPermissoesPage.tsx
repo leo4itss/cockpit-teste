@@ -609,9 +609,14 @@ function UsuarioPanel({ userId, graphData, accountId, theme, onClose, onRefresh:
 
         {userInstanciasViaGrupo.length > 0 && (
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: theme.sectionLabel }}>
-              Via grupo ({userInstanciasViaGrupo.length})
-            </p>
+            <div className="flex items-center gap-1.5 mb-2">
+              <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: theme.sectionLabel }}>
+                Via grupo ({userInstanciasViaGrupo.length})
+              </p>
+              <span title="Objetos acessíveis por herança de um grupo do qual este usuário faz parte" className="cursor-default">
+                <Info className="w-3 h-3 opacity-40 hover:opacity-70 transition-opacity" style={{ color: theme.sectionLabel }} />
+              </span>
+            </div>
             <div className="space-y-1">
               {userInstanciasViaGrupo.map(inst => {
                 const grupoConcedente = userGrupos.find(g =>
