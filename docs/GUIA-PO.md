@@ -356,11 +356,11 @@ A operação é irreversível, mas pode ser refeita adicionando o membro novamen
 
 ---
 
-**1.6 — Verificar acesso por instância**
+**1.6 — Verificar acesso por objeto**
 
 1. Ir para **Acessos > Usuários**
 2. Clicar em **Fernando**
-3. Na seção **Ações > POR INSTÂNCIA**, verificar:
+3. Na seção **Ações > POR OBJETO**, verificar:
 4. ✅ **"Gestão Documental Comgas"** aparece uma única vez com o badge do papel atual (ex: "Personalizado", "Revisor")
 5. ✅ Clicar em **"Editar"** ao lado da instância para abrir o painel de ações e ver quais ações estão selecionadas
 6. ✅ No painel de ações do membro, as ações herdadas via grupo aparecem desabilitadas (não podem ser desmarcadas individualmente)
