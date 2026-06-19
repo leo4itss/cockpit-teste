@@ -162,7 +162,6 @@ export function UsuarioDetailAccountSheet({
     setMembership(null)
     setInstancias([])
     setMembroInstancias([])
-    setPermComponentes([])
     onClose()
   }
 
