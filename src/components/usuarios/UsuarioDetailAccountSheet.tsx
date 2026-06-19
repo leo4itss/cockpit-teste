@@ -127,31 +127,6 @@ export function UsuarioDetailAccountSheet({
       )
       setMembroInstancias(todosOsMembros)
 
-      // ── Infere papeis de component_permissions (nível conta) ──
-      const permsByComp: Record<string, Set<string>> = {}
-      for (const p of contaPerms as any[]) {
-        const cid = p.componenteId ?? p.componente_id
-        if (!cid) continue
-        if (!permsByComp[cid]) permsByComp[cid] = new Set()
-        permsByComp[cid].add(p.acao)
-      }
-      const inferedComps: { compId: string; compNome: string; papel: string }[] = []
-      for (const [cid, acoes] of Object.entries(permsByComp)) {
-        const compNome = nomesMap[cid]
-        if (!compNome) continue
-        const cfg = getComponenteConfig(compNome)
-        if (cfg.permissaoMode !== 'component_permissions') continue
-        let papelLabel = 'Personalizado'
-        for (const p of cfg.papeis) {
-          const papelSet = new Set(p.defaultAcoes ?? [])
-          if (papelSet.size === acoes.size && [...papelSet].every(a => acoes.has(a))) {
-            papelLabel = p.label; break
-          }
-        }
-        inferedComps.push({ compId: cid, compNome, papel: papelLabel })
-      }
-      setPermComponentes(inferedComps)
-
     } finally {
       setLoadingAcesso(false)
     }
