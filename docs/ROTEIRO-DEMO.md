@@ -137,7 +137,7 @@
 
 ## Mensagem de encerramento
 
-> "Em resumo: permissões no Cockpit são **por objeto**, **baseadas em papéis predefinidos** com ações granulares, e podem ser atribuídas a usuários ou grupos. A herança via grupo simplifica a gestão em escala, e o painel de Ações Efetivas garante rastreabilidade completa de todas as permissões."
+> "Em resumo: permissões no Cockpit são sempre **por objeto** — não existe acesso global a um módulo inteiro. Os papéis predefinidos simplificam a configuração, a herança via grupo escala para times inteiros, e o painel de Ações Efetivas garante rastreabilidade de cada permissão. O Canvas permite visualizar toda essa estrutura graficamente e editar diretamente pelos painéis laterais."
 
 ---
 
