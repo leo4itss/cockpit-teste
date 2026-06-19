@@ -282,9 +282,7 @@ Detalhe de um usuário dentro do contexto de uma conta. Abre clicando no usuári
 1. **Dados pessoais:** foto, nome, e-mail, cargo, etc.
 2. **Papel no Cockpit:** papel de plataforma (`platform_admin`, `org_admin`, etc.)
 3. **Papel na conta:** `member` ou `account_admin`
-4. **Ações** (antes chamado "Permissões"): lista de ações granulares do usuário nesta conta
-   - Ações diretas: atribuídas diretamente ao usuário
-   - Ações via grupo: herdadas de grupos
+4. **Ações:** lista de objetos onde o usuário tem acesso, com o papel em cada um e botão "Editar" para abrir `AtribuirPermissoesSheet` em modo instância. Todo acesso é por objeto — não existe seção de permissões globais.
 
 ---
 
