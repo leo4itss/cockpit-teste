@@ -60,7 +60,45 @@ Ambas as opções têm justificativa:
 
 ### O que seria necessário para implementar hierarquia (se decidido)
 
-1. **Endpoint `permissoes-efetivas`:** adicionar traversal de `grupos.parentId` (ou query recursiva) para expandir `grupoIds` com ancestrais antes de consultar `component_permissions`
-2. **`displayName`:** definir qual nó da cadeia exibir no badge (decisão de produto acima)
-3. **Sincronizar `engine.ts` com o modelo real:** hoje o mock já suporta hierarquia; o endpoint real não. Se hierarquia for adotada, os dois precisam convergir
+1. ~~**Endpoint `permissoes-efetivas`:** adicionar traversal de `grupos.parentId`~~ → **IMPLEMENTADO** em `server/index.ts` e `api/index.ts` via função `expandirComAncestors()` (traversal in-memory com proteção anti-ciclo)
+2. **`displayName`:** definir qual nó da cadeia exibir no badge — atualmente exibe o grupo que detém a permissão no objeto (aguarda validação com River)
+3. **Sincronizar `engine.ts` com o modelo real:** assimetria resolvida — ambos suportam traversal de ancestrais
 4. **Sem alteração de schema:** `grupos.parentId` já existe — nenhuma migração necessária
+
+---
+
+## [DT-002] Modelo de Permissões Unificado — Tudo por Objeto
+
+**Data:** 19/06/2026
+**Status:** Implementado
+
+### Decisão
+
+Todos os componentes com instâncias gerenciadas na aba Objetos usam `acessoViaInstancia: true` em `src/authz/mock.ts`. Isso elimina o modo "global de conta inteira" da UI de atribuição de permissões.
+
+**Componentes e flags:**
+
+| Componente | `acessoViaInstancia` | Motivo |
+|---|---|---|
+| Assistente de IA | `true` | Cada assistente é um objeto independente |
+| Base de Conhecimento | `true` | Base Regulatório e Base Operações são contextos distintos |
+| Analytics | `true` | Dashboard Comercial é um objeto específico |
+| MaxDoc | `true` | Por instância |
+| DocAction | `true` | Por instância |
+
+### Impacto
+
+- `AtribuirPermissoesSheet` em modo global não exibe nenhum componente — sempre aberto em modo instância
+- `UsuarioDetailAccountSheet`: seção "GLOBAIS — NÍVEL DE CONTA" removida; só exibe objetos
+- `GrupoPanel` (Canvas): botão "Atribuir permissões ao grupo" substituído por lista de objetos com cadeado por instância
+- `UsuarioPanel` (Canvas): botão "Permissões diretas" removido; cadeado por objeto em "Acesso direto" + seção "Outros objetos"
+
+### Modelo mental resultante
+
+```
+Componente (tipo de recurso)  →  Instância (recurso / objeto)
+ex: Analytics                 →  Dashboard Comercial
+ex: Assistente de IA          →  Assistente Suporte / Assistente Farmacêutico
+```
+
+Permissão é sempre: `entidade → papel → objeto`. Não existe permissão de entidade para um componente inteiro.
