@@ -135,6 +135,37 @@
 
 ---
 
+## PARTE 4 — Canvas: visão gráfica das permissões (bônus se o tempo permitir)
+
+**Persona:** Carla Santos (Account Admin Santacruz) ou Marcelo Ribeiro (Org Admin)
+
+### Passo 12 · Abrir o Canvas
+
+- Sidebar → **Canvas**
+- Selecionar a conta
+
+> "O Canvas mostra a estrutura de permissões da conta como um grafo interativo. Nós em verde são usuários, azul são grupos, roxo são objetos, laranja é a conta-raiz."
+
+---
+
+### Passo 13 · Clicar em um usuário e mostrar o painel
+
+- Clicar no nó de **Lucas Oliveira**
+- Mostrar o painel lateral: Grupos, Acesso direto, Via grupo, Outros objetos
+
+> "O painel mostra de onde vem cada acesso do usuário. 'Acesso direto' é o que foi atribuído individualmente. 'Via grupo' é herança. 'Outros objetos' mostra onde ele ainda não tem acesso — o cadeado permite adicioná-lo diretamente pelo Canvas."
+
+---
+
+### Passo 14 · Clicar em um grupo
+
+- Clicar no nó de um grupo (ex: **Farmacêuticos**)
+- Mostrar a lista de objetos com papel por objeto e cadeado
+
+> "No painel do grupo, é possível gerenciar as permissões do grupo em cada objeto sem sair do Canvas."
+
+---
+
 ## Mensagem de encerramento
 
 > "Em resumo: permissões no Cockpit são sempre **por objeto** — não existe acesso global a um módulo inteiro. Os papéis predefinidos simplificam a configuração, a herança via grupo escala para times inteiros, e o painel de Ações Efetivas garante rastreabilidade de cada permissão. O Canvas permite visualizar toda essa estrutura graficamente e editar diretamente pelos painéis laterais."
