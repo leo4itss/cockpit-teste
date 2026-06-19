@@ -226,23 +226,18 @@ Permissões no Cockpit seguem o modelo **FGA (Fine-Grained Authorization)** — 
 
 > **Quem** (usuário ou grupo) **pode fazer o quê** (ação) **em qual módulo/objeto**
 
-### Dois tipos de módulo — onde cada um é gerenciado
+### Modelo unificado — tudo por objeto
 
-Os módulos da plataforma se dividem em dois grupos, e isso determina **onde** as permissões são configuradas:
+Todos os módulos da plataforma são gerenciados **por objeto** (instância). Não existe permissão de escopo "conta inteira" — cada acesso é configurado no objeto específico:
 
-| Tipo | Módulos | Onde gerenciar |
-|------|---------|----------------|
-| **Por objeto** | MaxDoc, DocAction, Assistente IA | Somente na aba **Objetos** → objeto específico |
-| **Conta inteira** | PAS Core, Analytics, Base de Conhecimento | Seção **GLOBAIS** em Acessos |
+| Módulo | Onde gerenciar |
+|--------|----------------|
+| MaxDoc | Aba **Objetos** → objeto específico (ex: "MaxDoc Comgas") |
+| DocAction | Aba **Objetos** → objeto específico (ex: "DocAction Comgas") |
+| Assistente IA | Aba **Objetos** → objeto específico (ex: "Assistente Suporte") |
+| Analytics | Aba **Objetos** → objeto específico (ex: "Dashboard Comercial") |
 
-> **Por que essa separação?** MaxDoc, DocAction e Assistente IA funcionam em objetos — cada "MaxDoc Comgas" ou "Assistente Suporte" é um objeto independente, com seus próprios membros e papéis. Não faz sentido atribuir permissão "global" para esses módulos, pois o acesso a cada objeto é configurado individualmente.
-
-### Dois escopos de permissão
-
-| Escopo | O que significa | Onde configurar |
-|--------|----------------|----------------|
-| **Global (nível conta)** | Vale para PAS Core, Analytics, Base de Conhecimento em toda a conta | Acessos → seção GLOBAIS |
-| **Por objeto** | Vale apenas para aquele objeto específico (MaxDoc, DocAction, Assistente IA) | Acessos → Objetos → objeto |
+> **Por que por objeto?** Cada instância é um recurso independente, com membros e papéis próprios. Atribuir permissão "global" para um módulo inteiro não reflete a realidade operacional — um usuário pode ter acesso ao "Assistente Suporte" sem ter acesso ao "Assistente CEO".
 
 ### Herança via grupo
 
