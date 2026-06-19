@@ -206,16 +206,41 @@ Visualização interativa da estrutura da organização como grafo. Usa `@xyflow
 
 Visualização interativa de permissões de uma conta. Usa `@xyflow/react`.
 
-**Nós no grafo:**
-- Conta selecionada
-- Usuários e grupos
-- Instâncias (objetos)
-- Permissões (arestas com rótulo da ação)
+**Header:** seletor de conta, toggle claro/escuro, botão "Sobre" (modal com legenda do Canvas).
 
-**Interatividade:**
-- Filtrar por usuário/grupo
-- Expandir/colapsar nós
-- Ver permissões diretas vs. herdadas de grupo
+**Nós no grafo:**
+- Conta (âncora, laranja)
+- Grupos (azul) — com papel e contador de membros
+- Usuários (verde) — com papel na conta
+- Objetos/instâncias (roxo) — com contador de membros visíveis no grafo
+
+**Arestas:**
+- **Linha sólida** → usuário é membro do grupo
+- **Linha tracejada** → grupo ou usuário tem acesso direto ao objeto
+
+**Legenda** (canto inferior esquerdo): cores dos nós e tipos de aresta.
+
+**Painel lateral (ao clicar em um nó):**
+
+#### Painel de Grupo
+- Nome, escopo e papel do grupo
+- Campo de busca para adicionar membros
+- Lista de membros (com botão de remover)
+- Seção **Objetos** — lista todos os objetos da conta com o papel atual do grupo em cada um (se houver) e cadeado para atribuir/editar permissões via `AtribuirPermissoesSheet` em modo instância
+
+#### Painel de Usuário
+- Nome, e-mail, papel na conta
+- **Grupos (N)** — grupos dos quais o usuário é membro
+- **Acesso direto (N)** — objetos onde o usuário foi adicionado individualmente; cada linha tem cadeado para editar permissões
+- **Via grupo (N)** — objetos acessíveis por herança de grupo (somente leitura; editar pelo painel do grupo)
+- **Outros objetos (N)** — objetos da conta sem acesso; cadeado dimmed para adicionar o usuário
+
+#### Painel de Objeto (Instância)
+- Nome, componente, contador de membros
+- Lista de membros com papel
+- Botão para abrir `InstanciaDetailSheet`
+
+**Comportamento de reload:** o Canvas só recarrega dados quando permissões são salvas (`onSuccess`) — fechar o sheet sem salvar não dispara reload.
 
 ---
 
