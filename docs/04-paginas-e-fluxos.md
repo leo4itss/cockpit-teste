@@ -106,28 +106,28 @@ Página central de gerenciamento de acesso dentro de uma conta. Acessível para 
 **Seletor de Conta:**
 Dropdown no topo — permite selecionar qual conta gerenciar (para Org Admin e Platform Admin, que têm acesso a múltiplas contas).
 
-**4 abas:**
+**Botão "Sobre":** exibe um modal contextual com orientação sobre a aba ativa.
+
+**3 abas:**
 
 #### Aba: Usuários
 - Lista usuários membros da conta selecionada
-- Colunas: Nome, E-mail, Papel na conta, Status
-- Ações: Ver detalhe, Adicionar usuário existente, Criar novo usuário
-- Sheet de detalhe mostra: dados pessoais, papel, objetos com permissão, ações granulares
+- Colunas: Nome, Usuário, E-mail, Papel na conta, Status, Último acesso
+- Ações (⋯): Ver detalhe, Editar, Ativar/Desativar, Ver permissões efetivas, Remover da conta
+- "Ver permissões efetivas" abre `PermissoesEfetivasSheet` — lista todos os objetos e ações do usuário com a origem de cada permissão (direta ou via grupo)
 
-#### Aba: Papéis
+#### Aba: Grupos
 - Lista grupos da conta (escopo `conta`) e da organização (escopo `org`)
-- Botão: "Criar Grupo"
-- Cada grupo mostra: Nome, Escopo, Papel, Membros
-- Ao clicar: abre sheet com membros e permissões do grupo
+- Colunas: Nome, Escopo, Papel padrão, Membros, Status
+- Botão: "Criar grupo"
+- Grupos de escopo `org` são somente leitura nesta página (gerenciados pelo Org Admin)
+- Ao clicar: abre `GrupoDetailSheet` com membros e papel
 
 #### Aba: Objetos
-- Lista instâncias (objetos) da conta
-- Cada objeto mostra: Nome do componente, Tipo, Membros, Status do entitlement
-- Ao clicar: abre `InstanciaDetailSheet` com membros e ações do objeto
-
-#### Aba: (Global — Nível de Conta)
-- Permissões FGA de escopo global (`instancia_id = null`)
-- Lista usuários e grupos com ações no nível da conta inteira
+- Lista instâncias (objetos) agrupadas por componente
+- Cada objeto mostra: Nome, descrição, Membros, Status
+- Ao clicar no ícone de lupa: abre `InstanciaDetailSheet` com membros e ações do objeto
+- Todo acesso a recursos é gerenciado **por objeto** — não existe permissão global de componente
 
 ---
 
