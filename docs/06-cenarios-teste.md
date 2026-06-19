@@ -255,3 +255,117 @@ Testar o fluxo de onboarding de novo usuário: criar conta, adicionar à conta, 
 8. Adicionar **João Teste** como **Leitor**
 9. **Verificar:** Ações de Leitor pré-selecionadas (6 ações): Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Baixar Documento, Imprimir
 10. Salvar
+
+---
+
+## Cenário 5 — Modal de Onboarding Contextual (Acessos)
+
+### Objetivo
+Validar que o botão "Sobre" em Acessos exibe o texto correto para cada aba ativa e que o modal fecha corretamente.
+
+### Pré-condições
+- Qualquer persona com acesso a Acessos
+
+### Passo a Passo
+
+**CT-01 — Aba Usuários**
+1. Navegar para Acessos > aba **Usuários**
+2. Clicar em **"Sobre"** (canto superior direito, ao lado da busca)
+3. **Verificar:** modal abre com título "Sobre esta aba — Usuários"
+4. **Verificar:** texto descreve papéis Membro e Administrador da Conta e menciona a aba Objetos e "Ver permissões efetivas"
+
+**CT-02 — Aba Grupos**
+1. Clicar na aba **Grupos**
+2. Clicar em **"Sobre"**
+3. **Verificar:** título "Sobre esta aba — Grupos"; texto descreve escopo Organização vs. Conta
+
+**CT-03 — Aba Objetos**
+1. Clicar na aba **Objetos**
+2. Clicar em **"Sobre"**
+3. **Verificar:** título "Sobre esta aba — Objetos"; texto descreve papéis predefinidos e permissões herdadas em verde
+
+**CT-04 — Fechar o modal**
+1. Abrir o modal (qualquer aba)
+2. Clicar em **"Entendi"** → modal fecha ✓
+3. Reabrir → clicar no **X** → modal fecha ✓
+4. Reabrir → pressionar **Esc** → modal fecha ✓
+
+---
+
+## Cenário 6 — Modal de Onboarding do Canvas
+
+### Objetivo
+Validar que o botão "Sobre" no Canvas exibe a legenda do grafo.
+
+**CT-05**
+1. Navegar para **Canvas**, selecionar conta Santacruz
+2. Clicar em **"Sobre"** (header, ao lado do toggle claro/escuro)
+3. **Verificar:** modal abre com título "Sobre o Canvas de Permissões"
+4. **Verificar:** texto descreve linha sólida (membro de grupo) e linha tracejada (acesso ao objeto)
+5. Clicar em **"Entendi"** → fecha
+
+---
+
+## Cenário 7 — Painel de Grupo no Canvas (Atribuição por Objeto)
+
+### Objetivo
+Validar que o painel de grupo no Canvas lista objetos com papel atual e permite atribuir permissões por objeto (não por componente global).
+
+### Pré-condições
+- Persona: **Carla Santos** (Account Admin, Santacruz)
+- Canvas > Santacruz selecionada
+
+**CT-06 — Listar objetos no painel do grupo**
+1. Clicar no nó **Farmacêuticos** no Canvas
+2. **Verificar:** painel lateral mostra seção **Objetos (N)** com todas as instâncias da conta
+3. **Verificar:** instâncias onde o grupo tem acesso mostram o papel atual (ex: "Viewer" em Assistente Suporte)
+4. **Verificar:** instâncias sem acesso mostram cadeado dimmed
+
+**CT-07 — Atribuir permissão a um objeto pelo Canvas**
+1. No painel do grupo Farmacêuticos, clicar no cadeado ao lado de **Base Regulatório**
+2. **Verificar:** `AtribuirPermissoesSheet` abre em modo instância para "Farmacêuticos / Base Regulatório"
+3. **Verificar:** NÃO aparecem outros componentes (sheet restrito à instância clicada)
+4. Fechar sem salvar → **Verificar:** Canvas NÃO recarrega
+
+---
+
+## Cenário 8 — Painel de Usuário no Canvas (Acesso Direto + Via Grupo + Outros)
+
+### Objetivo
+Validar as três seções de objetos no painel de usuário do Canvas.
+
+### Pré-condições
+- Canvas > Santacruz, persona Account Admin
+
+**CT-08 — Seções corretas para Lucas Oliveira**
+1. Clicar no nó **Lucas Oliveira**
+2. **Verificar:** seção **Acesso direto** lista Assistente Suporte com papel e cadeado ativo
+3. **Verificar:** seção **Via grupo** lista Assistente Farmacêutico com badge "Farmacêuticos"
+4. **Verificar:** seção **Outros objetos** lista instâncias sem nenhum acesso com cadeado dimmed
+
+**CT-09 — Editar permissão direta pelo Canvas**
+1. No painel de Lucas, clicar no cadeado em **Assistente Suporte** (Acesso direto)
+2. **Verificar:** sheet abre em modo instância para "Lucas Oliveira / Assistente Suporte"
+3. Salvar uma alteração → **Verificar:** Canvas recarrega após salvar
+4. Fechar sem salvar → **Verificar:** Canvas NÃO recarrega
+
+**CT-10 — Adicionar usuário a novo objeto pelo Canvas**
+1. No painel de Lucas, clicar no cadeado dimmed em um objeto na seção **Outros objetos**
+2. **Verificar:** sheet abre em modo instância para "Lucas Oliveira / [nome do objeto]"
+3. Atribuir papel e salvar → **Verificar:** o objeto migra de "Outros objetos" para "Acesso direto" após reload
+
+---
+
+## Cenário 9 — Permissões Efetivas com Herança e DisplayName
+
+### Objetivo
+Validar que "Ver permissões efetivas" mostra a origem correta (grupo com nome, não ID).
+
+**CT-11 — DisplayName do grupo na origem**
+1. Em Acessos > Usuários, nos três pontinhos de **Lucas Oliveira** → "Ver permissões efetivas"
+2. **Verificar:** Assistente Suporte aparece com ação "Viewer" e badge de fonte mostrando **"Farmacêuticos"** (nome do grupo, não ID)
+3. **Verificar:** Assistente Suporte (acesso direto de Lucas) mostra papel sem badge de grupo
+
+**CT-12 — Acesso direto de Beatriz**
+1. "Ver permissões efetivas" de **Beatriz Lima**
+2. **Verificar:** Assistente Suporte aparece como acesso direto sem badge de grupo (foi adicionada individualmente)
