@@ -857,6 +857,8 @@ export default function CanvasPermissoesPage() {
 
   // accountId persiste em sessionStorage — sobrevive à navegação entre abas
   const [accountId, setAccountId] = useSessionState<string | null>('canvas-accountId', null)
+  // Impede carregamento do grafo com accountId stale antes da validação da conta
+  const [accountValidated, setAccountValidated] = useState(false)
 
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [allAccounts, setAllAccounts] = useState<any[]>([])
