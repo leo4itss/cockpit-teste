@@ -872,8 +872,8 @@ export function AcessosPage() {
               <li><strong className="font-semibold">Membro</strong> — pode usar os produtos contratados conforme o que for atribuído a ele nos objetos desta conta.</li>
               <li><strong className="font-semibold">Administrador da Conta</strong> — pode gerenciar usuários e grupos dentro desta conta.</li>
             </ul>
-            <p>Para ver ou ajustar o que um usuário pode fazer em um produto específico (como MaxDoc ou Assistente IA), acesse a aba <strong className="font-semibold">Objetos</strong>.</p>
-            <p>Para ver todas as permissões de um usuário de uma vez, use a opção <strong className="font-semibold">"Ver permissões efetivas"</strong> no menu de ações (⋯) ao lado do nome dele.</p>
+            <p>Para ver ou ajustar o que um usuário pode fazer em um produto específico (como MaxDoc ou Assistente IA), acesse a aba <strong className="font-semibold">Objetos</strong> e adicione-o como membro do objeto desejado.</p>
+            <p>Use a opção <strong className="font-semibold">"Ver permissões efetivas"</strong> no menu de ações (⋯) ao lado do nome para ver tudo que o usuário pode fazer, incluindo permissões herdadas de grupos. <span className="text-[#6b7280]">Apenas objetos nos quais o usuário é membro direto ou pertence a um grupo membro aparecem nesta listagem.</span></p>
           </div>
         )}
         {abaAtiva === 'grupos' && (
