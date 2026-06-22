@@ -906,9 +906,9 @@ export default function CanvasPermissoesPage() {
     })
   }, [])
 
-  // Carrega dados da conta
+  // Carrega dados da conta — aguarda validação do accountId para evitar carregar conta stale
   useEffect(() => {
-    if (!accountId) return
+    if (!accountId || !accountValidated) return
     setLoading(true)
     setSelected(null)
     async function load() {
