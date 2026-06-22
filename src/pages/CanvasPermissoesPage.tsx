@@ -890,11 +890,13 @@ export default function CanvasPermissoesPage() {
     api.getAccounts(orgFilter).then(acc => {
       const ativos = (acc as any[]).filter(a => !a.deletedAt)
       setAllAccounts(ativos)
-      if (!accountId) setAccountId(defaultAccId ?? ativos[0]?.id ?? null)
+      const isValid = ativos.some((a: any) => a.id === accountId)
+      if (!accountId || !isValid) setAccountId(defaultAccId ?? ativos[0]?.id ?? null)
     }).catch(() => {
       const fallback = mockAccounts.filter(a => !orgFilter || a.orgId === orgFilter)
       setAllAccounts(fallback)
-      if (!accountId) setAccountId(defaultAccId ?? fallback[0]?.id ?? null)
+      const isValid = fallback.some(a => a.id === accountId)
+      if (!accountId || !isValid) setAccountId(defaultAccId ?? fallback[0]?.id ?? null)
     })
   }, [])
 
