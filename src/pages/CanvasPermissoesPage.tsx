@@ -974,7 +974,7 @@ export default function CanvasPermissoesPage() {
       finally { setLoading(false) }
     }
     load()
-  }, [accountId, refreshKey])
+  }, [accountId, refreshKey, accountValidated])
 
   // Reconstrói o grafo
   useEffect(() => {
