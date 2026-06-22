@@ -882,9 +882,11 @@ export default function CanvasPermissoesPage() {
       api.getAccount(defaultAccId).then(acc => {
         setAllAccounts([acc])
         setAccountId(defaultAccId)
+        setAccountValidated(true)
       }).catch(() => {
         const mock = mockAccounts.find(a => a.id === defaultAccId)
         if (mock) { setAllAccounts([mock]); setAccountId(defaultAccId) }
+        setAccountValidated(true)
       })
       return
     }
@@ -894,11 +896,13 @@ export default function CanvasPermissoesPage() {
       setAllAccounts(ativos)
       const isValid = ativos.some((a: any) => a.id === accountId)
       if (!accountId || !isValid) setAccountId(defaultAccId ?? ativos[0]?.id ?? null)
+      setAccountValidated(true)
     }).catch(() => {
       const fallback = mockAccounts.filter(a => !orgFilter || a.orgId === orgFilter)
       setAllAccounts(fallback)
       const isValid = fallback.some(a => a.id === accountId)
       if (!accountId || !isValid) setAccountId(defaultAccId ?? fallback[0]?.id ?? null)
+      setAccountValidated(true)
     })
   }, [])
 
