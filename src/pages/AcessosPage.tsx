@@ -878,13 +878,13 @@ export function AcessosPage() {
         )}
         {abaAtiva === 'grupos' && (
           <div className="text-sm text-[#374151] leading-relaxed space-y-3">
-            <p>Você está gerenciando os grupos desta conta. Grupos permitem atribuir permissões a várias pessoas de uma vez — todos os membros do grupo herdam automaticamente o acesso concedido ao grupo em qualquer objeto.</p>
+            <p>Você está gerenciando os grupos desta conta. Grupos permitem atribuir permissões a várias pessoas de uma vez — em vez de configurar cada usuário individualmente, você adiciona o grupo a um objeto e todos os seus membros herdam automaticamente o acesso.</p>
             <p>Existem dois tipos:</p>
             <ul className="space-y-1.5 pl-1">
               <li><strong className="font-semibold">Escopo Organização</strong> — criado pelo administrador da organização, compartilhado entre todas as contas, não editável aqui.</li>
               <li><strong className="font-semibold">Escopo Conta</strong> — exclusivo desta conta, criado e gerenciado aqui.</li>
             </ul>
-            <p>Para atribuir um grupo a um objeto, acesse a aba <strong className="font-semibold">Objetos</strong>.</p>
+            <p><strong className="font-semibold">Atenção:</strong> pertencer a um grupo não concede nenhum acesso automaticamente. É necessário adicionar o grupo a um objeto na aba <strong className="font-semibold">Objetos</strong> — somente então seus membros passam a herdar as permissões daquele objeto.</p>
           </div>
         )}
         {abaAtiva === 'instancias' && (
