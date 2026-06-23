@@ -547,7 +547,7 @@ Trocar o PersonaSwitcher para cada persona e verificar o sidebar:
 |---|---------|----------------|
 | MX-01 | Papel **Leitor** tem exatamente 6 ações: Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Baixar Documento, Imprimir | Adicionar membro com papel Leitor e conferir seleção |
 | MX-02 | Papel **Editor** não inclui Aprovar ou Publicar | Adicionar membro com papel Editor e conferir ausência |
-| MX-03 | Trocar papel atualiza ações automaticamente | Mudar Editor → Revisor e verificar mudança |
+| MX-03 | Trocar papel atualiza as **ações diretas** automaticamente; ações herdadas de grupo permanecem em verde (read-only) | Mudar Editor → Revisor: diretas mudam; badges de grupo mantidos |
 | MX-04 | Modo Personalizado persiste ao reabrir | Salvar seleção manual, fechar e reabrir |
 | MX-05 | Grupo com papel Aprovador concede ações a todos os membros | Adicionar grupo, verificar herança para membro do grupo |
 | MX-06 | Ações via grupo aparecem em verde (read-only) | Abrir PermissoesMembroSheet de usuário com herança de grupo |
