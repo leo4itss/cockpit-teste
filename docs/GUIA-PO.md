@@ -332,7 +332,7 @@ A operação é irreversível, mas pode ser refeita adicionando o membro novamen
 2. O painel de ações do membro (PermissoesMembroSheet) abre
 3. Clicar no card **Revisor** no seletor de papel
 4. ✅ **Verificar:** As ações atualizam automaticamente para: *Visualizar, Revisar Documento, Submeter para Aprovação, Solicitar Revisão*
-5. ✅ **Verificar:** *Criar Documento* e *Editar* **não** aparecem (o sistema limpa as ações anteriores e aplica as do novo papel)
+5. ✅ **Verificar:** As ações **diretas** de Editor foram substituídas pelas de Revisor. Se Fernando pertence a um grupo com acesso ao objeto (ex: Analistas de Qualidade), algumas ações como *Criar Documento* e *Editar* podem aparecer **em verde** — são herdadas do grupo e não do papel direto; não podem ser desmarcadas individualmente
 6. Salvar
 
 ---
