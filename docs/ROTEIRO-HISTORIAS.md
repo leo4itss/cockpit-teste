@@ -104,13 +104,14 @@ A **Comgas** e a **Santacruz** acabaram de contratar a suite PAS da ITSS. O Cock
 
 1. No painel do MaxDoc Comgas, clicar em **Ações** ao lado de **Fernando Costa**
 2. O painel de ações do membro abre (PermissoesMembroSheet)
-3. Mostrar as ações atuais de Editor (9 ações)
+3. Observar o banner verde no topo: _"Algumas ações estão marcadas via grupo — são somente leitura"_
 4. Clicar no card **Revisor**
-5. ✅ As ações mudam automaticamente para: Visualizar, Revisar Documento, Submeter para Aprovação, Solicitar Revisão
-6. ✅ *Criar Documento* e *Editar* somem — o sistema apaga o papel anterior e aplica o novo
-7. Salvar
+5. ✅ As ações **diretas** de Editor são substituídas pelas de Revisor: Visualizar, Revisar Documento, Submeter para Aprovação, Solicitar Revisão
+6. ✅ Algumas ações como *Criar Documento* e *Editar* **permanecem marcadas** — mas com o badge verde **"Analistas de Qualidade"**: são herdadas do grupo, não do papel direto
+7. ✅ Essas ações herdadas aparecem desabilitadas (não podem ser desmarcadas individualmente) — para removê-las seria necessário remover o grupo do objeto
+8. Salvar
 
-> _"Trocar o papel não acumula permissões antigas. O Cockpit apaga tudo que era do papel anterior e aplica exatamente o que o novo papel define. Sem sobras, sem surpresas."_
+> _"Trocar o papel atualiza apenas as permissões diretas de Fernando — o sistema apaga tudo que vinha do papel anterior e aplica o que o novo papel define. O que permanece marcado em verde vem do grupo Analistas de Qualidade, que também tem acesso a este objeto. São duas origens distintas, visíveis lado a lado."_
 
 ### Cena 3.1 — Usar o modo Personalizado
 
