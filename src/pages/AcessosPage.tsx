@@ -295,14 +295,32 @@ export function AcessosPage() {
 
   useEffect(() => {
     if (!accountId) return
-    api.getInstancias({ accountId })
-      .then(data => { setInstancias(data); setLoadingInstancias(false) })
-      .catch(() => {
-        // Fallback: filtra mock local pela conta
-        setInstancias(mockInstancias.filter(i => i.accountId === accountId))
+    setLoadingInstancias(true)
+    if (isAllAccounts) {
+      Promise.all(
+        allAccounts.map(acc =>
+          api.getInstancias({ accountId: acc.id })
+            .then((data: Instancia[]) => data.map(i => ({ i, accName: acc.name })))
+            .catch(() => [] as { i: Instancia; accName: string }[])
+        )
+      ).then(results => {
+        const merged: Instancia[] = []
+        const map: Record<string, string> = {}
+        results.flat().forEach(({ i, accName }) => { merged.push(i); map[i.id] = accName })
+        setInstancias(merged)
+        setInstAccountMap(map)
         setLoadingInstancias(false)
       })
-  }, [accountId])
+      return
+    }
+    api.getInstancias({ accountId })
+      .then(data => { setInstancias(data); setInstAccountMap({}); setLoadingInstancias(false) })
+      .catch(() => {
+        setInstancias(mockInstancias.filter(i => i.accountId === accountId))
+        setInstAccountMap({})
+        setLoadingInstancias(false)
+      })
+  }, [accountId, allAccounts])
 
   // Mapa de componenteId → nome (para exibir na coluna Componente)
   const [componenteNomes, setComponenteNomes] = useState<Record<string, string>>({})
