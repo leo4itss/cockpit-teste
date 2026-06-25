@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect, useMemo } from 'react'
-import { Search, UserPlus, UserMinus, Loader2, X, Building2, Building } from 'lucide-react'
+import { Search, UserPlus, UserMinus, Loader2, Building2, Building } from 'lucide-react'
 import {
   NestedSheet,
   NestedSheetHeader,
