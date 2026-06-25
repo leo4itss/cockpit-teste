@@ -286,7 +286,8 @@ export function AcessosPage() {
   }
 
   // ── Instâncias ──────────────────────────────────────────────
-  const [instancias, setInstancias]             = useState<Instancia[]>([])
+  const [instancias, setInstancias]               = useState<Instancia[]>([])
+  const [instAccountMap, setInstAccountMap]        = useState<Record<string, string>>({})
   const [loadingInstancias, setLoadingInstancias] = useState(true)
   const [searchInstancias, setSearchInstancias]   = useState('')
   const [showInstanciaDetail, setShowInstanciaDetail] = useState(false)
