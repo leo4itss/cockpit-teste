@@ -1173,13 +1173,50 @@ export default function CanvasPermissoesPage() {
             </button>
           }
         >
-          <div className="text-sm text-[#374151] leading-relaxed space-y-3">
-            <p>Você está no Canvas de Permissões. Esta tela mostra uma visão gráfica da estrutura de acessos da conta: grupos, usuários e objetos, conectados pelas relações de permissão.</p>
-            <ul className="space-y-1.5 pl-1">
-              <li><strong className="font-semibold">Linha sólida</strong> entre usuário e grupo: o usuário é membro daquele grupo.</li>
-              <li><strong className="font-semibold">Linha tracejada</strong> entre grupo/usuário e objeto: o grupo ou usuário tem acesso direto ao objeto.</li>
-            </ul>
-            <p>Clique em qualquer nó para ver detalhes no painel lateral.</p>
+          <div className="text-sm text-[#374151] leading-relaxed space-y-4">
+            <p>O <strong className="font-semibold">Canvas de Permissões</strong> é a visão <em>operacional</em> — permite visualizar e gerenciar as permissões granulares dentro de uma conta específica: grupos, usuários e objetos (instâncias), conectados pelas relações de acesso.</p>
+
+            <div>
+              <p className="font-semibold mb-1.5">Diferença em relação ao Canvas Org</p>
+              <div className="rounded-lg overflow-hidden border border-[#e5e7eb]">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="bg-[#f9fafb]">
+                      <th className="text-left px-3 py-2 font-semibold text-[#6b7280]"> </th>
+                      <th className="text-left px-3 py-2 font-semibold text-[#6b7280]">Canvas (esta tela)</th>
+                      <th className="text-left px-3 py-2 font-semibold text-[#6b7280]">Canvas Org</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#f3f4f6]">
+                    <tr>
+                      <td className="px-3 py-2 font-medium text-[#374151]">Seletor</td>
+                      <td className="px-3 py-2 text-[#374151]">Conta</td>
+                      <td className="px-3 py-2 text-[#374151]">Organização</td>
+                    </tr>
+                    <tr>
+                      <td className="px-3 py-2 font-medium text-[#374151]">Foco</td>
+                      <td className="px-3 py-2 text-[#374151]">Permissões dentro de uma conta</td>
+                      <td className="px-3 py-2 text-[#374151]">Hierarquia Org → Contas</td>
+                    </tr>
+                    <tr>
+                      <td className="px-3 py-2 font-medium text-[#374151]">Uso</td>
+                      <td className="px-3 py-2 text-[#374151]">Gerenciar e editar acessos</td>
+                      <td className="px-3 py-2 text-[#374151]">Entender a estrutura organizacional</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div>
+              <p className="font-semibold mb-1.5">Leitura do grafo</p>
+              <ul className="space-y-1.5 pl-1">
+                <li><strong className="font-semibold">Linha sólida</strong> entre usuário e grupo: o usuário é membro daquele grupo.</li>
+                <li><strong className="font-semibold">Linha tracejada</strong> entre grupo/usuário e objeto: há acesso direto ao objeto.</li>
+              </ul>
+            </div>
+
+            <p>Clique em qualquer nó para ver detalhes e gerenciar permissões no painel lateral.</p>
           </div>
         </Modal>
       </div>
