@@ -1057,48 +1057,60 @@ function CanvasOrgInner() {
             </button>
           }
         >
-          <div className="text-sm text-[#374151] leading-relaxed space-y-4">
-            <p>O <strong className="font-semibold">Canvas Org</strong> é a visão <em>estrutural</em> — permite entender a hierarquia organizacional: organização, contas e, ao expandir uma conta, os grupos, usuários e instâncias vinculados a ela.</p>
+          <div className="space-y-5">
+            <p className="text-sm text-[#374151] leading-relaxed">
+              Visão <strong className="font-semibold">estrutural</strong> da organização — explore a hierarquia de contas e veja grupos, usuários e objetos vinculados a cada uma.
+            </p>
 
             <div>
-              <p className="font-semibold mb-1.5">Diferença em relação ao Canvas</p>
-              <div className="rounded-lg overflow-hidden border border-[#e5e7eb]">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-[#9ca3af] mb-3">Canvas Org vs Canvas</p>
+              <div className="rounded-xl overflow-hidden border border-[#e5e7eb]">
                 <table className="w-full text-xs">
                   <thead>
-                    <tr className="bg-[#f9fafb]">
-                      <th className="text-left px-3 py-2 font-semibold text-[#6b7280]"> </th>
-                      <th className="text-left px-3 py-2 font-semibold text-[#6b7280]">Canvas Org (esta tela)</th>
-                      <th className="text-left px-3 py-2 font-semibold text-[#6b7280]">Canvas</th>
+                    <tr className="bg-[#f3f4f6]">
+                      <th className="text-left px-3 py-2.5 font-semibold text-[#6b7280] w-[90px]"> </th>
+                      <th className="text-left px-3 py-2.5 font-semibold text-[#030712]">Canvas Org <span className="font-normal text-[#6b7280]">(esta tela)</span></th>
+                      <th className="text-left px-3 py-2.5 font-semibold text-[#6b7280]">Canvas</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#f3f4f6]">
-                    <tr>
-                      <td className="px-3 py-2 font-medium text-[#374151]">Seletor</td>
-                      <td className="px-3 py-2 text-[#374151]">Organização</td>
-                      <td className="px-3 py-2 text-[#374151]">Conta</td>
-                    </tr>
-                    <tr>
-                      <td className="px-3 py-2 font-medium text-[#374151]">Foco</td>
-                      <td className="px-3 py-2 text-[#374151]">Hierarquia Org → Contas</td>
-                      <td className="px-3 py-2 text-[#374151]">Permissões dentro de uma conta</td>
-                    </tr>
-                    <tr>
-                      <td className="px-3 py-2 font-medium text-[#374151]">Uso</td>
-                      <td className="px-3 py-2 text-[#374151]">Entender a estrutura organizacional</td>
-                      <td className="px-3 py-2 text-[#374151]">Gerenciar e editar acessos</td>
-                    </tr>
+                    {([
+                      ['Seletor', 'Organização', 'Conta'],
+                      ['Foco', 'Hierarquia Org → Contas', 'Permissões dentro de uma conta'],
+                      ['Uso', 'Entender a estrutura organizacional', 'Gerenciar e editar acessos'],
+                    ] as const).map(([label, current, other]) => (
+                      <tr key={label} className="hover:bg-[#fafafa]">
+                        <td className="px-3 py-2.5 font-semibold text-[#374151]">{label}</td>
+                        <td className="px-3 py-2.5 text-[#030712] font-medium">{current}</td>
+                        <td className="px-3 py-2.5 text-[#6b7280]">{other}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
             </div>
 
             <div>
-              <p className="font-semibold mb-1.5">Como usar</p>
-              <ul className="space-y-1.5 pl-1">
-                <li>Selecione uma organização no seletor superior para visualizá-la.</li>
-                <li>Clique em uma <strong className="font-semibold">Conta</strong> para expandir e ver seus grupos, usuários e objetos.</li>
-                <li>Clique em qualquer nó expandido para ver detalhes no painel lateral.</li>
-              </ul>
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-[#9ca3af] mb-3">Como usar</p>
+              <div className="space-y-2">
+                {([
+                  { step: '1', text: 'Selecione uma organização no seletor do topo.' },
+                  { step: '2', text: <span>Clique em uma <strong className="font-semibold text-[#030712]">Conta</strong> para expandir grupos, usuários e objetos.</span> },
+                  { step: '3', text: 'Clique em qualquer nó expandido para ver detalhes no painel lateral.' },
+                ] as { step: string; text: React.ReactNode }[]).map(({ step, text }) => (
+                  <div key={step} className="flex items-start gap-3 p-3 rounded-xl bg-[#f9fafb] border border-[#f3f4f6]">
+                    <span className="w-5 h-5 rounded-full bg-[#e5e7eb] flex items-center justify-center text-[10px] font-bold text-[#374151] shrink-0 mt-0.5">{step}</span>
+                    <p className="text-sm text-[#374151] leading-relaxed">{text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-3 p-3 rounded-xl bg-blue-50 border border-blue-100">
+              <Info className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+              <p className="text-xs text-blue-800 leading-relaxed">
+                Para gerenciar permissões granulares dentro de uma conta, use o <strong className="font-semibold">Canvas</strong>.
+              </p>
             </div>
           </div>
         </Modal>
