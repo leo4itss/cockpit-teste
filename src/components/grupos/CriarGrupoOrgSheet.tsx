@@ -145,7 +145,7 @@ export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, grupos 
       id:        crypto.randomUUID(),
       nome:      nome.trim(),
       descricao: descricao.trim() || undefined,
-      papel,
+      papel:     '',
       escopo,
       orgId:     escopo === 'org'   ? orgIdEfetivo     : undefined,
       accountId: escopo === 'conta' ? contaSelecionada : undefined,
