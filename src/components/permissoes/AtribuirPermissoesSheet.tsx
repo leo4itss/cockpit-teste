@@ -419,14 +419,16 @@ export function AtribuirPermissoesSheet({
         }
       }
 
-      // Modo instância (Canvas): sincroniza instancia_membros com as permissões salvas
-      if (instanciaId && instanciaComponenteId) {
-        const activeDraft = draft[instanciaComponenteId] ?? []
-        const papelValue  = papelSelecionado[instanciaComponenteId]
-        const papel       = (papelValue && papelValue !== 'personalizado') ? papelValue : 'member'
+      // Modo instância (Canvas): sincroniza instancia_membros com as permissões salvas.
+      // Em modo instância há apenas um componente — usa Object.values para não depender
+      // de instanciaComponenteId bater exatamente com a chave do draft.
+      if (instanciaId) {
+        const activeActions = Object.values(draft).flat()
+        const papelValue    = Object.values(papelSelecionado)[0]
+        const papel         = (papelValue && papelValue !== 'personalizado') ? papelValue : 'member'
 
-        if (activeDraft.length > 0) {
-          await api.addInstanciaMembro(instanciaId, { entidadeTipo, entidadeId: entityId, papel }).catch(() => {})
+        if (activeActions.length > 0) {
+          await api.addInstanciaMembro(instanciaId, { entidadeTipo, entidadeId: entityId, papel })
         } else {
           // Sem permissões ativas: remove da instância se for membro
           try {
