@@ -1173,50 +1173,65 @@ export default function CanvasPermissoesPage() {
             </button>
           }
         >
-          <div className="text-sm text-[#374151] leading-relaxed space-y-4">
-            <p>O <strong className="font-semibold">Canvas de Permissões</strong> é a visão <em>operacional</em> — permite visualizar e gerenciar as permissões granulares dentro de uma conta específica: grupos, usuários e objetos (instâncias), conectados pelas relações de acesso.</p>
+          <div className="space-y-5">
+            <p className="text-sm text-[#374151] leading-relaxed">
+              Visão <strong className="font-semibold">operacional</strong> das permissões de uma conta — veja e gerencie quem tem acesso a quê, com toda a herança de grupos visível no grafo.
+            </p>
 
             <div>
-              <p className="font-semibold mb-1.5">Diferença em relação ao Canvas Org</p>
-              <div className="rounded-lg overflow-hidden border border-[#e5e7eb]">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-[#9ca3af] mb-3">Canvas vs Canvas Org</p>
+              <div className="rounded-xl overflow-hidden border border-[#e5e7eb]">
                 <table className="w-full text-xs">
                   <thead>
-                    <tr className="bg-[#f9fafb]">
-                      <th className="text-left px-3 py-2 font-semibold text-[#6b7280]"> </th>
-                      <th className="text-left px-3 py-2 font-semibold text-[#6b7280]">Canvas (esta tela)</th>
-                      <th className="text-left px-3 py-2 font-semibold text-[#6b7280]">Canvas Org</th>
+                    <tr className="bg-[#f3f4f6]">
+                      <th className="text-left px-3 py-2.5 font-semibold text-[#6b7280] w-[90px]"> </th>
+                      <th className="text-left px-3 py-2.5 font-semibold text-[#030712]">Canvas <span className="font-normal text-[#6b7280]">(esta tela)</span></th>
+                      <th className="text-left px-3 py-2.5 font-semibold text-[#6b7280]">Canvas Org</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#f3f4f6]">
-                    <tr>
-                      <td className="px-3 py-2 font-medium text-[#374151]">Seletor</td>
-                      <td className="px-3 py-2 text-[#374151]">Conta</td>
-                      <td className="px-3 py-2 text-[#374151]">Organização</td>
-                    </tr>
-                    <tr>
-                      <td className="px-3 py-2 font-medium text-[#374151]">Foco</td>
-                      <td className="px-3 py-2 text-[#374151]">Permissões dentro de uma conta</td>
-                      <td className="px-3 py-2 text-[#374151]">Hierarquia Org → Contas</td>
-                    </tr>
-                    <tr>
-                      <td className="px-3 py-2 font-medium text-[#374151]">Uso</td>
-                      <td className="px-3 py-2 text-[#374151]">Gerenciar e editar acessos</td>
-                      <td className="px-3 py-2 text-[#374151]">Entender a estrutura organizacional</td>
-                    </tr>
+                    {([
+                      ['Seletor', 'Conta', 'Organização'],
+                      ['Foco', 'Permissões dentro de uma conta', 'Hierarquia Org → Contas'],
+                      ['Uso', 'Gerenciar e editar acessos', 'Entender a estrutura organizacional'],
+                    ] as const).map(([label, current, other]) => (
+                      <tr key={label} className="hover:bg-[#fafafa]">
+                        <td className="px-3 py-2.5 font-semibold text-[#374151]">{label}</td>
+                        <td className="px-3 py-2.5 text-[#030712] font-medium">{current}</td>
+                        <td className="px-3 py-2.5 text-[#6b7280]">{other}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
             </div>
 
             <div>
-              <p className="font-semibold mb-1.5">Leitura do grafo</p>
-              <ul className="space-y-1.5 pl-1">
-                <li><strong className="font-semibold">Linha sólida</strong> entre usuário e grupo: o usuário é membro daquele grupo.</li>
-                <li><strong className="font-semibold">Linha tracejada</strong> entre grupo/usuário e objeto: há acesso direto ao objeto.</li>
-              </ul>
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-[#9ca3af] mb-3">Leitura do grafo</p>
+              <div className="space-y-2">
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-[#f9fafb] border border-[#f3f4f6]">
+                  <span className="mt-0.5 w-6 h-[2px] bg-[#374151] shrink-0 rounded-full self-center" />
+                  <div>
+                    <p className="text-sm font-semibold text-[#030712]">Linha sólida</p>
+                    <p className="text-xs text-[#6b7280] mt-0.5">Usuário → Grupo: o usuário é membro daquele grupo.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-[#f9fafb] border border-[#f3f4f6]">
+                  <span className="mt-0.5 w-6 shrink-0 self-center border-t-2 border-dashed border-[#374151]" />
+                  <div>
+                    <p className="text-sm font-semibold text-[#030712]">Linha tracejada</p>
+                    <p className="text-xs text-[#6b7280] mt-0.5">Grupo ou usuário → Objeto: há acesso direto ao objeto.</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <p>Clique em qualquer nó para ver detalhes e gerenciar permissões no painel lateral.</p>
+            <div className="flex gap-3 p-3 rounded-xl bg-blue-50 border border-blue-100">
+              <Info className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+              <p className="text-xs text-blue-800 leading-relaxed">
+                Clique em qualquer nó para ver detalhes e gerenciar permissões no painel lateral.
+              </p>
+            </div>
           </div>
         </Modal>
       </div>
