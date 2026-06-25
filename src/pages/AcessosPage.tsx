@@ -508,6 +508,9 @@ export function AcessosPage() {
                       onChange={e => setSelectedAccountId(e.target.value)}
                       className="appearance-none pl-2 pr-6 py-0.5 text-[11px] font-medium border border-gray-200 rounded-full bg-gray-50 text-gray-700 outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
                     >
+                      {isPlatformAdmin && (
+                        <option value={ALL_ACCOUNTS}>Todas as contas</option>
+                      )}
                       {allAccounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
                     </select>
                     <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
