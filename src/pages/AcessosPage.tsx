@@ -720,6 +720,11 @@ export function AcessosPage() {
                       <td className="px-4 py-3 text-sm text-[#030712]">{grupo.qtdMembros ?? 0}</td>
                       <td className="px-4 py-3"><PapelBadge papel={grupo.papel} /></td>
                       <td className="px-4 py-3"><EscopoBadge escopo={grupo.escopo} /></td>
+                      {isAllAccounts && (
+                        <td className="px-4 py-3 text-sm text-[#6b7280]">
+                          {grupo.escopo === 'org' ? <span className="italic text-xs">Org (todas)</span> : (allAccounts.find(a => a.id === grupo.accountId)?.name ?? '—')}
+                        </td>
+                      )}
                       <td className="px-4 py-3 text-center">
                         {grupo.status === 'Ativo'
                           ? <Badge variant="success">Ativo</Badge>
