@@ -756,7 +756,7 @@ export function AcessosPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={6} className="px-4 py-12 text-center">
+                    <td colSpan={isAllAccounts ? 7 : 6} className="px-4 py-12 text-center">
                       <p className="text-sm font-medium text-[#030712]">Nenhum grupo encontrado</p>
                       <p className="text-xs text-[#6b7280] mt-1">Crie um grupo para organizar os usuários desta conta.</p>
                     </td>
