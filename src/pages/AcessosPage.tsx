@@ -117,10 +117,11 @@ export function AcessosPage() {
     if (isPlatformAdmin && !selectedOrgId) { setAllAccounts([]); return }
     api.getAccounts(orgFilter)
       .then((accs: any[]) => {
-        setAllAccounts(accs.filter(a => !a.deletedAt))
-        // se a conta selecionada não pertence mais à org escolhida, limpa
-        if (selectedAccountId && !accs.find(a => a.id === selectedAccountId)) {
-          setSelectedAccountId('')
+        const active = accs.filter(a => !a.deletedAt)
+        setAllAccounts(active)
+        // se a conta selecionada não pertence mais à org escolhida, auto-seleciona a primeira
+        if (!selectedAccountId || !active.find(a => a.id === selectedAccountId)) {
+          setSelectedAccountId(active.length > 0 ? active[0].id : '')
         }
       })
       .catch(() => {})
