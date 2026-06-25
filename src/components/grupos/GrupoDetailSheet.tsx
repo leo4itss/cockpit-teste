@@ -5,11 +5,10 @@
  *   - Lista de membros com avatar, nome e e-mail
  *   - Adicionar membro via busca inline (dropdown de sugestões)
  *   - Remover membro com confirmação (ação visível só no hover)
- *   - Edição inline do papel (role) do grupo
  */
 
 import { useState, useEffect, useMemo } from 'react'
-import { Search, UserPlus, UserMinus, Loader2, Pencil, Check, X, Building2, Building } from 'lucide-react'
+import { Search, UserPlus, UserMinus, Loader2, X, Building2, Building } from 'lucide-react'
 import {
   NestedSheet,
   NestedSheetHeader,
