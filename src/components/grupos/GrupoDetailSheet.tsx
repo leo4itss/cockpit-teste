@@ -168,6 +168,7 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
   const [removingId, setRemovingId]     = useState<string | null>(null)
   const [objetos, setObjetos]           = useState<GrupoInstanciaVinculo[]>([])
   const [loadingObjetos, setLoadingObjetos] = useState(false)
+  const [objetosExpanded, setObjetosExpanded] = useState(true)
 
   // Carrega membros, usuários e objetos ao abrir
   useEffect(() => {
