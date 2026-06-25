@@ -609,3 +609,18 @@ export function getComponenteConfig(componenteNome: string): ComponenteTypeConfi
   const key = normalizeComponenteKey(componenteNome)
   return COMPONENTE_CONFIGS[key] ?? COMPONENTE_CONFIGS['default']
 }
+
+/**
+ * Busca informações de exibição de um papel em todos os componentes.
+ * Útil quando o Grupo guarda só o value do papel sem saber qual componente o definiu.
+ * Retorna o primeiro match encontrado; em caso de conflito de value entre componentes,
+ * prioriza pela ordem de definição em COMPONENTE_CONFIGS.
+ */
+export function getPapelInfo(value: string): { label: string; cls: string } | undefined {
+  if (!value) return undefined
+  for (const cfg of Object.values(COMPONENTE_CONFIGS)) {
+    const found = cfg.papeis.find(p => p.value === value)
+    if (found) return { label: found.label, cls: found.cls }
+  }
+  return undefined
+}
