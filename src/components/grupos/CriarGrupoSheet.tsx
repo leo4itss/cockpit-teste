@@ -34,8 +34,7 @@ interface Props {
   open:              boolean
   onClose:           () => void
   accountId:         string
-  // Nomes dos componentes ativos na conta (ex: ['MaxDoc','DocAction'] ou ['Assistente IA'])
-  componentesAtivos?: string[]
+  componentesAtivos?: string[]  // mantido para compatibilidade com chamadores existentes
   onSuccess:         (grupo: Grupo) => void
 }
 
