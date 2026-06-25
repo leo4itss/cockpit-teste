@@ -436,7 +436,9 @@ export function AcessosPage() {
       <div className="flex items-start justify-between px-8 py-4 gap-6">
         <div className="min-w-0">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-violet-50 text-violet-600 border border-violet-200">Escopo: Conta</span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-violet-50 text-violet-600 border border-violet-200">
+              {isAllAccounts ? 'Escopo: Organização' : 'Escopo: Conta'}
+            </span>
             {isAccountAdmin && !isPlatformAdmin && !isOrgAdmin && (
               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-orange-50 text-orange-600 border border-orange-200">Account Admin</span>
             )}
