@@ -418,6 +418,25 @@ export function AtribuirPermissoesSheet({
           }
         }
       }
+
+      // Modo instância (Canvas): sincroniza instancia_membros com as permissões salvas
+      if (instanciaId && instanciaComponenteId) {
+        const activeDraft = draft[instanciaComponenteId] ?? []
+        const papelValue  = papelSelecionado[instanciaComponenteId]
+        const papel       = (papelValue && papelValue !== 'personalizado') ? papelValue : 'member'
+
+        if (activeDraft.length > 0) {
+          await api.addInstanciaMembro(instanciaId, { entidadeTipo, entidadeId, papel }).catch(() => {})
+        } else {
+          // Sem permissões ativas: remove da instância se for membro
+          try {
+            const membros = await api.getInstanciaMembros(instanciaId)
+            const membro  = membros.find((m: any) => m.entidadeId === entityId)
+            if (membro) await api.removeInstanciaMembro(instanciaId, membro.id)
+          } catch { /* silencioso */ }
+        }
+      }
+
       onSuccess?.()
       handleClose()
     } catch (err: any) {
