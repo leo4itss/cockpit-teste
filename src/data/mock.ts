@@ -1064,19 +1064,19 @@ export const instanciaMembros: InstanciaMembro[] = [
   { id: 'im-sdash-lucas',  instanciaId: 'inst-a2-dash-com', entidadeTipo: 'user',  entidadeId: 'usr-lucas',        papel: 'viewer', assignedAt: '01/02/2026', displayName: 'Lucas Oliveira', email: 'lucas.oliveira@santacruz.com.br' },
   // ── Santacruz — inst-a2-maxdoc: Gestão Documental (DocNix) ────
   // ── Comgas — inst-comgas-maxdoc (DocNix) ─────────────────────
-  { id: 'im-cgmd-fernando', instanciaId: 'inst-comgas-maxdoc',    entidadeTipo: 'user',  entidadeId: 'usr-fernando',    papel: 'admin',  assignedAt: '01/03/2026', displayName: 'Fernando Costa',   email: 'fernando.costa@comgas.com.br' },
-  { id: 'im-cgmd-neide',    instanciaId: 'inst-comgas-maxdoc',    entidadeTipo: 'user',  entidadeId: 'usr-neide',       papel: 'member', assignedAt: '01/03/2026', displayName: 'Neide Oliveira',   email: 'neide.oliveira@comgas.com.br' },
-  { id: 'im-cgmd-grpaq',   instanciaId: 'inst-comgas-maxdoc',    entidadeTipo: 'group', entidadeId: 'grp-comgas-aq',   papel: 'member', assignedAt: '01/03/2026', displayName: 'Assuntos Regulatórios' },
+  { id: 'im-cgmd-fernando', instanciaId: 'inst-comgas-maxdoc',    entidadeTipo: 'user',  entidadeId: 'usr-fernando',    papel: 'editor',       assignedAt: '01/03/2026', displayName: 'Fernando Costa',   email: 'fernando.costa@comgas.com.br' },
+  { id: 'im-cgmd-neide',    instanciaId: 'inst-comgas-maxdoc',    entidadeTipo: 'user',  entidadeId: 'usr-neide',       papel: 'leitor',       assignedAt: '01/03/2026', displayName: 'Neide Oliveira',   email: 'neide.oliveira@comgas.com.br' },
+  { id: 'im-cgmd-grpaq',   instanciaId: 'inst-comgas-maxdoc',    entidadeTipo: 'group', entidadeId: 'grp-comgas-aq',   papel: 'revisor',      assignedAt: '01/03/2026', displayName: 'Assuntos Regulatórios' },
   // ── Comgas — inst-comgas-docaction (DocNix) ───────────────────
-  { id: 'im-cgda-marcelo',  instanciaId: 'inst-comgas-docaction', entidadeTipo: 'user',  entidadeId: 'usr-marcelo-c',   papel: 'admin',  assignedAt: '01/03/2026', displayName: 'Marcelo Ribeiro',  email: 'marcelo.ribeiro@comgas.com.br' },
-  { id: 'im-cgda-grpvend',  instanciaId: 'inst-comgas-docaction', entidadeTipo: 'group', entidadeId: 'grp-comgas-vend', papel: 'member', assignedAt: '01/03/2026', displayName: 'Equipe de Vendas' },
+  { id: 'im-cgda-marcelo',  instanciaId: 'inst-comgas-docaction', entidadeTipo: 'user',  entidadeId: 'usr-marcelo-c',   papel: 'admin-docaction', assignedAt: '01/03/2026', displayName: 'Marcelo Ribeiro',  email: 'marcelo.ribeiro@comgas.com.br' },
+  { id: 'im-cgda-grpvend',  instanciaId: 'inst-comgas-docaction', entidadeTipo: 'group', entidadeId: 'grp-comgas-vend', papel: 'analista',     assignedAt: '01/03/2026', displayName: 'Equipe de Vendas' },
   // ── Santacruz — inst-a2-maxdoc: Gestão Documental (DocNix) ────
-  { id: 'im-a2md-thiago',  instanciaId: 'inst-a2-maxdoc',   entidadeTipo: 'user',  entidadeId: 'usr-thiago',       papel: 'admin',  assignedAt: '01/03/2026', displayName: 'Thiago Martins', email: 'thiago.martins@santacruz.com.br' },
-  { id: 'im-a2md-beatriz', instanciaId: 'inst-a2-maxdoc',   entidadeTipo: 'user',  entidadeId: 'usr-beatriz',      papel: 'member', assignedAt: '01/03/2026', displayName: 'Beatriz Lima',   email: 'beatriz.lima@santacruz.com.br' },
-  { id: 'im-a2md-farma',   instanciaId: 'inst-a2-maxdoc',   entidadeTipo: 'group', entidadeId: 'grp-santa-farma',  papel: 'member', assignedAt: '01/03/2026', displayName: 'Farmacêuticos' },
+  { id: 'im-a2md-thiago',  instanciaId: 'inst-a2-maxdoc',   entidadeTipo: 'user',  entidadeId: 'usr-thiago',       papel: 'admin-maxdoc', assignedAt: '01/03/2026', displayName: 'Thiago Martins', email: 'thiago.martins@santacruz.com.br' },
+  { id: 'im-a2md-beatriz', instanciaId: 'inst-a2-maxdoc',   entidadeTipo: 'user',  entidadeId: 'usr-beatriz',      papel: 'editor',       assignedAt: '01/03/2026', displayName: 'Beatriz Lima',   email: 'beatriz.lima@santacruz.com.br' },
+  { id: 'im-a2md-farma',   instanciaId: 'inst-a2-maxdoc',   entidadeTipo: 'group', entidadeId: 'grp-santa-farma',  papel: 'leitor',       assignedAt: '01/03/2026', displayName: 'Farmacêuticos' },
   // ── Santacruz — inst-a2-docaction: Ocorrências (DocNix) ───────
-  { id: 'im-a2da-lucas',   instanciaId: 'inst-a2-docaction', entidadeTipo: 'user',  entidadeId: 'usr-lucas',        papel: 'member', assignedAt: '01/03/2026', displayName: 'Lucas Oliveira', email: 'lucas.oliveira@santacruz.com.br' },
-  { id: 'im-a2da-vendas',  instanciaId: 'inst-a2-docaction', entidadeTipo: 'group', entidadeId: 'grp-santa-vendas', papel: 'viewer', assignedAt: '01/03/2026', displayName: 'Equipe de Vendas' },
+  { id: 'im-a2da-lucas',   instanciaId: 'inst-a2-docaction', entidadeTipo: 'user',  entidadeId: 'usr-lucas',        papel: 'colaborador',  assignedAt: '01/03/2026', displayName: 'Lucas Oliveira', email: 'lucas.oliveira@santacruz.com.br' },
+  { id: 'im-a2da-vendas',  instanciaId: 'inst-a2-docaction', entidadeTipo: 'group', entidadeId: 'grp-santa-vendas', papel: 'colaborador',  assignedAt: '01/03/2026', displayName: 'Equipe de Vendas' },
 ]
 
 // ── Instâncias — fallback local para cenário Docnix/Comgas ─────
