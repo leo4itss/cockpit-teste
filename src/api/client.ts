@@ -119,6 +119,7 @@ export const api = {
     request<any>(`/api/grupos/${grupoId}/membros`, { method: 'POST', body: JSON.stringify({ userId }) }),
   removeGrupoMembro: (grupoId: string, userId: string) =>
     request<any>(`/api/grupos/${grupoId}/membros/${userId}`, { method: 'DELETE' }),
+  getGrupoInstancias: (grupoId: string) => request<GrupoInstanciaVinculo[]>(`/api/grupos/${grupoId}/instancias`),
 
   // Membros de conta
   getAccountMembros:    (accountId: string) => request<any[]>(`/api/accounts/${accountId}/membros`),
