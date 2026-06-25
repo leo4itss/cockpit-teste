@@ -610,7 +610,7 @@ export function AcessosPage() {
               </thead>
               <tbody>
                 {loadingUsers ? (
-                  <tr><td colSpan={7} className="px-4 py-8 text-center text-sm text-gray-500">Carregando...</td></tr>
+                  <tr><td colSpan={isAllAccounts ? 8 : 7} className="px-4 py-8 text-center text-sm text-gray-500">Carregando...</td></tr>
                 ) : filteredUsers.length > 0 ? (
                   filteredUsers.map(user => (
                     <tr
