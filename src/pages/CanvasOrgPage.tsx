@@ -1042,6 +1042,66 @@ function CanvasOrgInner() {
             {...permissoesSheet}
           />
         )}
+
+        {/* Modal — Sobre o Canvas Org */}
+        <Modal
+          open={showOnboarding}
+          onClose={() => setShowOnboarding(false)}
+          title="Sobre o Canvas Org"
+          footer={
+            <button
+              onClick={() => setShowOnboarding(false)}
+              className="px-4 py-2 text-sm font-medium text-white bg-[#030712] rounded-lg hover:bg-[#1f2937] transition-colors"
+            >
+              Entendi
+            </button>
+          }
+        >
+          <div className="text-sm text-[#374151] leading-relaxed space-y-4">
+            <p>O <strong className="font-semibold">Canvas Org</strong> é a visão <em>estrutural</em> — permite entender a hierarquia organizacional: organização, contas e, ao expandir uma conta, os grupos, usuários e instâncias vinculados a ela.</p>
+
+            <div>
+              <p className="font-semibold mb-1.5">Diferença em relação ao Canvas de Permissões</p>
+              <div className="rounded-lg overflow-hidden border border-[#e5e7eb]">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="bg-[#f9fafb]">
+                      <th className="text-left px-3 py-2 font-semibold text-[#6b7280]"> </th>
+                      <th className="text-left px-3 py-2 font-semibold text-[#6b7280]">Canvas Org (esta tela)</th>
+                      <th className="text-left px-3 py-2 font-semibold text-[#6b7280]">Canvas de Permissões</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#f3f4f6]">
+                    <tr>
+                      <td className="px-3 py-2 font-medium text-[#374151]">Seletor</td>
+                      <td className="px-3 py-2 text-[#374151]">Organização</td>
+                      <td className="px-3 py-2 text-[#374151]">Conta</td>
+                    </tr>
+                    <tr>
+                      <td className="px-3 py-2 font-medium text-[#374151]">Foco</td>
+                      <td className="px-3 py-2 text-[#374151]">Hierarquia Org → Contas</td>
+                      <td className="px-3 py-2 text-[#374151]">Permissões dentro de uma conta</td>
+                    </tr>
+                    <tr>
+                      <td className="px-3 py-2 font-medium text-[#374151]">Uso</td>
+                      <td className="px-3 py-2 text-[#374151]">Entender a estrutura organizacional</td>
+                      <td className="px-3 py-2 text-[#374151]">Gerenciar e editar acessos</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div>
+              <p className="font-semibold mb-1.5">Como usar</p>
+              <ul className="space-y-1.5 pl-1">
+                <li>Selecione uma organização no seletor superior para visualizá-la.</li>
+                <li>Clique em uma <strong className="font-semibold">Conta</strong> para expandir e ver seus grupos, usuários e objetos.</li>
+                <li>Clique em qualquer nó expandido para ver detalhes no painel lateral.</li>
+              </ul>
+            </div>
+          </div>
+        </Modal>
       </div>
     </VisualizerThemeContext.Provider>
   )
