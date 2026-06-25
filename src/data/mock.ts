@@ -985,7 +985,7 @@ export const grupos: Grupo[] = [
     descricao:  'Profissionais de farmácia. Acesso ao assistente de IA para consultas técnicas.',
     escopo:     'conta',
     accountId:  'a2',
-    papel:      'member',
+    papel:      'User',
     status:     'Ativo',
     createdAt:  '01/02/2026',
     qtdMembros: 2,
