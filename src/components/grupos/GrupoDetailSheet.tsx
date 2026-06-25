@@ -5,10 +5,11 @@
  *   - Lista de membros com avatar, nome e e-mail
  *   - Adicionar membro via busca inline (dropdown de sugestões)
  *   - Remover membro com confirmação (ação visível só no hover)
+ *   - Seção "Objetos" listando instâncias onde o grupo tem acesso
  */
 
 import { useState, useEffect, useMemo } from 'react'
-import { Search, UserPlus, UserMinus, Loader2, Building2, Building } from 'lucide-react'
+import { Search, UserPlus, UserMinus, Loader2, Building2, Building, Boxes } from 'lucide-react'
 import {
   NestedSheet,
   NestedSheetHeader,
@@ -20,12 +21,17 @@ import {
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { api } from '@/api/client'
+import type { GrupoInstanciaVinculo } from '@/api/client'
 import { cn } from '@/lib/utils'
+import { getPapelInfo } from '@/authz/mock'
 import type { User, Grupo } from '@/types'
 import {
   users as mockUsers,
   accountMembrosIds,
   grupoMembrosMap,
+  instanciaMembros as mockInstanciaMembros,
+  instancias as mockInstancias,
+  componentes as mockComponentes,
 } from '@/data/mock'
 
 // ── Tipos ─────────────────────────────────────────────────────
@@ -56,6 +62,22 @@ function EscopoBadge({ escopo }: { escopo: 'org' | 'conta' }) {
     : <Badge variant="default" className="bg-violet-50 text-violet-700 border border-violet-200">Conta</Badge>
 }
 
+function PapelBadge({ papel }: { papel: string }) {
+  if (!papel) return <span className="text-xs text-[#6b7280]">—</span>
+  const info = getPapelInfo(papel)
+  if (info) {
+    return (
+      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${info.cls}`}>
+        {info.label}
+      </span>
+    )
+  }
+  return (
+    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border border-gray-200 bg-gray-50 text-gray-600">
+      {papel}
+    </span>
+  )
+}
 
 // ── Seção de busca para adicionar membro ──────────────────────
 
@@ -144,11 +166,14 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
   const [showAdd, setShowAdd]           = useState(false)
   const [addingId, setAddingId]         = useState<string | null>(null)
   const [removingId, setRemovingId]     = useState<string | null>(null)
+  const [objetos, setObjetos]           = useState<GrupoInstanciaVinculo[]>([])
+  const [loadingObjetos, setLoadingObjetos] = useState(false)
 
-  // Carrega membros e todos os usuários ao abrir
+  // Carrega membros, usuários e objetos ao abrir
   useEffect(() => {
     if (!open || !grupo) return
     setLoadingMembros(true)
+    setLoadingObjetos(true)
     setShowAdd(false)
 
     Promise.all([
@@ -159,13 +184,34 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
       setAllUsers(users)
       setLoadingMembros(false)
     }).catch(() => {
-      // Fallback mock quando Neon está hibernando
       const membroIds = grupoMembrosMap[grupo.id] ?? []
       setMembros(mockUsers.filter(u => membroIds.includes(u.id)))
-      // Pool de busca: todos os membros da conta
       const contaIds = accountMembrosIds[accountId] ?? []
       setAllUsers(mockUsers.filter(u => contaIds.includes(u.id)))
       setLoadingMembros(false)
+    })
+
+    api.getGrupoInstancias(grupo.id).then(vincs => {
+      setObjetos(vincs)
+      setLoadingObjetos(false)
+    }).catch(() => {
+      // Fallback mock
+      const memberships = mockInstanciaMembros.filter(
+        m => m.entidadeTipo === 'group' && m.entidadeId === grupo.id
+      )
+      const vincs: GrupoInstanciaVinculo[] = memberships.map(m => {
+        const inst = mockInstancias.find(i => i.id === m.instanciaId)
+        const comp = inst ? mockComponentes.find(c => c.id === inst.componenteId) : null
+        return {
+          instanciaId:    m.instanciaId,
+          instanciaNome:  inst?.nome ?? m.instanciaId,
+          componenteNome: comp?.nome ?? '—',
+          papel:          m.papel,
+          assignedAt:     m.assignedAt,
+        }
+      })
+      setObjetos(vincs)
+      setLoadingObjetos(false)
     })
   }, [open, grupo?.id])
 
@@ -197,7 +243,7 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
   }
 
   function handleClose() {
-    setMembros([]); setAllUsers([]); setShowAdd(false)
+    setMembros([]); setAllUsers([]); setShowAdd(false); setObjetos([])
     onClose()
   }
 
@@ -226,11 +272,11 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
             </span>
           </div>
         )}
-
       </NestedSheetHeader>
 
       <NestedSheetBody noPadding>
-        {/* Barra de membros com contagem e ação */}
+
+        {/* ── Seção Membros ─────────────────────────────── */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <p className="text-sm font-medium text-[#030712]">
             Membros
@@ -252,18 +298,15 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
           </button>
         </div>
 
-        {/* Lista de membros */}
-        <div className="flex-1 overflow-y-auto">
+        <div>
           {loadingMembros ? (
-            <div className="flex items-center justify-center py-12 text-sm text-gray-500">
+            <div className="flex items-center justify-center py-8 text-sm text-gray-500">
               Carregando membros...
             </div>
           ) : membros.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 gap-2">
+            <div className="flex flex-col items-center justify-center py-8 gap-1">
               <p className="text-sm font-medium text-[#030712]">Nenhum membro ainda</p>
-              <p className="text-xs text-[#6b7280]">
-                Use o botão acima para adicionar usuários ao grupo.
-              </p>
+              <p className="text-xs text-[#6b7280]">Use o botão acima para adicionar usuários ao grupo.</p>
             </div>
           ) : (
             <table className="w-full">
@@ -288,7 +331,6 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
                       <td className="px-3 py-3 text-xs text-[#6b7280] hidden sm:table-cell">
                         {user.cargo || user.papel || '—'}
                       </td>
-                      {/* Ação remover — visível só no hover */}
                       <td className="pr-6 pl-3 py-3 text-right">
                         <div className="invisible group-hover:visible">
                           <button
@@ -312,7 +354,6 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
           )}
         </div>
 
-        {/* Busca inline para adicionar membro */}
         {showAdd && (
           <AddMembroSection
             allUsers={allUsers}
@@ -321,6 +362,60 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
             disabled={!!addingId}
           />
         )}
+
+        {/* ── Seção Objetos ──────────────────────────────── */}
+        <div className="border-t border-gray-200 mt-2">
+          <div className="flex items-center gap-2 px-6 py-4 border-b border-gray-100">
+            <Boxes className="w-4 h-4 text-[#6b7280]" />
+            <p className="text-sm font-medium text-[#030712]">
+              Objetos com acesso
+              {!loadingObjetos && (
+                <span className="ml-1.5 text-xs font-normal text-[#6b7280]">({objetos.length})</span>
+              )}
+            </p>
+          </div>
+
+          {loadingObjetos ? (
+            <div className="flex items-center justify-center py-8 text-sm text-gray-500">
+              Carregando objetos...
+            </div>
+          ) : objetos.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-8 gap-1">
+              <p className="text-sm font-medium text-[#030712]">Sem acesso a objetos</p>
+              <p className="text-xs text-[#6b7280]">
+                Adicione o grupo a um objeto na aba Objetos desta conta.
+              </p>
+            </div>
+          ) : (
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-100">
+                  <th className="pl-6 pr-3 py-2 text-left text-xs font-medium text-[#6b7280]">Objeto</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-[#6b7280] hidden sm:table-cell">Componente</th>
+                  <th className="pr-6 pl-3 py-2 text-left text-xs font-medium text-[#6b7280]">Papel</th>
+                </tr>
+              </thead>
+              <tbody>
+                {objetos.map(vinc => (
+                  <tr
+                    key={vinc.instanciaId}
+                    className="border-b border-gray-50 last:border-b-0 hover:bg-gray-50/60 transition-colors"
+                  >
+                    <td className="pl-6 pr-3 py-3">
+                      <p className="text-sm font-medium text-[#030712]">{vinc.instanciaNome}</p>
+                    </td>
+                    <td className="px-3 py-3 text-xs text-[#6b7280] hidden sm:table-cell">
+                      {vinc.componenteNome}
+                    </td>
+                    <td className="pr-6 pl-3 py-3">
+                      <PapelBadge papel={vinc.papel} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
 
       </NestedSheetBody>
 
