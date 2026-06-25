@@ -71,45 +71,13 @@ function FieldLabel({ children, required, hint }: {
 // ── Componente principal ──────────────────────────────────────
 
 export function CriarGrupoSheet({ open, onClose, accountId, componentesAtivos = [], onSuccess }: Props) {
-  // Obtém configs únicas para cada componente ativo (deduplicadas por tipo)
-  const secoesConfig = useMemo(() => {
-    if (componentesAtivos.length === 0) {
-      // Sem instâncias detectadas: usa config genérica
-      return [{ label: 'Geral', config: getComponenteConfig('') }]
-    }
-    const seen = new Set<string>()
-    return componentesAtivos
-      .map(nome => ({ nome, config: getComponenteConfig(nome) }))
-      .filter(({ config }) => {
-        if (seen.has(config.label)) return false
-        seen.add(config.label)
-        return true
-      })
-      .map(({ config }) => ({ label: config.label, config }))
-  }, [componentesAtivos])
-
-  const multiSecao = secoesConfig.length > 1
-
-  // Passo 1: componente selecionado (null = nenhum ainda)
-  // Passo 2: papel dentro do componente selecionado
-  const defaultSecao = secoesConfig[0]?.label ?? null
-
   const [nome, setNome]           = useState('')
   const [descricao, setDescricao] = useState('')
-  const [secaoSelecionada, setSecaoSelecionada] = useState<string | null>(multiSecao ? null : defaultSecao)
-  const [papel, setPapel]         = useState('')
   const [searchMembro, setSearchMembro] = useState('')
   const [allUsers, setAllUsers]   = useState<User[]>([])
   const [membros, setMembros]     = useState<User[]>([])
   const [saving, setSaving]       = useState(false)
   const [error, setError]         = useState<string | null>(null)
-
-  // Reset ao abrir
-  useEffect(() => {
-    if (!open) return
-    setSecaoSelecionada(multiSecao ? null : defaultSecao)
-    setPapel('')
-  }, [open, multiSecao, defaultSecao])
 
   // Carrega usuários para busca de membros
   useEffect(() => {
