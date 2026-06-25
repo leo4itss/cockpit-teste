@@ -430,57 +430,6 @@ export function AcessosPage() {
 
   // ── Render ──────────────────────────────────────────────────
 
-  // Org Admin / Platform Admin sem conta selecionada → mostrar seletor em cascata
-  if (!isAccountAdminOnly && !selectedAccountId) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full py-24 gap-6">
-        <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
-          <Building2 className="w-6 h-6 text-gray-400" />
-        </div>
-        <div className="text-center max-w-sm">
-          <p className="text-sm font-semibold text-gray-800">Selecione uma conta</p>
-          <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-            Esta página exibe acessos de uma conta específica. Escolha{isPlatformAdmin ? ' a organização e' : ''} a conta que deseja visualizar.
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-3 w-72">
-          {/* Seletor de org — só Platform Admin */}
-          {isPlatformAdmin && (
-            <div className="relative">
-              <select
-                value={selectedOrgId}
-                onChange={e => { setSelectedOrgId(e.target.value); setSelectedAccountId('') }}
-                className="w-full appearance-none pl-3 pr-8 py-2.5 text-sm border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-[#030712]"
-              >
-                <option value="">1. Selecione a organização...</option>
-                {allOrgs.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
-              </select>
-              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-            </div>
-          )}
-
-          {/* Seletor de conta */}
-          <div className="relative">
-            <select
-              value=""
-              onChange={e => setSelectedAccountId(e.target.value)}
-              disabled={isPlatformAdmin && !selectedOrgId}
-              className="w-full appearance-none pl-3 pr-8 py-2.5 text-sm border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-[#030712] disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <option value="">{isPlatformAdmin ? '2. ' : ''}Selecione a conta...</option>
-              {isPlatformAdmin && allAccounts.length > 0 && (
-                <option value={ALL_ACCOUNTS}>Todas as contas ({allAccounts.length})</option>
-              )}
-              {allAccounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-            </select>
-            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div>
       {/* Header */}
