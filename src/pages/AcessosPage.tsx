@@ -626,6 +626,7 @@ export function AcessosPage() {
                       </td>
                       <td className="px-4 py-3 text-sm text-[#030712]">{user.usuario}</td>
                       <td className="px-4 py-3 text-sm text-[#030712]">{user.email}</td>
+                      {isAllAccounts && <td className="px-4 py-3 text-sm text-[#6b7280]">{userAccountMap[user.id] ?? '—'}</td>}
                       <td className="px-4 py-3">
                         {user.papel === 'account_admin'
                           ? <Badge variant="warning">Administrador da Conta</Badge>
