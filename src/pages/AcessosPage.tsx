@@ -820,6 +820,7 @@ export function AcessosPage() {
                                 <p className="text-xs text-[#6b7280] mt-0.5 max-w-xs truncate">{inst.descricao}</p>
                               )}
                             </td>
+                            {isAllAccounts && <td className="px-4 py-3 text-sm text-[#6b7280]">{instAccountMap[inst.id] ?? '—'}</td>}
                             <td className="px-4 py-3 text-sm text-[#030712]">{inst.qtdMembros ?? 0}</td>
                             <td className="px-4 py-3 text-center">
                               {inst.status === 'Ativo'
