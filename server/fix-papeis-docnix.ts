@@ -85,7 +85,7 @@ async function fix() {
 
     for (const row of rows) {
       await db.update(instanciaMembros).set({ papel: novoPapel }).where(eq(instanciaMembros.id, row.id))
-      console.log(`[MaxDoc]    ${(row as any).displayName ?? row.id} (${row.instanciaId}): ${oldPapel} → ${novoPapel}`)
+      console.log(`[MaxDoc]    ${row.entidadeId} (${row.instanciaId}): ${oldPapel} → ${novoPapel}`)
       totalFixed++
     }
   }
