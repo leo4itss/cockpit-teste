@@ -69,7 +69,7 @@ function FieldLabel({ children, required, hint }: {
 
 // ── Componente principal ──────────────────────────────────────
 
-export function CriarGrupoSheet({ open, onClose, accountId, componentesAtivos = [], onSuccess }: Props) {
+export function CriarGrupoSheet({ open, onClose, accountId, componentesAtivos: _componentesAtivos, onSuccess }: Props) {
   const [nome, setNome]           = useState('')
   const [descricao, setDescricao] = useState('')
   const [searchMembro, setSearchMembro] = useState('')
