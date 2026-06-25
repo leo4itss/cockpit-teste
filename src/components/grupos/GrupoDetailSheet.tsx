@@ -21,7 +21,6 @@ import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { api } from '@/api/client'
 import { cn } from '@/lib/utils'
-import { mockPapeisDisponiveis, getPapelInfo } from '@/authz/mock'
 import type { User, Grupo } from '@/types'
 import {
   users as mockUsers,
