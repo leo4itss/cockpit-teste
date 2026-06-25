@@ -94,11 +94,15 @@ export function AcessosPage() {
   const [allOrgs,     setAllOrgs]     = useState<any[]>([])
   const [allAccounts, setAllAccounts] = useState<any[]>([])
 
-  // Platform Admin: carrega todas as orgs
+  // Platform Admin: carrega todas as orgs e auto-seleciona a primeira
   useEffect(() => {
     if (!isPlatformAdmin) return
     api.getOrganizations()
-      .then((orgs: any[]) => setAllOrgs(orgs.filter(o => o.status !== 'Inativo')))
+      .then((orgs: any[]) => {
+        const active = orgs.filter(o => o.status !== 'Inativo')
+        setAllOrgs(active)
+        if (!selectedOrgId && active.length > 0) setSelectedOrgId(active[0].id)
+      })
       .catch(() => {})
   }, [isPlatformAdmin])
 
