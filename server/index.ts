@@ -881,6 +881,38 @@ app.delete('/api/grupos/:id/membros/:userId', async (c) => {
   return c.json({ ok: true })
 })
 
+/**
+ * GET /api/grupos/:id/instancias
+ * Retorna todas as instâncias onde o grupo é membro, com o papel em cada uma.
+ */
+app.get('/api/grupos/:id/instancias', async (c) => {
+  const grupoId = c.req.param('id')
+
+  const memberships = await db
+    .select()
+    .from(instanciaMembros)
+    .where(and(eq(instanciaMembros.entidadeTipo, 'group'), eq(instanciaMembros.entidadeId, grupoId)))
+
+  if (!memberships.length) return c.json([])
+
+  const allInstancias   = await db.select().from(instancias)
+  const allComponentes  = await db.select().from(componentes)
+
+  const result = memberships.map((m: any) => {
+    const inst = allInstancias.find((i: any) => i.id === m.instanciaId)
+    const comp = inst ? allComponentes.find((c: any) => c.id === inst.componenteId) : null
+    return {
+      instanciaId:    m.instanciaId,
+      instanciaNome:  inst?.nome ?? m.instanciaId,
+      componenteNome: comp?.nome ?? '—',
+      papel:          m.papel,
+      assignedAt:     m.assignedAt,
+    }
+  })
+
+  return c.json(result)
+})
+
 // ── Vínculos Usuário–Conta ────────────────────────────────────
 
 /**
