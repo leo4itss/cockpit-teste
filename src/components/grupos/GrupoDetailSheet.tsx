@@ -196,23 +196,6 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
     }
   }
 
-  // ── Editar papel ─────────────────────────────────────────
-
-  async function handleSavePapel(novoPapel: string) {
-    if (!grupo) return
-    // Optimistic update: atualiza localmente e propaga para a lista pai
-    setLocalPapel(novoPapel)
-    onUpdate?.({ ...grupo, papel: novoPapel })
-    try {
-      await api.updateGrupo(grupo.id, {
-        nome:      grupo.nome,
-        descricao: grupo.descricao ?? null,
-        papel:     novoPapel,
-        status:    grupo.status,
-      })
-    } catch { /* silencioso — mudança já aplicada localmente */ }
-  }
-
   function handleClose() {
     setMembros([]); setAllUsers([]); setShowAdd(false)
     onClose()
