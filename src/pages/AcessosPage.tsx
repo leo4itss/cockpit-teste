@@ -801,6 +801,7 @@ export function AcessosPage() {
                       <thead>
                         <tr className="border-b border-gray-200">
                           <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40">Nome</th>
+                          {isAllAccounts && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[140px]">Conta</th>}
                           <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[80px]">Membros</th>
                           <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 w-[100px]">Status</th>
                           <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 w-[80px]">Ações</th>
