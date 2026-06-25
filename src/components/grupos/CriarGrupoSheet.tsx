@@ -26,7 +26,6 @@ import {
 import { Button } from '@/components/ui/Button'
 import { api } from '@/api/client'
 import { cn } from '@/lib/utils'
-import { getComponenteConfig } from '@/authz/mock'
 import type { User, Grupo } from '@/types'
 
 // ── Tipos ─────────────────────────────────────────────────────
