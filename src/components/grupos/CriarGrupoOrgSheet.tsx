@@ -65,13 +65,9 @@ function FieldLabel({ children, required, hint }: {
 
 // ── Componente principal ──────────────────────────────────────
 
-// Papéis disponíveis — consumidos do mock FGA (em produção viriam via API)
-const PAPEIS = mockPapeisDisponiveis
-
 export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, grupos = [], isPlatformAdmin, onSuccess }: Props) {
   const [nome, setNome]                         = useState('')
   const [descricao, setDescricao]               = useState('')
-  const [papel, setPapel]                       = useState('User')
   const [escopo, setEscopo]                     = useState<'org' | 'conta'>('org')
   const [orgSelecionada, setOrgSelecionada]     = useState('')   // só usado quando isPlatformAdmin + escopo='org'
   const [contaSelecionada, setContaSelecionada] = useState('')
