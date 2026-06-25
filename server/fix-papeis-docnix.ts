@@ -58,7 +58,7 @@ async function fix() {
   for (const [oldPapel, novoPapel] of Object.entries(DOCACTION_MAP)) {
     if (!docactionInstIds.length) break
     const rows = await db
-      .select({ id: instanciaMembros.id, displayName: instanciaMembros.displayName, papel: instanciaMembros.papel, instanciaId: instanciaMembros.instanciaId })
+      .select()
       .from(instanciaMembros)
       .where(and(
         inArray(instanciaMembros.instanciaId, docactionInstIds),
@@ -67,7 +67,7 @@ async function fix() {
 
     for (const row of rows) {
       await db.update(instanciaMembros).set({ papel: novoPapel }).where(eq(instanciaMembros.id, row.id))
-      console.log(`[DocAction] ${row.displayName ?? row.id} (${row.instanciaId}): ${oldPapel} → ${novoPapel}`)
+      console.log(`[DocAction] ${(row as any).displayName ?? row.id} (${row.instanciaId}): ${oldPapel} → ${novoPapel}`)
       totalFixed++
     }
   }
@@ -76,7 +76,7 @@ async function fix() {
   for (const [oldPapel, novoPapel] of Object.entries(MAXDOC_MAP)) {
     if (!maxdocInstIds.length) break
     const rows = await db
-      .select({ id: instanciaMembros.id, displayName: instanciaMembros.displayName, papel: instanciaMembros.papel, instanciaId: instanciaMembros.instanciaId })
+      .select()
       .from(instanciaMembros)
       .where(and(
         inArray(instanciaMembros.instanciaId, maxdocInstIds),
@@ -85,7 +85,7 @@ async function fix() {
 
     for (const row of rows) {
       await db.update(instanciaMembros).set({ papel: novoPapel }).where(eq(instanciaMembros.id, row.id))
-      console.log(`[MaxDoc]    ${row.displayName ?? row.id} (${row.instanciaId}): ${oldPapel} → ${novoPapel}`)
+      console.log(`[MaxDoc]    ${(row as any).displayName ?? row.id} (${row.instanciaId}): ${oldPapel} → ${novoPapel}`)
       totalFixed++
     }
   }
