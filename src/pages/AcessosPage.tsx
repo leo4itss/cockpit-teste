@@ -124,6 +124,7 @@ export function AcessosPage() {
 
   // accountId efetivo
   const accountId = isAccountAdminOnly ? (rawAccountId ?? '') : selectedAccountId
+  const isAllAccounts = accountId === ALL_ACCOUNTS
 
   // orgId efetivo — derivado do papel do usuário logado
   const effectiveOrgId = isPlatformAdmin
