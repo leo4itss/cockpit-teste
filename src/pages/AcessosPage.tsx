@@ -378,17 +378,17 @@ export function AcessosPage() {
   const [selectedGrupo, setSelectedGrupo]                   = useState<Grupo | null>(null)
 
   useEffect(() => {
-    // Para Account Admin puro, derivamos o orgId da conta selecionada (allAccounts)
     const orgIdForGrupos = effectiveOrgId
       || allAccounts.find(a => a.id === accountId)?.orgId
       || ''
-    if (!orgIdForGrupos && !accountId) return
-    api.getGrupos({ orgId: orgIdForGrupos, accountId })
+    const effectiveAccId = isAllAccounts ? undefined : accountId
+    if (!orgIdForGrupos && !effectiveAccId) return
+    setLoadingGrupos(true)
+    api.getGrupos({ orgId: orgIdForGrupos, accountId: effectiveAccId })
       .then(data => { setGrupos(data); setLoadingGrupos(false) })
       .catch(() => {
-        // Fallback: filtra mock local pelo accountId ou orgId
         const fallback = mockGrupos.filter(g =>
-          (accountId && g.accountId === accountId) ||
+          (effectiveAccId && g.accountId === effectiveAccId) ||
           (orgIdForGrupos && g.orgId === orgIdForGrupos)
         )
         setGrupos(fallback)
