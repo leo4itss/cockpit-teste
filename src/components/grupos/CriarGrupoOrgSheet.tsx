@@ -229,30 +229,6 @@ export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, grupos 
           </div>
 
           {/* Papel — seletor visual */}
-          <div className="flex flex-col gap-2">
-            <FieldLabel required hint="Define o papel padrão dos membros deste grupo.">
-              Papel
-            </FieldLabel>
-            <div className="grid grid-cols-3 gap-2">
-              {PAPEIS.map(p => (
-                <button
-                  key={p.value}
-                  type="button"
-                  onClick={() => setPapel(p.value)}
-                  disabled={saving}
-                  className={cn(
-                    'flex flex-col items-start px-3 py-2.5 rounded-lg border text-left transition-colors',
-                    papel === p.value
-                      ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
-                      : 'border-gray-200 bg-white hover:bg-gray-50'
-                  )}
-                >
-                  <span className="text-sm font-medium text-[#030712]">{p.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Escopo — seletor visual */}
           <div className="flex flex-col gap-2">
             <FieldLabel required>Escopo</FieldLabel>
