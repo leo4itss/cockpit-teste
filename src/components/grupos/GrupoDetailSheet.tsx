@@ -277,6 +277,68 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
 
       <NestedSheetBody noPadding>
 
+        {/* ── Seção Objetos com acesso (colapsável) ──────── */}
+        <div className="border-b border-gray-200">
+          <button
+            onClick={() => setObjetosExpanded(v => !v)}
+            className="w-full flex items-center gap-2 px-6 py-4 hover:bg-gray-50/60 transition-colors text-left"
+          >
+            {objetosExpanded
+              ? <ChevronDown className="w-4 h-4 text-[#6b7280] shrink-0" />
+              : <ChevronRight className="w-4 h-4 text-[#6b7280] shrink-0" />}
+            <Boxes className="w-4 h-4 text-[#6b7280] shrink-0" />
+            <span className="text-sm font-medium text-[#030712]">
+              Objetos com acesso
+              {!loadingObjetos && (
+                <span className="ml-1.5 text-xs font-normal text-[#6b7280]">({objetos.length})</span>
+              )}
+            </span>
+          </button>
+
+          {objetosExpanded && (
+            loadingObjetos ? (
+              <div className="flex items-center justify-center py-8 text-sm text-gray-500">
+                Carregando objetos...
+              </div>
+            ) : objetos.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-6 gap-1">
+                <p className="text-sm font-medium text-[#030712]">Sem acesso a objetos</p>
+                <p className="text-xs text-[#6b7280]">
+                  Adicione o grupo a um objeto na aba Objetos desta conta.
+                </p>
+              </div>
+            ) : (
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-100">
+                    <th className="pl-6 pr-3 py-2 text-left text-xs font-medium text-[#6b7280]">Objeto</th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-[#6b7280] hidden sm:table-cell">Componente</th>
+                    <th className="pr-6 pl-3 py-2 text-left text-xs font-medium text-[#6b7280]">Papel</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {objetos.map(vinc => (
+                    <tr
+                      key={vinc.instanciaId}
+                      className="border-b border-gray-50 last:border-b-0 hover:bg-gray-50/60 transition-colors"
+                    >
+                      <td className="pl-6 pr-3 py-3">
+                        <p className="text-sm font-medium text-[#030712]">{vinc.instanciaNome}</p>
+                      </td>
+                      <td className="px-3 py-3 text-xs text-[#6b7280] hidden sm:table-cell">
+                        {vinc.componenteNome}
+                      </td>
+                      <td className="pr-6 pl-3 py-3">
+                        <PapelBadge papel={vinc.papel} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )
+          )}
+        </div>
+
         {/* ── Seção Membros ─────────────────────────────── */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <p className="text-sm font-medium text-[#030712]">
@@ -363,60 +425,6 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
             disabled={!!addingId}
           />
         )}
-
-        {/* ── Seção Objetos ──────────────────────────────── */}
-        <div className="border-t border-gray-200 mt-2">
-          <div className="flex items-center gap-2 px-6 py-4 border-b border-gray-100">
-            <Boxes className="w-4 h-4 text-[#6b7280]" />
-            <p className="text-sm font-medium text-[#030712]">
-              Objetos com acesso
-              {!loadingObjetos && (
-                <span className="ml-1.5 text-xs font-normal text-[#6b7280]">({objetos.length})</span>
-              )}
-            </p>
-          </div>
-
-          {loadingObjetos ? (
-            <div className="flex items-center justify-center py-8 text-sm text-gray-500">
-              Carregando objetos...
-            </div>
-          ) : objetos.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8 gap-1">
-              <p className="text-sm font-medium text-[#030712]">Sem acesso a objetos</p>
-              <p className="text-xs text-[#6b7280]">
-                Adicione o grupo a um objeto na aba Objetos desta conta.
-              </p>
-            </div>
-          ) : (
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-100">
-                  <th className="pl-6 pr-3 py-2 text-left text-xs font-medium text-[#6b7280]">Objeto</th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-[#6b7280] hidden sm:table-cell">Componente</th>
-                  <th className="pr-6 pl-3 py-2 text-left text-xs font-medium text-[#6b7280]">Papel</th>
-                </tr>
-              </thead>
-              <tbody>
-                {objetos.map(vinc => (
-                  <tr
-                    key={vinc.instanciaId}
-                    className="border-b border-gray-50 last:border-b-0 hover:bg-gray-50/60 transition-colors"
-                  >
-                    <td className="pl-6 pr-3 py-3">
-                      <p className="text-sm font-medium text-[#030712]">{vinc.instanciaNome}</p>
-                    </td>
-                    <td className="px-3 py-3 text-xs text-[#6b7280] hidden sm:table-cell">
-                      {vinc.componenteNome}
-                    </td>
-                    <td className="pr-6 pl-3 py-3">
-                      <PapelBadge papel={vinc.papel} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
 
       </NestedSheetBody>
 
