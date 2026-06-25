@@ -148,6 +148,7 @@ export function AcessosPage() {
 
   // ── Usuários ────────────────────────────────────────────────
   const [users, setUsers]                   = useState<User[]>([])
+  const [userAccountMap, setUserAccountMap] = useState<Record<string, string>>({})
   const [loadingUsers, setLoadingUsers]     = useState(true)
   const [searchUsers, setSearchUsers]       = useState('')
   const [showOnboarding, setShowOnboarding] = useState(false)
