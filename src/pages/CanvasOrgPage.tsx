@@ -1061,14 +1061,14 @@ function CanvasOrgInner() {
             <p>O <strong className="font-semibold">Canvas Org</strong> é a visão <em>estrutural</em> — permite entender a hierarquia organizacional: organização, contas e, ao expandir uma conta, os grupos, usuários e instâncias vinculados a ela.</p>
 
             <div>
-              <p className="font-semibold mb-1.5">Diferença em relação ao Canvas de Permissões</p>
+              <p className="font-semibold mb-1.5">Diferença em relação ao Canvas</p>
               <div className="rounded-lg overflow-hidden border border-[#e5e7eb]">
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="bg-[#f9fafb]">
                       <th className="text-left px-3 py-2 font-semibold text-[#6b7280]"> </th>
                       <th className="text-left px-3 py-2 font-semibold text-[#6b7280]">Canvas Org (esta tela)</th>
-                      <th className="text-left px-3 py-2 font-semibold text-[#6b7280]">Canvas de Permissões</th>
+                      <th className="text-left px-3 py-2 font-semibold text-[#6b7280]">Canvas</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#f3f4f6]">
