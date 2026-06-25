@@ -786,6 +786,7 @@ function CanvasOrgInner() {
   const [selected,       setSelected]   = useState<SelectedEntity | null>(null)
   const [instanciaSheet, setInstSheet]  = useState<{ inst: any; accountId: string } | null>(null)
   const [permissoesSheet,setPermSheet]  = useState<any>(null)
+  const [showOnboarding, setShowOnboarding] = useState(false)
 
   // Carrega orgs (roda uma vez; preserva orgId da URL se já existir)
   useEffect(() => {
