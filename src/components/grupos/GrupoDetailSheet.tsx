@@ -137,20 +137,13 @@ function AddMembroSection({ allUsers, membros, onAdd, disabled }: AddMembroProps
 
 // ── Componente principal ──────────────────────────────────────
 
-export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome, contextoLabel, onUpdate }: Props) {
+export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome, contextoLabel }: Props) {
   const [membros, setMembros]           = useState<User[]>([])
   const [loadingMembros, setLoadingMembros] = useState(false)
   const [allUsers, setAllUsers]         = useState<User[]>([])
   const [showAdd, setShowAdd]           = useState(false)
   const [addingId, setAddingId]         = useState<string | null>(null)
   const [removingId, setRemovingId]     = useState<string | null>(null)
-// Papel local — permite edição inline sem recarregar a lista pai
-  const [localPapel, setLocalPapel]     = useState(grupo?.papel ?? '')
-
-  // Sincroniza papel local quando o grupo muda
-  useEffect(() => {
-    setLocalPapel(grupo?.papel ?? '')
-  }, [grupo?.id, grupo?.papel])
 
   // Carrega membros e todos os usuários ao abrir
   useEffect(() => {
