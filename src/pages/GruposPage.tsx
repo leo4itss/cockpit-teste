@@ -315,7 +315,6 @@ export function GruposPage() {
         accountId={selectedGrupo?.accountId ?? ''}
         accountNome={selectedGrupo ? (getContexto(selectedGrupo)?.nome ?? undefined) : undefined}
         contextoLabel={selectedGrupo ? (getContexto(selectedGrupo)?.label ?? undefined) : undefined}
-        onUpdate={updated => setGrupos(prev => prev.map(g => g.id === updated.id ? updated : g))}
       />
     </div>
   )
