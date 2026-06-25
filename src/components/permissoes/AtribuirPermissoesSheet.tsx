@@ -426,7 +426,7 @@ export function AtribuirPermissoesSheet({
         const papel       = (papelValue && papelValue !== 'personalizado') ? papelValue : 'member'
 
         if (activeDraft.length > 0) {
-          await api.addInstanciaMembro(instanciaId, { entidadeTipo, entidadeId, papel }).catch(() => {})
+          await api.addInstanciaMembro(instanciaId, { entidadeTipo, entidadeId: entityId, papel }).catch(() => {})
         } else {
           // Sem permissões ativas: remove da instância se for membro
           try {
