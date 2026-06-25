@@ -85,6 +85,8 @@ export function AcessosPage() {
   // Account Admin puro: não é nem Org Admin nem Platform Admin
   const isAccountAdminOnly = isAccountAdmin && !isOrgAdmin && !isPlatformAdmin
 
+  const ALL_ACCOUNTS = '__all__'
+
   // Seletor persistido em sessionStorage
   const [selectedOrgId,     setSelectedOrgId]     = useSessionState<string>('acessos-orgId', '')
   const [selectedAccountId, setSelectedAccountId] = useSessionState<string>('acessos-accountId', '')
