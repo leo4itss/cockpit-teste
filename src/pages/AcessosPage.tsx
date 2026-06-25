@@ -553,7 +553,7 @@ export function AcessosPage() {
               <button onClick={() => handleSearchChange('')} className="text-gray-400 hover:text-gray-600 leading-none">×</button>
             )}
           </div>
-          {abaAtiva === 'usuarios' ? (
+          {abaAtiva === 'usuarios' && !isAllAccounts ? (
             <div className="flex items-center gap-2">
               <Button onClick={() => setShowCriarSheet(true)}>
                 <Plus className="w-4 h-4 mr-1.5" />Criar usuário
