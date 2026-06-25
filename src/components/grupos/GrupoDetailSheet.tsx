@@ -210,7 +210,6 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
       <NestedSheetHeader onClose={handleClose}>
         <div className="flex items-center gap-2 mb-1 flex-wrap">
           <EscopoBadge escopo={grupo.escopo} />
-          <PapelEditor papel={localPapel} onSave={handleSavePapel} />
         </div>
         <NestedSheetTitle>{grupo.nome}</NestedSheetTitle>
         {grupo.descricao && (
