@@ -28,7 +28,7 @@ import '@xyflow/react/dist/style.css'
 import {
   Users, Shield, Bot, Database, Layers, X, Building, Building2,
   UserMinus, Loader2, ChevronDown, ChevronUp, Lock, Search,
-  Sun, Moon, ChevronRight,
+  Sun, Moon, ChevronRight, HelpCircle,
 } from 'lucide-react'
 import { api } from '@/api/client'
 import { useIsPlatformAdmin, useIsOrgAdmin } from '@/authz'
