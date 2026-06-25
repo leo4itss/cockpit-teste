@@ -108,21 +108,19 @@ export function CriarGrupoSheet({ open, onClose, accountId, componentesAtivos = 
     setMembros(prev => prev.filter(m => m.id !== userId))
   }
 
-  const canSave = nome.trim().length > 0 && papel.length > 0
+  const canSave = nome.trim().length > 0
 
   async function handleSave() {
     if (!canSave) return
     setSaving(true)
     setError(null)
 
-    const papelValor = papel
-
     const now = new Date().toLocaleDateString('pt-BR')
     const localGrupo: Grupo = {
       id:        crypto.randomUUID(),
       nome:      nome.trim(),
       descricao: descricao.trim() || undefined,
-      papel:     papelValor,
+      papel:     '',
       escopo:    'conta',
       accountId,
       status:    'Ativo',
