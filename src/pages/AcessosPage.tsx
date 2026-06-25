@@ -673,7 +673,7 @@ export function AcessosPage() {
                     </tr>
                   ))
                 ) : (
-                  <tr><td colSpan={7} className="px-4 py-8 text-center text-sm text-gray-500">Nenhum usuário encontrado</td></tr>
+                  <tr><td colSpan={isAllAccounts ? 8 : 7} className="px-4 py-8 text-center text-sm text-gray-500">Nenhum usuário encontrado</td></tr>
                 )}
               </tbody>
             </table>
