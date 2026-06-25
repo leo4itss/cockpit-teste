@@ -150,8 +150,7 @@ export function CriarGrupoSheet({ open, onClose, accountId, componentesAtivos = 
   }
 
   function handleClose() {
-    setNome(''); setDescricao(''); setPapel('')
-    setSecaoSelecionada(multiSecao ? null : defaultSecao)
+    setNome(''); setDescricao('')
     setSearchMembro(''); setMembros([]); setError(null)
     onClose()
   }
