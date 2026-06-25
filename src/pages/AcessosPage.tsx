@@ -161,17 +161,38 @@ export function AcessosPage() {
 
   useEffect(() => {
     if (!accountId) return
-    // Busca apenas os membros desta conta (não todos os usuários do sistema)
+    setLoadingUsers(true)
+    if (isAllAccounts) {
+      Promise.all(
+        allAccounts.map(acc =>
+          api.getAccountMembros(acc.id)
+            .then((data: User[]) => data.map(u => ({ u, accName: acc.name })))
+            .catch(() => [] as { u: User; accName: string }[])
+        )
+      ).then(results => {
+        const seenIds = new Set<string>()
+        const merged: User[] = []
+        const map: Record<string, string> = {}
+        results.flat().forEach(({ u, accName }) => {
+          if (!seenIds.has(u.id)) { seenIds.add(u.id); merged.push(u) }
+          if (!map[u.id]) map[u.id] = accName
+        })
+        setUsers(merged)
+        setUserAccountMap(map)
+        setLoadingUsers(false)
+      })
+      return
+    }
     api.getAccountMembros(accountId)
-      .then(data => { setUsers(data); setLoadingUsers(false) })
+      .then(data => { setUsers(data); setUserAccountMap({}); setLoadingUsers(false) })
       .catch(() => {
-        // Fallback: filtra mock local pelos membros conhecidos da conta
         const ids = accountMembrosIds[accountId] ?? []
         const fallback = mockUsers.filter(u => ids.includes(u.id))
         setUsers(fallback)
+        setUserAccountMap({})
         setLoadingUsers(false)
       })
-  }, [accountId])
+  }, [accountId, allAccounts])
 
   const filteredUsers = useMemo(() => {
     const q = searchUsers.toLowerCase()
