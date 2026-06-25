@@ -464,6 +464,9 @@ export function AcessosPage() {
               className="w-full appearance-none pl-3 pr-8 py-2.5 text-sm border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-[#030712] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="">{isPlatformAdmin ? '2. ' : ''}Selecione a conta...</option>
+              {isPlatformAdmin && allAccounts.length > 0 && (
+                <option value={ALL_ACCOUNTS}>Todas as contas ({allAccounts.length})</option>
+              )}
               {allAccounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
             </select>
             <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
