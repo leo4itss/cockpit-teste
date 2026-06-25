@@ -93,7 +93,7 @@ function PapelEditor({ papel, onSave }: PapelEditorProps) {
     setEditing(false)
   }
 
-  const opt = PAPEIS_OPCOES.find(p => p.value === papel)
+  const opt = PAPEIS_OPCOES.find(p => p.value === papel) ?? getPapelInfo(papel)
 
   if (!editing) {
     return (
