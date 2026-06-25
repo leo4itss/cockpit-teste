@@ -883,37 +883,108 @@ export function AcessosPage() {
         }
       >
         {abaAtiva === 'usuarios' && (
-          <div className="text-sm text-[#374151] leading-relaxed space-y-3">
-            <p>Você está gerenciando os membros desta conta. Cada pessoa listada tem um papel que define o que ela pode fazer no Cockpit:</p>
-            <ul className="space-y-1.5 pl-1">
-              <li><strong className="font-semibold">Membro</strong> — pode usar os produtos contratados conforme o que for atribuído a ele nos objetos desta conta.</li>
-              <li><strong className="font-semibold">Administrador da Conta</strong> — pode gerenciar usuários e grupos dentro desta conta.</li>
-            </ul>
-            <p>Para ver ou ajustar o que um usuário pode fazer em um produto específico (como MaxDoc ou Assistente IA), acesse a aba <strong className="font-semibold">Objetos</strong> e adicione-o como membro do objeto desejado.</p>
-            <p>Use a opção <strong className="font-semibold">"Ver permissões efetivas"</strong> no menu de ações (⋯) ao lado do nome para ver tudo que o usuário pode fazer, incluindo permissões herdadas de grupos. <span className="text-[#6b7280]">Apenas objetos nos quais o usuário é membro direto ou pertence a um grupo membro aparecem nesta listagem.</span></p>
+          <div className="space-y-5">
+            <p className="text-sm text-[#374151] leading-relaxed">
+              Gerencie quem tem acesso a esta conta e qual é o papel de cada pessoa no Cockpit.
+            </p>
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-[#9ca3af] mb-3">Papéis disponíveis</p>
+              <div className="space-y-2">
+                <div className="flex gap-3 p-3 rounded-xl bg-[#f9fafb] border border-[#f3f4f6]">
+                  <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+                    <Users className="w-4 h-4 text-blue-500" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-[#030712]">Membro</p>
+                    <p className="text-xs text-[#6b7280] mt-0.5 leading-relaxed">Acessa os produtos conforme as permissões atribuídas nos objetos desta conta.</p>
+                  </div>
+                </div>
+                <div className="flex gap-3 p-3 rounded-xl bg-[#f9fafb] border border-[#f3f4f6]">
+                  <div className="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
+                    <ShieldCheck className="w-4 h-4 text-orange-500" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-[#030712]">Administrador da Conta</p>
+                    <p className="text-xs text-[#6b7280] mt-0.5 leading-relaxed">Gerencia usuários e grupos dentro desta conta.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-3 p-3 rounded-xl bg-blue-50 border border-blue-100">
+              <Eye className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+              <p className="text-xs text-blue-800 leading-relaxed">
+                Use <strong className="font-semibold">"Ver permissões efetivas"</strong> no menu ⋯ para ver tudo que o usuário pode fazer, incluindo permissões herdadas de grupos.
+              </p>
+            </div>
           </div>
         )}
         {abaAtiva === 'grupos' && (
-          <div className="text-sm text-[#374151] leading-relaxed space-y-3">
-            <p>Você está gerenciando os grupos desta conta. Grupos permitem atribuir permissões a várias pessoas de uma vez — em vez de configurar cada usuário individualmente, você adiciona o grupo a um objeto e todos os seus membros herdam automaticamente o acesso.</p>
-            <p>Existem dois tipos:</p>
-            <ul className="space-y-1.5 pl-1">
-              <li><strong className="font-semibold">Escopo Organização</strong> — criado pelo administrador da organização, compartilhado entre todas as contas, não editável aqui.</li>
-              <li><strong className="font-semibold">Escopo Conta</strong> — exclusivo desta conta, criado e gerenciado aqui.</li>
-            </ul>
-            <p><strong className="font-semibold">Atenção:</strong> pertencer a um grupo não concede nenhum acesso automaticamente. É necessário adicionar o grupo a um objeto na aba <strong className="font-semibold">Objetos</strong> — somente então seus membros passam a herdar as permissões daquele objeto.</p>
+          <div className="space-y-5">
+            <p className="text-sm text-[#374151] leading-relaxed">
+              Agrupe usuários para atribuir permissões de uma só vez — ao adicionar um grupo a um objeto, todos os membros herdam automaticamente o acesso.
+            </p>
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-[#9ca3af] mb-3">Tipos de escopo</p>
+              <div className="space-y-2">
+                <div className="flex gap-3 p-3 rounded-xl bg-[#f9fafb] border border-[#f3f4f6]">
+                  <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+                    <Globe className="w-4 h-4 text-blue-500" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-[#030712]">Organização</p>
+                    <p className="text-xs text-[#6b7280] mt-0.5 leading-relaxed">Criado pelo Org Admin, compartilhado entre todas as contas. Somente leitura aqui.</p>
+                  </div>
+                </div>
+                <div className="flex gap-3 p-3 rounded-xl bg-[#f9fafb] border border-[#f3f4f6]">
+                  <div className="w-8 h-8 rounded-full bg-violet-50 flex items-center justify-center shrink-0">
+                    <Lock className="w-4 h-4 text-violet-500" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-[#030712]">Conta</p>
+                    <p className="text-xs text-[#6b7280] mt-0.5 leading-relaxed">Exclusivo desta conta — criado e gerenciado pelo Account Admin.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-3 p-3 rounded-xl bg-amber-50 border border-amber-100">
+              <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+              <p className="text-xs text-amber-800 leading-relaxed">
+                Pertencer a um grupo <strong className="font-semibold">não concede acesso automaticamente</strong>. É preciso adicionar o grupo a um objeto na aba <strong className="font-semibold">Objetos</strong> — somente então seus membros herdam as permissões.
+              </p>
+            </div>
           </div>
         )}
         {abaAtiva === 'instancias' && (
-          <div className="text-sm text-[#374151] leading-relaxed space-y-3">
-            <p>Você está gerenciando os objetos desta conta. Objetos são os serviços ou módulos configurados — como MaxDoc ou Assistente IA.</p>
-            <p>Cada objeto tem sua própria lista de membros com papéis que definem quais ações estão disponíveis. Ao abrir um objeto, você pode:</p>
-            <ul className="space-y-1.5 pl-1">
-              <li>Adicionar usuários ou grupos com um papel predefinido.</li>
-              <li>Personalizar manualmente as ações.</li>
-              <li>Ver quais ações um membro herda de um grupo.</li>
-            </ul>
-            <p>Papéis predefinidos selecionam automaticamente as ações correspondentes. Permissões herdadas de grupo aparecem marcadas em verde e não podem ser editadas diretamente.</p>
+          <div className="space-y-5">
+            <p className="text-sm text-[#374151] leading-relaxed">
+              Objetos são instâncias de serviços configurados nesta conta — como MaxDoc, Assistente IA ou Base de Conhecimento.
+            </p>
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-[#9ca3af] mb-3">O que você pode fazer em cada objeto</p>
+              <div className="space-y-2">
+                {([
+                  { icon: <Users className="w-4 h-4 text-blue-500" />, bg: 'bg-blue-50', title: 'Adicionar membros', desc: 'Usuários ou grupos com um papel predefinido.' },
+                  { icon: <SlidersHorizontal className="w-4 h-4 text-violet-500" />, bg: 'bg-violet-50', title: 'Personalizar ações', desc: 'Edite manualmente as ações disponíveis para cada membro.' },
+                  { icon: <GitBranch className="w-4 h-4 text-emerald-500" />, bg: 'bg-emerald-50', title: 'Ver herança de grupo', desc: 'Veja quais ações um membro herda por pertencer a um grupo.' },
+                ] as const).map(({ icon, bg, title, desc }) => (
+                  <div key={title} className="flex gap-3 p-3 rounded-xl bg-[#f9fafb] border border-[#f3f4f6]">
+                    <div className={`w-8 h-8 rounded-full ${bg} flex items-center justify-center shrink-0`}>
+                      {icon}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-[#030712]">{title}</p>
+                      <p className="text-xs text-[#6b7280] mt-0.5 leading-relaxed">{desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex gap-3 p-3 rounded-xl bg-emerald-50 border border-emerald-100">
+              <Info className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              <p className="text-xs text-emerald-800 leading-relaxed">
+                Permissões herdadas de grupos aparecem marcadas em <strong className="font-semibold">verde</strong> e não podem ser editadas diretamente.
+              </p>
+            </div>
           </div>
         )}
       </Modal>
