@@ -371,9 +371,25 @@ async function main() {
       } catch {
         // conflito — vínculo já existe
       }
+
+      // Também insere em component_permissions para que "Ações Efetivas" funcione
+      const cpId = `cp-elfa--${m.entidadeTipo}-${m.entidadeId}--${m.instanciaId}--${atribuicaoId}`
+      try {
+        await db.insert(componentPermissions).values({
+          id: cpId,
+          entidadeTipo: m.entidadeTipo,
+          entidadeId: m.entidadeId,
+          componenteId: 'comp-maxdoc',
+          acao: atribuicaoId,
+          instanciaId: m.instanciaId,
+          createdAt: new Date().toISOString(),
+        })
+      } catch {
+        // conflito — permissão já existe
+      }
     }
   }
-  console.log(`✅ ${membros.length} membros de instância · ${totalAtribs} vínculos de atribuição`)
+  console.log(`✅ ${membros.length} membros de instância · ${totalAtribs} vínculos de atribuição · component_permissions populados`)
 
   // ── Resumo ─────────────────────────────────────────────────────────────────
   console.log('\n🎉 Cenário multi-empresa Elfa concluído!')
