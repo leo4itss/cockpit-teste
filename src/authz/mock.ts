@@ -86,6 +86,20 @@ export const mockFGARelations: FGARelations = {
     // inst-dash-ops: grupo Analistas visualiza, Marcelo usa
     { entityType: 'group', entityId: 'g-analistas',   instanceId: 'inst-dash-ops',        role: 'viewer' },
     { entityType: 'user',  entityId: 'u-marcelo',     instanceId: 'inst-dash-ops',        role: 'member' },
+
+    // ── Hospital Elfa (cenário multi-empresa MaxDoc) ──────────────
+    // DEMONSTRAÇÃO DO DIFERENCIAL PAS vs Docnix:
+    // Carlos é admin-maxdoc no Hospital Central, leitor na Unidade Norte,
+    // e sem acesso à Unidade Sul — com o MESMO login.
+    // No Docnix atual isso é impossível: o usuário herda as mesmas atribuições em todas as empresas.
+    { entityType: 'user',  entityId: 'usr-carlos-elfa',    instanceId: 'inst-elfa-central', role: 'admin-maxdoc' },
+    { entityType: 'user',  entityId: 'usr-carlos-elfa',    instanceId: 'inst-elfa-norte',   role: 'leitor'       },
+    // Carlos NÃO tem acesso à inst-elfa-sul (Unidade Sul) — ausência intencional
+    { entityType: 'group', entityId: 'grp-elfa-editores',  instanceId: 'inst-elfa-central', role: 'editor'       },
+    { entityType: 'group', entityId: 'grp-elfa-editores',  instanceId: 'inst-elfa-norte',   role: 'editor'       },
+    { entityType: 'group', entityId: 'grp-elfa-aprovadores', instanceId: 'inst-elfa-central', role: 'aprovador'  },
+    { entityType: 'group', entityId: 'grp-elfa-aprovadores', instanceId: 'inst-elfa-norte',   role: 'aprovador'  },
+    { entityType: 'user',  entityId: 'usr-beatriz-elfa',   instanceId: 'inst-elfa-sul',     role: 'leitor'       },
   ],
 
   // ── Hierarquia de Grupos ──────────────────────────────────────
