@@ -102,11 +102,28 @@ This is a PoC — authorization is mocked, not wired to a real OpenFGA backend.
 
 In production, `engine.ts` functions would be replaced by OpenFGA SDK calls; the hook interface stays the same.
 
+### Pages and their purpose
+
+| Route | Page | Purpose |
+|-------|------|---------|
+| `/acessos` | `AcessosPage` | Members, groups, and objects of an account. Platform Admin auto-selects first org/account and can switch to "Todas as contas" mode to view across all accounts of an org. |
+| `/canvas` | `CanvasPermissoesPage` | **Operational** — visualize and manage fine-grained permissions within one account. Seletor: conta. |
+| `/canvas-org` | `CanvasOrgPage` | **Structural** — explore org → account hierarchy, expand accounts to see groups/users/objects. Seletor: organização. |
+| `/schema` | `SchemaVisualizerPage` | Interactive graph of the DB schema — useful for understanding table relationships. |
+
+### Role-based UI rules
+
+- **Platform Admin**: cannot create groups (Criar grupo button hidden). Auto-selects first org/account on AcessosPage load. Can switch to "Todas as contas" to see aggregated view across all accounts of an org.
+- **Org Admin**: manages groups and users within their org.
+- **Account Admin**: manages users and groups within their account only.
+
 ### Important constraints
 
 - **Neon HTTP driver does not support native transactions.** Use compensating transactions (create → if next step fails → delete). See `POST /api/organizations` for the pattern.
 - **CORS in `server/index.ts` is hardcoded to `http://localhost:5173`**. If the Vite port changes, update this.
 - **Import alias `@/`** maps to `src/` — defined in `vite.config.ts` and `tsconfig.app.json`.
 - **React deduplication**: `vite.config.ts` sets `dedupe: ['react', 'react-dom']` — required for `@xyflow/react` (the canvas visualizer).
+- **Dual API files**: every new endpoint must be added to **both** `server/index.ts` (local dev, with `/api/` prefix) and `api/index.ts` (Vercel production, without `/api/` prefix). Adding to only one will work locally but fail in production.
 - The floating canvas pages (`/canvas`, `/canvas-org`) use `@xyflow/react` for interactive graph visualization of permissions and org structure.
 - `SchemaVisualizerPage` (`/schema`) renders the DB schema as an interactive graph — useful for understanding table relationships.
+- **Terminology**: UI uses "Objeto" (not "Instância") when referring to configured copies of components (`Instancia` table). Use "Objeto" in labels, legends, and user-facing text.
