@@ -5,7 +5,9 @@
  *   Orgs:     '1'=Apple  '2'=Santacruz  '3'=Margatastiltda  '4'=Nadapedra  '5'=Agropocereal
  *             'org-docnix'=Docnix
  *   Accounts: 'a1'=Apple 'a2'=Santacruz 'a3'=Margatastiltda ... 'acc-comgas'=Comgas (Docnix)
+ *             'acc-elfa'=Hospital Elfa (Docnix) — cenário multi-empresa
  *   Users:    '1'=Leonardo  '2'=Ana  '3'=Marcelo  '4'=Carla  'usr-marcelo-c'=Marcelo Ribeiro
+ *             'usr-carlos-elfa'=Carlos Mendes (Account Admin Hospital Elfa)
  *
  * Não existe em produção — apenas para demonstração do PoC.
  */
