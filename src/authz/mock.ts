@@ -46,9 +46,12 @@ export const mockFGARelations: FGARelations = {
   // Ana (id='2'): account_admin da conta 'a1' (Apple).
   // Carla (id='4'): account_admin da conta 'a2' (Santacruz).
   //   → Carla só enxerga a conta a2 — não vê outras contas, org inteira nem contratos.
+  // Carlos Mendes (usr-carlos-elfa): account_admin da conta 'acc-elfa' (Hospital Elfa).
+  //   → Cenário multi-empresa Docnix: mesmo usuário com papéis diferentes por empresa (instância).
   accountAdmins: [
-    { userId: '2', accountId: 'a1' },
-    { userId: '4', accountId: 'a2' },
+    { userId: '2',              accountId: 'a1'       },
+    { userId: '4',              accountId: 'a2'       },
+    { userId: 'usr-carlos-elfa', accountId: 'acc-elfa' },
   ],
 
   // ── Members ──────────────────────────────────────────────────
