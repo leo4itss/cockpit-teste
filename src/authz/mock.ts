@@ -152,6 +152,12 @@ export const mockPersonas: Persona[] = [
     description: 'Marcelo Ribeiro — admin da Org Docnix; gerencia conta Comgas com solução Atlas e Assistente Vanessa IA',
     color: 'from-rose-400 to-pink-500',
   },
+  {
+    userId: 'usr-carlos-elfa',
+    label: 'Account Admin (Hospital Elfa)',
+    description: 'Carlos Mendes — admin da conta Hospital Elfa; demonstra papéis diferenciados por empresa (admin no Central, leitor no Norte, sem acesso no Sul)',
+    color: 'from-cyan-400 to-teal-500',
+  },
 ]
 
 // ── Níveis de acesso na conta ─────────────────────────────────
