@@ -310,19 +310,21 @@ Mostrar que ao adicionar um novo usuário, o administrador escolhe explicitament
 Mostrar a visão hierárquica da organização Docnix com as contas e seus objetos expandidos.
 
 ### Pré-condições
-- Persona: **Org Admin (Docnix)** — Marcelo Ribeiro
+- Persona: **Org Admin (Docnix)** — Marcelo Ribeiro *(trocar no PersonaSwitcher — Account Admin não tem acesso ao Canvas Org)*
 - Rota: **Canvas Org** (sidebar)
+
+> **Nota de perfil:** O Canvas Org é restrito a Org Admin e Platform Admin. Account Admin (Carlos Mendes) só vê **Acessos** e **Canvas** (visão de conta). Para esta demonstração, trocar a persona para **Marcelo Ribeiro**.
 
 ### Passo a Passo
 
-1. Trocar persona para **Org Admin (Docnix) — Marcelo Ribeiro**
+1. No PersonaSwitcher, trocar para **Org Admin (Docnix) — Marcelo Ribeiro**
 2. Navegar para **Canvas Org**
 3. Selecionar a organização **Docnix** no dropdown
-4. **Verificar:** Duas contas expandidas: **Comgas** e **Hospital Elfa**
+4. **Verificar:** Duas contas visíveis: **Comgas** e **Hospital Elfa**
 5. Expandir **Hospital Elfa**
-6. **Verificar:** Três nós de objetos MaxDoc visíveis: Hospital Central, Unidade Norte, Unidade Sul
+6. **Verificar:** Três nós de objetos MaxDoc: Hospital Central, Unidade Norte, Unidade Sul
 7. Clicar em **Hospital Central**
-8. **Verificar:** Painel lateral mostra membros e grupos com seus papéis
+8. **Verificar:** Painel lateral mostra membros e grupos com papéis
 9. **Verificar:** Carlos Mendes aparece como **Administrador**
 10. Clicar em **Unidade Norte**
 11. **Verificar:** Carlos Mendes aparece como **Leitor** (papel diferente — mesmo usuário)
@@ -331,8 +333,9 @@ Mostrar a visão hierárquica da organização Docnix com as contas e seus objet
 
 | Verificação | Esperado |
 |------------|---------|
-| Hierarquia no Canvas | org-docnix → acc-elfa → 3 instâncias MaxDoc |
+| Hierarquia no Canvas Org | org-docnix → acc-elfa → 3 instâncias MaxDoc |
 | Papel no painel por nó | Correto e independente por instância |
+| Acesso ao Canvas Org | Disponível apenas para Org Admin e Platform Admin |
 
 ---
 
