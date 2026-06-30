@@ -74,6 +74,15 @@ Key data patterns:
 - `Componente` linked to any Solution is inactivated on delete, not hard-deleted.
 - `Solution.plans` is a JSONB array with versioning: edits create a new plan entry (`statusVersao='ativo'`) and mark the previous as `'inativo'` — the backend handles this merge in `PUT /api/solutions/:id`.
 
+### Two parallel permission systems
+
+`instancia_membros` and `component_permissions` are **separate tables** that coexist:
+
+- **`instancia_membros`** — direct object membership with a role (`viewer | member | admin`). Read by `InstanciaDetailSheet` to show the member list of an object. Written by the object detail flow.
+- **`component_permissions`** — fine-grained action-level permissions. Written by `AtribuirPermissoesSheet` (Canvas). When Canvas saves permissions for an instância, it also upserts `instancia_membros` to keep both systems in sync. Removing all actions from an instância also removes the membership record.
+
+`GrupoInstanciaVinculo` type (`src/api/client.ts`) + endpoint `GET /api/grupos/:id/instancias` — returns which instâncias a group has access to (queried from `instancia_membros`). Must exist in **both** `server/index.ts` (local dev) and `api/index.ts` (Vercel production).
+
 ### Authorization (FGA)
 
 This is a PoC — authorization is mocked, not wired to a real OpenFGA backend.
