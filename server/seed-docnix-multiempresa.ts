@@ -15,7 +15,7 @@
 import 'dotenv/config'
 import { neon } from '@neondatabase/serverless'
 import { db } from './db'
-import { componentes, instancias, instanciaMembros, instanciaMembroAtribuicoes } from './schema'
+import { componentes, instancias, instanciaMembros, instanciaMembroAtribuicoes, componentPermissions } from './schema'
 import { eq } from 'drizzle-orm'
 
 const sql = neon(process.env.DATABASE_URL!)
