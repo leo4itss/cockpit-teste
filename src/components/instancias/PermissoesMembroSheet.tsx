@@ -123,9 +123,16 @@ export function PermissoesMembroSheet({
       .then((perms: any[]) => {
         const existing = perms.map((p: any) => p.acao as string)
         setSaved(existing)
-        // Usa sempre as permissões salvas no banco como draft inicial.
-        // expandDefaults só é chamado quando o usuário clica num papel (handlePapelChange).
-        setDraft(existing)
+        // Para Administrador (defaultAcoes: []) o draft deve ser todas as ações do catálogo.
+        // Usa o ref para ler o valor atual mesmo se o fetch de atribuições já terminou.
+        const papelDef = config.papeis.find(p => p.value === (membro.papel ?? ''))
+        const isAdminAll = papelDef && (papelDef.defaultAcoes ?? []).length === 0
+        const catalog = atribuicoesNomesRef.current
+        if (isAdminAll && catalog.length > 0) {
+          setDraft(catalog)
+        } else {
+          setDraft(existing)
+        }
       })
       .catch(() => {
         const papelDef = config.papeis.find(p => p.value === membro.papel)
