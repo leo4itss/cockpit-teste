@@ -200,27 +200,24 @@ export function PermissoesEfetivasSheet({
                   const nomeAtrib = atribuicoesMap[atribId] ?? atribId
                   const fontesDoAtrib = fontes.filter(f => f.atribuicaoId === atribId)
 
-                  if (fontesDoAtrib.length === 0) {
-                    return (
-                      <tr key={atribId} className="border-b border-gray-200 last:border-0">
-                        <td className="px-4 py-3 text-gray-900 font-medium">{nomeAtrib}</td>
-                        <td className="px-4 py-3">
-                          <span className="text-xs text-gray-400">—</span>
-                        </td>
-                      </tr>
-                    )
-                  }
-
-                  return fontesDoAtrib.map((f, idx) => (
-                    <tr key={`${atribId}-${idx}`} className="border-b border-gray-200 last:border-0 hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-3 text-gray-900 font-medium">
+                  return (
+                    <tr key={atribId} className="border-b border-gray-200 last:border-0 hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3 text-gray-900 font-medium align-top">
                         {nomeAtrib}
                       </td>
                       <td className="px-4 py-3">
-                        <FonteBadge fonte={f.fonte} entidadeId={f.entidadeId} displayName={f.displayName} />
+                        {fontesDoAtrib.length === 0 ? (
+                          <span className="text-xs text-gray-400">—</span>
+                        ) : (
+                          <div className="flex flex-wrap gap-1.5">
+                            {fontesDoAtrib.map((f, idx) => (
+                              <FonteBadge key={idx} fonte={f.fonte} entidadeId={f.entidadeId} displayName={f.displayName} />
+                            ))}
+                          </div>
+                        )}
                       </td>
                     </tr>
-                  ))
+                  )
                 })}
               </tbody>
             </table>
