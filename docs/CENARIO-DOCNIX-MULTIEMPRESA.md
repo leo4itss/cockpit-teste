@@ -364,5 +364,8 @@ Mostrar a visão hierárquica da organização Docnix com as contas e seus objet
 | Visibilidade da origem (direto vs. grupo) | ❌ Sem rastreabilidade | ✅ Badge por ação |
 | Alteração em uma empresa afeta outras | ⚠️ Risco real | ✅ Isolado por design |
 | Auditabilidade granular | ❌ Limitada | ✅ Ação a ação, por objeto |
+| Papéis configuráveis (conjuntos de ações) | ❌ Atribuições avulsas | ✅ Papéis com conjuntos customizáveis |
 
 > O modelo FGA (Fine-Grained Authorization) do PAS define papéis e ações sempre no nível do **objeto** (instância), nunca do usuário globalmente. Isso resolve nativamente a principal limitação levantada na reunião de 26/06/2026 com o time Docnix.
+
+> **Os papéis Leitor, Editor, Revisor, Aprovador e Administrador** usados neste demo são uma **proposta de referência**. Os conjuntos de ações de cada papel são totalmente configuráveis e devem ser definidos com o time Docnix antes de uma implementação real.
