@@ -193,13 +193,13 @@ Demonstrar o painel de ações efetivas mostrando exatamente o que cada usuário
 1. Em Acessos > aba **Usuários**, localizar **Carlos Mendes**
 2. Clicar nos três pontinhos (⋯) ou na lupa ao lado de Carlos → selecionar **"Ver permissões efetivas"**
 3. No dropdown de objeto, selecionar **MaxDoc — MaxDoc — Hospital Central**
-4. **Verificar:** Painel exibe múltiplas ações com badge **Direto** (azul)
-5. Ações esperadas incluem: Administrador Módulo MaxDoc, Acessar Todos, Criar Documento, Editar Documento, Aprovar Documento, Revisar Documento, Excluir Documento, Obsoletetar Documento, Controle de Acesso
+4. **Verificar:** Painel exibe 25 ações com badge **Direto** (azul)
+5. Ações esperadas incluem: Administrador Módulo MaxDoc, Acessar Todos, Criar Documento, Editar Documento, Editor Documento, Aprovar Documento, Aprovador Documento, Revisar Documento, Obsoletetar Documento, Emitir Cópia Controlada, Excluir Documento, Controle de Acesso
 
 #### 3.2 — Ações efetivas de Carlos na Unidade Norte
 
 1. No mesmo painel, trocar o dropdown para **MaxDoc — MaxDoc — Unidade Norte**
-2. **Verificar:** Apenas **3 ações** com badge **Direto** (azul): Leitor Documento, Leitor Anexos, Ler Todos
+2. **Verificar:** Apenas **2 ações** com badge **Direto** (azul): **Leitor Documento** e **Imprimir**
 3. **Verificar:** Criar Documento, Aprovar Documento e demais ações **não aparecem**
 
 #### 3.3 — Ações efetivas de João Pereira (via grupo Aprovadores)
@@ -207,7 +207,7 @@ Demonstrar o painel de ações efetivas mostrando exatamente o que cada usuário
 1. Fechar o painel de Carlos → localizar **João Pereira** → abrir permissões efetivas
 2. Selecionar **MaxDoc — MaxDoc — Hospital Central**
 3. **Verificar:** Ações aparecem com badge **Via Grupo · Aprovadores Corporativos** (verde)
-4. Ações esperadas: Aprovar Documento, Aprovador Substituto Documento, Ciclo de Aprovação Documentos, Obsoletetar Documento, Emitir Cópia Controlada, Assinatura Eletrônica
+4. Ações esperadas (5): **Aprovar Documento**, **Aprovador Documento**, **Obsoletetar Documento**, **Emitir Cópia Controlada**, **Emitir Cópia Não Controlada**
 5. Selecionar **MaxDoc — MaxDoc — Unidade Sul**
 6. **Verificar:** Nenhuma ação — João não tem acesso à Unidade Sul
 
@@ -215,10 +215,10 @@ Demonstrar o painel de ações efetivas mostrando exatamente o que cada usuário
 
 | Usuário | Empresa | Ações Efetivas |
 |---------|---------|----------------|
-| Carlos Mendes | Hospital Central | 9 ações diretas (Administrador) |
-| Carlos Mendes | Unidade Norte | 3 ações diretas (Leitor) |
+| Carlos Mendes | Hospital Central | 25 ações diretas (Administrador) |
+| Carlos Mendes | Unidade Norte | 2 ações diretas (Leitor Documento, Imprimir) |
 | Carlos Mendes | Unidade Sul | Nenhuma |
-| João Pereira | Hospital Central | 6 ações via grupo (Aprovadores) |
+| João Pereira | Hospital Central | 5 ações via grupo (Aprovadores) |
 | João Pereira | Unidade Sul | Nenhuma |
 
 ---
