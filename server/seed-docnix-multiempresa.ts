@@ -317,8 +317,15 @@ async function main() {
     },
   ]
 
-  // Limpar dados anteriores das instâncias Elfa antes de re-inserir
+  // Limpar dados anteriores das instâncias Elfa antes de re-inserir (ordem FK)
   await sql`DELETE FROM component_permissions WHERE instancia_id IN ('inst-elfa-central','inst-elfa-norte','inst-elfa-sul')`
+  await sql`
+    DELETE FROM instancia_membro_atribuicoes
+    WHERE membro_id IN (
+      SELECT id FROM instancia_membros
+      WHERE instancia_id IN ('inst-elfa-central','inst-elfa-norte','inst-elfa-sul')
+    )
+  `
   await sql`DELETE FROM instancia_membros WHERE instancia_id IN ('inst-elfa-central','inst-elfa-norte','inst-elfa-sul')`
 
   let totalCp = 0
