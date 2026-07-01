@@ -317,8 +317,9 @@ async function main() {
     },
   ]
 
-  // Limpar component_permissions anteriores (que foram gravados com IDs em vez de nomes)
+  // Limpar dados anteriores das instâncias Elfa antes de re-inserir
   await sql`DELETE FROM component_permissions WHERE instancia_id IN ('inst-elfa-central','inst-elfa-norte','inst-elfa-sul')`
+  await sql`DELETE FROM instancia_membros WHERE instancia_id IN ('inst-elfa-central','inst-elfa-norte','inst-elfa-sul')`
 
   let totalCp = 0
   for (const m of membros) {
