@@ -354,7 +354,7 @@ export function AtribuirPermissoesSheet({
       .finally(() => { if (!cancelled) setLoading(false) })
 
     return () => { cancelled = true }
-  }, [open, entityId, entityType, accountId, instanciaId, instanciaComponenteId, papel])
+  }, [open, entityId, entityType, accountId, instanciaId, instanciaComponenteId, papel, instanciaMembroPapel])
 
   const filtered = useMemo(() => {
     if (!search.trim()) return componentes
