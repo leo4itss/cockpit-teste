@@ -279,8 +279,8 @@ Mostrar que ao adicionar um novo usuário, o administrador escolhe explicitament
 2. Clicar em **"Adicionar membro"**
 3. **[Passo 1 — Wizard]** Buscar "João Pereira" → selecionar `usr-joao-elfa`
 4. **[Passo 2 — Wizard]** Selecionar papel **Revisor** → clicar em **Confirmar**
-5. **Verificar:** Ações pré-selecionadas (4): Visualizar, Revisar Documento, Submeter para Aprovação, Solicitar Revisão
-6. **Verificar:** Criar Documento, Aprovar Documento e Editar **não estão** marcadas
+5. **Verificar:** Ações pré-selecionadas (3): **Revisar Documento**, **Revisor Documento**, **Imprimir**
+6. **Verificar:** Criar Documento, Aprovar Documento e demais ações de edição/aprovação **não estão** marcadas
 7. Salvar
 8. **Verificar:** João aparece na lista do Hospital Central com badge **Revisor**
 
