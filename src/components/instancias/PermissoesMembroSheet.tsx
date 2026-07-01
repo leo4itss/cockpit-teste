@@ -69,10 +69,23 @@ export function PermissoesMembroSheet({
   // acao → nome do grupo que concede a ação
   const [inherited, setInherited] = useState<Record<string, string>>({})
 
+  // ── Catálogo de atribuições (banco) ──────────────────────
+  // Usado no expandDefaults para Administrador: prefere atribuições do banco sobre mock
+  const [atribuicoesNomes, setAtribuicoesNomes] = useState<string[]>([])
+  useEffect(() => {
+    if (!componenteId) return
+    fetch(`/api/componentes/${componenteId}/atribuicoes`)
+      .then(r => r.json())
+      .then((data: any[]) => setAtribuicoesNomes(data.filter(a => a.status !== 'Inativo').map(a => a.nome as string)))
+      .catch(() => {})
+  }, [componenteId])
+
   // ── Helpers ───────────────────────────────────────────────
   /** Expande defaultAcoes: [] (= Administrador) para todas as ações do catálogo */
   function expandDefaults(defaults: string[]): string[] {
     if (defaults.length > 0) return defaults
+    // Prefere catálogo do banco (componente_atribuicoes) sobre mock hardcoded (componente_acoes)
+    if (atribuicoesNomes.length > 0) return atribuicoesNomes
     return (config.acoes ?? []).map(a => a.acao)
   }
 
