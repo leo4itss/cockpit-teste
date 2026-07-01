@@ -231,7 +231,7 @@ Demonstrar o painel de ações efetivas mostrando exatamente o que cada usuário
 
 | Usuário | Empresa | Ações Efetivas |
 |---------|---------|----------------|
-| Carlos Mendes | Hospital Central | 25 ações diretas (Administrador) |
+| Carlos Mendes | Hospital Central | Todas as ações diretas (Administrador) |
 | Carlos Mendes | Unidade Norte | 2 ações diretas (Leitor Documento, Imprimir) |
 | Carlos Mendes | Unidade Sul | Nenhuma |
 | João Pereira | Hospital Central | 5 ações via grupo (Aprovadores) |
