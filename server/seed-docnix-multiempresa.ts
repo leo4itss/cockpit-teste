@@ -230,12 +230,10 @@ async function main() {
   }
 
   const membros: MembroData[] = [
-    // Nomes de ação alinhados com componente_atribuicoes no banco (12 atribuições MaxDoc):
-    // 'Administrar MaxDoc', 'Aprovar Documento', 'Criar Documento', 'Cópia Controlada',
-    // 'Editar Documento', 'Emitir Cópia Não Controlada', 'Excluir Documento', 'Imprimir',
-    // 'Ler Todos os Documentos', 'Obsoletetar Documento', 'Revisar Documento', 'Tabelas Administrativas'
+    // Nomes alinhados com COMPONENTE_CONFIGS.maxdoc.papeis[].defaultAcoes e
+    // com os nomes do catálogo em componente_atribuicoes (seed-docnix-atribuicoes.ts).
 
-    // Carlos — Hospital Central: Administrador (todas as 12 ações)
+    // Carlos — Hospital Central: Administrador (todas as ações)
     {
       id: 'im-elfa-carlos-central',
       instanciaId: 'inst-elfa-central',
@@ -243,9 +241,15 @@ async function main() {
       entidadeId: 'usr-carlos-elfa',
       papel: 'admin-maxdoc',
       acoes: [
-        'Administrar MaxDoc', 'Aprovar Documento', 'Criar Documento', 'Cópia Controlada',
-        'Editar Documento', 'Emitir Cópia Não Controlada', 'Excluir Documento', 'Imprimir',
-        'Ler Todos os Documentos', 'Obsoletetar Documento', 'Revisar Documento', 'Tabelas Administrativas',
+        'Administrar', 'Administrador Módulo MaxDoc', 'Acessar Todos',
+        'Criar Documento', 'Editar Documento', 'Editor Documento', 'Nova Versão',
+        'Upload Documento', 'Download Documento', 'Imprimir',
+        'Leitor Documento', 'Leitor Anexos',
+        'Criar Anexo', 'Editar Anexo', 'Anexar Arquivos',
+        'Revisar Documento', 'Revisor Documento',
+        'Aprovar Documento', 'Aprovador Documento',
+        'Obsoletetar Documento', 'Emitir Cópia Controlada', 'Emitir Cópia Não Controlada',
+        'Excluir Documento', 'Tabelas Administrativas', 'Controle de Acesso',
       ],
     },
     // Carlos — Unidade Norte: LEITOR (papel completamente diferente — mesmo login!)
@@ -255,7 +259,7 @@ async function main() {
       entidadeTipo: 'user',
       entidadeId: 'usr-carlos-elfa',
       papel: 'leitor',
-      acoes: ['Ler Todos os Documentos', 'Imprimir'],
+      acoes: ['Leitor Documento', 'Imprimir'],
     },
     // Carlos NÃO tem acesso à Unidade Sul (sem entrada na tabela)
 
@@ -266,7 +270,7 @@ async function main() {
       entidadeTipo: 'group',
       entidadeId: 'grp-elfa-editores',
       papel: 'editor',
-      acoes: ['Criar Documento', 'Editar Documento', 'Imprimir'],
+      acoes: ['Criar Documento', 'Editor Documento', 'Imprimir'],
     },
     // Grupo Editores — Unidade Norte: Editor
     {
@@ -275,7 +279,7 @@ async function main() {
       entidadeTipo: 'group',
       entidadeId: 'grp-elfa-editores',
       papel: 'editor',
-      acoes: ['Criar Documento', 'Editar Documento', 'Imprimir'],
+      acoes: ['Criar Documento', 'Editor Documento', 'Imprimir'],
     },
     // Grupo Aprovadores — Hospital Central: Aprovador
     {
@@ -285,8 +289,8 @@ async function main() {
       entidadeId: 'grp-elfa-aprovadores',
       papel: 'aprovador',
       acoes: [
-        'Aprovar Documento', 'Revisar Documento', 'Obsoletetar Documento',
-        'Cópia Controlada', 'Emitir Cópia Não Controlada',
+        'Aprovar Documento', 'Aprovador Documento',
+        'Obsoletetar Documento', 'Emitir Cópia Controlada', 'Emitir Cópia Não Controlada',
       ],
     },
     // Grupo Aprovadores — Unidade Norte: Aprovador
@@ -297,8 +301,8 @@ async function main() {
       entidadeId: 'grp-elfa-aprovadores',
       papel: 'aprovador',
       acoes: [
-        'Aprovar Documento', 'Revisar Documento', 'Obsoletetar Documento',
-        'Cópia Controlada', 'Emitir Cópia Não Controlada',
+        'Aprovar Documento', 'Aprovador Documento',
+        'Obsoletetar Documento', 'Emitir Cópia Controlada', 'Emitir Cópia Não Controlada',
       ],
     },
     // Beatriz (direto) — Unidade Sul: Leitor
@@ -309,7 +313,7 @@ async function main() {
       entidadeTipo: 'user',
       entidadeId: 'usr-beatriz-elfa',
       papel: 'leitor',
-      acoes: ['Ler Todos os Documentos', 'Imprimir'],
+      acoes: ['Leitor Documento', 'Imprimir'],
     },
   ]
 
