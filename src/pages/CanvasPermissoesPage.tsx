@@ -634,7 +634,7 @@ function UsuarioPanel({ userId, graphData, accountId, theme, onClose, onRefresh:
                       <CompIcon tipo={tipo} size={13} color={compIconColor(tipo, theme.mode)} />
                       <span className="text-xs flex-1 truncate" style={{ color: theme.panelText }}>{inst.nome}</span>
                       {isDocNix
-                        ? <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700 border border-violet-200">DocNix</span>
+                        ? mb?.papel && <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700 border border-violet-200">{getPapelInfo(mb.papel)?.label ?? mb.papel}</span>
                         : mb?.papel && <span className="text-[9px] font-semibold" style={{ color: theme.btnPermText }}>{mb.papel}</span>
                       }
                       <button
