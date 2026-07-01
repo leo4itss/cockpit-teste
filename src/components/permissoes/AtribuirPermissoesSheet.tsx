@@ -137,7 +137,7 @@ function ComponenteIcon({ tipo, locked }: { tipo: ComponenteTipo; locked?: boole
 
 export function AtribuirPermissoesSheet({
   open, onClose, entityType, entityId, entityNome, accountId, accountNome, papel, onSuccess,
-  instanciaId, instanciaComponenteId, instanciaNome,
+  instanciaId, instanciaComponenteId, instanciaNome, instanciaMembroPapel,
 }: Props) {
   const [componentes, setComponentes]       = useState<Componente[]>([])
   const [activeCapabilities, setActiveCapabilities] = useState<Set<string>>(new Set())
