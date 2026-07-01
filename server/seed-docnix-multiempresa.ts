@@ -217,33 +217,37 @@ async function main() {
   // Carlos ter ADMIN no Central e LEITOR no Norte com o MESMO login é
   // IMPOSSÍVEL no Docnix atual → é exatamente o que o PAS resolve.
 
+  // component_permissions.acao deve conter o NOME da ação (ex: 'Criar Documento'),
+  // não o ID da atribuição (ex: 'atrib-maxdoc-criar-doc').
+  // Os nomes devem coincidir com COMPONENTE_CONFIGS.maxdoc.acoes em src/authz/mock.ts.
   type MembroData = {
     id: string
     instanciaId: string
     entidadeTipo: 'user' | 'group'
     entidadeId: string
     papel: string
-    atribuicaoIds: string[]
+    acoes: string[] // nomes de ação usados em component_permissions.acao
   }
 
   const membros: MembroData[] = [
-    // Carlos — Hospital Central: Administrador
+    // Carlos — Hospital Central: Administrador (todas as ações)
     {
       id: 'im-elfa-carlos-central',
       instanciaId: 'inst-elfa-central',
       entidadeTipo: 'user',
       entidadeId: 'usr-carlos-elfa',
       papel: 'admin-maxdoc',
-      atribuicaoIds: [
-        'atrib-maxdoc-admin-modulo',
-        'atrib-maxdoc-acessar-todos',
-        'atrib-maxdoc-criar-doc',
-        'atrib-maxdoc-editar-doc',
-        'atrib-maxdoc-aprovar-doc',
-        'atrib-maxdoc-revisar-doc',
-        'atrib-maxdoc-excluir-doc',
-        'atrib-maxdoc-obsoletetar-doc',
-        'atrib-maxdoc-controle-acesso',
+      acoes: [
+        'Visualizar', 'Ler Todos', 'Leitor Documento', 'Leitor Anexos',
+        'Baixar Documento', 'Imprimir', 'Criar Documento', 'Editar',
+        'Nova Versão', 'Mover', 'Cancelar Edição', 'Visualizar Histórico de Versões',
+        'Upload Documento', 'Editor Documento', 'Criar Anexo', 'Editar Anexo',
+        'Anexar Arquivos', 'Assinatura Eletrônica', 'Revisar Documento',
+        'Submeter para Aprovação', 'Solicitar Revisão', 'Revisor Documento',
+        'Revisar como Substituto Documento', 'Aprovar Documento', 'Rejeitar Documento',
+        'Aprovador Documento', 'Aprovador Substituto Documento', 'Obsoletetar Documento',
+        'Emitir Cópia Controlada', 'Emitir Cópia Não Controlada',
+        'Cópia Controlada Anexos', 'Ciclo de Aprovação Documentos',
       ],
     },
     // Carlos — Unidade Norte: LEITOR (papel completamente diferente)
@@ -253,10 +257,9 @@ async function main() {
       entidadeTipo: 'user',
       entidadeId: 'usr-carlos-elfa',
       papel: 'leitor',
-      atribuicaoIds: [
-        'atrib-maxdoc-leitor-doc',
-        'atrib-maxdoc-leitor-anexos',
-        'atrib-maxdoc-ler-todos',
+      acoes: [
+        'Visualizar', 'Ler Todos', 'Leitor Documento', 'Leitor Anexos',
+        'Baixar Documento', 'Imprimir',
       ],
     },
     // Carlos NÃO tem acesso à Unidade Sul (sem entrada na tabela)
@@ -268,13 +271,10 @@ async function main() {
       entidadeTipo: 'group',
       entidadeId: 'grp-elfa-editores',
       papel: 'editor',
-      atribuicaoIds: [
-        'atrib-maxdoc-criar-doc',
-        'atrib-maxdoc-editar-doc',
-        'atrib-maxdoc-nova-versao',
-        'atrib-maxdoc-submeter-aprovacao',
-        'atrib-maxdoc-download-doc',
-        'atrib-maxdoc-imprimir',
+      acoes: [
+        'Visualizar', 'Criar Documento', 'Editar', 'Nova Versão',
+        'Submeter para Aprovação', 'Baixar Documento', 'Imprimir',
+        'Visualizar Histórico de Versões',
       ],
     },
     // Grupo Editores — Unidade Norte: Editor
@@ -284,13 +284,10 @@ async function main() {
       entidadeTipo: 'group',
       entidadeId: 'grp-elfa-editores',
       papel: 'editor',
-      atribuicaoIds: [
-        'atrib-maxdoc-criar-doc',
-        'atrib-maxdoc-editar-doc',
-        'atrib-maxdoc-nova-versao',
-        'atrib-maxdoc-submeter-aprovacao',
-        'atrib-maxdoc-download-doc',
-        'atrib-maxdoc-imprimir',
+      acoes: [
+        'Visualizar', 'Criar Documento', 'Editar', 'Nova Versão',
+        'Submeter para Aprovação', 'Baixar Documento', 'Imprimir',
+        'Visualizar Histórico de Versões',
       ],
     },
     // Grupo Aprovadores — Hospital Central: Aprovador
@@ -300,13 +297,14 @@ async function main() {
       entidadeTipo: 'group',
       entidadeId: 'grp-elfa-aprovadores',
       papel: 'aprovador',
-      atribuicaoIds: [
-        'atrib-maxdoc-aprovar-doc',
-        'atrib-maxdoc-aprov-subst-doc',
-        'atrib-maxdoc-ciclo-aprov-doc',
-        'atrib-maxdoc-obsoletetar-doc',
-        'atrib-maxdoc-emitir-copia-ctrl',
-        'atrib-maxdoc-assinatura-eletronica',
+      acoes: [
+        'Visualizar', 'Ler Todos', 'Leitor Documento', 'Leitor Anexos',
+        'Baixar Documento', 'Imprimir', 'Assinatura Eletrônica',
+        'Revisar Documento', 'Aprovar Documento', 'Rejeitar Documento',
+        'Aprovador Documento', 'Aprovador Substituto Documento',
+        'Obsoletetar Documento', 'Emitir Cópia Controlada',
+        'Emitir Cópia Não Controlada', 'Cópia Controlada Anexos',
+        'Ciclo de Aprovação Documentos',
       ],
     },
     // Grupo Aprovadores — Unidade Norte: Aprovador
@@ -316,13 +314,14 @@ async function main() {
       entidadeTipo: 'group',
       entidadeId: 'grp-elfa-aprovadores',
       papel: 'aprovador',
-      atribuicaoIds: [
-        'atrib-maxdoc-aprovar-doc',
-        'atrib-maxdoc-aprov-subst-doc',
-        'atrib-maxdoc-ciclo-aprov-doc',
-        'atrib-maxdoc-obsoletetar-doc',
-        'atrib-maxdoc-emitir-copia-ctrl',
-        'atrib-maxdoc-assinatura-eletronica',
+      acoes: [
+        'Visualizar', 'Ler Todos', 'Leitor Documento', 'Leitor Anexos',
+        'Baixar Documento', 'Imprimir', 'Assinatura Eletrônica',
+        'Revisar Documento', 'Aprovar Documento', 'Rejeitar Documento',
+        'Aprovador Documento', 'Aprovador Substituto Documento',
+        'Obsoletetar Documento', 'Emitir Cópia Controlada',
+        'Emitir Cópia Não Controlada', 'Cópia Controlada Anexos',
+        'Ciclo de Aprovação Documentos',
       ],
     },
     // Beatriz (direto) — Unidade Sul: Leitor
@@ -333,15 +332,17 @@ async function main() {
       entidadeTipo: 'user',
       entidadeId: 'usr-beatriz-elfa',
       papel: 'leitor',
-      atribuicaoIds: [
-        'atrib-maxdoc-leitor-doc',
-        'atrib-maxdoc-leitor-anexos',
-        'atrib-maxdoc-ler-todos',
+      acoes: [
+        'Visualizar', 'Ler Todos', 'Leitor Documento', 'Leitor Anexos',
+        'Baixar Documento', 'Imprimir',
       ],
     },
   ]
 
-  let totalAtribs = 0
+  // Limpar component_permissions anteriores (que foram gravados com IDs em vez de nomes)
+  await sql`DELETE FROM component_permissions WHERE instancia_id IN ('inst-elfa-central','inst-elfa-norte','inst-elfa-sul')`
+
+  let totalCp = 0
   for (const m of membros) {
     await db
       .insert(instanciaMembros)
@@ -358,38 +359,21 @@ async function main() {
         set: { papel: m.papel },
       })
 
-    for (const atribuicaoId of m.atribuicaoIds) {
-      const linkId = `${m.id}--${atribuicaoId}`
-      try {
-        await db.insert(instanciaMembroAtribuicoes).values({
-          id: linkId,
-          membroId: m.id,
-          atribuicaoId,
-          assignedAt: new Date().toISOString(),
-        })
-        totalAtribs++
-      } catch {
-        // conflito — vínculo já existe
-      }
-
-      // Também insere em component_permissions para que "Ações Efetivas" funcione
-      const cpId = `cp-elfa--${m.entidadeTipo}-${m.entidadeId}--${m.instanciaId}--${atribuicaoId}`
-      try {
-        await db.insert(componentPermissions).values({
-          id: cpId,
-          entidadeTipo: m.entidadeTipo,
-          entidadeId: m.entidadeId,
-          componenteId: 'comp-maxdoc',
-          acao: atribuicaoId,
-          instanciaId: m.instanciaId,
-          createdAt: new Date().toISOString(),
-        })
-      } catch {
-        // conflito — permissão já existe
-      }
+    for (const acao of m.acoes) {
+      const cpId = `cp-elfa--${m.entidadeTipo}-${m.entidadeId}--${m.instanciaId}--${acao.replace(/\s+/g, '-').toLowerCase()}`
+      await db.insert(componentPermissions).values({
+        id: cpId,
+        entidadeTipo: m.entidadeTipo,
+        entidadeId: m.entidadeId,
+        componenteId: 'comp-maxdoc',
+        acao,
+        instanciaId: m.instanciaId,
+        createdAt: new Date().toISOString(),
+      }).onConflictDoNothing()
+      totalCp++
     }
   }
-  console.log(`✅ ${membros.length} membros de instância · ${totalAtribs} vínculos de atribuição · component_permissions populados`)
+  console.log(`✅ ${membros.length} membros de instância · ${totalCp} component_permissions (nomes de ação)`)
 
   // ── Resumo ─────────────────────────────────────────────────────────────────
   console.log('\n🎉 Cenário multi-empresa Elfa concluído!')
