@@ -259,6 +259,25 @@ export function AtribuirPermissoesSheet({
           if (!cancelled && anyDefaultApplied) setDefaultsAplicados(true)
         }
 
+        // Modo instância + papel conhecido (vindo de instancia_membros): é a fonte de
+        // verdade — evita reinferir a partir do conjunto de permissões, que pode estar
+        // dessincronizado (ex.: Administrador com um subconjunto salvo em vez de todas).
+        if (modoInstancia && instanciaMembroPapel && ativos.length === 1) {
+          const comp = ativos[0]
+          const cfg  = getComponenteConfig(comp.nome)
+          const papelDef = cfg.papeis.find(p => p.value === instanciaMembroPapel)
+          if (papelDef) {
+            const defaults = papelDef.defaultAcoes ?? []
+            if (defaults.length === 0) {
+              // [] = todas as ações do catálogo — prefere catálogo do banco sobre mock
+              const allAcoes = (newAtribMap[comp.id]?.length ? newAtribMap[comp.id] : (cfg.acoes ?? [])).map(a => a.acao)
+              draftMap[comp.id] = allAcoes
+            } else {
+              draftMap[comp.id] = defaults
+            }
+          }
+        }
+
         setOriginal(permMap)
         setDraft(draftMap)
 
@@ -266,12 +285,22 @@ export function AtribuirPermissoesSheet({
         if (!cancelled) {
           const inferredPapeis: Record<string, string> = {}
           ativos.forEach(c => {
+            // Modo instância: usa o papel salvo diretamente, sem reinferir.
+            if (modoInstancia && instanciaMembroPapel) {
+              const cfg = getComponenteConfig(c.nome)
+              if (cfg.papeis.some(p => p.value === instanciaMembroPapel)) {
+                inferredPapeis[c.id] = instanciaMembroPapel
+                return
+              }
+            }
+
             const cfg        = getComponenteConfig(c.nome)
             const currentSet = new Set(draftMap[c.id] ?? [])
             if (currentSet.size === 0) return
 
             // Todos os componentes usam component_permissions (FGA puro)
-            const allAcoes = (cfg.acoes ?? newAtribMap[c.id] ?? []).map(a => a.acao)
+            // Prefere catálogo do banco (componente_atribuicoes) sobre mock hardcoded (cfg.acoes)
+            const allAcoes = (newAtribMap[c.id]?.length ? newAtribMap[c.id] : (cfg.acoes ?? [])).map(a => a.acao)
             let matched = false
             for (const p of cfg.papeis) {
               const defaults = p.defaultAcoes ?? []
