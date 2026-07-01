@@ -385,28 +385,27 @@ const COMPONENTE_CONFIGS: Record<string, ComponenteTypeConfig> = {
       {
         value: 'leitor', label: 'Leitor', desc: 'Leitura e download de documentos',
         cls: 'bg-gray-100 text-gray-600 border-gray-200',
-        // Nomes alinhados com componente_atribuicoes no banco (12 atribuições MaxDoc)
-        defaultAcoes: ['Ler Todos os Documentos', 'Imprimir'],
+        defaultAcoes: ['Leitor Documento', 'Imprimir'],
       },
       {
         value: 'editor', label: 'Editor', desc: 'Cria e edita documentos e anexos',
         cls: 'bg-blue-50 text-blue-700 border-blue-200',
-        defaultAcoes: ['Criar Documento', 'Editar Documento', 'Imprimir'],
+        defaultAcoes: ['Criar Documento', 'Editor Documento', 'Imprimir'],
       },
       {
         value: 'revisor', label: 'Revisor', desc: 'Revisa e submete documentos para aprovação',
         cls: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-        defaultAcoes: ['Revisar Documento', 'Imprimir'],
+        defaultAcoes: ['Revisar Documento', 'Revisor Documento', 'Imprimir'],
       },
       {
         value: 'aprovador', label: 'Aprovador', desc: 'Aprova, obsoleta e emite cópias controladas',
         cls: 'bg-orange-50 text-orange-700 border-orange-200',
-        defaultAcoes: ['Aprovar Documento', 'Revisar Documento', 'Obsoletetar Documento', 'Cópia Controlada', 'Emitir Cópia Não Controlada'],
+        defaultAcoes: ['Aprovar Documento', 'Aprovador Documento', 'Obsoletetar Documento', 'Emitir Cópia Controlada', 'Emitir Cópia Não Controlada'],
       },
       {
         value: 'admin-maxdoc', label: 'Administrador', desc: 'Acesso completo ao MaxDoc',
         cls: 'bg-red-50 text-red-700 border-red-200',
-        defaultAcoes: [], // [] = todas as ações (Administrar MaxDoc + todas as 12)
+        defaultAcoes: [], // [] = todas as ações do catálogo
       },
     ],
     acoes: [
