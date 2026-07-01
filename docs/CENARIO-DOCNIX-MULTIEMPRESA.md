@@ -89,12 +89,11 @@ Demonstrar que Carlos Mendes é Administrador no Hospital Central, Leitor na Uni
 3. **Verificar (Grupos — 2):**
    - **Editores Docnix** com badge **Editor**
    - **Aprovadores Corporativos** com badge **Aprovador**
-4. **Verificar (Usuários — 2):**
-   - **Carlos Mendes** com badge **Administrador** (laranja/vermelho)
-   - **João Pereira** com badge **Revisor**
+4. **Verificar (Usuários — 1):**
+   - **Carlos Mendes** com badge **Administrador** (vermelho)
 5. Clicar em **Editar** ao lado de Carlos Mendes
 6. **Verificar:** Papel **Administrador** selecionado (destacado em azul)
-7. **Verificar:** **32 ações diretas** — todas as ações do MaxDoc estão marcadas
+7. **Verificar:** **25 ações diretas** — conjunto completo de ações de administração do MaxDoc
 8. Fechar sem salvar
 
 #### 1.3 — Inspecionar a Unidade Norte (papel Leitor — mesmo Carlos)
@@ -103,8 +102,8 @@ Demonstrar que Carlos Mendes é Administrador no Hospital Central, Leitor na Uni
 2. **Verificar (Usuários — 1):** Carlos Mendes com badge **Leitor** (cinza)
 3. Clicar em **Editar** ao lado de Carlos Mendes
 4. **Verificar:** Papel **Leitor** selecionado
-5. **Verificar:** Apenas **6 ações** marcadas: Visualizar, Ler Todos, Leitor Documento, Leitor Anexos, Baixar Documento, Imprimir
-6. **Verificar:** Criar Documento, Editar, Nova Versão, Aprovar Documento e todas as demais ações **NÃO** estão marcadas
+5. **Verificar:** Apenas **2 ações** marcadas: **Leitor Documento** e **Imprimir**
+6. **Verificar:** Criar Documento, Editor Documento, Aprovar Documento e todas as demais ações **NÃO** estão marcadas
 7. Fechar sem salvar
 
 > **Ponto de impacto para o cliente:** o mesmo Carlos Mendes que edita, cria e aprova documentos no Hospital Central não consegue sequer criar um documento na Unidade Norte — tudo com o mesmo login.
