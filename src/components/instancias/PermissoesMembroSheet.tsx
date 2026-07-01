@@ -70,25 +70,28 @@ export function PermissoesMembroSheet({
   const [inherited, setInherited] = useState<Record<string, string>>({})
 
   // ── Catálogo de atribuições (banco) ──────────────────────
-  // Usado no expandDefaults para Administrador: prefere atribuições do banco sobre mock
+  // Ref sempre atualizado — permite leitura do valor atual dentro de closures de useEffect
+  const atribuicoesNomesRef = useRef<string[]>([])
   const [atribuicoesNomes, setAtribuicoesNomes] = useState<string[]>([])
   useEffect(() => {
     if (!componenteId) return
     fetch(`/api/componentes/${componenteId}/atribuicoes`)
       .then(r => r.json())
-      .then((data: any[]) => setAtribuicoesNomes(data.filter(a => a.status !== 'Inativo').map(a => a.nome as string)))
+      .then((data: any[]) => {
+        const nomes = data.filter(a => a.status !== 'Inativo').map(a => a.nome as string)
+        atribuicoesNomesRef.current = nomes
+        setAtribuicoesNomes(nomes)
+      })
       .catch(() => {})
   }, [componenteId])
 
-  // Quando atribuicoesNomes carrega após o sheet já estar aberto, re-aplica o draft
-  // para papéis cujo defaultAcoes é [] (= Administrador: todas as ações).
+  // Quando atribuicoesNomes carrega APÓS o draft já ter sido definido (perms chegaram primeiro),
+  // re-aplica para papéis cujo defaultAcoes é [] (= Administrador: todas as ações).
   useEffect(() => {
     if (atribuicoesNomes.length === 0) return
     if (!selectedPapel || selectedPapel === 'personalizado') return
     const papelDef = config.papeis.find(p => p.value === selectedPapel)
-    if (!papelDef) return
-    const defaults = papelDef.defaultAcoes ?? []
-    if (defaults.length > 0) return // papéis com lista fixa já estão corretos
+    if (!papelDef || (papelDef.defaultAcoes ?? []).length > 0) return
     setDraft(atribuicoesNomes)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [atribuicoesNomes])
