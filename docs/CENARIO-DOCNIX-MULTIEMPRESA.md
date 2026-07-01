@@ -119,8 +119,8 @@ Demonstrar que Carlos Mendes é Administrador no Hospital Central, Leitor na Uni
 
 | Verificação | Esperado |
 |------------|---------|
-| Carlos no Hospital Central | Badge **Administrador**, 32 ações diretas |
-| Carlos na Unidade Norte | Badge **Leitor**, 6 ações diretas (sem criar/editar/aprovar) |
+| Carlos no Hospital Central | Badge **Administrador**, 25 ações diretas |
+| Carlos na Unidade Norte | Badge **Leitor**, 2 ações diretas (Leitor Documento, Imprimir) |
 | Carlos na Unidade Sul | **Não aparece** na lista de membros |
 | Separação por objeto | Cada instância tem lista de membros e papéis independentes |
 
