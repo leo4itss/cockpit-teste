@@ -512,7 +512,7 @@ function GrupoPanel({ grupoId, graphData, accountId, theme, onClose, onRefresh, 
                   <span className="text-xs flex-1 truncate" style={{ color: theme.panelText }}>{inst.nome}</span>
                   {membroDoGrupo && (
                     isDocNix
-                      ? <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700 border border-violet-200">DocNix</span>
+                      ? <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700 border border-violet-200">{getPapelInfo(membroDoGrupo.papel)?.label ?? membroDoGrupo.papel}</span>
                       : <span className="text-[9px] font-semibold" style={{ color: theme.btnPermText }}>{membroDoGrupo.papel}</span>
                   )}
                   <button
