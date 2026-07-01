@@ -647,6 +647,7 @@ function UsuarioPanel({ userId, graphData, accountId, theme, onClose, onRefresh:
                           instanciaId: inst.id,
                           instanciaComponenteId: inst.componenteId,
                           instanciaNome: inst.nome,
+                          instanciaMembroPapel: mb?.papel,
                         })}
                         title="Editar permissões neste objeto"
                         className="p-1 rounded transition-colors shrink-0"
