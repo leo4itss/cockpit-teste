@@ -328,7 +328,7 @@ function buildGraph(data: GraphData, selectedId: string | null, theme: Visualize
           stroke: mb.entidadeTipo === 'user' ? theme.edgeInstUser : theme.edgeInstGroup,
           strokeWidth: 1.5, strokeDasharray: '6 3',
         },
-        label: isDocNix ? 'DocNix' : mb.papel,
+        label: isDocNix ? (getPapelInfo(mb.papel)?.label ?? mb.papel) : mb.papel,
         labelStyle: { fontSize: 9, fill: theme.cardMuted },
         labelBgStyle: { fill: theme.canvasBg, fillOpacity: 0.85 },
       })
