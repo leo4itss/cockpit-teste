@@ -357,8 +357,8 @@ export function AtribuirPermissoesSheet({
     const defaults = papelDef?.defaultAcoes ?? []
 
     if (defaults.length === 0) {
-      // [] = todas as ações do catálogo (ex: Administrador)
-      const allAcoes = (cfg.acoes ?? atribuicoesMap[compId] ?? []).map(a => a.acao)
+      // [] = todas as ações do catálogo (ex: Administrador) — prefere catálogo do banco
+      const allAcoes = (atribuicoesMap[compId]?.length ? atribuicoesMap[compId] : (cfg.acoes ?? [])).map(a => a.acao)
       setDraft(prev => ({ ...prev, [compId]: allAcoes }))
     } else {
       setDraft(prev => ({ ...prev, [compId]: defaults }))
