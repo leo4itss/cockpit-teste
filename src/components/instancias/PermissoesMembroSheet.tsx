@@ -80,6 +80,19 @@ export function PermissoesMembroSheet({
       .catch(() => {})
   }, [componenteId])
 
+  // Quando atribuicoesNomes carrega após o sheet já estar aberto, re-aplica o draft
+  // para papéis cujo defaultAcoes é [] (= Administrador: todas as ações).
+  useEffect(() => {
+    if (atribuicoesNomes.length === 0) return
+    if (!selectedPapel || selectedPapel === 'personalizado') return
+    const papelDef = config.papeis.find(p => p.value === selectedPapel)
+    if (!papelDef) return
+    const defaults = papelDef.defaultAcoes ?? []
+    if (defaults.length > 0) return // papéis com lista fixa já estão corretos
+    setDraft(atribuicoesNomes)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [atribuicoesNomes])
+
   // ── Helpers ───────────────────────────────────────────────
   /** Expande defaultAcoes: [] (= Administrador) para todas as ações do catálogo */
   function expandDefaults(defaults: string[]): string[] {
