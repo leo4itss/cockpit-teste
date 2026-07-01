@@ -271,14 +271,21 @@ export function AcessosPage() {
   async function handleOpenPermEfetivas(user: User) {
     setPermEfetivasUser(user)
     setPermEfetivasInstancias([])
+
+    // Grupos do usuário — necessário para incluir objetos onde o acesso é só via grupo.
+    const userGrupos = await api.getUserGrupos(user.id, accountId).catch(() => [] as any[])
+    const grupoIds = new Set(userGrupos.map((g: any) => g.id))
+
     const userInstIds: string[] = []
     await Promise.all(
       instancias.map(inst =>
         api.getInstanciaMembros(inst.id)
           .then((mems: any[]) => {
-            if (mems.some(m => m.entidadeTipo === 'user' && m.entidadeId === user.id)) {
-              userInstIds.push(inst.id)
-            }
+            const temAcesso = mems.some(m =>
+              (m.entidadeTipo === 'user' && m.entidadeId === user.id) ||
+              (m.entidadeTipo === 'group' && grupoIds.has(m.entidadeId))
+            )
+            if (temAcesso) userInstIds.push(inst.id)
           })
           .catch(() => {})
       )
