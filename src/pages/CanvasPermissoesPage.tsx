@@ -25,6 +25,7 @@ import {
   Sun, Moon, HelpCircle, Info,
 } from 'lucide-react'
 import { api } from '@/api/client'
+import { getPapelInfo } from '@/authz/mock'
 import { useIsPlatformAdmin, useIsOrgAdmin, useIsAccountAdmin } from '@/authz'
 import { useAdminAccountId, useAdminOrgId } from '@/authz/hooks'
 import { useSessionState } from '@/hooks/useSessionState'
