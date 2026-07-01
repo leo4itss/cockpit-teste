@@ -665,7 +665,7 @@ export function AcessosPage() {
               </thead>
               <tbody>
                 {loadingGrupos ? (
-                  <tr><td colSpan={isAllAccounts ? 7 : 6} className="px-4 py-8 text-center text-sm text-gray-500">Carregando...</td></tr>
+                  <tr><td colSpan={isAllAccounts ? 6 : 5} className="px-4 py-8 text-center text-sm text-gray-500">Carregando...</td></tr>
                 ) : filteredGrupos.length > 0 ? (
                   filteredGrupos.map(grupo => (
                     <tr
