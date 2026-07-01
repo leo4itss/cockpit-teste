@@ -524,6 +524,7 @@ function GrupoPanel({ grupoId, graphData, accountId, theme, onClose, onRefresh, 
                       instanciaId: inst.id,
                       instanciaComponenteId: inst.componenteId,
                       instanciaNome: inst.nome,
+                      instanciaMembroPapel: membroDoGrupo?.papel,
                     })}
                     title="Atribuir permissões neste objeto"
                     className="p-1 rounded transition-colors shrink-0"
