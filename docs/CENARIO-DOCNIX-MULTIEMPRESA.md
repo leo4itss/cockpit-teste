@@ -109,7 +109,7 @@ Demonstrar que Carlos Mendes é Administrador no Hospital Central, Leitor na Uni
    - **Carlos Mendes** com badge **Administrador** (vermelho)
 5. Clicar em **Editar** ao lado de Carlos Mendes
 6. **Verificar:** Papel **Administrador** selecionado (destacado em azul)
-7. **Verificar:** **25 ações diretas** — conjunto completo de ações de administração do MaxDoc
+7. **Verificar:** Todas as **47 ações** do catálogo MaxDoc estão marcadas
 8. Fechar sem salvar
 
 #### 1.3 — Inspecionar a Unidade Norte (papel Leitor — mesmo Carlos)
