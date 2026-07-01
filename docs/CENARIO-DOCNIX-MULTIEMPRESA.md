@@ -94,9 +94,9 @@ Demonstrar que Carlos Mendes é Administrador no Hospital Central, Leitor na Uni
 2. Confirmar que a conta exibida é **Hospital Elfa**
 3. Clicar na aba **Objetos**
 4. **Verificar:** Três objetos MaxDoc aparecem na lista:
-   - MaxDoc — Hospital Central (4 membros)
-   - MaxDoc — Unidade Norte (3 membros)
-   - MaxDoc — Unidade Sul (1 membro)
+   - MaxDoc — Hospital Central (3 membros: Carlos + 2 grupos)
+   - MaxDoc — Unidade Norte (3 membros: Carlos + 2 grupos)
+   - MaxDoc — Unidade Sul (1 membro: Beatriz direto)
 
 #### 1.2 — Inspecionar o Hospital Central (papel Administrador)
 
