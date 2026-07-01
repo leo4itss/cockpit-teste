@@ -680,7 +680,6 @@ export function AcessosPage() {
                         )}
                       </td>
                       <td className="px-4 py-3 text-sm text-[#030712]">{grupo.qtdMembros ?? 0}</td>
-                      <td className="px-4 py-3"><PapelBadge papel={grupo.papel} /></td>
                       <td className="px-4 py-3"><EscopoBadge escopo={grupo.escopo} /></td>
                       {isAllAccounts && (
                         <td className="px-4 py-3 text-sm text-[#6b7280]">
