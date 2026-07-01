@@ -20,21 +20,6 @@ No PAS, o papel é atribuído ao nível do **objeto** (instância), não do usu�
 | Grupo | Grupo (com papel por objeto) |
 | Usuário compartilhado | Usuário com papéis distintos por instância |
 
-### Nota sobre os Papéis neste Demo
-
-O PAS trabalha com **ações granulares** — o administrador pode conceder qualquer combinação de ações a um usuário ou grupo em cada objeto. Para facilitar a operação no dia a dia, o sistema permite definir **papéis pré-configurados** (conjuntos de ações com nome), que funcionam como atalhos.
-
-Os papéis usados neste demo — **Leitor, Editor, Revisor, Aprovador e Administrador** — são uma **proposta de referência** criada para a demonstração. Os conjuntos de ações associados a cada papel são totalmente configuráveis e devem ser definidos em conjunto com o time Docnix antes de uma implementação real.
-
-| Papel (demo) | Ações incluídas (proposta) |
-|-------------|--------------------------|
-| Leitor | Leitor Documento, Imprimir |
-| Editor | Criar Documento, Editor Documento, Imprimir |
-| Revisor | Revisar Documento, Revisor Documento, Imprimir |
-| Aprovador | Aprovar Documento, Aprovador Documento, Obsoletetar Documento, Emitir Cópia Controlada, Emitir Cópia Não Controlada |
-| Administrador | Todas as 47 ações do catálogo MaxDoc |
-
-> Estes conjuntos são intencionalmente simples para fins de demonstração. Em produção, o time Docnix definiria os conjuntos reais com base nos perfis de acesso existentes no sistema.
 
 ---
 
