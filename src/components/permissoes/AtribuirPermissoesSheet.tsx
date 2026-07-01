@@ -107,6 +107,10 @@ interface Props {
   instanciaId?:         string
   instanciaComponenteId?: string
   instanciaNome?:       string
+  // Papel já salvo em instancia_membros para este membro nesta instância —
+  // fonte de verdade para o seletor de papel (evita reinferir a partir do
+  // conjunto de permissões, que pode estar dessincronizado).
+  instanciaMembroPapel?: string
 }
 
 // ── Helpers ────────────────────────────────────────────────────
