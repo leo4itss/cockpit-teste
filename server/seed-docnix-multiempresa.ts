@@ -230,7 +230,12 @@ async function main() {
   }
 
   const membros: MembroData[] = [
-    // Carlos — Hospital Central: Administrador (todas as ações)
+    // Nomes de ação alinhados com componente_atribuicoes no banco (12 atribuições MaxDoc):
+    // 'Administrar MaxDoc', 'Aprovar Documento', 'Criar Documento', 'Cópia Controlada',
+    // 'Editar Documento', 'Emitir Cópia Não Controlada', 'Excluir Documento', 'Imprimir',
+    // 'Ler Todos os Documentos', 'Obsoletetar Documento', 'Revisar Documento', 'Tabelas Administrativas'
+
+    // Carlos — Hospital Central: Administrador (todas as 12 ações)
     {
       id: 'im-elfa-carlos-central',
       instanciaId: 'inst-elfa-central',
@@ -238,29 +243,19 @@ async function main() {
       entidadeId: 'usr-carlos-elfa',
       papel: 'admin-maxdoc',
       acoes: [
-        'Visualizar', 'Ler Todos', 'Leitor Documento', 'Leitor Anexos',
-        'Baixar Documento', 'Imprimir', 'Criar Documento', 'Editar',
-        'Nova Versão', 'Mover', 'Cancelar Edição', 'Visualizar Histórico de Versões',
-        'Upload Documento', 'Editor Documento', 'Criar Anexo', 'Editar Anexo',
-        'Anexar Arquivos', 'Assinatura Eletrônica', 'Revisar Documento',
-        'Submeter para Aprovação', 'Solicitar Revisão', 'Revisor Documento',
-        'Revisar como Substituto Documento', 'Aprovar Documento', 'Rejeitar Documento',
-        'Aprovador Documento', 'Aprovador Substituto Documento', 'Obsoletetar Documento',
-        'Emitir Cópia Controlada', 'Emitir Cópia Não Controlada',
-        'Cópia Controlada Anexos', 'Ciclo de Aprovação Documentos',
+        'Administrar MaxDoc', 'Aprovar Documento', 'Criar Documento', 'Cópia Controlada',
+        'Editar Documento', 'Emitir Cópia Não Controlada', 'Excluir Documento', 'Imprimir',
+        'Ler Todos os Documentos', 'Obsoletetar Documento', 'Revisar Documento', 'Tabelas Administrativas',
       ],
     },
-    // Carlos — Unidade Norte: LEITOR (papel completamente diferente)
+    // Carlos — Unidade Norte: LEITOR (papel completamente diferente — mesmo login!)
     {
       id: 'im-elfa-carlos-norte',
       instanciaId: 'inst-elfa-norte',
       entidadeTipo: 'user',
       entidadeId: 'usr-carlos-elfa',
       papel: 'leitor',
-      acoes: [
-        'Visualizar', 'Ler Todos', 'Leitor Documento', 'Leitor Anexos',
-        'Baixar Documento', 'Imprimir',
-      ],
+      acoes: ['Ler Todos os Documentos', 'Imprimir'],
     },
     // Carlos NÃO tem acesso à Unidade Sul (sem entrada na tabela)
 
@@ -271,11 +266,7 @@ async function main() {
       entidadeTipo: 'group',
       entidadeId: 'grp-elfa-editores',
       papel: 'editor',
-      acoes: [
-        'Visualizar', 'Criar Documento', 'Editar', 'Nova Versão',
-        'Submeter para Aprovação', 'Baixar Documento', 'Imprimir',
-        'Visualizar Histórico de Versões',
-      ],
+      acoes: ['Criar Documento', 'Editar Documento', 'Imprimir'],
     },
     // Grupo Editores — Unidade Norte: Editor
     {
@@ -284,11 +275,7 @@ async function main() {
       entidadeTipo: 'group',
       entidadeId: 'grp-elfa-editores',
       papel: 'editor',
-      acoes: [
-        'Visualizar', 'Criar Documento', 'Editar', 'Nova Versão',
-        'Submeter para Aprovação', 'Baixar Documento', 'Imprimir',
-        'Visualizar Histórico de Versões',
-      ],
+      acoes: ['Criar Documento', 'Editar Documento', 'Imprimir'],
     },
     // Grupo Aprovadores — Hospital Central: Aprovador
     {
@@ -298,13 +285,8 @@ async function main() {
       entidadeId: 'grp-elfa-aprovadores',
       papel: 'aprovador',
       acoes: [
-        'Visualizar', 'Ler Todos', 'Leitor Documento', 'Leitor Anexos',
-        'Baixar Documento', 'Imprimir', 'Assinatura Eletrônica',
-        'Revisar Documento', 'Aprovar Documento', 'Rejeitar Documento',
-        'Aprovador Documento', 'Aprovador Substituto Documento',
-        'Obsoletetar Documento', 'Emitir Cópia Controlada',
-        'Emitir Cópia Não Controlada', 'Cópia Controlada Anexos',
-        'Ciclo de Aprovação Documentos',
+        'Aprovar Documento', 'Revisar Documento', 'Obsoletetar Documento',
+        'Cópia Controlada', 'Emitir Cópia Não Controlada',
       ],
     },
     // Grupo Aprovadores — Unidade Norte: Aprovador
@@ -315,13 +297,8 @@ async function main() {
       entidadeId: 'grp-elfa-aprovadores',
       papel: 'aprovador',
       acoes: [
-        'Visualizar', 'Ler Todos', 'Leitor Documento', 'Leitor Anexos',
-        'Baixar Documento', 'Imprimir', 'Assinatura Eletrônica',
-        'Revisar Documento', 'Aprovar Documento', 'Rejeitar Documento',
-        'Aprovador Documento', 'Aprovador Substituto Documento',
-        'Obsoletetar Documento', 'Emitir Cópia Controlada',
-        'Emitir Cópia Não Controlada', 'Cópia Controlada Anexos',
-        'Ciclo de Aprovação Documentos',
+        'Aprovar Documento', 'Revisar Documento', 'Obsoletetar Documento',
+        'Cópia Controlada', 'Emitir Cópia Não Controlada',
       ],
     },
     // Beatriz (direto) — Unidade Sul: Leitor
@@ -332,10 +309,7 @@ async function main() {
       entidadeTipo: 'user',
       entidadeId: 'usr-beatriz-elfa',
       papel: 'leitor',
-      acoes: [
-        'Visualizar', 'Ler Todos', 'Leitor Documento', 'Leitor Anexos',
-        'Baixar Documento', 'Imprimir',
-      ],
+      acoes: ['Ler Todos os Documentos', 'Imprimir'],
     },
   ]
 
