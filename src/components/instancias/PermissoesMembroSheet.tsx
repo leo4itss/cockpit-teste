@@ -107,15 +107,9 @@ export function PermissoesMembroSheet({
       .then((perms: any[]) => {
         const existing = perms.map((p: any) => p.acao as string)
         setSaved(existing)
-        // Se o papel é nomeado (não personalizado), mostrar os defaults do papel como draft.
-        // Isso garante que o sheet reflita o papel correto ao abrir, mesmo se o DB tiver estado stale.
-        if (membro.papel && membro.papel !== 'personalizado') {
-          const papelDef = config.papeis.find(p => p.value === membro.papel)
-          const defaults = expandDefaults(papelDef?.defaultAcoes ?? [])
-          setDraft(defaults.length > 0 ? defaults : existing)
-        } else {
-          setDraft(existing.length > 0 ? existing : [])
-        }
+        // Usa sempre as permissões salvas no banco como draft inicial.
+        // expandDefaults só é chamado quando o usuário clica num papel (handlePapelChange).
+        setDraft(existing)
       })
       .catch(() => {
         const papelDef = config.papeis.find(p => p.value === membro.papel)
