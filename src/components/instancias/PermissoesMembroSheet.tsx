@@ -85,16 +85,17 @@ export function PermissoesMembroSheet({
       .catch(() => {})
   }, [componenteId])
 
-  // Quando atribuicoesNomes carrega APÓS o draft já ter sido definido (perms chegaram primeiro),
-  // re-aplica para papéis cujo defaultAcoes é [] (= Administrador: todas as ações).
+  // Corrige o draft para papéis com defaultAcoes:[] assim que AMBOS os fetches terminam:
+  // permissões (loading=false) e catálogo (atribuicoesNomes não vazio).
+  // Sem isso, o fetch mais lento sobrescreve o resultado do mais rápido.
   useEffect(() => {
-    if (atribuicoesNomes.length === 0) return
-    if (!selectedPapel || selectedPapel === 'personalizado') return
-    const papelDef = config.papeis.find(p => p.value === selectedPapel)
+    if (loading || !open || atribuicoesNomes.length === 0) return
+    if (selectedPapel === 'personalizado') return
+    const papelDef = config.papeis.find(p => p.value === (membro.papel ?? ''))
     if (!papelDef || (papelDef.defaultAcoes ?? []).length > 0) return
     setDraft(atribuicoesNomes)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [atribuicoesNomes])
+  }, [loading, open, atribuicoesNomes])
 
   // ── Helpers ───────────────────────────────────────────────
   /** Expande defaultAcoes: [] (= Administrador) para todas as ações do catálogo */
