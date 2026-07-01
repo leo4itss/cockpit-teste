@@ -273,7 +273,7 @@ Provar que alterar o papel de Carlos na Unidade Norte não afeta seu papel no Ho
 | Verificação | Esperado |
 |------------|---------|
 | Carlos na Unidade Norte após edição | Badge **Editor**, 3 ações (Criar Documento, Editor Documento, Imprimir) |
-| Carlos no Hospital Central após edição | Badge **Administrador**, 25 ações — **inalterado** |
+| Carlos no Hospital Central após edição | Badge **Administrador**, todas as ações — **inalterado** |
 | Isolamento confirmado | Alteração em uma instância não propaga para outra |
 
 ---
