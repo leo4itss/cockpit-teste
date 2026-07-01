@@ -297,7 +297,7 @@ Mostrar que ao adicionar um novo usuário, o administrador escolhe explicitament
 
 | Verificação | Esperado |
 |------------|---------|
-| João no Hospital Central (direto) | Badge **Revisor**, 4 ações |
+| João no Hospital Central (direto) | Badge **Revisor**, 3 ações (Revisar Documento, Revisor Documento, Imprimir) |
 | João na Unidade Norte (direto) | **Não aparece** (apenas via grupo Aprovadores) |
 | João na Unidade Sul | **Não aparece** |
 
