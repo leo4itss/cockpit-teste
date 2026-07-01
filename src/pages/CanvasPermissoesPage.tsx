@@ -806,7 +806,7 @@ function InstanciaPanel({ instanciaId, graphData, theme, onClose, onOpenInstanci
                       </span>
                     )}
                     {isDocNix
-                      ? <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700 border border-violet-200">DocNix</span>
+                      ? <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700 border border-violet-200">{getPapelInfo(mb.papel)?.label ?? mb.papel}</span>
                       : <span className="text-[9px] font-medium" style={{ color: theme.panelMuted }}>{mb.papel}</span>
                     }
                   </div>
