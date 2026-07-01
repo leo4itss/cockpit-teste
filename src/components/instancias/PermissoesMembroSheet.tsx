@@ -298,13 +298,6 @@ export function PermissoesMembroSheet({
               </p>
             ) : (
               <>
-                {/* Usa catálogo do banco (componente_atribuicoes) quando disponível */}
-                {(() => {
-                  const acoesLista = atribuicoesNomes.length > 0
-                    ? atribuicoesNomes.map(n => ({ acao: n, label: n }))
-                    : (config.acoes ?? [])
-                  return null // apenas define acoesLista — renderizado abaixo
-                })()}
                 <div className="border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100 max-h-[min(50vh,380px)] overflow-y-auto">
                   {(atribuicoesNomes.length > 0
                     ? atribuicoesNomes.map(n => ({ acao: n, label: n }))
