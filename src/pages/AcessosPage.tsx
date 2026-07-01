@@ -45,29 +45,6 @@ function EscopoBadge({ escopo }: { escopo: 'org' | 'conta' }) {
     : <Badge variant="default" className="bg-violet-50 text-violet-700 border border-violet-200">Conta</Badge>
 }
 
-// ── Badge de papel ────────────────────────────────────────────
-
-const PAPEL_LABELS: Record<string, string> = {
-  'Viewer': 'Visualizador',
-  'User':   'Usuário',
-  'Admin':  'Administrador',
-}
-
-function PapelBadge({ papel }: { papel?: string }) {
-  if (!papel) return <span className="text-xs text-gray-400">—</span>
-  const variants: Record<string, string> = {
-    'Viewer': 'bg-gray-100 text-gray-600 border-gray-200',
-    'User':   'bg-blue-50 text-blue-700 border-blue-200',
-    'Admin':  'bg-orange-50 text-orange-700 border-orange-200',
-  }
-  const cls = variants[papel] ?? 'bg-gray-100 text-gray-600 border-gray-200'
-  return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${cls}`}>
-      {PAPEL_LABELS[papel] ?? papel}
-    </span>
-  )
-}
-
 // ─────────────────────────────────────────────────────────────
 
 export function AcessosPage() {
