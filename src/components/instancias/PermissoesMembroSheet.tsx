@@ -292,14 +292,24 @@ export function PermissoesMembroSheet({
               <div className="flex items-center gap-2 py-4 text-sm text-gray-400">
                 <Loader2 className="w-3.5 h-3.5 animate-spin" /> Carregando...
               </div>
-            ) : (config.acoes ?? []).length === 0 ? (
+            ) : (atribuicoesNomes.length === 0 && (config.acoes ?? []).length === 0) ? (
               <p className="text-sm text-gray-500 py-4 text-center">
                 Nenhuma ação cadastrada para este componente.
               </p>
             ) : (
               <>
+                {/* Usa catálogo do banco (componente_atribuicoes) quando disponível */}
+                {(() => {
+                  const acoesLista = atribuicoesNomes.length > 0
+                    ? atribuicoesNomes.map(n => ({ acao: n, label: n }))
+                    : (config.acoes ?? [])
+                  return null // apenas define acoesLista — renderizado abaixo
+                })()}
                 <div className="border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100 max-h-[min(50vh,380px)] overflow-y-auto">
-                  {(config.acoes ?? []).map(({ acao, label }) => {
+                  {(atribuicoesNomes.length > 0
+                    ? atribuicoesNomes.map(n => ({ acao: n, label: n }))
+                    : (config.acoes ?? [])
+                  ).map(({ acao, label }) => {
                     const isInherited = !!inherited[acao]
                     const grupoNome   = inherited[acao]
 
