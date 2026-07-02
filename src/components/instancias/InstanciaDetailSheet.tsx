@@ -101,13 +101,20 @@ function PapelBadge({ papel }: { papel: string }) {
 
 // Editor inline de papel para membro de instância FGA (Viewer/Member/Admin)
 function PapelEditor({
-  papel, onSave,
-}: { papel: string; onSave: (novo: string) => Promise<void> }) {
-  const [editing, setEditing] = useState(false)
+  papel, onSave, onEditingChange,
+}: { papel: string; onSave: (novo: string) => Promise<void>; onEditingChange?: (editing: boolean) => void }) {
+  const [editing, setEditingState] = useState(false)
   const [draft, setDraft]     = useState(papel)
   const [saving, setSaving]   = useState(false)
 
+  function setEditing(next: boolean) {
+    setEditingState(next)
+    onEditingChange?.(next)
+  }
+
   useEffect(() => { setDraft(papel); setEditing(false) }, [papel])
+  // Garante que o estado de edição no pai seja limpo se o componente desmontar em edição
+  useEffect(() => () => onEditingChange?.(false), [])
 
   async function handleSave() {
     if (draft === papel) { setEditing(false); return }
@@ -149,13 +156,19 @@ function PapelEditor({
 
 // Editor inline de papel para membro de instância DocNix (usa mockDocNixPapeis)
 function PapelEditorDocNix({
-  papel, modulo, onSave,
-}: { papel: string; modulo: string | null; onSave: (novo: string) => Promise<void> }) {
-  const [editing, setEditing] = useState(false)
+  papel, modulo, onSave, onEditingChange,
+}: { papel: string; modulo: string | null; onSave: (novo: string) => Promise<void>; onEditingChange?: (editing: boolean) => void }) {
+  const [editing, setEditingState] = useState(false)
   const [draft, setDraft]     = useState(papel)
   const [saving, setSaving]   = useState(false)
 
+  function setEditing(next: boolean) {
+    setEditingState(next)
+    onEditingChange?.(next)
+  }
+
   useEffect(() => { setDraft(papel); setEditing(false) }, [papel])
+  useEffect(() => () => onEditingChange?.(false), [])
 
   const papeis = modulo
     ? mockDocNixPapeis.filter(p => p.modulo === modulo)
