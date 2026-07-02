@@ -915,7 +915,7 @@ export function InstanciaDetailSheet({
                             — membros dos grupos herdarão este acesso
                           </span>
                         </div>
-                        <table className="w-full">
+                        <table className="w-full table-fixed">
                           <tbody>{gruposMembros.map(renderRow)}</tbody>
                         </table>
                       </>
@@ -932,7 +932,7 @@ export function InstanciaDetailSheet({
                             </span>
                           </div>
                         )}
-                        <table className="w-full">
+                        <table className="w-full table-fixed">
                           <tbody>{usuariosMembros.map(renderRow)}</tbody>
                         </table>
                       </>
