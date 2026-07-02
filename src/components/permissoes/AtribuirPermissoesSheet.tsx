@@ -538,6 +538,7 @@ export function AtribuirPermissoesSheet({
     setSearch(''); setOriginal({}); setDraft({}); setComponentes([])
     setActiveCapabilities(new Set()); setSaveError(null); setInherited({})
     setPapelSelecionado({})
+    setCombinarPapeis({}); setPapeisCombinados({})
     onClose()
   }
 
