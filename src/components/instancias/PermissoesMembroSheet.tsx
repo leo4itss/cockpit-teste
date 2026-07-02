@@ -203,11 +203,18 @@ export function PermissoesMembroSheet({
       const next = new Set(prev)
       if (next.has(papelValue)) next.delete(papelValue)
       else next.add(papelValue)
-      setDraft(unionAcoesDosPapeis(next))
-      setSelectedPapel('personalizado')
       return next
     })
+    setSelectedPapel('personalizado')
   }
+
+  // Recalcula o draft sempre que o conjunto de papéis combinados mudar
+  // (evita chamar setDraft dentro do updater de setPapeisCombinados).
+  useEffect(() => {
+    if (!combinarPapeis) return
+    setDraft(unionAcoesDosPapeis(papeisCombinados))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [papeisCombinados, combinarPapeis])
 
   function handleToggleCombinarPapeis() {
     setCombinarPapeis(prev => {
