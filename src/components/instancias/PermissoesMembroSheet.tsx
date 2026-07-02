@@ -187,6 +187,46 @@ export function PermissoesMembroSheet({
     setDraft(expandDefaults(papelDef.defaultAcoes ?? []))
   }
 
+  /** União das ações padrão de um conjunto de papéis (usado no modo "Combinar papéis"). */
+  function unionAcoesDosPapeis(valores: Set<string>): string[] {
+    const acoes = new Set<string>()
+    for (const valor of valores) {
+      const papelDef = config.papeis.find(p => p.value === valor)
+      if (!papelDef) continue
+      expandDefaults(papelDef.defaultAcoes ?? []).forEach(a => acoes.add(a))
+    }
+    return [...acoes]
+  }
+
+  function handleTogglePapelCombinado(papelValue: string) {
+    setPapeisCombinados(prev => {
+      const next = new Set(prev)
+      if (next.has(papelValue)) next.delete(papelValue)
+      else next.add(papelValue)
+      setDraft(unionAcoesDosPapeis(next))
+      setSelectedPapel('personalizado')
+      return next
+    })
+  }
+
+  function handleToggleCombinarPapeis() {
+    setCombinarPapeis(prev => {
+      const next = !prev
+      if (next) {
+        // Ativando: parte do papel único já selecionado, se houver
+        const seed = selectedPapel && selectedPapel !== 'personalizado' ? new Set([selectedPapel]) : new Set<string>()
+        setPapeisCombinados(seed)
+      } else {
+        // Desativando: se sobrou exatamente um papel combinado, volta pro modo single-select
+        if (papeisCombinados.size === 1) {
+          setSelectedPapel([...papeisCombinados][0])
+        }
+        setPapeisCombinados(new Set())
+      }
+      return next
+    })
+  }
+
   function toggleItem(acao: string) {
     if (inherited[acao]) return // herdadas são read-only
     setSelectedPapel('personalizado')
