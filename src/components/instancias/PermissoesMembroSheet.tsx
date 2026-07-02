@@ -58,6 +58,14 @@ export function PermissoesMembroSheet({
   const [selectedPapel, setSelectedPapel] = useState(membro.papel ?? config.papeis[0]?.value ?? '')
   const [papelError,    setPapelError]    = useState<string | null>(null)
 
+  // ── Combinar papéis (seleção múltipla) ────────────────────
+  // Quando ativo, os cards de papel viram multi-seleção e o draft de ações
+  // vira a união das ações padrão de todos os papéis marcados. Como
+  // instancia_membros.papel só guarda um valor, o resultado é sempre
+  // salvo como 'personalizado' — mesmo mecanismo já usado na edição manual.
+  const [combinarPapeis,   setCombinarPapeis]   = useState(false)
+  const [papeisCombinados, setPapeisCombinados] = useState<Set<string>>(new Set())
+
   // ── Ações (FGA puro) ──────────────────────────────────────
   const [saved,     setSaved]     = useState<string[]>([])
   const [draft,     setDraft]     = useState<string[]>([])
