@@ -196,7 +196,7 @@ Demonstrar o painel de ações efetivas mostrando exatamente o que cada usuário
 
 1. Em Acessos > aba **Usuários**, localizar **Carlos Mendes**
 2. Clicar nos três pontinhos (⋯) ou na lupa ao lado de Carlos → selecionar **"Ver permissões efetivas"**
-3. No dropdown de objeto, selecionar **MaxDoc — MaxDoc — Hospital Central**
+3. Na lista de objetos (seleção por botão de rádio), selecionar **MaxDoc — MaxDoc — Hospital Central**
 4. **Verificar:** Painel exibe múltiplas ações com badge **Direto** (azul) — conjunto completo do Administrador
 5. Ações esperadas incluem: Administrador Módulo MaxDoc, Acessar Todos, Criar Documento, Editar Documento, Editor Documento, Aprovar Documento, Aprovador Documento, Revisar Documento, Obsoletetar Documento, Emitir Cópia Controlada, Excluir Documento, Controle de Acesso, entre outras
 
