@@ -845,8 +845,8 @@ export function InstanciaDetailSheet({
                       key={membro.id}
                       className="group border-b border-gray-50 hover:bg-gray-50/60 transition-colors last:border-b-0"
                     >
-                      <td className="pl-6 pr-3 py-3">
-                        <div className="flex items-center gap-3">
+                      <td className="pl-6 pr-3 py-3 w-auto">
+                        <div className="flex items-center gap-3 min-w-0">
                           <Avatar nome={nome} isGroup={isGroup} />
                           <div className="min-w-0">
                             <p className="text-sm font-medium text-[#030712] truncate">{nome}</p>
@@ -856,7 +856,7 @@ export function InstanciaDetailSheet({
                           </div>
                         </div>
                       </td>
-                      <td className="px-3 py-3">
+                      <td className="px-3 py-3 w-[130px]">
                         {canManage && !atribuicoesDocnix ? (
                           <PapelEditor
                             papel={membro.papel}
@@ -872,7 +872,7 @@ export function InstanciaDetailSheet({
                           <PapelBadge papel={membro.papel} />
                         )}
                       </td>
-                      <td className="pr-6 pl-3 py-3 text-right">
+                      <td className="pr-6 pl-3 py-3 text-right w-[190px]">
                         <div className="flex items-center justify-end gap-1 invisible group-hover:visible">
                           <button
                             onClick={() => { setMembroPermissoes(membro); setShowPermissoes(true) }}
