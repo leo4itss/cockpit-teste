@@ -7,6 +7,7 @@ import {
   NestedSheetBody,
 } from '@/components/ui/nested-sheet'
 import { api } from '@/api/client'
+import { cn } from '@/lib/utils'
 
 // ── Tipos ──────────────────────────────────────────────────────
 
