@@ -210,8 +210,10 @@ export function PermissoesMembroSheet({
 
   // Recalcula o draft sempre que o conjunto de papéis combinados mudar
   // (evita chamar setDraft dentro do updater de setPapeisCombinados).
+  // Conjunto vazio não mexe no draft — evita apagar edições manuais ao
+  // ligar o modo "Combinar papéis" sem nenhum papel ainda marcado.
   useEffect(() => {
-    if (!combinarPapeis) return
+    if (!combinarPapeis || papeisCombinados.size === 0) return
     setDraft(unionAcoesDosPapeis(papeisCombinados))
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [papeisCombinados, combinarPapeis])
