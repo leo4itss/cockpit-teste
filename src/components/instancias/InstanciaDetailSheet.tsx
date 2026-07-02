@@ -498,6 +498,10 @@ export function InstanciaDetailSheet({
   const [addingId, setAddingId]                 = useState<string | null>(null)
   const [removingId, setRemovingId]             = useState<string | null>(null)
   const [removeError, setRemoveError]           = useState<string | null>(null)
+  // Membro cujo papel está sendo editado inline — usado para ocultar os botões
+  // de Ações/Remover (mouseover) enquanto o select de papel está aberto,
+  // evitando sobreposição visual entre os dois grupos de controles.
+  const [editingPapelId, setEditingPapelId]     = useState<string | null>(null)
   // Sheet unificado de permissões por membro (FGA ou DocNix)
   const [showPermissoes, setShowPermissoes]     = useState(false)
   const [membroPermissoes, setMembroPermissoes] = useState<InstanciaMembro | null>(null)
