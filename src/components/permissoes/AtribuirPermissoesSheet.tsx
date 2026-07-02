@@ -152,6 +152,10 @@ export function AtribuirPermissoesSheet({
   const [draft, setDraft]       = useState<Record<string, string[]>>({})
   // componenteId → papel selecionado ('personalizado' se editado manualmente)
   const [papelSelecionado, setPapelSelecionado] = useState<Record<string, string>>({})
+  // componenteId → modo "combinar papéis" ativo (seleção múltipla de papéis)
+  const [combinarPapeis, setCombinarPapeis] = useState<Record<string, boolean>>({})
+  // componenteId → conjunto de papéis combinados atualmente marcados
+  const [papeisCombinados, setPapeisCombinados] = useState<Record<string, Set<string>>>({})
   // componenteId → { acao → nome do grupo que concede } (permissões herdadas via grupo)
   const [inherited, setInherited] = useState<Record<string, Record<string, string>>>({})
   // componenteId → AcaoItem[] vindas do catálogo DocNix (substitui ACOES['default'] quando presente)
