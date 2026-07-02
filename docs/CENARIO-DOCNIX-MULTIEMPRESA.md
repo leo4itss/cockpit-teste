@@ -284,9 +284,11 @@ Mostrar que ao adicionar um novo usuário, o administrador escolhe explicitament
 3. **[Passo 1 — Wizard]** Buscar "João Pereira" → selecionar `usr-joao-elfa`
 4. **[Passo 2 — Wizard]** Selecionar papel **Revisor** → clicar em **Confirmar**
 5. **Verificar:** Ações pré-selecionadas (3): **Revisar Documento**, **Revisor Documento**, **Imprimir**
-6. **Verificar:** Criar Documento, Aprovar Documento e demais ações de edição/aprovação **não estão** marcadas
+6. **Verificar (dentro do wizard, em "Ver ações ▾"):** Criar Documento, Aprovar Documento e demais ações de edição/aprovação **não estão** marcadas — o wizard só mostra as ações diretas do papel escolhido, sem considerar heranças de grupo
 7. Salvar
 8. **Verificar:** João aparece na lista do Hospital Central com badge **Revisor**
+
+> **Nota:** se depois de salvar você abrir **Ações** ao lado de João (em vez do wizard), verá também as 5 ações herdadas do grupo **Aprovadores Corporativos** (do qual ele já era membro desde o Cenário 2), marcadas em verde e somente leitura — além das 3 diretas do papel Revisor. Isso é esperado: o sheet "Ações" soma as duas fontes (direto + via grupo), diferente do wizard de adição, que só lida com a atribuição direta que está sendo criada.
 
 #### 5.2 — Confirmar que João NÃO ganhou acesso automático às demais empresas
 
