@@ -103,7 +103,7 @@ Demonstrar que Carlos Mendes é Administrador no Hospital Central, Leitor na Uni
 #### 1.3 — Inspecionar a Unidade Norte (papel Leitor — mesmo Carlos)
 
 1. Fechar a sheet do Hospital Central → clicar em **MaxDoc — Unidade Norte**
-2. **Verificar (Usuários):** Carlos Mendes com badge **Leitor** (cinza)
+2. **Verificar (Usuários — 2):** Carlos Mendes com badge **Leitor** (cinza) — o outro usuário (Ricardo) é de validação anterior
 3. Clicar em **Ações** ao lado de Carlos Mendes
 4. **Verificar:** Papel **Leitor** selecionado
 5. **Verificar:** Apenas **2 ações** marcadas: **Leitor Documento** e **Imprimir**
