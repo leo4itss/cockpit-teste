@@ -213,11 +213,8 @@ export function PermissoesMembroSheet({
   // Conjunto vazio não mexe no draft — evita apagar edições manuais ao
   // ligar o modo "Combinar papéis" sem nenhum papel ainda marcado.
   useEffect(() => {
-    console.log('[DEBUG] union effect fired', { combinarPapeis, papeisCombinados: [...papeisCombinados] })
     if (!combinarPapeis || papeisCombinados.size === 0) return
-    const union = unionAcoesDosPapeis(papeisCombinados)
-    console.log('[DEBUG] union result', union)
-    setDraft(union)
+    setDraft(unionAcoesDosPapeis(papeisCombinados))
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [papeisCombinados, combinarPapeis])
 
