@@ -122,6 +122,8 @@ export function PermissoesMembroSheet({
     setSaveError(null)
     setInherited({})
     setSelectedPapel(membro.papel ?? config.papeis[0]?.value ?? '')
+    setCombinarPapeis(false)
+    setPapeisCombinados(new Set())
     setLoading(true)
 
     api.getPermissions({
