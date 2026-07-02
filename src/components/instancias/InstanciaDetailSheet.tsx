@@ -114,6 +114,7 @@ function PapelEditor({
 
   useEffect(() => { setDraft(papel); setEditing(false) }, [papel])
   // Garante que o estado de edição no pai seja limpo se o componente desmontar em edição
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => () => onEditingChange?.(false), [])
 
   async function handleSave() {
@@ -168,6 +169,7 @@ function PapelEditorDocNix({
   }
 
   useEffect(() => { setDraft(papel); setEditing(false) }, [papel])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => () => onEditingChange?.(false), [])
 
   const papeis = modulo
