@@ -202,7 +202,7 @@ Demonstrar o painel de ações efetivas mostrando exatamente o que cada usuário
 
 #### 3.2 — Ações efetivas de Carlos na Unidade Norte
 
-1. No mesmo painel, trocar o dropdown para **MaxDoc — MaxDoc — Unidade Norte**
+1. No mesmo painel, selecionar **MaxDoc — MaxDoc — Unidade Norte** na lista de objetos
 2. **Verificar:** Apenas **2 ações** com badge **Direto** (azul): **Leitor Documento** e **Imprimir**
 3. **Verificar:** Criar Documento, Aprovar Documento e demais ações **não aparecem**
 
