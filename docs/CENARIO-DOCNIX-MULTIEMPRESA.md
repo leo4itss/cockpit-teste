@@ -241,7 +241,7 @@ Provar que alterar o papel de Carlos na Unidade Norte não afeta seu papel no Ho
 #### 4.1 — Elevar Carlos para Editor na Unidade Norte
 
 1. Abrir **MaxDoc — Unidade Norte**
-2. Clicar em **Editar** ao lado de Carlos Mendes
+2. Clicar em **Ações** ao lado de Carlos Mendes
 3. No seletor de papel, clicar em **Editor** (em vez de Leitor)
 4. **Verificar:** Ações atualizam para (3 ações): **Criar Documento**, **Editor Documento**, **Imprimir**
 5. Clicar em **Salvar**
