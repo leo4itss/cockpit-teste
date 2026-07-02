@@ -92,9 +92,10 @@ Demonstrar que Carlos Mendes é Administrador no Hospital Central, Leitor na Uni
 3. **Verificar (Grupos — 2):**
    - **Editores Docnix** com badge **Editor**
    - **Aprovadores Corporativos** com badge **Aprovador**
-4. **Verificar (Usuários — 1):**
+4. **Verificar (Usuários — 3):**
    - **Carlos Mendes** com badge **Administrador** (vermelho)
-5. Clicar em **Editar** ao lado de Carlos Mendes
+   - Os demais usuários (João Pereira, Ricardo) são de validações anteriores — foque em Carlos para este cenário
+5. Clicar em **Ações** ao lado de Carlos Mendes
 6. **Verificar:** Papel **Administrador** selecionado (destacado em azul)
 7. **Verificar:** Todas as **47 ações** do catálogo MaxDoc estão marcadas
 8. Fechar sem salvar
