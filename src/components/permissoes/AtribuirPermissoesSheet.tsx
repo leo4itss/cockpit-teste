@@ -753,7 +753,7 @@ export function AtribuirPermissoesSheet({
                                     type="button"
                                     disabled={saving}
                                     onClick={() => combinarAtivo
-                                      ? handleTogglePapelCombinado(comp.id, comp.nome, p.value)
+                                      ? handleTogglePapelCombinado(comp.id, p.value)
                                       : handleSelectPapel(comp.id, comp.nome, p.value)}
                                     className={cn(
                                       'px-3 py-1 rounded-full text-xs font-medium border transition-colors',
