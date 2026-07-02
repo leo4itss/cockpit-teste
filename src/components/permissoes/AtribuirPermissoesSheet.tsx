@@ -404,6 +404,55 @@ export function AtribuirPermissoesSheet({
     setPapelSelecionado(prev => ({ ...prev, [compId]: papelValue }))
   }
 
+  /** União das ações padrão de um conjunto de papéis (usado no modo "Combinar papéis"). */
+  function unionAcoesDosPapeis(compId: string, compNome: string, valores: Set<string>): string[] {
+    const cfg   = getComponenteConfig(compNome)
+    const acoes = new Set<string>()
+    for (const valor of valores) {
+      const papelDef = cfg.papeis.find(p => p.value === valor)
+      const defaults = papelDef?.defaultAcoes ?? []
+      if (defaults.length === 0) {
+        // [] = todas as ações do catálogo (ex: Administrador)
+        const allAcoes = (atribuicoesMap[compId]?.length ? atribuicoesMap[compId] : (cfg.acoes ?? [])).map(a => a.acao)
+        allAcoes.forEach(a => acoes.add(a))
+      } else {
+        defaults.forEach(a => acoes.add(a))
+      }
+    }
+    return [...acoes]
+  }
+
+  function handleTogglePapelCombinado(compId: string, compNome: string, papelValue: string) {
+    setPapeisCombinados(prev => {
+      const atual = new Set(prev[compId] ?? [])
+      if (atual.has(papelValue)) atual.delete(papelValue)
+      else atual.add(papelValue)
+      setDraft(d => ({ ...d, [compId]: unionAcoesDosPapeis(compId, compNome, atual) }))
+      setPapelSelecionado(p => ({ ...p, [compId]: 'personalizado' }))
+      return { ...prev, [compId]: atual }
+    })
+  }
+
+  function handleToggleCombinarPapeis(compId: string) {
+    setCombinarPapeis(prev => {
+      const ativar = !prev[compId]
+      if (ativar) {
+        // Ativando: parte do papel único já selecionado, se houver
+        const papelAtual = papelSelecionado[compId]
+        const seed = papelAtual && papelAtual !== 'personalizado' ? new Set([papelAtual]) : new Set<string>()
+        setPapeisCombinados(p => ({ ...p, [compId]: seed }))
+      } else {
+        // Desativando: se sobrou exatamente um papel combinado, volta pro modo seleção única
+        const atual = papeisCombinados[compId] ?? new Set<string>()
+        if (atual.size === 1) {
+          setPapelSelecionado(p => ({ ...p, [compId]: [...atual][0] }))
+        }
+        setPapeisCombinados(p => ({ ...p, [compId]: new Set() }))
+      }
+      return { ...prev, [compId]: ativar }
+    })
+  }
+
   const hasChanges = componentes.some(c => {
     const orig = new Set(original[c.id] ?? [])
     const draftAcoes = draft[c.id] ?? []
