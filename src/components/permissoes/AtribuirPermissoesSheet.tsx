@@ -422,16 +422,29 @@ export function AtribuirPermissoesSheet({
     return [...acoes]
   }
 
-  function handleTogglePapelCombinado(compId: string, compNome: string, papelValue: string) {
+  function handleTogglePapelCombinado(compId: string, papelValue: string) {
     setPapeisCombinados(prev => {
       const atual = new Set(prev[compId] ?? [])
       if (atual.has(papelValue)) atual.delete(papelValue)
       else atual.add(papelValue)
-      setDraft(d => ({ ...d, [compId]: unionAcoesDosPapeis(compId, compNome, atual) }))
-      setPapelSelecionado(p => ({ ...p, [compId]: 'personalizado' }))
       return { ...prev, [compId]: atual }
     })
+    setPapelSelecionado(p => ({ ...p, [compId]: 'personalizado' }))
   }
+
+  // Recalcula o draft de cada componente sempre que seu conjunto de papéis
+  // combinados mudar (evita chamar setDraft dentro do updater de setPapeisCombinados).
+  // Conjuntos vazios não mexem no draft — evita apagar edições manuais ao
+  // ligar o modo "Combinar papéis" sem nenhum papel ainda marcado.
+  useEffect(() => {
+    Object.entries(papeisCombinados).forEach(([compId, valores]) => {
+      if (!combinarPapeis[compId] || valores.size === 0) return
+      const comp = componentes.find(c => c.id === compId)
+      if (!comp) return
+      setDraft(d => ({ ...d, [compId]: unionAcoesDosPapeis(compId, comp.nome, valores) }))
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [papeisCombinados])
 
   function handleToggleCombinarPapeis(compId: string) {
     setCombinarPapeis(prev => {
