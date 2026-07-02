@@ -79,9 +79,11 @@ Demonstrar que Carlos Mendes é Administrador no Hospital Central, Leitor na Uni
 2. Confirmar que a conta exibida é **Hospital Elfa**
 3. Clicar na aba **Objetos**
 4. **Verificar:** Três objetos MaxDoc aparecem na lista:
-   - MaxDoc — Hospital Central (3 membros: Carlos + 2 grupos)
-   - MaxDoc — Unidade Norte (3 membros: Carlos + 2 grupos)
+   - MaxDoc — Hospital Central (5 membros: Carlos + 2 grupos + 2 usuários adicionados em validações anteriores)
+   - MaxDoc — Unidade Norte (4 membros: Carlos + 2 grupos + 1 usuário adicionado em validação anterior)
    - MaxDoc — Unidade Sul (1 membro: Beatriz direto)
+
+> **Nota:** os números acima refletem o estado atual do ambiente de demonstração, que acumula membros de validações já realizadas (ex.: João Pereira via Cenário 5, e um usuário de teste "Ricardo"). Para uma contagem "limpa" (3 membros no Central, 3 na Norte), execute novamente `server/seed-docnix-multiempresa.ts`.
 
 #### 1.2 — Inspecionar o Hospital Central (papel Administrador)
 
