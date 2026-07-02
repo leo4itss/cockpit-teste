@@ -391,8 +391,10 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
                           </div>
                         </div>
                       </td>
-                      <td className="px-3 py-3 text-xs text-[#6b7280] hidden sm:table-cell">
-                        {user.cargo || user.papel || '—'}
+                      <td className="px-3 py-3 hidden sm:table-cell">
+                        {user.papel === 'account_admin'
+                          ? <Badge variant="warning">Administrador da Conta</Badge>
+                          : <Badge variant="default">Membro</Badge>}
                       </td>
                       <td className="pr-6 pl-3 py-3 text-right">
                         <div className="invisible group-hover:visible">
