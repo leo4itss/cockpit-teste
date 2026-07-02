@@ -157,7 +157,7 @@ Mostrar que grupos também têm papéis distintos por empresa, e que membros do 
 3. **Verificar:** Seção **Objetos com acesso (2)**:
    - MaxDoc — Hospital Central com badge **Editor**
    - MaxDoc — Unidade Norte com badge **Editor**
-4. **Verificar:** Seção **Membros (1):** Beatriz Santos como membro do grupo
+4. **Verificar:** Seção **Membros (2):** Beatriz Santos como membro do grupo (um segundo membro, "Ricardo", é de validação anterior)
 5. Fechar
 
 #### 2.3 — Ver acesso direto vs. via grupo de Beatriz
