@@ -705,34 +705,65 @@ export function AtribuirPermissoesSheet({
                       {/* Seletor de papel — atalho para definir ações em bloco */}
                       {/* Oculto quando DocNix sem catálogo (mostra mensagem alternativa abaixo) */}
                       {!locked && !(comp.tipoModelo === 'docnix' && acoes === ACOES['default']) && (() => {
-                        const cfg        = getComponenteConfig(comp.nome)
-                        const papelAtual = papelSelecionado[comp.id]
+                        const cfg          = getComponenteConfig(comp.nome)
+                        const papelAtual   = papelSelecionado[comp.id]
+                        const combinarAtivo = combinarPapeis[comp.id] ?? false
+                        const combinados    = papeisCombinados[comp.id] ?? new Set<string>()
                         return (
                           <div className="pl-8 mb-3">
-                            <p className="text-[11px] font-medium text-[#6b7280] mb-1.5 uppercase tracking-wide">Papel</p>
-                            <div className="flex flex-wrap gap-1.5">
-                              {cfg.papeis.map(p => (
+                            <div className="flex items-center justify-between mb-1.5">
+                              <p className="text-[11px] font-medium text-[#6b7280] uppercase tracking-wide">Papel</p>
+                              <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                                <span className="text-[10px] font-medium text-[#6b7280]">Combinar papéis</span>
                                 <button
-                                  key={p.value}
                                   type="button"
                                   disabled={saving}
-                                  onClick={() => handleSelectPapel(comp.id, comp.nome, p.value)}
+                                  onClick={() => handleToggleCombinarPapeis(comp.id)}
                                   className={cn(
-                                    'px-3 py-1 rounded-full text-xs font-medium border transition-colors',
-                                    papelAtual === p.value
-                                      ? 'border-blue-500 bg-blue-50 text-blue-700 ring-1 ring-blue-500'
-                                      : 'border-gray-200 bg-white text-[#6b7280] hover:bg-gray-50 hover:text-[#030712]',
+                                    'relative inline-flex h-4 w-7 shrink-0 items-center rounded-full transition-colors',
+                                    combinarAtivo ? 'bg-blue-600' : 'bg-gray-300',
                                   )}
                                 >
-                                  {p.label}
+                                  <span className={cn(
+                                    'inline-block h-2.5 w-2.5 transform rounded-full bg-white transition-transform',
+                                    combinarAtivo ? 'translate-x-3.5' : 'translate-x-0.5',
+                                  )} />
                                 </button>
-                              ))}
-                              {papelAtual === 'personalizado' && (
+                              </label>
+                            </div>
+                            <div className="flex flex-wrap gap-1.5">
+                              {cfg.papeis.map(p => {
+                                const isSelected = combinarAtivo ? combinados.has(p.value) : papelAtual === p.value
+                                return (
+                                  <button
+                                    key={p.value}
+                                    type="button"
+                                    disabled={saving}
+                                    onClick={() => combinarAtivo
+                                      ? handleTogglePapelCombinado(comp.id, comp.nome, p.value)
+                                      : handleSelectPapel(comp.id, comp.nome, p.value)}
+                                    className={cn(
+                                      'px-3 py-1 rounded-full text-xs font-medium border transition-colors',
+                                      isSelected
+                                        ? 'border-blue-500 bg-blue-50 text-blue-700 ring-1 ring-blue-500'
+                                        : 'border-gray-200 bg-white text-[#6b7280] hover:bg-gray-50 hover:text-[#030712]',
+                                    )}
+                                  >
+                                    {p.label}
+                                  </button>
+                                )
+                              })}
+                              {papelAtual === 'personalizado' && !(combinarAtivo && combinados.size > 0) && (
                                 <span className="px-3 py-1 rounded-full text-xs font-medium border border-amber-200 bg-amber-50 text-amber-700">
                                   Personalizado
                                 </span>
                               )}
                             </div>
+                            {combinarAtivo && combinados.size > 1 && (
+                              <p className="text-[10px] text-blue-600 mt-1">
+                                Ações combinadas de {combinados.size} papéis — ajuste manualmente na lista abaixo se necessário.
+                              </p>
+                            )}
                           </div>
                         )
                       })()}
