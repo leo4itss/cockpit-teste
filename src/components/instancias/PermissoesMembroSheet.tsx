@@ -316,31 +316,55 @@ export function PermissoesMembroSheet({
 
           {/* ── Cards de papel ─────────────────────────────── */}
           <div className="space-y-2">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Papel</p>
-            <div className="grid grid-cols-3 gap-1.5">
-              {config.papeis.map(p => (
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Papel</p>
+              <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                <span className="text-[11px] font-medium text-gray-500">Combinar papéis</span>
                 <button
-                  key={p.value}
                   type="button"
-                  onClick={() => handlePapelChange(p.value)}
+                  onClick={handleToggleCombinarPapeis}
                   className={cn(
-                    'flex flex-col items-start px-2.5 py-2 rounded-lg border text-left transition-colors',
-                    selectedPapel === p.value
-                      ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
-                      : 'border-gray-200 bg-white hover:bg-gray-50',
+                    'relative inline-flex h-4 w-7 shrink-0 items-center rounded-full transition-colors',
+                    combinarPapeis ? 'bg-blue-600' : 'bg-gray-300',
                   )}
                 >
-                  <span className="text-xs font-medium text-gray-900">{p.label}</span>
+                  <span className={cn(
+                    'inline-block h-2.5 w-2.5 transform rounded-full bg-white transition-transform',
+                    combinarPapeis ? 'translate-x-3.5' : 'translate-x-0.5',
+                  )} />
                 </button>
-              ))}
+              </label>
+            </div>
+            <div className="grid grid-cols-3 gap-1.5">
+              {config.papeis.map(p => {
+                const isSelected = combinarPapeis ? papeisCombinados.has(p.value) : selectedPapel === p.value
+                return (
+                  <button
+                    key={p.value}
+                    type="button"
+                    onClick={() => combinarPapeis ? handleTogglePapelCombinado(p.value) : handlePapelChange(p.value)}
+                    className={cn(
+                      'flex flex-col items-start px-2.5 py-2 rounded-lg border text-left transition-colors',
+                      isSelected
+                        ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
+                        : 'border-gray-200 bg-white hover:bg-gray-50',
+                    )}
+                  >
+                    <span className="text-xs font-medium text-gray-900">{p.label}</span>
+                  </button>
+                )
+              })}
 
               {/* Card "Personalizado" — seleção manual livre */}
               <button
                 type="button"
-                onClick={() => { setSelectedPapel('personalizado') }}
+                onClick={() => {
+                  if (combinarPapeis) { setPapeisCombinados(new Set()) }
+                  setSelectedPapel('personalizado')
+                }}
                 className={cn(
                   'flex flex-col items-start px-2.5 py-2 rounded-lg border text-left transition-colors',
-                  selectedPapel === 'personalizado'
+                  (combinarPapeis ? papeisCombinados.size === 0 : selectedPapel === 'personalizado')
                     ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
                     : 'border-gray-200 bg-white hover:bg-gray-50',
                 )}
@@ -349,6 +373,11 @@ export function PermissoesMembroSheet({
                 <span className="text-[10px] text-gray-500 mt-0.5 leading-tight">Selecionar manualmente</span>
               </button>
             </div>
+            {combinarPapeis && papeisCombinados.size > 1 && (
+              <p className="text-[11px] text-blue-600">
+                Ações combinadas de {papeisCombinados.size} papéis — ajuste manualmente na lista abaixo se necessário.
+              </p>
+            )}
             {papelError && <p className="text-xs text-red-600">{papelError}</p>}
           </div>
 
