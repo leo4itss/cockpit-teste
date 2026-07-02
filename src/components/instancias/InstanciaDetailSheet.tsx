@@ -854,9 +854,10 @@ export function InstanciaDetailSheet({
                 const usuariosMembros = membros.filter(m => m.entidadeTipo === 'user')
 
                 function renderRow(membro: typeof membros[number]) {
-                  const isGroup    = membro.entidadeTipo === 'group'
-                  const isRemoving = removingId === membro.id
-                  const nome       = membro.displayName ?? membro.entidadeId
+                  const isGroup       = membro.entidadeTipo === 'group'
+                  const isRemoving    = removingId === membro.id
+                  const isEditingPapel = editingPapelId === membro.id
+                  const nome          = membro.displayName ?? membro.entidadeId
                   return (
                     <tr
                       key={membro.id}
@@ -878,19 +879,24 @@ export function InstanciaDetailSheet({
                           <PapelEditor
                             papel={membro.papel}
                             onSave={(novo) => handleSavePapel(membro, novo)}
+                            onEditingChange={(ed) => setEditingPapelId(ed ? membro.id : null)}
                           />
                         ) : canManage && atribuicoesDocnix ? (
                           <PapelEditorDocNix
                             papel={membro.papel}
                             modulo={componenteNome ?? null}
                             onSave={(novo) => handleSavePapel(membro, novo)}
+                            onEditingChange={(ed) => setEditingPapelId(ed ? membro.id : null)}
                           />
                         ) : (
                           <PapelBadge papel={membro.papel} />
                         )}
                       </td>
                       <td className="pr-6 pl-3 py-3 text-right w-[190px]">
-                        <div className="flex items-center justify-end gap-1 invisible group-hover:visible">
+                        <div className={cn(
+                          'flex items-center justify-end gap-1',
+                          isEditingPapel ? 'invisible' : 'invisible group-hover:visible',
+                        )}>
                           <button
                             onClick={() => { setMembroPermissoes(membro); setShowPermissoes(true) }}
                             className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-blue-600 hover:bg-blue-50 transition-colors"
