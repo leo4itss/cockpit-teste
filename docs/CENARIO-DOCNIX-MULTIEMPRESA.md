@@ -324,15 +324,14 @@ Mostrar a visão hierárquica da organização Docnix com as contas e seus objet
 
 1. No PersonaSwitcher, trocar para **Org Admin (Docnix) — Marcelo Ribeiro**
 2. Navegar para **Canvas Org**
-3. Selecionar a organização **Docnix** no dropdown
-4. **Verificar:** Duas contas visíveis: **Comgas** e **Hospital Elfa**
-5. Expandir **Hospital Elfa**
-6. **Verificar:** Três nós de objetos MaxDoc: Hospital Central, Unidade Norte, Unidade Sul
-7. Clicar em **Hospital Central**
-8. **Verificar:** Painel lateral mostra membros e grupos com papéis
-9. **Verificar:** Carlos Mendes aparece como **Administrador**
-10. Clicar em **Unidade Norte**
-11. **Verificar:** Carlos Mendes aparece como **Leitor** (papel diferente — mesmo usuário)
+3. **Verificar:** Duas contas visíveis: **Comgas** e **Hospital Elfa**
+4. Expandir **Hospital Elfa**
+5. **Verificar:** Três nós de objetos MaxDoc: Hospital Central, Unidade Norte, Unidade Sul
+6. Clicar em **Hospital Central**
+7. **Verificar:** Painel lateral mostra membros e grupos com papéis
+8. **Verificar:** Carlos Mendes aparece como **Administrador**
+9. Clicar em **Unidade Norte**
+10. **Verificar:** Carlos Mendes aparece como **Leitor** (papel diferente — mesmo usuário)
 
 ### Resultados Esperados
 
