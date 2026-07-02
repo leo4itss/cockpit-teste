@@ -251,8 +251,8 @@ Provar que alterar o papel de Carlos na Unidade Norte não afeta seu papel no Ho
 
 1. Fechar → abrir **MaxDoc — Hospital Central**
 2. **Verificar:** Carlos Mendes ainda aparece com badge **Administrador**
-3. Clicar em **Editar** ao lado de Carlos
-4. **Verificar:** Ainda 25 ações diretas, papel **Administrador** inalterado
+3. Clicar em **Ações** ao lado de Carlos
+4. **Verificar:** Ainda todas as **47 ações** do catálogo marcadas (expansão automática do papel Administrador), papel **Administrador** inalterado
 
 > **Ponto de impacto:** no Docnix atual, se você alterasse as atribuições de um usuário em uma empresa, correria o risco de impactar todas as outras. No PAS, cada empresa (objeto) é completamente isolada.
 
