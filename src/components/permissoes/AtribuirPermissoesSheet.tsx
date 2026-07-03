@@ -623,8 +623,8 @@ export function AtribuirPermissoesSheet({
             <div className="flex items-start gap-3 mx-6 mt-5 p-3.5 rounded-xl border border-violet-200 bg-violet-50">
               <Users className="w-4 h-4 text-violet-600 shrink-0 mt-0.5" />
               <p className="text-sm text-violet-800">
-                Você está atribuindo permissões ao <strong>grupo {entityNome}</strong>.
-                Todos os membros herdarão estas permissões automaticamente.
+                Você está atribuindo Ações ao <strong>grupo {entityNome}</strong>.
+                Todos os membros herdarão estas Ações automaticamente.
               </p>
             </div>
           )}
