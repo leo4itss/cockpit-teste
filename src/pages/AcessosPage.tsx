@@ -481,7 +481,7 @@ export function AcessosPage() {
           <p className="text-sm text-[#6b7280] mt-1 max-w-[1080px]">
             {isAllAccounts
               ? <>Visão consolidada de todas as contas da organização. Diferente de <strong className="font-medium text-[#374151]">Usuários</strong> (visão org), aqui você vê membros, grupos e objetos por conta.</>
-              : <>Gerencie quem acessa <strong className="font-medium text-[#374151]">esta conta</strong> e com quais permissões. Diferente de <strong className="font-medium text-[#374151]">Usuários</strong> (visão da organização), aqui você vê apenas os membros e grupos desta conta específica.</>
+              : <>Gerencie quem acessa <strong className="font-medium text-[#374151]">esta conta</strong> e com quais Ações. Diferente de <strong className="font-medium text-[#374151]">Usuários</strong> (visão da organização), aqui você vê apenas os membros e grupos desta conta específica.</>
             }
           </p>
         </div>
