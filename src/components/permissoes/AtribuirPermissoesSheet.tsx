@@ -308,13 +308,6 @@ export function AtribuirPermissoesSheet({
             // Todos os componentes usam component_permissions (FGA puro)
             // Prefere catálogo do banco (componente_atribuicoes) sobre mock hardcoded (cfg.acoes)
             const allAcoes = (newAtribMap[c.id]?.length ? newAtribMap[c.id] : (cfg.acoes ?? [])).map(a => a.acao)
-            ;(window as any).__debugInfo = {
-              compNome: c.nome,
-              allAcoesLength: allAcoes.length,
-              currentSetSize: currentSet.size,
-              inAllAcoesNotCurrent: allAcoes.filter(a => !currentSet.has(a)),
-              inCurrentNotAllAcoes: [...currentSet].filter(a => !allAcoes.includes(a)),
-            }
             let matched = false
             for (const p of cfg.papeis) {
               const defaults = p.defaultAcoes ?? []
@@ -329,13 +322,20 @@ export function AtribuirPermissoesSheet({
               // Tenta reconstruir uma combinação de 2+ papéis cuja união bata exatamente
               // com o conjunto salvo — necessário porque "Combinar papéis" é persistido
               // como 'personalizado' (sem coluna própria para a lista de papéis).
+              // Busca por tamanho crescente para sempre preferir a menor combinação
+              // (evita ambiguidade quando Administrador, que já cobre tudo, está envolvido —
+              // embora esse caso específico já tenha sido resolvido pelo match de papel único acima).
               const valores = cfg.papeis.map(p => p.value)
               const n = valores.length
               if (n <= 12) {
+                const subsetsPorTamanho: string[][] = []
                 for (let mask = 1; mask < (1 << n); mask++) {
                   const subset: string[] = []
                   for (let i = 0; i < n; i++) if (mask & (1 << i)) subset.push(valores[i])
-                  if (subset.length < 2) continue
+                  if (subset.length >= 2) subsetsPorTamanho.push(subset)
+                }
+                subsetsPorTamanho.sort((a, b) => a.length - b.length)
+                for (const subset of subsetsPorTamanho) {
                   const union = new Set(unionAcoesDosPapeis(c.id, c.nome, new Set(subset)))
                   if (union.size === currentSet.size && [...union].every(a => currentSet.has(a))) {
                     combinacoesEncontradas[c.id] = new Set(subset)
