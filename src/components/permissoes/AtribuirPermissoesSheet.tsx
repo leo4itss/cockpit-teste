@@ -484,23 +484,24 @@ export function AtribuirPermissoesSheet({
   }, [papeisCombinados])
 
   function handleToggleCombinarPapeis(compId: string) {
-    setCombinarPapeis(prev => {
-      const ativar = !prev[compId]
-      if (ativar) {
-        // Ativando: parte do papel único já selecionado, se houver
-        const papelAtual = papelSelecionado[compId]
-        const seed = papelAtual && papelAtual !== 'personalizado' ? new Set([papelAtual]) : new Set<string>()
-        setPapeisCombinados(p => ({ ...p, [compId]: seed }))
-      } else {
-        // Desativando: se sobrou exatamente um papel combinado, volta pro modo seleção única
-        const atual = papeisCombinados[compId] ?? new Set<string>()
-        if (atual.size === 1) {
-          setPapelSelecionado(p => ({ ...p, [compId]: [...atual][0] }))
-        }
-        setPapeisCombinados(p => ({ ...p, [compId]: new Set() }))
+    // Evita chamar setState dentro do updater de outro setState (quebra sob
+    // React.StrictMode, que invoca updaters duas vezes) — lê o estado atual
+    // direto do closure do handler, já que é disparado por um clique do usuário.
+    const ativar = !combinarPapeis[compId]
+    if (ativar) {
+      // Ativando: parte do papel único já selecionado, se houver
+      const papelAtual = papelSelecionado[compId]
+      const seed = papelAtual && papelAtual !== 'personalizado' ? new Set([papelAtual]) : new Set<string>()
+      setPapeisCombinados(p => ({ ...p, [compId]: seed }))
+    } else {
+      // Desativando: se sobrou exatamente um papel combinado, volta pro modo seleção única
+      const atual = papeisCombinados[compId] ?? new Set<string>()
+      if (atual.size === 1) {
+        setPapelSelecionado(p => ({ ...p, [compId]: [...atual][0] }))
       }
-      return { ...prev, [compId]: ativar }
-    })
+      setPapeisCombinados(p => ({ ...p, [compId]: new Set() }))
+    }
+    setCombinarPapeis(prev => ({ ...prev, [compId]: ativar }))
   }
 
   const hasChanges = componentes.some(c => {
