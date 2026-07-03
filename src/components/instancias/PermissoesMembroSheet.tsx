@@ -450,8 +450,8 @@ export function PermissoesMembroSheet({
           </div>
 
           {/* ── Lista de ações ─────────────────────────────── */}
-          <div className="space-y-2">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Ações</p>
+          <div className="flex flex-col flex-1 min-h-0 space-y-2">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider shrink-0">Ações</p>
 
             {loading ? (
               <div className="flex items-center gap-2 py-4 text-sm text-gray-400">
@@ -463,7 +463,7 @@ export function PermissoesMembroSheet({
               </p>
             ) : (
               <>
-                <div className="border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100 max-h-[min(50vh,380px)] overflow-y-auto">
+                <div className="border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100 flex-1 min-h-0 overflow-y-auto">
                   {(atribuicoesNomes.length > 0
                     ? atribuicoesNomes.map(n => ({ acao: n, label: n }))
                     : (config.acoes ?? [])
