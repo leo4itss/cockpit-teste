@@ -288,6 +288,9 @@ export function AtribuirPermissoesSheet({
         // ── Infere papelSelecionado a partir das permissões carregadas ──
         if (!cancelled) {
           const inferredPapeis: Record<string, string> = {}
+          // componenteId → combinação de papéis reconstruída (quando 'personalizado'
+          // vem de uma combinação salva, não de edição manual avulsa)
+          const combinacoesEncontradas: Record<string, Set<string>> = {}
           ativos.forEach(c => {
             // Modo instância: usa o papel salvo diretamente, sem reinferir.
             if (modoInstancia && instanciaMembroPapel) {
@@ -315,9 +318,36 @@ export function AtribuirPermissoesSheet({
                 inferredPapeis[c.id] = p.value; matched = true; break
               }
             }
-            if (!matched) inferredPapeis[c.id] = 'personalizado'
+            if (!matched) {
+              // Tenta reconstruir uma combinação de 2+ papéis cuja união bata exatamente
+              // com o conjunto salvo — necessário porque "Combinar papéis" é persistido
+              // como 'personalizado' (sem coluna própria para a lista de papéis).
+              const valores = cfg.papeis.map(p => p.value)
+              const n = valores.length
+              if (n <= 12) {
+                for (let mask = 1; mask < (1 << n); mask++) {
+                  const subset: string[] = []
+                  for (let i = 0; i < n; i++) if (mask & (1 << i)) subset.push(valores[i])
+                  if (subset.length < 2) continue
+                  const union = new Set(unionAcoesDosPapeis(c.id, c.nome, new Set(subset)))
+                  if (union.size === currentSet.size && [...union].every(a => currentSet.has(a))) {
+                    combinacoesEncontradas[c.id] = new Set(subset)
+                    break
+                  }
+                }
+              }
+              inferredPapeis[c.id] = 'personalizado'
+            }
           })
           setPapelSelecionado(inferredPapeis)
+          if (Object.keys(combinacoesEncontradas).length > 0) {
+            setCombinarPapeis(prev => {
+              const next = { ...prev }
+              Object.keys(combinacoesEncontradas).forEach(cid => { next[cid] = true })
+              return next
+            })
+            setPapeisCombinados(prev => ({ ...prev, ...combinacoesEncontradas }))
+          }
         }
 
         // ── Permissões herdadas via grupos (só para usuários, fora do modo instância) ──
