@@ -634,7 +634,7 @@ export function AtribuirPermissoesSheet({
             <div className="flex items-start gap-3 mx-6 mt-3 p-3.5 rounded-xl border border-blue-200 bg-blue-50">
               <span className="text-base shrink-0 mt-0.5">✦</span>
               <p className="text-sm text-blue-800">
-                Pré-selecionamos as permissões padrão para o papel{' '}
+                Pré-selecionamos as Ações padrão para o nível de acesso{' '}
                 <strong>{papel}</strong>. Ajuste conforme necessário antes de salvar.
               </p>
             </div>
