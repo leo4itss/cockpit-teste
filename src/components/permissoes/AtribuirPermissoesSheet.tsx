@@ -914,12 +914,12 @@ export function AtribuirPermissoesSheet({
         ) : totalAcoes > 0 && (
           <p className="text-xs text-[#6b7280] flex-1 mr-2">
             <strong className="text-[#030712]">{totalAcoes}</strong>{' '}
-            {totalAcoes === 1 ? 'permissão ativa' : 'permissões ativas'}
+            {totalAcoes === 1 ? 'ação ativa' : 'ações ativas'}
           </p>
         )}
         <Button variant="outline" onClick={handleClose} disabled={saving}>Cancelar</Button>
         <Button onClick={handleSalvar} disabled={!hasChanges || saving}>
-          {saving ? 'Salvando...' : 'Salvar permissões'}
+          {saving ? 'Salvando...' : 'Salvar Ações'}
         </Button>
       </NestedSheetFooter>
     </NestedSheet>
