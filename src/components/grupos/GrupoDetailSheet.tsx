@@ -162,6 +162,10 @@ function AddMembroSection({ allUsers, membros, onAdd, disabled }: AddMembroProps
 export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome, contextoLabel }: Props) {
   const [membros, setMembros]           = useState<User[]>([])
   const [loadingMembros, setLoadingMembros] = useState(false)
+  // userId → papel de conta ('member' | 'account_admin'), vindo de user_account_memberships.
+  // Não usar user.papel diretamente: esse campo é um texto livre (cargo/perfil) da tabela
+  // users, sem relação com o papel de conta.
+  const [accountPapelMap, setAccountPapelMap] = useState<Record<string, string>>({})
   const [allUsers, setAllUsers]         = useState<User[]>([])
   const [showAdd, setShowAdd]           = useState(false)
   const [addingId, setAddingId]         = useState<string | null>(null)
