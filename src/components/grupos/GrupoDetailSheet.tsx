@@ -207,8 +207,7 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
         .catch(() => setAccountPapelMap({}))
     } else {
       setAccountPapelMap({})
-      setLoadingMembros(false)
-    })
+    }
 
     api.getGrupoInstancias(grupo.id).then(vincs => {
       setObjetos(vincs)
