@@ -902,7 +902,7 @@ export function InstanciaDetailSheet({
                           <button
                             onClick={() => { setMembroPermissoes(membro); setShowPermissoes(true) }}
                             className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-blue-600 hover:bg-blue-50 transition-colors"
-                            title="Ver e editar permissões"
+                            title="Ver e editar Ações"
                           >
                             <Shield className="w-3.5 h-3.5" />
                             Ações
