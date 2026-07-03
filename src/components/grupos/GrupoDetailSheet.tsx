@@ -196,6 +196,20 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
       setLoadingMembros(false)
     })
 
+    // Papel de conta real (member | account_admin) — só existe para grupos com escopo=conta.
+    if (accountId) {
+      api.getAccountMembros(accountId)
+        .then((rows: any[]) => {
+          const map: Record<string, string> = {}
+          rows.forEach(r => { map[r.id] = r.papel })
+          setAccountPapelMap(map)
+        })
+        .catch(() => setAccountPapelMap({}))
+    } else {
+      setAccountPapelMap({})
+      setLoadingMembros(false)
+    })
+
     api.getGrupoInstancias(grupo.id).then(vincs => {
       setObjetos(vincs)
       setLoadingObjetos(false)
