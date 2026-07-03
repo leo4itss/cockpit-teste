@@ -639,7 +639,7 @@ export function AcessosPage() {
       {abaAtiva === 'grupos' && (
         <div className="px-8 pt-6 pb-8">
           <p className="text-sm text-[#6b7280] mb-4">
-            Grupos com escopo <strong>Organização</strong> são criados pelo Org Admin e herdados por todas as contas — você pode atribuir permissões a eles, mas não editá-los aqui.
+            Grupos com escopo <strong>Organização</strong> são criados pelo Org Admin e herdados por todas as contas — você pode atribuir Ações a eles, mas não editá-los aqui.
             Grupos com escopo <strong>Conta</strong> são exclusivos desta conta e gerenciados pelo Account Admin.
           </p>
           <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
