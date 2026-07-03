@@ -140,6 +140,9 @@ export function AcessosPage() {
   const [selectedUser, setSelectedUser]           = useState<User | null>(null)
   const [permEfetivasUser, setPermEfetivasUser]           = useState<User | null>(null)
   const [permEfetivasInstancias, setPermEfetivasInstancias] = useState<{ id: string; nome: string; componenteId: string }[]>([])
+  // Evita que uma resposta antiga (de um clique anterior em outro usuário) sobrescreva
+  // o resultado de um clique mais recente — ver handleOpenPermEfetivas.
+  const permEfetivasRequestId = useRef(0)
 
   useEffect(() => {
     if (!accountId) return
