@@ -904,21 +904,17 @@ export function AtribuirPermissoesSheet({
             )}
           </div>
 
-          {/* Contador */}
-          {totalAcoes > 0 && (
-            <div className="px-6 py-2 border-t border-gray-100 bg-gray-50">
-              <p className="text-xs text-[#6b7280]">
-                <strong className="text-[#030712]">{totalAcoes}</strong>{' '}
-                {totalAcoes === 1 ? 'permissão ativa' : 'permissões ativas'}
-              </p>
-            </div>
-          )}
         </div>
       </NestedSheetBody>
 
       <NestedSheetFooter>
-        {saveError && (
+        {saveError ? (
           <p className="text-xs text-red-600 flex-1 mr-2">{saveError}</p>
+        ) : totalAcoes > 0 && (
+          <p className="text-xs text-[#6b7280] flex-1 mr-2">
+            <strong className="text-[#030712]">{totalAcoes}</strong>{' '}
+            {totalAcoes === 1 ? 'permissão ativa' : 'permissões ativas'}
+          </p>
         )}
         <Button variant="outline" onClick={handleClose} disabled={saving}>Cancelar</Button>
         <Button onClick={handleSalvar} disabled={!hasChanges || saving}>
