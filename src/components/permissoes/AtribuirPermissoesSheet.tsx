@@ -659,7 +659,7 @@ export function AtribuirPermissoesSheet({
                 <strong>{bloqueadosCount} {bloqueadosCount === 1 ? 'componente' : 'componentes'}</strong>{' '}
                 {bloqueadosCount === 1 ? 'está bloqueado' : 'estão bloqueados'} porque a capability correspondente
                 não está ativa para esta conta. Ative-a em{' '}
-                <strong>Contas → Licenças Ativas</strong> antes de atribuir permissões.
+                <strong>Contas → Licenças Ativas</strong> antes de atribuir Ações.
               </p>
             </div>
           )}
