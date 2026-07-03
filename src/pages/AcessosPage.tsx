@@ -45,29 +45,6 @@ function EscopoBadge({ escopo }: { escopo: 'org' | 'conta' }) {
     : <Badge variant="default" className="bg-violet-50 text-violet-700 border border-violet-200">Conta</Badge>
 }
 
-// ── Badge de papel ────────────────────────────────────────────
-
-const PAPEL_LABELS: Record<string, string> = {
-  'Viewer': 'Visualizador',
-  'User':   'Usuário',
-  'Admin':  'Administrador',
-}
-
-function PapelBadge({ papel }: { papel?: string }) {
-  if (!papel) return <span className="text-xs text-gray-400">—</span>
-  const variants: Record<string, string> = {
-    'Viewer': 'bg-gray-100 text-gray-600 border-gray-200',
-    'User':   'bg-blue-50 text-blue-700 border-blue-200',
-    'Admin':  'bg-orange-50 text-orange-700 border-orange-200',
-  }
-  const cls = variants[papel] ?? 'bg-gray-100 text-gray-600 border-gray-200'
-  return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${cls}`}>
-      {PAPEL_LABELS[papel] ?? papel}
-    </span>
-  )
-}
-
 // ─────────────────────────────────────────────────────────────
 
 export function AcessosPage() {
@@ -163,6 +140,9 @@ export function AcessosPage() {
   const [selectedUser, setSelectedUser]           = useState<User | null>(null)
   const [permEfetivasUser, setPermEfetivasUser]           = useState<User | null>(null)
   const [permEfetivasInstancias, setPermEfetivasInstancias] = useState<{ id: string; nome: string; componenteId: string }[]>([])
+  // Evita que uma resposta antiga (de um clique anterior em outro usuário) sobrescreva
+  // o resultado de um clique mais recente — ver handleOpenPermEfetivas.
+  const permEfetivasRequestId = useRef(0)
 
   useEffect(() => {
     if (!accountId) return
@@ -269,20 +249,38 @@ export function AcessosPage() {
   }
 
   async function handleOpenPermEfetivas(user: User) {
+    const requestId = ++permEfetivasRequestId.current
     setPermEfetivasUser(user)
     setPermEfetivasInstancias([])
-    const userInstIds: string[] = []
-    await Promise.all(
-      instancias.map(inst =>
-        api.getInstanciaMembros(inst.id)
-          .then((mems: any[]) => {
-            if (mems.some(m => m.entidadeTipo === 'user' && m.entidadeId === user.id)) {
-              userInstIds.push(inst.id)
-            }
-          })
-          .catch(() => {})
-      )
-    )
+
+    // Grupos do usuário e membros de cada objeto são independentes — buscamos em
+    // paralelo em vez de esperar os grupos para só então buscar os objetos.
+    const [userGrupos, membrosPorInstancia] = await Promise.all([
+      api.getUserGrupos(user.id, accountId).catch((err) => {
+        console.error('Falha ao buscar grupos do usuário para Ações Efetivas:', err)
+        return null
+      }),
+      Promise.all(
+        instancias.map(inst =>
+          api.getInstanciaMembros(inst.id)
+            .then((mems: any[]) => ({ inst, mems }))
+            .catch(() => ({ inst, mems: [] as any[] }))
+        )
+      ),
+    ])
+
+    // Se outro clique em "Ver permissões efetivas" aconteceu enquanto esperávamos,
+    // essa resposta está desatualizada — descarta em vez de sobrescrever o usuário atual.
+    if (requestId !== permEfetivasRequestId.current) return
+
+    const grupoIds = new Set((userGrupos ?? []).map((g: any) => g.id))
+    const userInstIds = membrosPorInstancia
+      .filter(({ mems }) => mems.some(m =>
+        (m.entidadeTipo === 'user' && m.entidadeId === user.id) ||
+        (m.entidadeTipo === 'group' && grupoIds.has(m.entidadeId))
+      ))
+      .map(({ inst }) => inst.id)
+
     setPermEfetivasInstancias(
       instancias
         .filter(i => userInstIds.includes(i.id))
@@ -650,7 +648,6 @@ export function AcessosPage() {
                 <tr className="border-b border-gray-200">
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[240px]">Grupo</th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[100px]">Membros</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[130px]">Papel</th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[130px]">Escopo</th>
                   {isAllAccounts && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[140px]">Conta</th>}
                   <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 w-[100px]">Status</th>
@@ -659,7 +656,7 @@ export function AcessosPage() {
               </thead>
               <tbody>
                 {loadingGrupos ? (
-                  <tr><td colSpan={isAllAccounts ? 7 : 6} className="px-4 py-8 text-center text-sm text-gray-500">Carregando...</td></tr>
+                  <tr><td colSpan={isAllAccounts ? 6 : 5} className="px-4 py-8 text-center text-sm text-gray-500">Carregando...</td></tr>
                 ) : filteredGrupos.length > 0 ? (
                   filteredGrupos.map(grupo => (
                     <tr
@@ -674,7 +671,6 @@ export function AcessosPage() {
                         )}
                       </td>
                       <td className="px-4 py-3 text-sm text-[#030712]">{grupo.qtdMembros ?? 0}</td>
-                      <td className="px-4 py-3"><PapelBadge papel={grupo.papel} /></td>
                       <td className="px-4 py-3"><EscopoBadge escopo={grupo.escopo} /></td>
                       {isAllAccounts && (
                         <td className="px-4 py-3 text-sm text-[#6b7280]">
@@ -712,7 +708,7 @@ export function AcessosPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={isAllAccounts ? 7 : 6} className="px-4 py-12 text-center">
+                    <td colSpan={isAllAccounts ? 6 : 5} className="px-4 py-12 text-center">
                       <p className="text-sm font-medium text-[#030712]">Nenhum grupo encontrado</p>
                       <p className="text-xs text-[#6b7280] mt-1">Crie um grupo para organizar os usuários desta conta.</p>
                     </td>

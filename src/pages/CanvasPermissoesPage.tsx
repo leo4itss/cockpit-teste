@@ -25,6 +25,7 @@ import {
   Sun, Moon, HelpCircle, Info,
 } from 'lucide-react'
 import { api } from '@/api/client'
+import { getPapelInfo } from '@/authz/mock'
 import { useIsPlatformAdmin, useIsOrgAdmin, useIsAccountAdmin } from '@/authz'
 import { useAdminAccountId, useAdminOrgId } from '@/authz/hooks'
 import { useSessionState } from '@/hooks/useSessionState'
@@ -327,7 +328,7 @@ function buildGraph(data: GraphData, selectedId: string | null, theme: Visualize
           stroke: mb.entidadeTipo === 'user' ? theme.edgeInstUser : theme.edgeInstGroup,
           strokeWidth: 1.5, strokeDasharray: '6 3',
         },
-        label: isDocNix ? 'DocNix' : mb.papel,
+        label: isDocNix ? (getPapelInfo(mb.papel)?.label ?? mb.papel) : mb.papel,
         labelStyle: { fontSize: 9, fill: theme.cardMuted },
         labelBgStyle: { fill: theme.canvasBg, fillOpacity: 0.85 },
       })
@@ -511,7 +512,7 @@ function GrupoPanel({ grupoId, graphData, accountId, theme, onClose, onRefresh, 
                   <span className="text-xs flex-1 truncate" style={{ color: theme.panelText }}>{inst.nome}</span>
                   {membroDoGrupo && (
                     isDocNix
-                      ? <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700 border border-violet-200">DocNix</span>
+                      ? <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700 border border-violet-200">{getPapelInfo(membroDoGrupo.papel)?.label ?? membroDoGrupo.papel}</span>
                       : <span className="text-[9px] font-semibold" style={{ color: theme.btnPermText }}>{membroDoGrupo.papel}</span>
                   )}
                   <button
@@ -523,6 +524,7 @@ function GrupoPanel({ grupoId, graphData, accountId, theme, onClose, onRefresh, 
                       instanciaId: inst.id,
                       instanciaComponenteId: inst.componenteId,
                       instanciaNome: inst.nome,
+                      instanciaMembroPapel: membroDoGrupo?.papel,
                     })}
                     title="Atribuir permissões neste objeto"
                     className="p-1 rounded transition-colors shrink-0"
@@ -633,7 +635,7 @@ function UsuarioPanel({ userId, graphData, accountId, theme, onClose, onRefresh:
                       <CompIcon tipo={tipo} size={13} color={compIconColor(tipo, theme.mode)} />
                       <span className="text-xs flex-1 truncate" style={{ color: theme.panelText }}>{inst.nome}</span>
                       {isDocNix
-                        ? <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700 border border-violet-200">DocNix</span>
+                        ? mb?.papel && <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700 border border-violet-200">{getPapelInfo(mb.papel)?.label ?? mb.papel}</span>
                         : mb?.papel && <span className="text-[9px] font-semibold" style={{ color: theme.btnPermText }}>{mb.papel}</span>
                       }
                       <button
@@ -645,6 +647,7 @@ function UsuarioPanel({ userId, graphData, accountId, theme, onClose, onRefresh:
                           instanciaId: inst.id,
                           instanciaComponenteId: inst.componenteId,
                           instanciaNome: inst.nome,
+                          instanciaMembroPapel: mb?.papel,
                         })}
                         title="Editar permissões neste objeto"
                         className="p-1 rounded transition-colors shrink-0"
@@ -805,7 +808,7 @@ function InstanciaPanel({ instanciaId, graphData, theme, onClose, onOpenInstanci
                       </span>
                     )}
                     {isDocNix
-                      ? <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700 border border-violet-200">DocNix</span>
+                      ? <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700 border border-violet-200">{getPapelInfo(mb.papel)?.label ?? mb.papel}</span>
                       : <span className="text-[9px] font-medium" style={{ color: theme.panelMuted }}>{mb.papel}</span>
                     }
                   </div>

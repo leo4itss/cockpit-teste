@@ -101,13 +101,21 @@ function PapelBadge({ papel }: { papel: string }) {
 
 // Editor inline de papel para membro de instância FGA (Viewer/Member/Admin)
 function PapelEditor({
-  papel, onSave,
-}: { papel: string; onSave: (novo: string) => Promise<void> }) {
-  const [editing, setEditing] = useState(false)
+  papel, onSave, onEditingChange,
+}: { papel: string; onSave: (novo: string) => Promise<void>; onEditingChange?: (editing: boolean) => void }) {
+  const [editing, setEditingState] = useState(false)
   const [draft, setDraft]     = useState(papel)
   const [saving, setSaving]   = useState(false)
 
+  function setEditing(next: boolean) {
+    setEditingState(next)
+    onEditingChange?.(next)
+  }
+
   useEffect(() => { setDraft(papel); setEditing(false) }, [papel])
+  // Garante que o estado de edição no pai seja limpo se o componente desmontar em edição
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => () => onEditingChange?.(false), [])
 
   async function handleSave() {
     if (draft === papel) { setEditing(false); return }
@@ -149,13 +157,20 @@ function PapelEditor({
 
 // Editor inline de papel para membro de instância DocNix (usa mockDocNixPapeis)
 function PapelEditorDocNix({
-  papel, modulo, onSave,
-}: { papel: string; modulo: string | null; onSave: (novo: string) => Promise<void> }) {
-  const [editing, setEditing] = useState(false)
+  papel, modulo, onSave, onEditingChange,
+}: { papel: string; modulo: string | null; onSave: (novo: string) => Promise<void>; onEditingChange?: (editing: boolean) => void }) {
+  const [editing, setEditingState] = useState(false)
   const [draft, setDraft]     = useState(papel)
   const [saving, setSaving]   = useState(false)
 
+  function setEditing(next: boolean) {
+    setEditingState(next)
+    onEditingChange?.(next)
+  }
+
   useEffect(() => { setDraft(papel); setEditing(false) }, [papel])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => () => onEditingChange?.(false), [])
 
   const papeis = modulo
     ? mockDocNixPapeis.filter(p => p.modulo === modulo)
@@ -498,6 +513,10 @@ export function InstanciaDetailSheet({
   const [addingId, setAddingId]                 = useState<string | null>(null)
   const [removingId, setRemovingId]             = useState<string | null>(null)
   const [removeError, setRemoveError]           = useState<string | null>(null)
+  // Membro cujo papel está sendo editado inline — usado para ocultar os botões
+  // de Ações/Remover (mouseover) enquanto o select de papel está aberto,
+  // evitando sobreposição visual entre os dois grupos de controles.
+  const [editingPapelId, setEditingPapelId]     = useState<string | null>(null)
   // Sheet unificado de permissões por membro (FGA ou DocNix)
   const [showPermissoes, setShowPermissoes]     = useState(false)
   const [membroPermissoes, setMembroPermissoes] = useState<InstanciaMembro | null>(null)
@@ -837,16 +856,17 @@ export function InstanciaDetailSheet({
                 const usuariosMembros = membros.filter(m => m.entidadeTipo === 'user')
 
                 function renderRow(membro: typeof membros[number]) {
-                  const isGroup    = membro.entidadeTipo === 'group'
-                  const isRemoving = removingId === membro.id
-                  const nome       = membro.displayName ?? membro.entidadeId
+                  const isGroup       = membro.entidadeTipo === 'group'
+                  const isRemoving    = removingId === membro.id
+                  const isEditingPapel = editingPapelId === membro.id
+                  const nome          = membro.displayName ?? membro.entidadeId
                   return (
                     <tr
                       key={membro.id}
                       className="group border-b border-gray-50 hover:bg-gray-50/60 transition-colors last:border-b-0"
                     >
-                      <td className="pl-6 pr-3 py-3">
-                        <div className="flex items-center gap-3">
+                      <td className="pl-6 pr-3 py-3 w-auto">
+                        <div className="flex items-center gap-3 min-w-0">
                           <Avatar nome={nome} isGroup={isGroup} />
                           <div className="min-w-0">
                             <p className="text-sm font-medium text-[#030712] truncate">{nome}</p>
@@ -856,24 +876,29 @@ export function InstanciaDetailSheet({
                           </div>
                         </div>
                       </td>
-                      <td className="px-3 py-3">
+                      <td className="px-3 py-3 w-[130px]">
                         {canManage && !atribuicoesDocnix ? (
                           <PapelEditor
                             papel={membro.papel}
                             onSave={(novo) => handleSavePapel(membro, novo)}
+                            onEditingChange={(ed) => setEditingPapelId(ed ? membro.id : null)}
                           />
                         ) : canManage && atribuicoesDocnix ? (
                           <PapelEditorDocNix
                             papel={membro.papel}
                             modulo={componenteNome ?? null}
                             onSave={(novo) => handleSavePapel(membro, novo)}
+                            onEditingChange={(ed) => setEditingPapelId(ed ? membro.id : null)}
                           />
                         ) : (
                           <PapelBadge papel={membro.papel} />
                         )}
                       </td>
-                      <td className="pr-6 pl-3 py-3 text-right">
-                        <div className="flex items-center justify-end gap-1 invisible group-hover:visible">
+                      <td className="pr-6 pl-3 py-3 text-right w-[190px]">
+                        <div className={cn(
+                          'flex items-center justify-end gap-1',
+                          isEditingPapel ? 'invisible' : 'invisible group-hover:visible',
+                        )}>
                           <button
                             onClick={() => { setMembroPermissoes(membro); setShowPermissoes(true) }}
                             className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-blue-600 hover:bg-blue-50 transition-colors"
@@ -915,7 +940,7 @@ export function InstanciaDetailSheet({
                             — membros dos grupos herdarão este acesso
                           </span>
                         </div>
-                        <table className="w-full">
+                        <table className="w-full table-fixed">
                           <tbody>{gruposMembros.map(renderRow)}</tbody>
                         </table>
                       </>
@@ -932,7 +957,7 @@ export function InstanciaDetailSheet({
                             </span>
                           </div>
                         )}
-                        <table className="w-full">
+                        <table className="w-full table-fixed">
                           <tbody>{usuariosMembros.map(renderRow)}</tbody>
                         </table>
                       </>

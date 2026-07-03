@@ -896,6 +896,26 @@ export const users: User[] = [
     ultimoAcesso: '21/05/2026',
     createdAt: '15/02/2026',
   },
+  // Persona Account Admin (Hospital Elfa) — id='usr-carlos-elfa' alinhado com mockFGARelations
+  // Também existe no banco como membro da conta Hospital Elfa (seed-docnix-multiempresa.ts)
+  {
+    id: 'usr-carlos-elfa',
+    nomeCompleto: 'Carlos Mendes',
+    usuario: 'carlosmendes',
+    email: 'carlos.mendes@hospitalelfa.com.br',
+    pais: 'Brasil',
+    telefone: '(11) 9 8100-4400',
+    area: 'TI',
+    cargo: 'Account Admin',
+    papel: 'Account Admin',
+    etiquetas: '',
+    formatoData: 'DD/MM/YYYY',
+    formatoHora: '24h',
+    fusoHorario: 'America/Sao_Paulo',
+    status: 'Ativo',
+    ultimoAcesso: '30/06/2026',
+    createdAt: '01/05/2026',
+  },
   // Persona Org Admin (Docnix) — id='usr-marcelo-c' alinhado com mockFGARelations
   // Também existe no banco como membro da conta Comgas (seed-docnix.ts)
   {
