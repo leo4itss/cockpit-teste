@@ -308,6 +308,7 @@ export function AtribuirPermissoesSheet({
             // Todos os componentes usam component_permissions (FGA puro)
             // Prefere catálogo do banco (componente_atribuicoes) sobre mock hardcoded (cfg.acoes)
             const allAcoes = (newAtribMap[c.id]?.length ? newAtribMap[c.id] : (cfg.acoes ?? [])).map(a => a.acao)
+            console.log('[DEBUG]', c.nome, 'allAcoes.length', allAcoes.length, 'currentSet.size', currentSet.size, 'diff', allAcoes.filter(a => !currentSet.has(a)))
             let matched = false
             for (const p of cfg.papeis) {
               const defaults = p.defaultAcoes ?? []
