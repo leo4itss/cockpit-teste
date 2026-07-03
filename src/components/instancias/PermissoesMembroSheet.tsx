@@ -519,14 +519,6 @@ export function PermissoesMembroSheet({
                     )
                   })}
                 </div>
-                <p className="text-xs text-gray-400">
-                  <strong className="text-gray-600">{diretasCount}</strong> ação{diretasCount !== 1 ? 'ões' : ''} direta{diretasCount !== 1 ? 's' : ''}
-                  {hasInherited && (
-                    <span className="text-emerald-600 ml-1">
-                      + <strong>{Object.keys(inherited).length}</strong> via grupo
-                    </span>
-                  )}
-                </p>
               </>
             )}
           </div>
@@ -535,8 +527,17 @@ export function PermissoesMembroSheet({
       </NestedSheetBody>
 
       <NestedSheetFooter>
-        {(saveError || papelError) && (
+        {(saveError || papelError) ? (
           <p className="text-xs text-red-600 flex-1 mr-2">{saveError ?? papelError}</p>
+        ) : !loading && (
+          <p className="text-xs text-gray-400 flex-1 mr-2">
+            <strong className="text-gray-600">{diretasCount}</strong> {diretasCount === 1 ? 'ação direta' : 'ações diretas'}
+            {hasInherited && (
+              <span className="text-emerald-600 ml-1">
+                + <strong>{Object.keys(inherited).length}</strong> via grupo
+              </span>
+            )}
+          </p>
         )}
         <Button variant="outline" onClick={handleClose} disabled={saving}>Cancelar</Button>
         <Button onClick={handleSalvar} disabled={!hasChanges || saving || loading}>
