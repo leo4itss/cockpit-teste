@@ -278,21 +278,22 @@ export function PermissoesMembroSheet({
   }, [papeisCombinados, combinarPapeis])
 
   function handleToggleCombinarPapeis() {
-    setCombinarPapeis(prev => {
-      const next = !prev
-      if (next) {
-        // Ativando: parte do papel único já selecionado, se houver
-        const seed = selectedPapel && selectedPapel !== 'personalizado' ? new Set([selectedPapel]) : new Set<string>()
-        setPapeisCombinados(seed)
-      } else {
-        // Desativando: se sobrou exatamente um papel combinado, volta pro modo single-select
-        if (papeisCombinados.size === 1) {
-          setSelectedPapel([...papeisCombinados][0])
-        }
-        setPapeisCombinados(new Set())
+    // Evita chamar setState dentro do updater de outro setState (quebra sob
+    // React.StrictMode, que invoca updaters duas vezes) — lê o estado atual
+    // direto do closure do handler, já que é disparado por um clique do usuário.
+    const ativar = !combinarPapeis
+    if (ativar) {
+      // Ativando: parte do papel único já selecionado, se houver
+      const seed = selectedPapel && selectedPapel !== 'personalizado' ? new Set([selectedPapel]) : new Set<string>()
+      setPapeisCombinados(seed)
+    } else {
+      // Desativando: se sobrou exatamente um papel combinado, volta pro modo single-select
+      if (papeisCombinados.size === 1) {
+        setSelectedPapel([...papeisCombinados][0])
       }
-      return next
-    })
+      setPapeisCombinados(new Set())
+    }
+    setCombinarPapeis(ativar)
   }
 
   function toggleItem(acao: string) {
