@@ -203,8 +203,16 @@ export function PermissoesMembroSheet({
    * Necessário porque a combinação é persistida como papel='personalizado' (sem coluna
    * própria para guardar a lista) — ao reabrir, a única forma de "lembrar" a combinação
    * é comparar o conjunto de ações salvo contra a união de cada combinação possível de
-   * papéis nomeados. Retorna null se não houver combinação de 2+ papéis cuja união bata
-   * exatamente com o salvo (ex.: edição manual avulsa).
+   * papéis nomeados.
+   *
+   * Busca por tamanho crescente (1, 2, 3...) e retorna a MENOR combinação que bate
+   * exatamente — isso evita ambiguidade quando Administrador (defaultAcoes: [] = todas
+   * as ações) está envolvido: como Administrador sozinho já cobre o catálogo inteiro,
+   * qualquer combinação "outro papel + Administrador" produziria a mesma união dele
+   * sozinho, então sempre preferimos o papel único quando ele já basta.
+   *
+   * Retorna { papeis: Set com 1 item } para papel único, ou 2+ para combinação real.
+   * Retorna null se nada bater exatamente (ex.: edição manual avulsa).
    */
   function inferirCombinacaoPapeis(existingAcoes: string[]): Set<string> | null {
     if (existingAcoes.length === 0) return null
@@ -212,10 +220,16 @@ export function PermissoesMembroSheet({
     const valores = config.papeis.map(p => p.value)
     const n = valores.length
     if (n > 12) return null // segurança: evita explosão combinatória
+
+    const subsetsPorTamanho: string[][] = []
     for (let mask = 1; mask < (1 << n); mask++) {
       const subset: string[] = []
       for (let i = 0; i < n; i++) if (mask & (1 << i)) subset.push(valores[i])
-      if (subset.length < 2) continue // papel único já é tratado sem precisar de inferência
+      subsetsPorTamanho.push(subset)
+    }
+    subsetsPorTamanho.sort((a, b) => a.length - b.length)
+
+    for (const subset of subsetsPorTamanho) {
       const union = new Set(unionAcoesDosPapeis(new Set(subset)))
       if (union.size === existingSet.size && [...union].every(a => existingSet.has(a))) {
         return new Set(subset)
@@ -226,12 +240,17 @@ export function PermissoesMembroSheet({
 
   // Ao abrir com papel salvo como 'personalizado', tenta reconstruir se ele veio de uma
   // combinação de papéis (em vez de edição manual avulsa) e reativa o modo Combinar papéis.
+  // Se a menor combinação encontrada tiver só 1 papel, mostra como seleção única normal
+  // (não faz sentido ligar "Combinar papéis" para um único papel).
   useEffect(() => {
     if (loading || !open || atribuicoesNomes.length === 0) return
     if ((membro.papel ?? '') !== 'personalizado') return
     if (combinarPapeis) return // já está em modo combinar (ex.: usuário acabou de togglear)
     const combinacao = inferirCombinacaoPapeis(saved)
-    if (combinacao) {
+    if (!combinacao) return
+    if (combinacao.size === 1) {
+      setSelectedPapel([...combinacao][0])
+    } else {
       setCombinarPapeis(true)
       setPapeisCombinados(combinacao)
     }
