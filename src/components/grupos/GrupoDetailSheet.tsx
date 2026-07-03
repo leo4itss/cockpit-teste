@@ -409,7 +409,7 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
                         </div>
                       </td>
                       <td className="px-3 py-3 hidden sm:table-cell">
-                        {user.papel === 'account_admin'
+                        {accountPapelMap[user.id] === 'account_admin'
                           ? <Badge variant="warning">Administrador da Conta</Badge>
                           : <Badge variant="default">Membro</Badge>}
                       </td>
