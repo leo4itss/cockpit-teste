@@ -370,11 +370,11 @@ export function PermissoesMembroSheet({
       </NestedSheetHeader>
 
       <NestedSheetBody noPadding>
-        <div className="px-6 py-5 space-y-5">
+        <div className="h-full px-6 py-5 flex flex-col gap-5">
 
           {/* ── Banner herança via grupo ────────────────────── */}
           {!loading && hasInherited && (
-            <div className="flex items-start gap-3 p-3.5 rounded-xl border border-emerald-200 bg-emerald-50">
+            <div className="flex items-start gap-3 p-3.5 rounded-xl border border-emerald-200 bg-emerald-50 shrink-0">
               <Users className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
               <p className="text-sm text-emerald-800">
                 Algumas ações estão marcadas via <strong>grupo</strong> — são somente leitura.
@@ -383,7 +383,7 @@ export function PermissoesMembroSheet({
           )}
 
           {/* ── Cards de papel ─────────────────────────────── */}
-          <div className="space-y-2">
+          <div className="space-y-2 shrink-0">
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Papel</p>
               <label className="flex items-center gap-1.5 cursor-pointer select-none">
