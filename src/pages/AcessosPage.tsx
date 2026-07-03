@@ -249,27 +249,38 @@ export function AcessosPage() {
   }
 
   async function handleOpenPermEfetivas(user: User) {
+    const requestId = ++permEfetivasRequestId.current
     setPermEfetivasUser(user)
     setPermEfetivasInstancias([])
 
-    // Grupos do usuário — necessário para incluir objetos onde o acesso é só via grupo.
-    const userGrupos = await api.getUserGrupos(user.id, accountId).catch(() => [] as any[])
-    const grupoIds = new Set(userGrupos.map((g: any) => g.id))
+    // Grupos do usuário e membros de cada objeto são independentes — buscamos em
+    // paralelo em vez de esperar os grupos para só então buscar os objetos.
+    const [userGrupos, membrosPorInstancia] = await Promise.all([
+      api.getUserGrupos(user.id, accountId).catch((err) => {
+        console.error('Falha ao buscar grupos do usuário para Ações Efetivas:', err)
+        return null
+      }),
+      Promise.all(
+        instancias.map(inst =>
+          api.getInstanciaMembros(inst.id)
+            .then((mems: any[]) => ({ inst, mems }))
+            .catch(() => ({ inst, mems: [] as any[] }))
+        )
+      ),
+    ])
 
-    const userInstIds: string[] = []
-    await Promise.all(
-      instancias.map(inst =>
-        api.getInstanciaMembros(inst.id)
-          .then((mems: any[]) => {
-            const temAcesso = mems.some(m =>
-              (m.entidadeTipo === 'user' && m.entidadeId === user.id) ||
-              (m.entidadeTipo === 'group' && grupoIds.has(m.entidadeId))
-            )
-            if (temAcesso) userInstIds.push(inst.id)
-          })
-          .catch(() => {})
-      )
-    )
+    // Se outro clique em "Ver permissões efetivas" aconteceu enquanto esperávamos,
+    // essa resposta está desatualizada — descarta em vez de sobrescrever o usuário atual.
+    if (requestId !== permEfetivasRequestId.current) return
+
+    const grupoIds = new Set((userGrupos ?? []).map((g: any) => g.id))
+    const userInstIds = membrosPorInstancia
+      .filter(({ mems }) => mems.some(m =>
+        (m.entidadeTipo === 'user' && m.entidadeId === user.id) ||
+        (m.entidadeTipo === 'group' && grupoIds.has(m.entidadeId))
+      ))
+      .map(({ inst }) => inst.id)
+
     setPermEfetivasInstancias(
       instancias
         .filter(i => userInstIds.includes(i.id))
