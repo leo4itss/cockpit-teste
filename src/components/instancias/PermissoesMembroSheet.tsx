@@ -198,6 +198,46 @@ export function PermissoesMembroSheet({
     return [...acoes]
   }
 
+  /**
+   * Tenta reconstruir quais papéis foram combinados a partir do conjunto de ações salvo.
+   * Necessário porque a combinação é persistida como papel='personalizado' (sem coluna
+   * própria para guardar a lista) — ao reabrir, a única forma de "lembrar" a combinação
+   * é comparar o conjunto de ações salvo contra a união de cada combinação possível de
+   * papéis nomeados. Retorna null se não houver combinação de 2+ papéis cuja união bata
+   * exatamente com o salvo (ex.: edição manual avulsa).
+   */
+  function inferirCombinacaoPapeis(existingAcoes: string[]): Set<string> | null {
+    if (existingAcoes.length === 0) return null
+    const existingSet = new Set(existingAcoes)
+    const valores = config.papeis.map(p => p.value)
+    const n = valores.length
+    if (n > 12) return null // segurança: evita explosão combinatória
+    for (let mask = 1; mask < (1 << n); mask++) {
+      const subset: string[] = []
+      for (let i = 0; i < n; i++) if (mask & (1 << i)) subset.push(valores[i])
+      if (subset.length < 2) continue // papel único já é tratado sem precisar de inferência
+      const union = new Set(unionAcoesDosPapeis(new Set(subset)))
+      if (union.size === existingSet.size && [...union].every(a => existingSet.has(a))) {
+        return new Set(subset)
+      }
+    }
+    return null
+  }
+
+  // Ao abrir com papel salvo como 'personalizado', tenta reconstruir se ele veio de uma
+  // combinação de papéis (em vez de edição manual avulsa) e reativa o modo Combinar papéis.
+  useEffect(() => {
+    if (loading || !open || atribuicoesNomes.length === 0) return
+    if ((membro.papel ?? '') !== 'personalizado') return
+    if (combinarPapeis) return // já está em modo combinar (ex.: usuário acabou de togglear)
+    const combinacao = inferirCombinacaoPapeis(saved)
+    if (combinacao) {
+      setCombinarPapeis(true)
+      setPapeisCombinados(combinacao)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, open, atribuicoesNomes, saved])
+
   function handleTogglePapelCombinado(papelValue: string) {
     setPapeisCombinados(prev => {
       const next = new Set(prev)
