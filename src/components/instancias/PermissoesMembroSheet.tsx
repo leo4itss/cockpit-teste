@@ -107,13 +107,10 @@ export function PermissoesMembroSheet({
   }, [loading, open, atribuicoesNomes])
 
   // ── Helpers ───────────────────────────────────────────────
-  /** Expande defaultAcoes: [] (= Administrador) para todas as ações do catálogo */
-  function expandDefaults(defaults: string[]): string[] {
-    if (defaults.length > 0) return defaults
-    // Prefere catálogo do banco (componente_atribuicoes) sobre mock hardcoded (componente_acoes)
-    if (atribuicoesNomes.length > 0) return atribuicoesNomes
-    return (config.acoes ?? []).map(a => a.acao)
-  }
+  // Catálogo completo de ações — prefere o catálogo do banco (componente_atribuicoes)
+  // sobre o mock hardcoded (componente_acoes). Usado para expandir defaultAcoes: []
+  // (= Administrador) e para a lógica de combinar papéis.
+  const catalogo = atribuicoesNomes.length > 0 ? atribuicoesNomes : (config.acoes ?? []).map(a => a.acao)
 
   // ── Carregamento ao abrir ─────────────────────────────────
   useEffect(() => {
