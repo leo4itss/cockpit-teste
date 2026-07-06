@@ -270,16 +270,9 @@ export function AtribuirPermissoesSheet({
         if (modoInstancia && instanciaMembroPapel && ativos.length === 1) {
           const comp = ativos[0]
           const cfg  = getComponenteConfig(comp.nome)
-          const papelDef = cfg.papeis.find(p => p.value === instanciaMembroPapel)
-          if (papelDef) {
-            const defaults = papelDef.defaultAcoes ?? []
-            if (defaults.length === 0) {
-              // [] = todas as ações do catálogo — prefere catálogo do banco sobre mock
-              const allAcoes = (newAtribMap[comp.id]?.length ? newAtribMap[comp.id] : (cfg.acoes ?? [])).map(a => a.acao)
-              draftMap[comp.id] = allAcoes
-            } else {
-              draftMap[comp.id] = defaults
-            }
+          if (cfg.papeis.some(p => p.value === instanciaMembroPapel)) {
+            const catalogo = resolverCatalogo(comp.id, cfg.acoes, newAtribMap)
+            draftMap[comp.id] = unirAcoesDosPapeis(cfg.papeis, new Set([instanciaMembroPapel]), catalogo)
           }
         }
 
