@@ -464,11 +464,7 @@ export function PermissoesMembroSheet({
               </p>
             ) : (
               <>
-<<<<<<< HEAD
-                <div className="border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100 max-h-[min(50vh,380px)] overflow-y-auto">
-=======
                 <div className="border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100 flex-1 min-h-0 overflow-y-auto">
->>>>>>> aaa3f4f7999c4bf3592b3aff90419ce0a524ce96
                   {(atribuicoesNomes.length > 0
                     ? atribuicoesNomes.map(n => ({ acao: n, label: n }))
                     : (config.acoes ?? [])
