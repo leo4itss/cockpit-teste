@@ -662,6 +662,26 @@ app.get('/grupos/:id/instancias', async (c) => {
   }))
 })
 
+app.get('/accounts/:id/usuario-grupos', async (c) => {
+  const accountId = c.req.param('id')
+  const gruposVisiveis = await db.select().from(grupos)
+    .where(or(eq(grupos.accountId, accountId), isNull(grupos.accountId)))
+  if (!gruposVisiveis.length) return c.json([])
+
+  const grupoIds = gruposVisiveis.map((g: any) => g.id)
+  const links = await db.select().from(usuarioGrupos).where(inArray(usuarioGrupos.grupoId, grupoIds))
+
+  return c.json(links.map((l: any) => {
+    const g = gruposVisiveis.find((gr: any) => gr.id === l.grupoId)
+    return {
+      userId:      l.userId,
+      grupoId:     l.grupoId,
+      grupoNome:   g?.nome ?? l.grupoId,
+      grupoEscopo: g?.accountId ? 'conta' : 'org',
+    }
+  }))
+})
+
 // ── Accounts — membros e entitlements ─────────────────────────
 app.get('/accounts/:id/membros', async (c) => {
   const accountId = c.req.param('id')
