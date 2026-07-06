@@ -85,32 +85,65 @@ interface AddMembroProps {
   allUsers:  User[]
   membros:   User[]
   onAdd:     (user: User) => void
+  /** Adiciona vários usuários de uma vez (endpoint bulk) */
+  onAddBulk: (users: User[]) => Promise<void>
   disabled?: boolean
 }
 
-function AddMembroSection({ allUsers, membros, onAdd, disabled }: AddMembroProps) {
+function AddMembroSection({ allUsers, membros, onAdd, onAddBulk, disabled }: AddMembroProps) {
   const [search, setSearch] = useState('')
+  // Seleção acumulada entre buscas — permite montar um lote pesquisando termos diferentes
+  const [selecionados, setSelecionados] = useState<Map<string, User>>(new Map())
+  const [addingBulk, setAddingBulk] = useState(false)
+
+  const membroIds = useMemo(() => new Set(membros.map(m => m.id)), [membros])
 
   const sugestoes = useMemo(() => {
     const q = search.trim().toLowerCase()
     if (!q) return []
-    const ids = new Set(membros.map(m => m.id))
     return allUsers
-      .filter(u => !ids.has(u.id))
+      .filter(u => !membroIds.has(u.id))
       .filter(u =>
         u.nomeCompleto.toLowerCase().includes(q) ||
         u.email.toLowerCase().includes(q)
       )
-      .slice(0, 5)
-  }, [search, allUsers, membros])
+      .slice(0, 8)
+  }, [search, allUsers, membroIds])
 
-  function select(user: User) {
-    onAdd(user)
-    setSearch('')
+  function toggle(user: User) {
+    setSelecionados(prev => {
+      const next = new Map(prev)
+      if (next.has(user.id)) next.delete(user.id)
+      else next.set(user.id, user)
+      return next
+    })
+  }
+
+  // Clique simples com nada selecionado mantém o fluxo antigo (adiciona na hora);
+  // com seleção em andamento, o clique vira toggle para compor o lote.
+  function handleRowClick(user: User) {
+    if (selecionados.size === 0) {
+      onAdd(user)
+      setSearch('')
+    } else {
+      toggle(user)
+    }
+  }
+
+  async function handleAddSelecionados() {
+    if (selecionados.size === 0) return
+    setAddingBulk(true)
+    try {
+      await onAddBulk([...selecionados.values()])
+      setSelecionados(new Map())
+      setSearch('')
+    } finally {
+      setAddingBulk(false)
+    }
   }
 
   return (
-    <div className="px-6 py-3 border-t border-gray-100 bg-gray-50/60">
+    <div className="px-6 py-3 border-t border-gray-100 bg-gray-50/60 space-y-2">
       <div className="relative">
         <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-colors">
           <Search className="w-4 h-4 text-gray-400 shrink-0" />
@@ -119,7 +152,7 @@ function AddMembroSection({ allUsers, membros, onAdd, disabled }: AddMembroProps
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar usuário para adicionar..."
-            disabled={disabled}
+            disabled={disabled || addingBulk}
             className="flex-1 bg-transparent text-sm outline-none text-[#030712] placeholder:text-[#6b7280]"
           />
           {search && (
@@ -127,21 +160,31 @@ function AddMembroSection({ allUsers, membros, onAdd, disabled }: AddMembroProps
           )}
         </div>
 
-        {/* Dropdown de sugestões */}
+        {/* Dropdown de sugestões — checkbox para compor lote, clique para ação */}
         {sugestoes.length > 0 && (
-          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-hidden">
+          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-hidden max-h-[280px] overflow-y-auto">
             {sugestoes.map(user => (
-              <button
+              <div
                 key={user.id}
-                onClick={() => select(user)}
-                className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 transition-colors text-left"
+                onClick={() => handleRowClick(user)}
+                className={cn(
+                  'w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 transition-colors text-left cursor-pointer',
+                  selecionados.has(user.id) && 'bg-blue-50/60 hover:bg-blue-50',
+                )}
               >
+                <input
+                  type="checkbox"
+                  checked={selecionados.has(user.id)}
+                  onChange={() => toggle(user)}
+                  onClick={e => e.stopPropagation()}
+                  className="w-4 h-4 rounded border-gray-300 accent-blue-600 shrink-0 cursor-pointer"
+                />
                 <Avatar nome={user.nomeCompleto} />
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-[#030712] truncate">{user.nomeCompleto}</p>
                   <p className="text-xs text-[#6b7280] truncate">{user.email}</p>
                 </div>
-              </button>
+              </div>
             ))}
           </div>
         )}
@@ -153,6 +196,27 @@ function AddMembroSection({ allUsers, membros, onAdd, disabled }: AddMembroProps
           </div>
         )}
       </div>
+
+      {/* Lote em composição */}
+      {selecionados.size > 0 && (
+        <div className="flex items-center gap-2 flex-wrap">
+          <p className="text-xs text-[#6b7280]">
+            <strong className="text-[#030712]">{selecionados.size}</strong> {selecionados.size === 1 ? 'selecionado' : 'selecionados'}
+          </p>
+          <button
+            onClick={() => setSelecionados(new Map())}
+            disabled={addingBulk}
+            className="text-xs text-gray-500 hover:text-gray-700 underline underline-offset-2"
+          >
+            limpar
+          </button>
+          <Button onClick={handleAddSelecionados} disabled={addingBulk} className="ml-auto h-7 text-xs px-3">
+            {addingBulk
+              ? <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />Adicionando...</>
+              : `Adicionar selecionados (${selecionados.size})`}
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
