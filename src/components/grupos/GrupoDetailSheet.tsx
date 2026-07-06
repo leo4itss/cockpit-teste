@@ -310,6 +310,17 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
     }
   }
 
+  // Adiciona vários usuários de uma vez — mesma tupla FGA (user member group)
+  // da atribuição individual, via endpoint bulk idempotente.
+  async function handleAddBulk(usersToAdd: User[]) {
+    if (!grupo || usersToAdd.length === 0) return
+    await api.addGrupoMembrosBulk(grupo.id, usersToAdd.map(u => u.id))
+    setMembros(prev => {
+      const existentes = new Set(prev.map(m => m.id))
+      return [...prev, ...usersToAdd.filter(u => !existentes.has(u.id))]
+    })
+  }
+
   // ── Remover membro ───────────────────────────────────────
 
   async function handleRemove(user: User) {
