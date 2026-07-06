@@ -180,6 +180,22 @@ function AddMembroSection({ allUsers, membros, onAdd, onAddBulk, disabled }: Add
         {/* Dropdown de sugestões — checkbox para compor lote, clique para ação */}
         {sugestoes.length > 0 && (
           <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-hidden max-h-[280px] overflow-y-auto">
+            {/* Selecionar todos os resultados da busca (mesmo os fora do recorte exibido) */}
+            <div
+              onClick={toggleSelecionarTodosMatches}
+              className="w-full flex items-center gap-3 px-3 py-2 bg-gray-50 border-b border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors sticky top-0"
+            >
+              <input
+                type="checkbox"
+                checked={todosMatchesSelecionados}
+                onChange={toggleSelecionarTodosMatches}
+                onClick={e => e.stopPropagation()}
+                className="w-4 h-4 rounded border-gray-300 accent-blue-600 shrink-0 cursor-pointer"
+              />
+              <p className="text-xs font-medium text-[#374151]">
+                Selecionar todos os <strong>{matches.length}</strong> {matches.length === 1 ? 'resultado' : 'resultados'} da busca
+              </p>
+            </div>
             {sugestoes.map(user => (
               <div
                 key={user.id}
