@@ -431,6 +431,74 @@ export function AcessosPage() {
     return map
   }, [instanciaMembrosMap, userGruposMap])
 
+  const filteredUsers = useMemo(() => {
+    const q = searchUsers.toLowerCase()
+    return users.filter(u => {
+      const matchSearch = !q ||
+        u.nomeCompleto.toLowerCase().includes(q) ||
+        u.usuario.toLowerCase().includes(q) ||
+        u.email.toLowerCase().includes(q)
+      const matchGrupo  = !filtroGrupo  || (userGruposMap[u.id] ?? []).some(g => g.grupoId === filtroGrupo)
+      const matchObjeto = !filtroObjeto || (userObjetosMap[u.id]?.has(filtroObjeto) ?? false)
+      const matchPapel  = !filtroPapel  || u.papel === filtroPapel
+      const matchStatus = !filtroStatus || u.status === filtroStatus
+      return matchSearch && matchGrupo && matchObjeto && matchPapel && matchStatus
+    })
+  }, [users, searchUsers, filtroGrupo, filtroObjeto, filtroPapel, filtroStatus, userGruposMap, userObjetosMap])
+
+  // Paginação client-side — a tabela nunca renderiza mais que USERS_PAGE_SIZE linhas
+  // de uma vez (necessário para manter a tela fluida com dezenas de milhares de usuários)
+  const totalPaginas = Math.max(1, Math.ceil(filteredUsers.length / USERS_PAGE_SIZE))
+  const paginaAtual  = Math.min(paginaUsuarios, totalPaginas - 1)
+  const paginatedUsers = useMemo(
+    () => filteredUsers.slice(paginaAtual * USERS_PAGE_SIZE, (paginaAtual + 1) * USERS_PAGE_SIZE),
+    [filteredUsers, paginaAtual]
+  )
+
+  // ── Seleção em massa ────────────────────────────────────────
+  const paginaToda = paginatedUsers.length > 0 && paginatedUsers.every(u => selectedUserIds.has(u.id))
+  const filtroTodo = filteredUsers.length > 0 && filteredUsers.every(u => selectedUserIds.has(u.id))
+
+  function toggleSelecionado(userId: string) {
+    setSelectedUserIds(prev => {
+      const next = new Set(prev)
+      if (next.has(userId)) next.delete(userId)
+      else next.add(userId)
+      return next
+    })
+  }
+
+  function toggleSelecionarPagina() {
+    setSelectedUserIds(prev => {
+      const next = new Set(prev)
+      if (paginaToda) paginatedUsers.forEach(u => next.delete(u.id))
+      else paginatedUsers.forEach(u => next.add(u.id))
+      return next
+    })
+  }
+
+  function selecionarTodosDoFiltro() {
+    setSelectedUserIds(new Set(filteredUsers.map(u => u.id)))
+  }
+
+  function limparSelecao() {
+    setSelectedUserIds(new Set())
+  }
+
+  // Recarrega o mapa usuário→grupos após uma atribuição em massa
+  function handleAtribuicaoMassaSuccess(grupo: Grupo) {
+    setUserGruposMap(prev => {
+      const next = { ...prev }
+      selectedUserIds.forEach(uid => {
+        const atuais = next[uid] ?? []
+        if (!atuais.some(g => g.grupoId === grupo.id)) {
+          next[uid] = [...atuais, { grupoId: grupo.id, grupoNome: grupo.nome }]
+        }
+      })
+      return next
+    })
+  }
+
   // Mapa de componenteId → nome (para exibir na coluna Componente)
   const [componenteNomes, setComponenteNomes] = useState<Record<string, string>>({})
   const [componenteTipoModelos, setComponenteTipoModelos] = useState<Record<string, string>>({})
