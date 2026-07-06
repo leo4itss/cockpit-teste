@@ -516,6 +516,7 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
             allUsers={allUsers}
             membros={membros}
             onAdd={handleAdd}
+            onAddBulk={handleAddBulk}
             disabled={!!addingId}
           />
         )}
