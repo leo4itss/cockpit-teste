@@ -1145,6 +1145,13 @@ export function AcessosPage() {
         onSave={handleSaveEditUser}
         onDelete={handleDeleteUser}
       />
+      <AtribuirGrupoEmMassaSheet
+        open={showAtribuirGrupo}
+        onClose={() => setShowAtribuirGrupo(false)}
+        userIds={[...selectedUserIds]}
+        grupos={grupos}
+        onSuccess={handleAtribuicaoMassaSuccess}
+      />
 
       {/* Sheets — Grupos */}
       <CriarGrupoSheet
