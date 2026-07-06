@@ -16,6 +16,7 @@ import SchemaVisualizerPage from './pages/SchemaVisualizerPage'
 import CanvasPermissoesPage from './pages/CanvasPermissoesPage'
 import CanvasOrgPage from './pages/CanvasOrgPage'
 import { InstanciaPage } from './pages/InstanciaPage'
+import { FigmaCaptureSession } from './components/FigmaCaptureSession'
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
     <UsersProvider>
     <ComponentesProvider>
     <BrowserRouter>
+      <FigmaCaptureSession />
       <Routes>
         <Route path="/home" element={<HomePage />} />
         <Route path="/" element={<Layout />}>
