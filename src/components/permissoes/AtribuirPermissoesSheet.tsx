@@ -414,6 +414,14 @@ export function AtribuirPermissoesSheet({
     return ACOES[inferirTipo(comp.nome)]
   }
 
+  // Catálogo completo de ações de um componente (para expandir defaultAcoes: [] e para
+  // a lógica de combinar papéis) — prefere o catálogo do banco (componente_atribuicoes)
+  // sobre o mock hardcoded do papel (cfg.acoes). Recebe o mapa explicitamente porque em
+  // alguns pontos de chamada o valor mais atual ainda não foi commitado em atribuicoesMap.
+  function resolverCatalogo(compId: string, cfgAcoes: AcaoItem[] | undefined, mapaAtribuicoes: Record<string, AcaoItem[]>): string[] {
+    return (mapaAtribuicoes[compId]?.length ? mapaAtribuicoes[compId] : (cfgAcoes ?? [])).map(a => a.acao)
+  }
+
   function toggle(componenteId: string, acao: string) {
     setDraft(prev => {
       const current = prev[componenteId] ?? []
