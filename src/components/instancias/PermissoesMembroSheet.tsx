@@ -185,46 +185,6 @@ export function PermissoesMembroSheet({
     setDraft(unirAcoesDosPapeis(config.papeis, new Set([papelDef.value]), catalogo))
   }
 
-  /**
-   * Tenta reconstruir quais papéis foram combinados a partir do conjunto de ações salvo.
-   * Necessário porque a combinação é persistida como papel='personalizado' (sem coluna
-   * própria para guardar a lista) — ao reabrir, a única forma de "lembrar" a combinação
-   * é comparar o conjunto de ações salvo contra a união de cada combinação possível de
-   * papéis nomeados.
-   *
-   * Busca por tamanho crescente (1, 2, 3...) e retorna a MENOR combinação que bate
-   * exatamente — isso evita ambiguidade quando Administrador (defaultAcoes: [] = todas
-   * as ações) está envolvido: como Administrador sozinho já cobre o catálogo inteiro,
-   * qualquer combinação "outro papel + Administrador" produziria a mesma união dele
-   * sozinho, então sempre preferimos o papel único quando ele já basta.
-   *
-   * Retorna { papeis: Set com 1 item } para papel único, ou 2+ para combinação real.
-   * Retorna null se nada bater exatamente (ex.: edição manual avulsa).
-   */
-  function inferirCombinacaoPapeis(existingAcoes: string[]): Set<string> | null {
-    if (existingAcoes.length === 0) return null
-    const existingSet = new Set(existingAcoes)
-    const valores = config.papeis.map(p => p.value)
-    const n = valores.length
-    if (n > 12) return null // segurança: evita explosão combinatória
-
-    const subsetsPorTamanho: string[][] = []
-    for (let mask = 1; mask < (1 << n); mask++) {
-      const subset: string[] = []
-      for (let i = 0; i < n; i++) if (mask & (1 << i)) subset.push(valores[i])
-      subsetsPorTamanho.push(subset)
-    }
-    subsetsPorTamanho.sort((a, b) => a.length - b.length)
-
-    for (const subset of subsetsPorTamanho) {
-      const union = new Set(unionAcoesDosPapeis(new Set(subset)))
-      if (union.size === existingSet.size && [...union].every(a => existingSet.has(a))) {
-        return new Set(subset)
-      }
-    }
-    return null
-  }
-
   // Ao abrir com papel salvo como 'personalizado', tenta reconstruir se ele veio de uma
   // combinação de papéis (em vez de edição manual avulsa) e reativa o modo Combinar papéis.
   // Se a menor combinação encontrada tiver só 1 papel, mostra como seleção única normal
@@ -233,7 +193,7 @@ export function PermissoesMembroSheet({
     if (loading || !open || atribuicoesNomes.length === 0) return
     if ((membro.papel ?? '') !== 'personalizado') return
     if (combinarPapeis) return // já está em modo combinar (ex.: usuário acabou de togglear)
-    const combinacao = inferirCombinacaoPapeis(saved)
+    const combinacao = inferirCombinacaoDePapeis(config.papeis, saved, catalogo)
     if (!combinacao) return
     if (combinacao.size === 1) {
       setSelectedPapel([...combinacao][0])
