@@ -146,7 +146,7 @@ export function PermissoesMembroSheet({
       .catch(() => {
         const papelDef = config.papeis.find(p => p.value === membro.papel)
         setSaved([])
-        setDraft(expandDefaults(papelDef?.defaultAcoes ?? []))
+        setDraft(papelDef ? unirAcoesDosPapeis(config.papeis, new Set([papelDef.value]), catalogo) : [])
       })
       .finally(() => { if (!cancelled) setLoading(false) })
 
