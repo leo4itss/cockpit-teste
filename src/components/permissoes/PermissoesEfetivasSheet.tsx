@@ -7,6 +7,7 @@ import {
   NestedSheetBody,
 } from '@/components/ui/nested-sheet'
 import { api } from '@/api/client'
+import { cn } from '@/lib/utils'
 
 // ── Tipos ──────────────────────────────────────────────────────
 
@@ -140,18 +141,41 @@ export function PermissoesEfetivasSheet({
         {/* Seletor de objeto — exibido quando há múltiplos e nenhum fixado */}
         {!instanciaIdProp && instancias && instancias.length > 0 && (
           <div className="mb-4">
-            <label className="block text-xs font-medium text-gray-600 mb-1">Objeto</label>
-            <select
-              value={selectedInstanciaId}
-              onChange={e => setSelectedInstanciaId(e.target.value)}
-              className="w-full text-sm border border-gray-300 rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-            >
-              {instancias.map(i => (
-                <option key={i.id} value={i.id}>
-                  {componenteNomes?.[i.componenteId] ? `${componenteNomes[i.componenteId]} — ` : ''}{i.nome}
-                </option>
-              ))}
-            </select>
+            <label className="block text-xs font-medium text-gray-600 mb-2">Objeto</label>
+            <div className="flex flex-col gap-1.5" role="radiogroup">
+              {instancias.map(i => {
+                const label = componenteNomes?.[i.componenteId]
+                  ? `${componenteNomes[i.componenteId]} — ${i.nome}`
+                  : i.nome
+                const selected = i.id === selectedInstanciaId
+                return (
+                  <label
+                    key={i.id}
+                    className={cn(
+                      'flex items-center gap-2.5 px-3 py-2 rounded-lg border cursor-pointer transition-colors',
+                      selected
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-200 bg-white hover:bg-gray-50',
+                    )}
+                  >
+                    <input
+                      type="radio"
+                      name="permissoes-efetivas-objeto"
+                      value={i.id}
+                      checked={selected}
+                      onChange={() => setSelectedInstanciaId(i.id)}
+                      className="w-4 h-4 accent-blue-600 shrink-0"
+                    />
+                    <span className={cn(
+                      'text-sm',
+                      selected ? 'font-medium text-gray-900' : 'text-gray-700',
+                    )}>
+                      {label}
+                    </span>
+                  </label>
+                )
+              })}
+            </div>
           </div>
         )}
 
@@ -200,27 +224,24 @@ export function PermissoesEfetivasSheet({
                   const nomeAtrib = atribuicoesMap[atribId] ?? atribId
                   const fontesDoAtrib = fontes.filter(f => f.atribuicaoId === atribId)
 
-                  if (fontesDoAtrib.length === 0) {
-                    return (
-                      <tr key={atribId} className="border-b border-gray-200 last:border-0">
-                        <td className="px-4 py-3 text-gray-900 font-medium">{nomeAtrib}</td>
-                        <td className="px-4 py-3">
-                          <span className="text-xs text-gray-400">—</span>
-                        </td>
-                      </tr>
-                    )
-                  }
-
-                  return fontesDoAtrib.map((f, idx) => (
-                    <tr key={`${atribId}-${idx}`} className="border-b border-gray-200 last:border-0 hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-3 text-gray-900 font-medium">
+                  return (
+                    <tr key={atribId} className="border-b border-gray-200 last:border-0 hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3 text-gray-900 font-medium align-top">
                         {nomeAtrib}
                       </td>
                       <td className="px-4 py-3">
-                        <FonteBadge fonte={f.fonte} entidadeId={f.entidadeId} displayName={f.displayName} />
+                        {fontesDoAtrib.length === 0 ? (
+                          <span className="text-xs text-gray-400">—</span>
+                        ) : (
+                          <div className="flex flex-wrap gap-1.5">
+                            {fontesDoAtrib.map((f, idx) => (
+                              <FonteBadge key={idx} fonte={f.fonte} entidadeId={f.entidadeId} displayName={f.displayName} />
+                            ))}
+                          </div>
+                        )}
                       </td>
                     </tr>
-                  ))
+                  )
                 })}
               </tbody>
             </table>

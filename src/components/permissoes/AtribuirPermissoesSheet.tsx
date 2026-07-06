@@ -107,6 +107,10 @@ interface Props {
   instanciaId?:         string
   instanciaComponenteId?: string
   instanciaNome?:       string
+  // Papel já salvo em instancia_membros para este membro nesta instância —
+  // fonte de verdade para o seletor de papel (evita reinferir a partir do
+  // conjunto de permissões, que pode estar dessincronizado).
+  instanciaMembroPapel?: string
 }
 
 // ── Helpers ────────────────────────────────────────────────────
@@ -133,7 +137,7 @@ function ComponenteIcon({ tipo, locked }: { tipo: ComponenteTipo; locked?: boole
 
 export function AtribuirPermissoesSheet({
   open, onClose, entityType, entityId, entityNome, accountId, accountNome, papel, onSuccess,
-  instanciaId, instanciaComponenteId, instanciaNome,
+  instanciaId, instanciaComponenteId, instanciaNome, instanciaMembroPapel,
 }: Props) {
   const [componentes, setComponentes]       = useState<Componente[]>([])
   const [activeCapabilities, setActiveCapabilities] = useState<Set<string>>(new Set())
@@ -148,6 +152,10 @@ export function AtribuirPermissoesSheet({
   const [draft, setDraft]       = useState<Record<string, string[]>>({})
   // componenteId → papel selecionado ('personalizado' se editado manualmente)
   const [papelSelecionado, setPapelSelecionado] = useState<Record<string, string>>({})
+  // componenteId → modo "combinar papéis" ativo (seleção múltipla de papéis)
+  const [combinarPapeis, setCombinarPapeis] = useState<Record<string, boolean>>({})
+  // componenteId → conjunto de papéis combinados atualmente marcados
+  const [papeisCombinados, setPapeisCombinados] = useState<Record<string, Set<string>>>({})
   // componenteId → { acao → nome do grupo que concede } (permissões herdadas via grupo)
   const [inherited, setInherited] = useState<Record<string, Record<string, string>>>({})
   // componenteId → AcaoItem[] vindas do catálogo DocNix (substitui ACOES['default'] quando presente)
@@ -255,19 +263,51 @@ export function AtribuirPermissoesSheet({
           if (!cancelled && anyDefaultApplied) setDefaultsAplicados(true)
         }
 
+        // Modo instância + papel conhecido (vindo de instancia_membros): é a fonte de
+        // verdade — evita reinferir a partir do conjunto de permissões, que pode estar
+        // dessincronizado (ex.: Administrador com um subconjunto salvo em vez de todas).
+        if (modoInstancia && instanciaMembroPapel && ativos.length === 1) {
+          const comp = ativos[0]
+          const cfg  = getComponenteConfig(comp.nome)
+          const papelDef = cfg.papeis.find(p => p.value === instanciaMembroPapel)
+          if (papelDef) {
+            const defaults = papelDef.defaultAcoes ?? []
+            if (defaults.length === 0) {
+              // [] = todas as ações do catálogo — prefere catálogo do banco sobre mock
+              const allAcoes = (newAtribMap[comp.id]?.length ? newAtribMap[comp.id] : (cfg.acoes ?? [])).map(a => a.acao)
+              draftMap[comp.id] = allAcoes
+            } else {
+              draftMap[comp.id] = defaults
+            }
+          }
+        }
+
         setOriginal(permMap)
         setDraft(draftMap)
 
         // ── Infere papelSelecionado a partir das permissões carregadas ──
         if (!cancelled) {
           const inferredPapeis: Record<string, string> = {}
+          // componenteId → combinação de papéis reconstruída (quando 'personalizado'
+          // vem de uma combinação salva, não de edição manual avulsa)
+          const combinacoesEncontradas: Record<string, Set<string>> = {}
           ativos.forEach(c => {
+            // Modo instância: usa o papel salvo diretamente, sem reinferir.
+            if (modoInstancia && instanciaMembroPapel) {
+              const cfg = getComponenteConfig(c.nome)
+              if (cfg.papeis.some(p => p.value === instanciaMembroPapel)) {
+                inferredPapeis[c.id] = instanciaMembroPapel
+                return
+              }
+            }
+
             const cfg        = getComponenteConfig(c.nome)
             const currentSet = new Set(draftMap[c.id] ?? [])
             if (currentSet.size === 0) return
 
             // Todos os componentes usam component_permissions (FGA puro)
-            const allAcoes = (cfg.acoes ?? newAtribMap[c.id] ?? []).map(a => a.acao)
+            // Prefere catálogo do banco (componente_atribuicoes) sobre mock hardcoded (cfg.acoes)
+            const allAcoes = (newAtribMap[c.id]?.length ? newAtribMap[c.id] : (cfg.acoes ?? [])).map(a => a.acao)
             let matched = false
             for (const p of cfg.papeis) {
               const defaults = p.defaultAcoes ?? []
@@ -278,9 +318,43 @@ export function AtribuirPermissoesSheet({
                 inferredPapeis[c.id] = p.value; matched = true; break
               }
             }
-            if (!matched) inferredPapeis[c.id] = 'personalizado'
+            if (!matched) {
+              // Tenta reconstruir uma combinação de 2+ papéis cuja união bata exatamente
+              // com o conjunto salvo — necessário porque "Combinar papéis" é persistido
+              // como 'personalizado' (sem coluna própria para a lista de papéis).
+              // Busca por tamanho crescente para sempre preferir a menor combinação
+              // (evita ambiguidade quando Administrador, que já cobre tudo, está envolvido —
+              // embora esse caso específico já tenha sido resolvido pelo match de papel único acima).
+              const valores = cfg.papeis.map(p => p.value)
+              const n = valores.length
+              if (n <= 12) {
+                const subsetsPorTamanho: string[][] = []
+                for (let mask = 1; mask < (1 << n); mask++) {
+                  const subset: string[] = []
+                  for (let i = 0; i < n; i++) if (mask & (1 << i)) subset.push(valores[i])
+                  if (subset.length >= 2) subsetsPorTamanho.push(subset)
+                }
+                subsetsPorTamanho.sort((a, b) => a.length - b.length)
+                for (const subset of subsetsPorTamanho) {
+                  const union = new Set(unionAcoesDosPapeis(c.id, c.nome, new Set(subset)))
+                  if (union.size === currentSet.size && [...union].every(a => currentSet.has(a))) {
+                    combinacoesEncontradas[c.id] = new Set(subset)
+                    break
+                  }
+                }
+              }
+              inferredPapeis[c.id] = 'personalizado'
+            }
           })
           setPapelSelecionado(inferredPapeis)
+          if (Object.keys(combinacoesEncontradas).length > 0) {
+            setCombinarPapeis(prev => {
+              const next = { ...prev }
+              Object.keys(combinacoesEncontradas).forEach(cid => { next[cid] = true })
+              return next
+            })
+            setPapeisCombinados(prev => ({ ...prev, ...combinacoesEncontradas }))
+          }
         }
 
         // ── Permissões herdadas via grupos (só para usuários, fora do modo instância) ──
@@ -321,7 +395,7 @@ export function AtribuirPermissoesSheet({
       .finally(() => { if (!cancelled) setLoading(false) })
 
     return () => { cancelled = true }
-  }, [open, entityId, entityType, accountId, instanciaId, instanciaComponenteId, papel])
+  }, [open, entityId, entityType, accountId, instanciaId, instanciaComponenteId, papel, instanciaMembroPapel])
 
   const filtered = useMemo(() => {
     if (!search.trim()) return componentes
@@ -357,14 +431,77 @@ export function AtribuirPermissoesSheet({
     const defaults = papelDef?.defaultAcoes ?? []
 
     if (defaults.length === 0) {
-      // [] = todas as ações do catálogo (ex: Administrador)
-      const allAcoes = (cfg.acoes ?? atribuicoesMap[compId] ?? []).map(a => a.acao)
+      // [] = todas as ações do catálogo (ex: Administrador) — prefere catálogo do banco
+      const allAcoes = (atribuicoesMap[compId]?.length ? atribuicoesMap[compId] : (cfg.acoes ?? [])).map(a => a.acao)
       setDraft(prev => ({ ...prev, [compId]: allAcoes }))
     } else {
       setDraft(prev => ({ ...prev, [compId]: defaults }))
     }
 
     setPapelSelecionado(prev => ({ ...prev, [compId]: papelValue }))
+  }
+
+  /** União das ações padrão de um conjunto de papéis (usado no modo "Combinar papéis"). */
+  function unionAcoesDosPapeis(compId: string, compNome: string, valores: Set<string>): string[] {
+    const cfg   = getComponenteConfig(compNome)
+    const acoes = new Set<string>()
+    for (const valor of valores) {
+      const papelDef = cfg.papeis.find(p => p.value === valor)
+      const defaults = papelDef?.defaultAcoes ?? []
+      if (defaults.length === 0) {
+        // [] = todas as ações do catálogo (ex: Administrador)
+        const allAcoes = (atribuicoesMap[compId]?.length ? atribuicoesMap[compId] : (cfg.acoes ?? [])).map(a => a.acao)
+        allAcoes.forEach(a => acoes.add(a))
+      } else {
+        defaults.forEach(a => acoes.add(a))
+      }
+    }
+    return [...acoes]
+  }
+
+  function handleTogglePapelCombinado(compId: string, papelValue: string) {
+    setPapeisCombinados(prev => {
+      const atual = new Set(prev[compId] ?? [])
+      if (atual.has(papelValue)) atual.delete(papelValue)
+      else atual.add(papelValue)
+      return { ...prev, [compId]: atual }
+    })
+    setPapelSelecionado(p => ({ ...p, [compId]: 'personalizado' }))
+  }
+
+  // Recalcula o draft de cada componente sempre que seu conjunto de papéis
+  // combinados mudar (evita chamar setDraft dentro do updater de setPapeisCombinados).
+  // Conjuntos vazios não mexem no draft — evita apagar edições manuais ao
+  // ligar o modo "Combinar papéis" sem nenhum papel ainda marcado.
+  useEffect(() => {
+    Object.entries(papeisCombinados).forEach(([compId, valores]) => {
+      if (!combinarPapeis[compId] || valores.size === 0) return
+      const comp = componentes.find(c => c.id === compId)
+      if (!comp) return
+      setDraft(d => ({ ...d, [compId]: unionAcoesDosPapeis(compId, comp.nome, valores) }))
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [papeisCombinados])
+
+  function handleToggleCombinarPapeis(compId: string) {
+    // Evita chamar setState dentro do updater de outro setState (quebra sob
+    // React.StrictMode, que invoca updaters duas vezes) — lê o estado atual
+    // direto do closure do handler, já que é disparado por um clique do usuário.
+    const ativar = !combinarPapeis[compId]
+    if (ativar) {
+      // Ativando: parte do papel único já selecionado, se houver
+      const papelAtual = papelSelecionado[compId]
+      const seed = papelAtual && papelAtual !== 'personalizado' ? new Set([papelAtual]) : new Set<string>()
+      setPapeisCombinados(p => ({ ...p, [compId]: seed }))
+    } else {
+      // Desativando: se sobrou exatamente um papel combinado, volta pro modo seleção única
+      const atual = papeisCombinados[compId] ?? new Set<string>()
+      if (atual.size === 1) {
+        setPapelSelecionado(p => ({ ...p, [compId]: [...atual][0] }))
+      }
+      setPapeisCombinados(p => ({ ...p, [compId]: new Set() }))
+    }
+    setCombinarPapeis(prev => ({ ...prev, [compId]: ativar }))
   }
 
   const hasChanges = componentes.some(c => {
@@ -452,6 +589,7 @@ export function AtribuirPermissoesSheet({
     setSearch(''); setOriginal({}); setDraft({}); setComponentes([])
     setActiveCapabilities(new Set()); setSaveError(null); setInherited({})
     setPapelSelecionado({})
+    setCombinarPapeis({}); setPapeisCombinados({})
     onClose()
   }
 
@@ -485,8 +623,8 @@ export function AtribuirPermissoesSheet({
             <div className="flex items-start gap-3 mx-6 mt-5 p-3.5 rounded-xl border border-violet-200 bg-violet-50">
               <Users className="w-4 h-4 text-violet-600 shrink-0 mt-0.5" />
               <p className="text-sm text-violet-800">
-                Você está atribuindo permissões ao <strong>grupo {entityNome}</strong>.
-                Todos os membros herdarão estas permissões automaticamente.
+                Você está atribuindo Ações ao <strong>grupo {entityNome}</strong>.
+                Todos os membros herdarão estas Ações automaticamente.
               </p>
             </div>
           )}
@@ -496,7 +634,7 @@ export function AtribuirPermissoesSheet({
             <div className="flex items-start gap-3 mx-6 mt-3 p-3.5 rounded-xl border border-blue-200 bg-blue-50">
               <span className="text-base shrink-0 mt-0.5">✦</span>
               <p className="text-sm text-blue-800">
-                Pré-selecionamos as permissões padrão para o papel{' '}
+                Pré-selecionamos as Ações padrão para o nível de acesso{' '}
                 <strong>{papel}</strong>. Ajuste conforme necessário antes de salvar.
               </p>
             </div>
@@ -507,8 +645,8 @@ export function AtribuirPermissoesSheet({
             <div className="flex items-start gap-3 mx-6 mt-3 p-3.5 rounded-xl border border-emerald-200 bg-emerald-50">
               <Users className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
               <p className="text-sm text-emerald-800">
-                Algumas ações estão marcadas via <strong>grupo</strong> — são somente leitura.
-                Você pode adicionar permissões diretas adicionais ao usuário.
+                Algumas Ações estão marcadas via <strong>grupo</strong> — são somente leitura.
+                Você pode adicionar Ações diretas adicionais ao usuário.
               </p>
             </div>
           )}
@@ -521,7 +659,7 @@ export function AtribuirPermissoesSheet({
                 <strong>{bloqueadosCount} {bloqueadosCount === 1 ? 'componente' : 'componentes'}</strong>{' '}
                 {bloqueadosCount === 1 ? 'está bloqueado' : 'estão bloqueados'} porque a capability correspondente
                 não está ativa para esta conta. Ative-a em{' '}
-                <strong>Contas → Licenças Ativas</strong> antes de atribuir permissões.
+                <strong>Contas → Licenças Ativas</strong> antes de atribuir Ações.
               </p>
             </div>
           )}
@@ -618,34 +756,65 @@ export function AtribuirPermissoesSheet({
                       {/* Seletor de papel — atalho para definir ações em bloco */}
                       {/* Oculto quando DocNix sem catálogo (mostra mensagem alternativa abaixo) */}
                       {!locked && !(comp.tipoModelo === 'docnix' && acoes === ACOES['default']) && (() => {
-                        const cfg        = getComponenteConfig(comp.nome)
-                        const papelAtual = papelSelecionado[comp.id]
+                        const cfg          = getComponenteConfig(comp.nome)
+                        const papelAtual   = papelSelecionado[comp.id]
+                        const combinarAtivo = combinarPapeis[comp.id] ?? false
+                        const combinados    = papeisCombinados[comp.id] ?? new Set<string>()
                         return (
                           <div className="pl-8 mb-3">
-                            <p className="text-[11px] font-medium text-[#6b7280] mb-1.5 uppercase tracking-wide">Papel</p>
-                            <div className="flex flex-wrap gap-1.5">
-                              {cfg.papeis.map(p => (
+                            <div className="flex items-center justify-between mb-1.5">
+                              <p className="text-[11px] font-medium text-[#6b7280] uppercase tracking-wide">Papel</p>
+                              <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                                <span className="text-[10px] font-medium text-[#6b7280]">Combinar papéis</span>
                                 <button
-                                  key={p.value}
                                   type="button"
                                   disabled={saving}
-                                  onClick={() => handleSelectPapel(comp.id, comp.nome, p.value)}
+                                  onClick={() => handleToggleCombinarPapeis(comp.id)}
                                   className={cn(
-                                    'px-3 py-1 rounded-full text-xs font-medium border transition-colors',
-                                    papelAtual === p.value
-                                      ? 'border-blue-500 bg-blue-50 text-blue-700 ring-1 ring-blue-500'
-                                      : 'border-gray-200 bg-white text-[#6b7280] hover:bg-gray-50 hover:text-[#030712]',
+                                    'relative inline-flex h-4 w-7 shrink-0 items-center rounded-full transition-colors',
+                                    combinarAtivo ? 'bg-blue-600' : 'bg-gray-300',
                                   )}
                                 >
-                                  {p.label}
+                                  <span className={cn(
+                                    'inline-block h-2.5 w-2.5 transform rounded-full bg-white transition-transform',
+                                    combinarAtivo ? 'translate-x-3.5' : 'translate-x-0.5',
+                                  )} />
                                 </button>
-                              ))}
-                              {papelAtual === 'personalizado' && (
+                              </label>
+                            </div>
+                            <div className="flex flex-wrap gap-1.5">
+                              {cfg.papeis.map(p => {
+                                const isSelected = combinarAtivo ? combinados.has(p.value) : papelAtual === p.value
+                                return (
+                                  <button
+                                    key={p.value}
+                                    type="button"
+                                    disabled={saving}
+                                    onClick={() => combinarAtivo
+                                      ? handleTogglePapelCombinado(comp.id, p.value)
+                                      : handleSelectPapel(comp.id, comp.nome, p.value)}
+                                    className={cn(
+                                      'px-3 py-1 rounded-full text-xs font-medium border transition-colors',
+                                      isSelected
+                                        ? 'border-blue-500 bg-blue-50 text-blue-700 ring-1 ring-blue-500'
+                                        : 'border-gray-200 bg-white text-[#6b7280] hover:bg-gray-50 hover:text-[#030712]',
+                                    )}
+                                  >
+                                    {p.label}
+                                  </button>
+                                )
+                              })}
+                              {papelAtual === 'personalizado' && !(combinarAtivo && combinados.size > 0) && (
                                 <span className="px-3 py-1 rounded-full text-xs font-medium border border-amber-200 bg-amber-50 text-amber-700">
                                   Personalizado
                                 </span>
                               )}
                             </div>
+                            {combinarAtivo && combinados.size > 1 && (
+                              <p className="text-[10px] text-blue-600 mt-1">
+                                Ações combinadas de {combinados.size} papéis — ajuste manualmente na lista abaixo se necessário.
+                              </p>
+                            )}
                           </div>
                         )
                       })()}
@@ -736,25 +905,21 @@ export function AtribuirPermissoesSheet({
             )}
           </div>
 
-          {/* Contador */}
-          {totalAcoes > 0 && (
-            <div className="px-6 py-2 border-t border-gray-100 bg-gray-50">
-              <p className="text-xs text-[#6b7280]">
-                <strong className="text-[#030712]">{totalAcoes}</strong>{' '}
-                {totalAcoes === 1 ? 'permissão ativa' : 'permissões ativas'}
-              </p>
-            </div>
-          )}
         </div>
       </NestedSheetBody>
 
       <NestedSheetFooter>
-        {saveError && (
+        {saveError ? (
           <p className="text-xs text-red-600 flex-1 mr-2">{saveError}</p>
+        ) : totalAcoes > 0 && (
+          <p className="text-xs text-[#6b7280] flex-1 mr-2">
+            <strong className="text-[#030712]">{totalAcoes}</strong>{' '}
+            {totalAcoes === 1 ? 'ação ativa' : 'ações ativas'}
+          </p>
         )}
         <Button variant="outline" onClick={handleClose} disabled={saving}>Cancelar</Button>
         <Button onClick={handleSalvar} disabled={!hasChanges || saving}>
-          {saving ? 'Salvando...' : 'Salvar permissões'}
+          {saving ? 'Salvando...' : 'Salvar Ações'}
         </Button>
       </NestedSheetFooter>
     </NestedSheet>

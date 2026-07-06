@@ -292,7 +292,7 @@ export interface FGARelations {
     entityType: 'user' | 'group'
     entityId:   string
     instanceId: string
-    role:       'viewer' | 'member' | 'admin'
+    role:       'viewer' | 'member' | 'admin' | string
   }>
 
   // Atribuições efetivas por instância

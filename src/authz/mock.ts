@@ -5,7 +5,9 @@
  *   Orgs:     '1'=Apple  '2'=Santacruz  '3'=Margatastiltda  '4'=Nadapedra  '5'=Agropocereal
  *             'org-docnix'=Docnix
  *   Accounts: 'a1'=Apple 'a2'=Santacruz 'a3'=Margatastiltda ... 'acc-comgas'=Comgas (Docnix)
+ *             'acc-elfa'=Hospital Elfa (Docnix) — cenário multi-empresa
  *   Users:    '1'=Leonardo  '2'=Ana  '3'=Marcelo  '4'=Carla  'usr-marcelo-c'=Marcelo Ribeiro
+ *             'usr-carlos-elfa'=Carlos Mendes (Account Admin Hospital Elfa)
  *
  * Não existe em produção — apenas para demonstração do PoC.
  */
@@ -44,9 +46,12 @@ export const mockFGARelations: FGARelations = {
   // Ana (id='2'): account_admin da conta 'a1' (Apple).
   // Carla (id='4'): account_admin da conta 'a2' (Santacruz).
   //   → Carla só enxerga a conta a2 — não vê outras contas, org inteira nem contratos.
+  // Carlos Mendes (usr-carlos-elfa): account_admin da conta 'acc-elfa' (Hospital Elfa).
+  //   → Cenário multi-empresa Docnix: mesmo usuário com papéis diferentes por empresa (instância).
   accountAdmins: [
-    { userId: '2', accountId: 'a1' },
-    { userId: '4', accountId: 'a2' },
+    { userId: '2',              accountId: 'a1'       },
+    { userId: '4',              accountId: 'a2'       },
+    { userId: 'usr-carlos-elfa', accountId: 'acc-elfa' },
   ],
 
   // ── Members ──────────────────────────────────────────────────
@@ -81,6 +86,20 @@ export const mockFGARelations: FGARelations = {
     // inst-dash-ops: grupo Analistas visualiza, Marcelo usa
     { entityType: 'group', entityId: 'g-analistas',   instanceId: 'inst-dash-ops',        role: 'viewer' },
     { entityType: 'user',  entityId: 'u-marcelo',     instanceId: 'inst-dash-ops',        role: 'member' },
+
+    // ── Hospital Elfa (cenário multi-empresa MaxDoc) ──────────────
+    // DEMONSTRAÇÃO DO DIFERENCIAL PAS vs Docnix:
+    // Carlos é admin-maxdoc no Hospital Central, leitor na Unidade Norte,
+    // e sem acesso à Unidade Sul — com o MESMO login.
+    // No Docnix atual isso é impossível: o usuário herda as mesmas atribuições em todas as empresas.
+    { entityType: 'user',  entityId: 'usr-carlos-elfa',    instanceId: 'inst-elfa-central', role: 'admin-maxdoc' },
+    { entityType: 'user',  entityId: 'usr-carlos-elfa',    instanceId: 'inst-elfa-norte',   role: 'leitor'       },
+    // Carlos NÃO tem acesso à inst-elfa-sul (Unidade Sul) — ausência intencional
+    { entityType: 'group', entityId: 'grp-elfa-editores',  instanceId: 'inst-elfa-central', role: 'editor'       },
+    { entityType: 'group', entityId: 'grp-elfa-editores',  instanceId: 'inst-elfa-norte',   role: 'editor'       },
+    { entityType: 'group', entityId: 'grp-elfa-aprovadores', instanceId: 'inst-elfa-central', role: 'aprovador'  },
+    { entityType: 'group', entityId: 'grp-elfa-aprovadores', instanceId: 'inst-elfa-norte',   role: 'aprovador'  },
+    { entityType: 'user',  entityId: 'usr-beatriz-elfa',   instanceId: 'inst-elfa-sul',     role: 'leitor'       },
   ],
 
   // ── Hierarquia de Grupos ──────────────────────────────────────
@@ -132,6 +151,12 @@ export const mockPersonas: Persona[] = [
     label: 'Org Admin (Docnix)',
     description: 'Marcelo Ribeiro — admin da Org Docnix; gerencia conta Comgas com solução Atlas e Assistente Vanessa IA',
     color: 'from-rose-400 to-pink-500',
+  },
+  {
+    userId: 'usr-carlos-elfa',
+    label: 'Account Admin (Hospital Elfa)',
+    description: 'Carlos Mendes — admin da conta Hospital Elfa; demonstra papéis diferenciados por empresa (admin no Central, leitor no Norte, sem acesso no Sul)',
+    color: 'from-cyan-400 to-teal-500',
   },
 ]
 
@@ -360,27 +385,27 @@ const COMPONENTE_CONFIGS: Record<string, ComponenteTypeConfig> = {
       {
         value: 'leitor', label: 'Leitor', desc: 'Leitura e download de documentos',
         cls: 'bg-gray-100 text-gray-600 border-gray-200',
-        defaultAcoes: ['Visualizar','Ler Todos','Leitor Documento','Leitor Anexos','Baixar Documento','Imprimir'],
+        defaultAcoes: ['Leitor Documento', 'Imprimir'],
       },
       {
         value: 'editor', label: 'Editor', desc: 'Cria e edita documentos e anexos',
         cls: 'bg-blue-50 text-blue-700 border-blue-200',
-        defaultAcoes: ['Visualizar','Criar Documento','Editar','Nova Versão','Mover','Cancelar Edição','Baixar Documento','Imprimir','Visualizar Histórico de Versões'],
+        defaultAcoes: ['Criar Documento', 'Editor Documento', 'Imprimir'],
       },
       {
         value: 'revisor', label: 'Revisor', desc: 'Revisa e submete documentos para aprovação',
         cls: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-        defaultAcoes: ['Visualizar','Revisar Documento','Submeter para Aprovação','Solicitar Revisão'],
+        defaultAcoes: ['Revisar Documento', 'Revisor Documento', 'Imprimir'],
       },
       {
         value: 'aprovador', label: 'Aprovador', desc: 'Aprova, obsoleta e emite cópias controladas',
         cls: 'bg-orange-50 text-orange-700 border-orange-200',
-        defaultAcoes: ['Visualizar','Ler Todos','Leitor Documento','Leitor Anexos','Baixar Documento','Imprimir','Assinatura Eletrônica','Revisar Documento','Aprovar Documento','Rejeitar Documento','Aprovador Documento','Aprovador Substituto Documento','Obsoletetar Documento','Emitir Cópia Controlada','Emitir Cópia Não Controlada','Cópia Controlada Anexos','Ciclo de Aprovação Documentos'],
+        defaultAcoes: ['Aprovar Documento', 'Aprovador Documento', 'Obsoletetar Documento', 'Emitir Cópia Controlada', 'Emitir Cópia Não Controlada'],
       },
       {
         value: 'admin-maxdoc', label: 'Administrador', desc: 'Acesso completo ao MaxDoc',
         cls: 'bg-red-50 text-red-700 border-red-200',
-        defaultAcoes: [], // [] = todas as ações de config.acoes
+        defaultAcoes: [], // [] = todas as ações do catálogo
       },
     ],
     acoes: [

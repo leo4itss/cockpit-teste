@@ -292,7 +292,7 @@ export function getInstanciaRole(
   userId: string,
   instanceId: string,
   rel: FGARelations,
-): 'admin' | 'member' | 'viewer' | null {
+): string | null {
   if (isPlatformAdmin(userId, rel)) return 'admin'
 
   const members = rel.instanceMembers ?? []

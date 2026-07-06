@@ -152,7 +152,7 @@ export function useAdminOrgId(): string | null {
  * Retorna o papel do usuário em uma instância específica,
  * ou null se não tiver acesso.
  */
-export function useGetInstanciaRole(instanceId: string): 'admin' | 'member' | 'viewer' | null {
+export function useGetInstanciaRole(instanceId: string): string | null {
   const { currentUser, relations } = useAuthz()
   return engine.getInstanciaRole(currentUser.id, instanceId, relations)
 }

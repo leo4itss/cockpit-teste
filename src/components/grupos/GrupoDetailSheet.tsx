@@ -162,6 +162,10 @@ function AddMembroSection({ allUsers, membros, onAdd, disabled }: AddMembroProps
 export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome, contextoLabel }: Props) {
   const [membros, setMembros]           = useState<User[]>([])
   const [loadingMembros, setLoadingMembros] = useState(false)
+  // userId → papel de conta ('member' | 'account_admin'), vindo de user_account_memberships.
+  // Não usar user.papel diretamente: esse campo é um texto livre (cargo/perfil) da tabela
+  // users, sem relação com o papel de conta.
+  const [accountPapelMap, setAccountPapelMap] = useState<Record<string, string>>({})
   const [allUsers, setAllUsers]         = useState<User[]>([])
   const [showAdd, setShowAdd]           = useState(false)
   const [addingId, setAddingId]         = useState<string | null>(null)
@@ -191,6 +195,19 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
       setAllUsers(mockUsers.filter(u => contaIds.includes(u.id)))
       setLoadingMembros(false)
     })
+
+    // Papel de conta real (member | account_admin) — só existe para grupos com escopo=conta.
+    if (accountId) {
+      api.getAccountMembros(accountId)
+        .then((rows: any[]) => {
+          const map: Record<string, string> = {}
+          rows.forEach(r => { map[r.id] = r.papel })
+          setAccountPapelMap(map)
+        })
+        .catch(() => setAccountPapelMap({}))
+    } else {
+      setAccountPapelMap({})
+    }
 
     api.getGrupoInstancias(grupo.id).then(vincs => {
       setObjetos(vincs)
@@ -391,8 +408,10 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
                           </div>
                         </div>
                       </td>
-                      <td className="px-3 py-3 text-xs text-[#6b7280] hidden sm:table-cell">
-                        {user.cargo || user.papel || '—'}
+                      <td className="px-3 py-3 hidden sm:table-cell">
+                        {accountPapelMap[user.id] === 'account_admin'
+                          ? <Badge variant="warning">Administrador da Conta</Badge>
+                          : <Badge variant="default">Membro</Badge>}
                       </td>
                       <td className="pr-6 pl-3 py-3 text-right">
                         <div className="invisible group-hover:visible">
