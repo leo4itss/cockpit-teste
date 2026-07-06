@@ -18,6 +18,7 @@ import type { User, Grupo } from '@/types'
 
 import { CriarGrupoSheet } from '@/components/grupos/CriarGrupoSheet'
 import { GrupoDetailSheet } from '@/components/grupos/GrupoDetailSheet'
+import { AtribuirGrupoEmMassaSheet } from '@/components/usuarios/AtribuirGrupoEmMassaSheet'
 import { InstanciaDetailSheet } from '@/components/instancias/InstanciaDetailSheet'
 import { PermissoesEfetivasSheet } from '@/components/permissoes/PermissoesEfetivasSheet'
 import { Modal } from '@/components/ui/Modal'
