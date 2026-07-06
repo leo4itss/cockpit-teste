@@ -6,7 +6,7 @@
  * O papel selecionado é salvo em instancia_membros para exibição no badge.
  */
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { Loader2, Users } from 'lucide-react'
 import {
   NestedSheet,
@@ -69,10 +69,39 @@ export function PermissoesMembroSheet({
   // acao → nome do grupo que concede a ação
   const [inherited, setInherited] = useState<Record<string, string>>({})
 
+  // ── Catálogo de atribuições (banco) ──────────────────────
+  // Ref sempre atualizado — permite leitura do valor atual dentro de closures de useEffect
+  const atribuicoesNomesRef = useRef<string[]>([])
+  const [atribuicoesNomes, setAtribuicoesNomes] = useState<string[]>([])
+  useEffect(() => {
+    if (!componenteId) return
+    fetch(`/api/componentes/${componenteId}/atribuicoes`)
+      .then(r => r.json())
+      .then((data: any[]) => {
+        const nomes = data.filter(a => a.status !== 'Inativo').map(a => a.nome as string)
+        atribuicoesNomesRef.current = nomes
+        setAtribuicoesNomes(nomes)
+      })
+      .catch(() => {})
+  }, [componenteId])
+
+  // Corrige o draft para papéis com defaultAcoes:[] assim que AMBOS os fetches terminam:
+  // permissões (loading=false) e catálogo (atribuicoesNomes não vazio).
+  // Sem isso, o fetch mais lento sobrescreve o resultado do mais rápido.
+  useEffect(() => {
+    if (loading || !open || atribuicoesNomes.length === 0) return
+    if (selectedPapel === 'personalizado') return
+    const papelDef = config.papeis.find(p => p.value === (membro.papel ?? ''))
+    if (!papelDef || (papelDef.defaultAcoes ?? []).length > 0) return
+    setDraft(atribuicoesNomes)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, open, atribuicoesNomes])
+
   // ── Helpers ───────────────────────────────────────────────
   /** Expande defaultAcoes: [] (= Administrador) para todas as ações do catálogo */
   function expandDefaults(defaults: string[]): string[] {
     if (defaults.length > 0) return defaults
+    if (atribuicoesNomes.length > 0) return atribuicoesNomes
     return (config.acoes ?? []).map(a => a.acao)
   }
 
@@ -94,14 +123,15 @@ export function PermissoesMembroSheet({
       .then((perms: any[]) => {
         const existing = perms.map((p: any) => p.acao as string)
         setSaved(existing)
-        // Se o papel é nomeado (não personalizado), mostrar os defaults do papel como draft.
-        // Isso garante que o sheet reflita o papel correto ao abrir, mesmo se o DB tiver estado stale.
-        if (membro.papel && membro.papel !== 'personalizado') {
-          const papelDef = config.papeis.find(p => p.value === membro.papel)
-          const defaults = expandDefaults(papelDef?.defaultAcoes ?? [])
-          setDraft(defaults.length > 0 ? defaults : existing)
+        // Para Administrador (defaultAcoes: []) o draft deve ser todas as ações do catálogo.
+        // Usa o ref para ler o valor atual mesmo se o fetch de atribuições já terminou.
+        const papelDef = config.papeis.find(p => p.value === (membro.papel ?? ''))
+        const isAdminAll = papelDef && (papelDef.defaultAcoes ?? []).length === 0
+        const catalog = atribuicoesNomesRef.current
+        if (isAdminAll && catalog.length > 0) {
+          setDraft(catalog)
         } else {
-          setDraft(existing.length > 0 ? existing : [])
+          setDraft(existing)
         }
       })
       .catch(() => {
@@ -279,14 +309,17 @@ export function PermissoesMembroSheet({
               <div className="flex items-center gap-2 py-4 text-sm text-gray-400">
                 <Loader2 className="w-3.5 h-3.5 animate-spin" /> Carregando...
               </div>
-            ) : (config.acoes ?? []).length === 0 ? (
+            ) : (atribuicoesNomes.length === 0 && (config.acoes ?? []).length === 0) ? (
               <p className="text-sm text-gray-500 py-4 text-center">
                 Nenhuma ação cadastrada para este componente.
               </p>
             ) : (
               <>
                 <div className="border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100 max-h-[min(50vh,380px)] overflow-y-auto">
-                  {(config.acoes ?? []).map(({ acao, label }) => {
+                  {(atribuicoesNomes.length > 0
+                    ? atribuicoesNomes.map(n => ({ acao: n, label: n }))
+                    : (config.acoes ?? [])
+                  ).map(({ acao, label }) => {
                     const isInherited = !!inherited[acao]
                     const grupoNome   = inherited[acao]
 
