@@ -47,6 +47,25 @@ function EscopoBadge({ escopo }: { escopo: 'org' | 'conta' }) {
     : <Badge variant="default" className="bg-violet-50 text-violet-700 border border-violet-200">Conta</Badge>
 }
 
+// ── Colunas configuráveis da aba Usuários ─────────────────────
+// "Nome" é fixa; as demais o usuário escolhe (estilo File Explorer).
+// A preferência persiste em localStorage.
+
+const USER_COLUMNS = [
+  { id: 'usuario',      label: 'Usuário' },
+  { id: 'email',        label: 'E-mail' },
+  { id: 'grupos',       label: 'Grupo' },
+  { id: 'papel',        label: 'Papel' },
+  { id: 'status',       label: 'Status' },
+  { id: 'ultimoAcesso', label: 'Último acesso' },
+] as const
+type UserColumnId = typeof USER_COLUMNS[number]['id']
+
+// Padrão pós-GAP da reunião de 06/07: "Grupo" substitui "Papel" (que fica opcional)
+const DEFAULT_USER_COLUMNS: UserColumnId[] = ['usuario', 'email', 'grupos', 'status', 'ultimoAcesso']
+
+const USERS_PAGE_SIZE = 50
+
 // ─────────────────────────────────────────────────────────────
 
 export function AcessosPage() {
