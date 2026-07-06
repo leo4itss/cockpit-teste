@@ -13,6 +13,7 @@ import { api } from '@/api/client'
 import { cn } from '@/lib/utils'
 import { accountEntitlements as mockEntitlements } from '@/data/mock'
 import { getComponenteConfig } from '@/authz/mock'
+import { unirAcoesDosPapeis, inferirCombinacaoDePapeis } from '@/authz/combinarPapeis'
 import type { Componente } from '@/types'
 
 // ── Tipos ──────────────────────────────────────────────────────
