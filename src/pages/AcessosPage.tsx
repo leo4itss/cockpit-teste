@@ -678,52 +678,212 @@ export function AcessosPage() {
       </div>
 
       {/* ── Aba Usuários ── */}
-      {abaAtiva === 'usuarios' && (
-        <div className="px-8 pt-6 pb-8">
+      {abaAtiva === 'usuarios' && (() => {
+        const colSpanUsuarios = 2 + colunasVisiveis.length + (isAllAccounts ? 1 : 0) + 1
+        return (
+        <div className="px-8 pt-6 pb-8 space-y-4">
+
+          {/* Filtros + colunas configuráveis */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="relative">
+              <select
+                value={filtroGrupo}
+                onChange={e => setFiltroGrupo(e.target.value)}
+                className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
+              >
+                <option value="">Todos os grupos</option>
+                {grupos.filter(g => g.status === 'Ativo').map(g => <option key={g.id} value={g.id}>{g.nome}</option>)}
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+            </div>
+            <div className="relative">
+              <select
+                value={filtroArea}
+                onChange={e => setFiltroArea(e.target.value)}
+                className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
+              >
+                <option value="">Todas as áreas</option>
+                {areasDisponiveis.map(a => <option key={a} value={a}>{a}</option>)}
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+            </div>
+            <div className="relative">
+              <select
+                value={filtroPapel}
+                onChange={e => setFiltroPapel(e.target.value)}
+                className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
+              >
+                <option value="">Todos os papéis</option>
+                <option value="member">Membro</option>
+                <option value="account_admin">Administrador da Conta</option>
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+            </div>
+            <div className="relative">
+              <select
+                value={filtroStatus}
+                onChange={e => setFiltroStatus(e.target.value)}
+                className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
+              >
+                <option value="">Todos os status</option>
+                <option value="Ativo">Ativo</option>
+                <option value="Inativo">Inativo</option>
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+            </div>
+
+            <div className="ml-auto">
+              <Popover
+                content={
+                  <div className="flex flex-col gap-0.5 min-w-[180px] p-1">
+                    <p className="px-2 py-1.5 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Colunas visíveis</p>
+                    {USER_COLUMNS.map(col => (
+                      <label key={col.id} className="flex items-center gap-2.5 px-2 py-1.5 text-sm text-[#030712] hover:bg-gray-100 rounded-md cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={colVisivel(col.id)}
+                          onChange={() => setColunasVisiveis(prev =>
+                            prev.includes(col.id) ? prev.filter(c => c !== col.id) : [...prev, col.id]
+                          )}
+                          className="w-4 h-4 rounded border-gray-300 accent-blue-600"
+                        />
+                        {col.label}
+                      </label>
+                    ))}
+                  </div>
+                }
+              >
+                <button
+                  className="flex items-center gap-1.5 px-3 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] text-[#374151] hover:bg-gray-50 transition-colors"
+                  title="Configurar colunas"
+                >
+                  <Columns3 className="w-4 h-4" />
+                  Colunas
+                </button>
+              </Popover>
+            </div>
+          </div>
+
+          {/* Barra de ação da seleção em massa */}
+          {selectedUserIds.size > 0 && (
+            <div className="flex items-center gap-3 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-xl">
+              <p className="text-sm text-blue-800">
+                <strong>{selectedUserIds.size.toLocaleString('pt-BR')}</strong>{' '}
+                {selectedUserIds.size === 1 ? 'usuário selecionado' : 'usuários selecionados'}
+              </p>
+              {paginaToda && !filtroTodo && (
+                <button
+                  onClick={selecionarTodosDoFiltro}
+                  className="text-sm font-medium text-blue-600 hover:text-blue-800 underline underline-offset-2"
+                >
+                  Selecionar todos os {filteredUsers.length.toLocaleString('pt-BR')} resultados do filtro
+                </button>
+              )}
+              <div className="ml-auto flex items-center gap-2">
+                <Button variant="outline" onClick={limparSelecao} className="h-8 text-xs">
+                  Limpar seleção
+                </Button>
+                <Button onClick={() => setShowAtribuirGrupo(true)} className="h-8 text-xs">
+                  <UserPlus className="w-3.5 h-3.5 mr-1.5" />
+                  Atribuir a grupo
+                </Button>
+              </div>
+            </div>
+          )}
+
           <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200">
+                  <th className="pl-4 pr-1 py-3 w-[36px]">
+                    <input
+                      type="checkbox"
+                      checked={paginaToda}
+                      ref={el => { if (el) el.indeterminate = !paginaToda && paginatedUsers.some(u => selectedUserIds.has(u.id)) }}
+                      onChange={toggleSelecionarPagina}
+                      className="w-4 h-4 rounded border-gray-300 accent-blue-600 cursor-pointer align-middle"
+                      title="Selecionar página"
+                    />
+                  </th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[200px]">Nome</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[150px]">Usuário</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[200px]">E-mail</th>
+                  {colVisivel('usuario') && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[150px]">Usuário</th>}
+                  {colVisivel('email') && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[200px]">E-mail</th>}
                   {isAllAccounts && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[140px]">Conta</th>}
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[150px]">Papel</th>
-                  <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 min-w-[120px]">Status</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[120px]">Último acesso</th>
+                  {colVisivel('grupos') && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[180px]">Grupo</th>}
+                  {colVisivel('papel') && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[150px]">Papel</th>}
+                  {colVisivel('status') && <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 min-w-[120px]">Status</th>}
+                  {colVisivel('ultimoAcesso') && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[120px]">Último acesso</th>}
                   <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 w-[80px]">Ações</th>
                 </tr>
               </thead>
               <tbody>
                 {loadingUsers ? (
-                  <tr><td colSpan={isAllAccounts ? 8 : 7} className="px-4 py-8 text-center text-sm text-gray-500">Carregando...</td></tr>
-                ) : filteredUsers.length > 0 ? (
-                  filteredUsers.map(user => (
+                  <tr><td colSpan={colSpanUsuarios} className="px-4 py-8 text-center text-sm text-gray-500">Carregando...</td></tr>
+                ) : paginatedUsers.length > 0 ? (
+                  paginatedUsers.map(user => (
                     <tr
                       key={user.id}
-                      className="group border-b border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer last:border-b-0"
+                      className={cn(
+                        'group border-b border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer last:border-b-0',
+                        selectedUserIds.has(user.id) && 'bg-blue-50/40 hover:bg-blue-50/60',
+                      )}
                       onClick={() => handleViewUser(user)}
                     >
+                      <td className="pl-4 pr-1 py-3" onClick={e => e.stopPropagation()}>
+                        <input
+                          type="checkbox"
+                          checked={selectedUserIds.has(user.id)}
+                          onChange={() => toggleSelecionado(user.id)}
+                          className="w-4 h-4 rounded border-gray-300 accent-blue-600 cursor-pointer align-middle"
+                        />
+                      </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           <Initials nome={user.nomeCompleto} />
                           <span className="text-sm font-medium text-[#030712] truncate">{user.nomeCompleto}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-sm text-[#030712]">{user.usuario}</td>
-                      <td className="px-4 py-3 text-sm text-[#030712]">{user.email}</td>
+                      {colVisivel('usuario') && <td className="px-4 py-3 text-sm text-[#030712]">{user.usuario}</td>}
+                      {colVisivel('email') && <td className="px-4 py-3 text-sm text-[#030712]">{user.email}</td>}
                       {isAllAccounts && <td className="px-4 py-3 text-sm text-[#6b7280]">{userAccountMap[user.id] ?? '—'}</td>}
-                      <td className="px-4 py-3">
-                        {user.papel === 'account_admin'
-                          ? <Badge variant="warning">Administrador da Conta</Badge>
-                          : <Badge variant="default">Membro</Badge>}
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        {user.status === 'Ativo'
-                          ? <Badge variant="success" showIcon>Ativo</Badge>
-                          : <Badge variant="secondary" showIcon>{user.status}</Badge>}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-[#030712]">{user.ultimoAcesso}</td>
+                      {colVisivel('grupos') && (
+                        <td className="px-4 py-3">
+                          {(() => {
+                            const gs = userGruposMap[user.id] ?? []
+                            if (gs.length === 0) return <span className="text-xs text-gray-400">—</span>
+                            const visiveis = gs.slice(0, 2)
+                            return (
+                              <div className="flex items-center gap-1 flex-wrap">
+                                {visiveis.map(g => (
+                                  <span key={g.grupoId} className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-violet-50 text-violet-700 border border-violet-200 max-w-[140px] truncate">
+                                    {g.grupoNome}
+                                  </span>
+                                ))}
+                                {gs.length > 2 && (
+                                  <span className="text-[11px] font-medium text-gray-500" title={gs.slice(2).map(g => g.grupoNome).join(', ')}>
+                                    +{gs.length - 2}
+                                  </span>
+                                )}
+                              </div>
+                            )
+                          })()}
+                        </td>
+                      )}
+                      {colVisivel('papel') && (
+                        <td className="px-4 py-3">
+                          {user.papel === 'account_admin'
+                            ? <Badge variant="warning">Administrador da Conta</Badge>
+                            : <Badge variant="default">Membro</Badge>}
+                        </td>
+                      )}
+                      {colVisivel('status') && (
+                        <td className="px-4 py-3 text-center">
+                          {user.status === 'Ativo'
+                            ? <Badge variant="success" showIcon>Ativo</Badge>
+                            : <Badge variant="secondary" showIcon>{user.status}</Badge>}
+                        </td>
+                      )}
+                      {colVisivel('ultimoAcesso') && <td className="px-4 py-3 text-sm text-[#030712]">{user.ultimoAcesso}</td>}
                       <td className="px-4 py-3 text-center" onClick={e => e.stopPropagation()}>
                         <div className="invisible group-hover:visible">
                           <Popover
