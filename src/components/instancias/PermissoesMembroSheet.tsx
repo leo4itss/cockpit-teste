@@ -182,18 +182,7 @@ export function PermissoesMembroSheet({
     setSelectedPapel(novoPapel)
     const papelDef = config.papeis.find(p => p.value === novoPapel)
     if (!papelDef) { setDraft([]); return }
-    setDraft(expandDefaults(papelDef.defaultAcoes ?? []))
-  }
-
-  /** União das ações padrão de um conjunto de papéis (usado no modo "Combinar papéis"). */
-  function unionAcoesDosPapeis(valores: Set<string>): string[] {
-    const acoes = new Set<string>()
-    for (const valor of valores) {
-      const papelDef = config.papeis.find(p => p.value === valor)
-      if (!papelDef) continue
-      expandDefaults(papelDef.defaultAcoes ?? []).forEach(a => acoes.add(a))
-    }
-    return [...acoes]
+    setDraft(unirAcoesDosPapeis(config.papeis, new Set([papelDef.value]), catalogo))
   }
 
   /**
