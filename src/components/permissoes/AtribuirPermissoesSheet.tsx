@@ -428,7 +428,9 @@ export function AtribuirPermissoesSheet({
       if (!combinarPapeis[compId] || valores.size === 0) return
       const comp = componentes.find(c => c.id === compId)
       if (!comp) return
-      setDraft(d => ({ ...d, [compId]: unionAcoesDosPapeis(compId, comp.nome, valores) }))
+      const cfg = getComponenteConfig(comp.nome)
+      const catalogo = resolverCatalogo(compId, cfg.acoes, atribuicoesMap)
+      setDraft(d => ({ ...d, [compId]: unirAcoesDosPapeis(cfg.papeis, valores, catalogo) }))
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [papeisCombinados])
