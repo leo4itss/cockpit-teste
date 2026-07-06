@@ -404,36 +404,9 @@ export function AtribuirPermissoesSheet({
 
   function handleSelectPapel(compId: string, compNome: string, papelValue: string) {
     const cfg      = getComponenteConfig(compNome)
-    const papelDef = cfg.papeis.find(p => p.value === papelValue)
-    const defaults = papelDef?.defaultAcoes ?? []
-
-    if (defaults.length === 0) {
-      // [] = todas as ações do catálogo (ex: Administrador) — prefere catálogo do banco
-      const allAcoes = (atribuicoesMap[compId]?.length ? atribuicoesMap[compId] : (cfg.acoes ?? [])).map(a => a.acao)
-      setDraft(prev => ({ ...prev, [compId]: allAcoes }))
-    } else {
-      setDraft(prev => ({ ...prev, [compId]: defaults }))
-    }
-
+    const catalogo = resolverCatalogo(compId, cfg.acoes, atribuicoesMap)
+    setDraft(prev => ({ ...prev, [compId]: unirAcoesDosPapeis(cfg.papeis, new Set([papelValue]), catalogo) }))
     setPapelSelecionado(prev => ({ ...prev, [compId]: papelValue }))
-  }
-
-  /** União das ações padrão de um conjunto de papéis (usado no modo "Combinar papéis"). */
-  function unionAcoesDosPapeis(compId: string, compNome: string, valores: Set<string>): string[] {
-    const cfg   = getComponenteConfig(compNome)
-    const acoes = new Set<string>()
-    for (const valor of valores) {
-      const papelDef = cfg.papeis.find(p => p.value === valor)
-      const defaults = papelDef?.defaultAcoes ?? []
-      if (defaults.length === 0) {
-        // [] = todas as ações do catálogo (ex: Administrador)
-        const allAcoes = (atribuicoesMap[compId]?.length ? atribuicoesMap[compId] : (cfg.acoes ?? [])).map(a => a.acao)
-        allAcoes.forEach(a => acoes.add(a))
-      } else {
-        defaults.forEach(a => acoes.add(a))
-      }
-    }
-    return [...acoes]
   }
 
   function handleTogglePapelCombinado(compId: string, papelValue: string) {
