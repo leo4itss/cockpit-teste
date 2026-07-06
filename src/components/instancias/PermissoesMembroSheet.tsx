@@ -21,6 +21,7 @@ import { api } from '@/api/client'
 import { cn } from '@/lib/utils'
 import type { InstanciaMembro } from '@/types'
 import { useComponenteConfig } from '@/authz/hooks'
+import { unirAcoesDosPapeis, inferirCombinacaoDePapeis } from '@/authz/combinarPapeis'
 
 // ── Props ─────────────────────────────────────────────────────
 
