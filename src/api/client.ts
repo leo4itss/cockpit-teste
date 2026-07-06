@@ -125,12 +125,24 @@ export const api = {
   getGrupoMembros:   (grupoId: string)              => request<any[]>(`/api/grupos/${grupoId}/membros`),
   addGrupoMembro:    (grupoId: string, userId: string) =>
     request<any>(`/api/grupos/${grupoId}/membros`, { method: 'POST', body: JSON.stringify({ userId }) }),
+  // Atribuição em massa — insere apenas os vínculos que ainda não existem (idempotente)
+  addGrupoMembrosBulk: (grupoId: string, userIds: string[]) =>
+    request<{ adicionados: number; jaExistiam: number }>(
+      `/api/grupos/${grupoId}/membros/bulk`,
+      { method: 'POST', body: JSON.stringify({ userIds }) },
+    ),
   removeGrupoMembro: (grupoId: string, userId: string) =>
     request<any>(`/api/grupos/${grupoId}/membros/${userId}`, { method: 'DELETE' }),
   getGrupoInstancias: (grupoId: string) => request<GrupoInstanciaVinculo[]>(`/api/grupos/${grupoId}/instancias`),
 
   // Membros de conta
   getAccountMembros:    (accountId: string) => request<any[]>(`/api/accounts/${accountId}/membros`),
+  // Tuplas (userId, grupoId, grupoNome, grupoEscopo) de todos os grupos visíveis na conta
+  // (grupos da conta + org-scoped) em uma única chamada — usado pela coluna "Grupo".
+  getAccountUsuarioGrupos: (accountId: string) =>
+    request<{ userId: string; grupoId: string; grupoNome: string; grupoEscopo: 'conta' | 'org' }[]>(
+      `/api/accounts/${accountId}/usuario-grupos`,
+    ),
   addAccountMembro:     (accountId: string, data: { userId: string; papel: string }) =>
     request<any>(`/api/accounts/${accountId}/membros`, { method: 'POST', body: JSON.stringify(data) }),
   removeAccountMembro:  (accountId: string, userId: string) =>
