@@ -615,6 +615,28 @@ app.delete('/grupos/:id/membros/:userId', async (c) => {
   return c.json({ ok: true })
 })
 
+app.post('/grupos/:id/membros/bulk', async (c) => {
+  const grupoId = c.req.param('id')
+  const { userIds } = await c.req.json()
+  if (!Array.isArray(userIds) || userIds.length === 0) {
+    return c.json({ error: 'userIds deve ser um array não vazio' }, 400)
+  }
+
+  const existing = await db.select().from(usuarioGrupos)
+    .where(and(eq(usuarioGrupos.grupoId, grupoId), inArray(usuarioGrupos.userId, userIds)))
+  const jaExistem = new Set(existing.map((l: any) => l.userId))
+  const novos = [...new Set(userIds as string[])].filter(uid => !jaExistem.has(uid))
+
+  if (novos.length > 0) {
+    const assignedAt = new Date().toLocaleDateString('pt-BR')
+    await db.insert(usuarioGrupos).values(
+      novos.map(userId => ({ id: crypto.randomUUID(), userId, grupoId, assignedAt }))
+    )
+  }
+
+  return c.json({ adicionados: novos.length, jaExistiam: jaExistem.size }, 201)
+})
+
 app.get('/grupos/:id/instancias', async (c) => {
   const grupoId = c.req.param('id')
   const memberships = await db
