@@ -211,54 +211,6 @@ export function AcessosPage() {
     setSelectedUserIds(new Set())
   }, [searchUsers, filtroGrupo, filtroObjeto, filtroPapel, filtroStatus, accountId])
 
-  // Membros (diretos + via grupo) de cada objeto — carregado 1x por lista de instâncias,
-  // usado para computar quais objetos cada usuário enxerga (filtro "Objetos").
-  const [instanciaMembrosMap, setInstanciaMembrosMap] =
-    useState<Record<string, { entidadeTipo: string; entidadeId: string }[]>>({})
-  useEffect(() => {
-    if (instancias.length === 0) { setInstanciaMembrosMap({}); return }
-    let cancelled = false
-    Promise.all(
-      instancias.map(inst =>
-        api.getInstanciaMembros(inst.id)
-          .then((mems: any[]) => ({ instId: inst.id, mems }))
-          .catch(() => ({ instId: inst.id, mems: [] as any[] }))
-      )
-    ).then(results => {
-      if (cancelled) return
-      const map: Record<string, { entidadeTipo: string; entidadeId: string }[]> = {}
-      results.forEach(({ instId, mems }) => { map[instId] = mems })
-      setInstanciaMembrosMap(map)
-    })
-    return () => { cancelled = true }
-  }, [instancias])
-
-  // userId → Set de instanciaIds que o usuário acessa (direto ou herdado via grupo)
-  const userObjetosMap = useMemo(() => {
-    const grupoParaUsuarios: Record<string, string[]> = {}
-    Object.entries(userGruposMap).forEach(([uid, gs]) => {
-      gs.forEach(g => {
-        if (!grupoParaUsuarios[g.grupoId]) grupoParaUsuarios[g.grupoId] = []
-        grupoParaUsuarios[g.grupoId].push(uid)
-      })
-    })
-    const map: Record<string, Set<string>> = {}
-    Object.entries(instanciaMembrosMap).forEach(([instId, mems]) => {
-      mems.forEach(m => {
-        if (m.entidadeTipo === 'user') {
-          if (!map[m.entidadeId]) map[m.entidadeId] = new Set()
-          map[m.entidadeId].add(instId)
-        } else if (m.entidadeTipo === 'group') {
-          (grupoParaUsuarios[m.entidadeId] ?? []).forEach(uid => {
-            if (!map[uid]) map[uid] = new Set()
-            map[uid].add(instId)
-          })
-        }
-      })
-    })
-    return map
-  }, [instanciaMembrosMap, userGruposMap])
-
   useEffect(() => {
     if (!accountId) return
     setLoadingUsers(true)
