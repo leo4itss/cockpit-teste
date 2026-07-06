@@ -740,12 +740,12 @@ export function AcessosPage() {
             </div>
             <div className="relative">
               <select
-                value={filtroArea}
-                onChange={e => setFiltroArea(e.target.value)}
+                value={filtroObjeto}
+                onChange={e => setFiltroObjeto(e.target.value)}
                 className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
               >
-                <option value="">Todas as áreas</option>
-                {areasDisponiveis.map(a => <option key={a} value={a}>{a}</option>)}
+                <option value="">Todos os objetos</option>
+                {instancias.filter(i => i.status === 'Ativo').map(i => <option key={i.id} value={i.id}>{i.nome}</option>)}
               </select>
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
             </div>
