@@ -863,6 +863,43 @@ app.post('/api/grupos/:id/membros', async (c) => {
 })
 
 /**
+ * POST /api/grupos/:id/membros/bulk
+ * Body: { userIds: string[] }
+ *
+ * Atribuição em massa: insere apenas os vínculos que ainda não existem
+ * (idempotente — seguro para retry, já que o driver HTTP do Neon não tem
+ * transação). O cliente envia em chunks e acumula o progresso.
+ *
+ * Escreve tuplas FGA (PoC: comentado):
+ *   user:<userId> member group:<grupoId>  — uma por usuário, em batch
+ */
+app.post('/api/grupos/:id/membros/bulk', async (c) => {
+  const grupoId = c.req.param('id')
+  const { userIds } = await c.req.json()
+  if (!Array.isArray(userIds) || userIds.length === 0) {
+    return c.json({ error: 'userIds deve ser um array não vazio' }, 400)
+  }
+
+  const existing = await db
+    .select()
+    .from(usuarioGrupos)
+    .where(and(eq(usuarioGrupos.grupoId, grupoId), inArray(usuarioGrupos.userId, userIds)))
+  const jaExistem = new Set(existing.map((l: any) => l.userId))
+  const novos = [...new Set(userIds as string[])].filter(uid => !jaExistem.has(uid))
+
+  if (novos.length > 0) {
+    const assignedAt = new Date().toLocaleDateString('pt-BR')
+    await db.insert(usuarioGrupos).values(
+      novos.map(userId => ({ id: crypto.randomUUID(), userId, grupoId, assignedAt }))
+    )
+  }
+
+  // TODO (produção): await fga.write(novos.map(userId => ({ user: `user:${userId}`, relation: 'member', object: `group:${grupoId}` })))
+
+  return c.json({ adicionados: novos.length, jaExistiam: jaExistem.size }, 201)
+})
+
+/**
  * DELETE /api/grupos/:id/membros/:userId
  *
  * Escreve tupla FGA (PoC: comentado):
