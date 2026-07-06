@@ -219,6 +219,11 @@ function AddMembroSection({ allUsers, membros, onAdd, onAddBulk, disabled }: Add
                 </div>
               </div>
             ))}
+            {matches.length > sugestoes.length && (
+              <p className="px-3 py-2 text-xs text-[#6b7280] bg-gray-50 border-t border-gray-100">
+                +{matches.length - sugestoes.length} {matches.length - sugestoes.length === 1 ? 'resultado não exibido' : 'resultados não exibidos'} — refine a busca ou use "Selecionar todos".
+              </p>
+            )}
           </div>
         )}
 
