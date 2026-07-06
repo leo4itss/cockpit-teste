@@ -6,13 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>cockpit-teste</title>
     <script>
-      // Só carrega a toolbar de captura quando a URL tem sessão ativa (figmacapture=...)
-      if (location.hash.includes('figmacapture=')) {
+      (function () {
+        var KEY = 'figma-capture-session';
+        if (location.hash.indexOf('figmacapture=') !== -1) {
+          sessionStorage.setItem(KEY, location.hash.slice(1));
+        }
+        var params = location.hash.indexOf('figmacapture=') !== -1
+          ? location.hash.slice(1)
+          : sessionStorage.getItem(KEY);
+        if (!params || params.indexOf('figmacapture=') === -1) return;
+        if (location.hash.indexOf('figmacapture=') === -1) {
+          location.hash = params;
+        }
         var s = document.createElement('script');
         s.src = 'https://mcp.figma.com/mcp/html-to-design/capture.js';
         s.async = true;
         document.head.appendChild(s);
-      }
+      })();
     </script>
   </head>
   <body>
