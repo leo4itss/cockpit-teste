@@ -98,7 +98,9 @@ function AddMembroSection({ allUsers, membros, onAdd, onAddBulk, disabled }: Add
 
   const membroIds = useMemo(() => new Set(membros.map(m => m.id)), [membros])
 
-  const sugestoes = useMemo(() => {
+  // Todos os usuários que casam com a busca (usado pelo "Selecionar todos");
+  // a lista exibida no dropdown é um recorte para não pesar o DOM.
+  const matches = useMemo(() => {
     const q = search.trim().toLowerCase()
     if (!q) return []
     return allUsers
@@ -107,14 +109,29 @@ function AddMembroSection({ allUsers, membros, onAdd, onAddBulk, disabled }: Add
         u.nomeCompleto.toLowerCase().includes(q) ||
         u.email.toLowerCase().includes(q)
       )
-      .slice(0, 8)
   }, [search, allUsers, membroIds])
+
+  const sugestoes = useMemo(() => matches.slice(0, 30), [matches])
+
+  const todosMatchesSelecionados =
+    matches.length > 0 && matches.every(u => selecionados.has(u.id))
 
   function toggle(user: User) {
     setSelecionados(prev => {
       const next = new Map(prev)
       if (next.has(user.id)) next.delete(user.id)
       else next.set(user.id, user)
+      return next
+    })
+  }
+
+  // Seleciona/desseleciona TODOS os resultados da busca atual — inclusive os
+  // que não estão visíveis no recorte do dropdown.
+  function toggleSelecionarTodosMatches() {
+    setSelecionados(prev => {
+      const next = new Map(prev)
+      if (todosMatchesSelecionados) matches.forEach(u => next.delete(u.id))
+      else matches.forEach(u => next.set(u.id, u))
       return next
     })
   }
