@@ -165,6 +165,52 @@ export function AcessosPage() {
   // o resultado de um clique mais recente — ver handleOpenPermEfetivas.
   const permEfetivasRequestId = useRef(0)
 
+  // ── Coluna "Grupo" + filtros + colunas configuráveis + seleção em massa ──
+  // userId → grupos dos quais é membro (carregado em uma única chamada por conta)
+  const [userGruposMap, setUserGruposMap] = useState<Record<string, { grupoId: string; grupoNome: string }[]>>({})
+  const [filtroGrupo,  setFiltroGrupo]  = useState('')
+  const [filtroArea,   setFiltroArea]   = useState('')
+  const [filtroPapel,  setFiltroPapel]  = useState('')
+  const [filtroStatus, setFiltroStatus] = useState('')
+  const [colunasVisiveis, setColunasVisiveis] = useLocalState<UserColumnId[]>('acessos-usuarios-colunas', DEFAULT_USER_COLUMNS)
+  const [paginaUsuarios, setPaginaUsuarios] = useState(0)
+  const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set())
+  const [showAtribuirGrupo, setShowAtribuirGrupo] = useState(false)
+
+  const colVisivel = (id: UserColumnId) => colunasVisiveis.includes(id)
+
+  // Carrega o mapa usuário→grupos (1 chamada por conta; no modo "Todas as contas",
+  // uma por conta em paralelo, com merge)
+  useEffect(() => {
+    if (!accountId) return
+    const accountIds = isAllAccounts ? allAccounts.map(a => a.id) : [accountId]
+    if (accountIds.length === 0) return
+    let cancelled = false
+    Promise.all(
+      accountIds.map(id => api.getAccountUsuarioGrupos(id).catch(() => []))
+    ).then(results => {
+      if (cancelled) return
+      const map: Record<string, { grupoId: string; grupoNome: string }[]> = {}
+      const seen = new Set<string>() // userId:grupoId — evita duplicar grupos org em "Todas as contas"
+      results.flat().forEach(({ userId, grupoId, grupoNome }) => {
+        const key = `${userId}:${grupoId}`
+        if (seen.has(key)) return
+        seen.add(key)
+        if (!map[userId]) map[userId] = []
+        map[userId].push({ grupoId, grupoNome })
+      })
+      setUserGruposMap(map)
+    })
+    return () => { cancelled = true }
+  }, [accountId, allAccounts, isAllAccounts])
+
+  // Filtros/conta mudaram → volta para a primeira página e limpa a seleção
+  // (uma seleção feita sob um filtro não deve vazar para outro contexto)
+  useEffect(() => {
+    setPaginaUsuarios(0)
+    setSelectedUserIds(new Set())
+  }, [searchUsers, filtroGrupo, filtroArea, filtroPapel, filtroStatus, accountId])
+
   useEffect(() => {
     if (!accountId) return
     setLoadingUsers(true)
