@@ -220,7 +220,7 @@ export function PermissoesMembroSheet({
   // ligar o modo "Combinar papéis" sem nenhum papel ainda marcado.
   useEffect(() => {
     if (!combinarPapeis || papeisCombinados.size === 0) return
-    setDraft(unionAcoesDosPapeis(papeisCombinados))
+    setDraft(unirAcoesDosPapeis(config.papeis, papeisCombinados, catalogo))
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [papeisCombinados, combinarPapeis])
 
