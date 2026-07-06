@@ -919,13 +919,45 @@ export function AcessosPage() {
                     </tr>
                   ))
                 ) : (
-                  <tr><td colSpan={isAllAccounts ? 8 : 7} className="px-4 py-8 text-center text-sm text-gray-500">Nenhum usuário encontrado</td></tr>
+                  <tr><td colSpan={colSpanUsuarios} className="px-4 py-8 text-center text-sm text-gray-500">Nenhum usuário encontrado</td></tr>
                 )}
               </tbody>
             </table>
+
+            {/* Paginação */}
+            {!loadingUsers && filteredUsers.length > USERS_PAGE_SIZE && (
+              <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-gray-50/60">
+                <p className="text-xs text-[#6b7280]">
+                  Exibindo <strong>{paginaAtual * USERS_PAGE_SIZE + 1}</strong>–<strong>{Math.min((paginaAtual + 1) * USERS_PAGE_SIZE, filteredUsers.length)}</strong>{' '}
+                  de <strong>{filteredUsers.length.toLocaleString('pt-BR')}</strong> usuários
+                </p>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    className="h-7 text-xs px-2.5"
+                    disabled={paginaAtual === 0}
+                    onClick={() => setPaginaUsuarios(p => Math.max(0, p - 1))}
+                  >
+                    Anterior
+                  </Button>
+                  <span className="text-xs text-[#6b7280]">
+                    {paginaAtual + 1} / {totalPaginas}
+                  </span>
+                  <Button
+                    variant="outline"
+                    className="h-7 text-xs px-2.5"
+                    disabled={paginaAtual >= totalPaginas - 1}
+                    onClick={() => setPaginaUsuarios(p => Math.min(totalPaginas - 1, p + 1))}
+                  >
+                    Próxima
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      )}
+        )
+      })()}
 
       {/* ── Aba Grupos ── */}
       {abaAtiva === 'grupos' && (
