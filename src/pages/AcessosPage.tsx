@@ -206,12 +206,12 @@ export function AcessosPage() {
     return () => { cancelled = true }
   }, [accountId, allAccounts, isAllAccounts])
 
-  // Filtros/conta mudaram → volta para a primeira página e limpa a seleção
-  // (uma seleção feita sob um filtro não deve vazar para outro contexto)
+  // Filtros/conta/itens por página mudaram → volta para a primeira página e limpa
+  // a seleção (uma seleção feita sob um filtro não deve vazar para outro contexto)
   useEffect(() => {
     setPaginaUsuarios(0)
     setSelectedUserIds(new Set())
-  }, [searchUsers, filtroGrupo, filtroObjeto, filtroPapel, filtroStatus, accountId])
+  }, [searchUsers, filtroGrupo, filtroObjeto, filtroPapel, filtroStatus, accountId, pageSize])
 
   useEffect(() => {
     if (!accountId) return
