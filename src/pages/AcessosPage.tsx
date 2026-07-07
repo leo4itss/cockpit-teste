@@ -448,13 +448,13 @@ export function AcessosPage() {
     })
   }, [users, searchUsers, filtroGrupo, filtroObjeto, filtroPapel, filtroStatus, userGruposMap, userObjetosMap])
 
-  // Paginação client-side — a tabela nunca renderiza mais que USERS_PAGE_SIZE linhas
+  // Paginação client-side — a tabela nunca renderiza mais que pageSize linhas
   // de uma vez (necessário para manter a tela fluida com dezenas de milhares de usuários)
-  const totalPaginas = Math.max(1, Math.ceil(filteredUsers.length / USERS_PAGE_SIZE))
+  const totalPaginas = Math.max(1, Math.ceil(filteredUsers.length / pageSize))
   const paginaAtual  = Math.min(paginaUsuarios, totalPaginas - 1)
   const paginatedUsers = useMemo(
-    () => filteredUsers.slice(paginaAtual * USERS_PAGE_SIZE, (paginaAtual + 1) * USERS_PAGE_SIZE),
-    [filteredUsers, paginaAtual]
+    () => filteredUsers.slice(paginaAtual * pageSize, (paginaAtual + 1) * pageSize),
+    [filteredUsers, paginaAtual, pageSize]
   )
 
   // ── Seleção em massa ────────────────────────────────────────
