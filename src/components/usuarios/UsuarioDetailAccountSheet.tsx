@@ -84,6 +84,9 @@ export function UsuarioDetailAccountSheet({
   const [componenteNomes, setComponenteNomes] = useState<Record<string, string>>({})
   const [loadingAcesso, setLoadingAcesso]     = useState(false)
 
+  // Grupos aos quais o usuário pertence (escopo desta conta + org-scoped herdados)
+  const [grupos, setGrupos]                   = useState<Grupo[]>([])
+
 
   // Permissões de instância selecionada
   const [instanciaAberta, setInstanciaAberta] = useState<{
