@@ -277,6 +277,45 @@ export function UsuarioDetailAccountSheet({
 
           <Divider />
 
+          {/* ── Grupos ───────────────────────────────────────── */}
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-2">
+              <Users className="w-4 h-4 text-[#6b7280] shrink-0" />
+              <SectionTitle>Grupos</SectionTitle>
+            </div>
+            {loadingAcesso ? (
+              <p className="text-sm text-[#6b7280]">Carregando…</p>
+            ) : grupos.length === 0 ? (
+              <div className="px-4 py-3 rounded-lg border border-dashed border-gray-200 bg-gray-50">
+                <p className="text-sm text-[#6b7280]">
+                  Não pertence a nenhum grupo nesta conta.
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-1.5">
+                {grupos.map(g => (
+                  <div
+                    key={g.id}
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-200 bg-white"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-violet-100 text-violet-600 shrink-0 flex items-center justify-center">
+                      <Users className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-[#030712] truncate">{g.nome}</p>
+                      {g.descricao && <p className="text-xs text-[#6b7280] truncate">{g.descricao}</p>}
+                    </div>
+                    {g.escopo === 'org'
+                      ? <Badge variant="info">Organização</Badge>
+                      : <Badge variant="default" className="bg-violet-50 text-violet-700 border border-violet-200">Conta</Badge>}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <Divider />
+
           {/* ── Permissões ───────────────────────────────────── */}
           <div className="flex flex-col gap-5">
             <div className="flex items-center gap-2">
