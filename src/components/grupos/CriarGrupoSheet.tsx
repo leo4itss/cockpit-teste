@@ -78,14 +78,18 @@ export function CriarGrupoSheet({ open, onClose, accountId, componentesAtivos: _
   const [saving, setSaving]       = useState(false)
   const [error, setError]         = useState<string | null>(null)
 
+  // Seleção acumulada no dropdown de busca — compõe um lote antes de adicionar
+  const [selecionadosBusca, setSelecionadosBusca] = useState<Map<string, User>>(new Map())
+
   // Carrega usuários para busca de membros
   useEffect(() => {
     if (!open) return
     api.getUsers().then(setAllUsers).catch(() => {})
   }, [open])
 
-  // Filtra usuários pela busca — exclui já selecionados
-  const sugestoes = useMemo(() => {
+  // Todos os usuários que casam com a busca (usado pelo "Selecionar todos");
+  // a lista exibida no dropdown é um recorte para não pesar o DOM.
+  const matches = useMemo(() => {
     const q = searchMembro.trim().toLowerCase()
     if (!q) return []
     const selecionadosIds = new Set(membros.map(m => m.id))
@@ -95,8 +99,12 @@ export function CriarGrupoSheet({ open, onClose, accountId, componentesAtivos: _
         u.nomeCompleto.toLowerCase().includes(q) ||
         u.email.toLowerCase().includes(q)
       )
-      .slice(0, 6)
   }, [searchMembro, allUsers, membros])
+
+  const sugestoes = useMemo(() => matches.slice(0, 30), [matches])
+
+  const todosMatchesSelecionados =
+    matches.length > 0 && matches.every(u => selecionadosBusca.has(u.id))
 
   function addMembro(user: User) {
     setMembros(prev => prev.find(m => m.id === user.id) ? prev : [...prev, user])
@@ -105,6 +113,43 @@ export function CriarGrupoSheet({ open, onClose, accountId, componentesAtivos: _
 
   function removeMembro(userId: string) {
     setMembros(prev => prev.filter(m => m.id !== userId))
+  }
+
+  function toggleSelecaoBusca(user: User) {
+    setSelecionadosBusca(prev => {
+      const next = new Map(prev)
+      if (next.has(user.id)) next.delete(user.id)
+      else next.set(user.id, user)
+      return next
+    })
+  }
+
+  // Clique simples com nada selecionado mantém o fluxo antigo (adiciona na hora);
+  // com seleção em andamento, o clique vira toggle para compor o lote.
+  function handleSugestaoClick(user: User) {
+    if (selecionadosBusca.size === 0) addMembro(user)
+    else toggleSelecaoBusca(user)
+  }
+
+  // Seleciona/desseleciona TODOS os resultados da busca atual — inclusive os
+  // que não estão visíveis no recorte do dropdown.
+  function toggleSelecionarTodosMatches() {
+    setSelecionadosBusca(prev => {
+      const next = new Map(prev)
+      if (todosMatchesSelecionados) matches.forEach(u => next.delete(u.id))
+      else matches.forEach(u => next.set(u.id, u))
+      return next
+    })
+  }
+
+  function addSelecionadosBusca() {
+    if (selecionadosBusca.size === 0) return
+    setMembros(prev => {
+      const existentes = new Set(prev.map(m => m.id))
+      return [...prev, ...[...selecionadosBusca.values()].filter(u => !existentes.has(u.id))]
+    })
+    setSelecionadosBusca(new Map())
+    setSearchMembro('')
   }
 
   const canSave = nome.trim().length > 0
