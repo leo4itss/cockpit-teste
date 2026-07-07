@@ -64,7 +64,8 @@ type UserColumnId = typeof USER_COLUMNS[number]['id']
 // Padrão pós-GAP da reunião de 06/07: "Grupo" substitui "Papel" (que fica opcional)
 const DEFAULT_USER_COLUMNS: UserColumnId[] = ['usuario', 'email', 'grupos', 'status', 'ultimoAcesso']
 
-const USERS_PAGE_SIZE = 50
+const PAGE_SIZE_OPTIONS = [10, 20, 50, 100] as const
+const DEFAULT_PAGE_SIZE = 50
 
 // ─────────────────────────────────────────────────────────────
 
