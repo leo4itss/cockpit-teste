@@ -559,16 +559,6 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
           )}
         </div>
 
-        {showAdd && (
-          <AddMembroSection
-            allUsers={allUsers}
-            membros={membros}
-            onAdd={handleAdd}
-            onAddBulk={handleAddBulk}
-            disabled={!!addingId}
-          />
-        )}
-
       </NestedSheetBody>
 
       <NestedSheetFooter>
