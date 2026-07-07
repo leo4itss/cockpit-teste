@@ -196,6 +196,7 @@ export function CriarGrupoSheet({ open, onClose, accountId, componentesAtivos: _
   function handleClose() {
     setNome(''); setDescricao('')
     setSearchMembro(''); setMembros([]); setError(null)
+    setSelecionadosBusca(new Map())
     onClose()
   }
 
