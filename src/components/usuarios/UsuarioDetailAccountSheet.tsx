@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Check, Shield, Layers } from 'lucide-react'
+import { Check, Shield, Layers, Users } from 'lucide-react'
 import {
   NestedSheet,
   NestedSheetHeader,
@@ -8,12 +8,13 @@ import {
   NestedSheetFooter,
 } from '@/components/ui/nested-sheet'
 import { Button } from '@/components/ui/Button'
+import { Badge } from '@/components/ui/Badge'
 import { AtribuirPermissoesSheet } from '@/components/permissoes/AtribuirPermissoesSheet'
 import { PermissoesMembroSheet } from '@/components/instancias/PermissoesMembroSheet'
 import { NIVEIS_CONTA, getComponenteConfig } from '@/authz/mock'
 import { cn } from '@/lib/utils'
 import { api } from '@/api/client'
-import type { User, Instancia, InstanciaMembro, UserAccountMembership } from '@/types'
+import type { User, Instancia, InstanciaMembro, UserAccountMembership, Grupo } from '@/types'
 
 // ── Helpers ───────────────────────────────────────────────────
 
