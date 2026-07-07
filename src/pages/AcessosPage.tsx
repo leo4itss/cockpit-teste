@@ -175,6 +175,7 @@ export function AcessosPage() {
   const [filtroStatus,  setFiltroStatus]  = useState('')
   const [colunasVisiveis, setColunasVisiveis] = useLocalState<UserColumnId[]>('acessos-usuarios-colunas', DEFAULT_USER_COLUMNS)
   const [paginaUsuarios, setPaginaUsuarios] = useState(0)
+  const [pageSize, setPageSize] = useLocalState<number>('acessos-usuarios-page-size', DEFAULT_PAGE_SIZE)
   const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set())
   const [showAtribuirGrupo, setShowAtribuirGrupo] = useState(false)
 
