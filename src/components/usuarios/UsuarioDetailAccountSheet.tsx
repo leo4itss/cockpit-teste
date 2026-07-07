@@ -168,6 +168,7 @@ export function UsuarioDetailAccountSheet({
     setMembership(null)
     setInstancias([])
     setMembroInstancias([])
+    setGrupos([])
     onClose()
   }
 
