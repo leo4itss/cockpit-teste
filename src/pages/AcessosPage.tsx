@@ -969,33 +969,51 @@ export function AcessosPage() {
             </table>
 
             {/* Paginação */}
-            {!loadingUsers && filteredUsers.length > USERS_PAGE_SIZE && (
+            {!loadingUsers && filteredUsers.length > 0 && (
               <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-gray-50/60">
-                <p className="text-xs text-[#6b7280]">
-                  Exibindo <strong>{paginaAtual * USERS_PAGE_SIZE + 1}</strong>–<strong>{Math.min((paginaAtual + 1) * USERS_PAGE_SIZE, filteredUsers.length)}</strong>{' '}
-                  de <strong>{filteredUsers.length.toLocaleString('pt-BR')}</strong> usuários
-                </p>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    className="h-7 text-xs px-2.5"
-                    disabled={paginaAtual === 0}
-                    onClick={() => setPaginaUsuarios(p => Math.max(0, p - 1))}
-                  >
-                    Anterior
-                  </Button>
-                  <span className="text-xs text-[#6b7280]">
-                    {paginaAtual + 1} / {totalPaginas}
-                  </span>
-                  <Button
-                    variant="outline"
-                    className="h-7 text-xs px-2.5"
-                    disabled={paginaAtual >= totalPaginas - 1}
-                    onClick={() => setPaginaUsuarios(p => Math.min(totalPaginas - 1, p + 1))}
-                  >
-                    Próxima
-                  </Button>
+                <div className="flex items-center gap-3">
+                  <p className="text-xs text-[#6b7280]">
+                    Exibindo <strong>{paginaAtual * pageSize + 1}</strong>–<strong>{Math.min((paginaAtual + 1) * pageSize, filteredUsers.length)}</strong>{' '}
+                    de <strong>{filteredUsers.length.toLocaleString('pt-BR')}</strong> usuários
+                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <label htmlFor="page-size-select" className="text-xs text-[#6b7280]">Por página</label>
+                    <div className="relative">
+                      <select
+                        id="page-size-select"
+                        value={pageSize}
+                        onChange={e => setPageSize(Number(e.target.value))}
+                        className="appearance-none pl-2 pr-6 py-1 text-xs bg-white border border-gray-200 rounded-md outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
+                      >
+                        {PAGE_SIZE_OPTIONS.map(n => <option key={n} value={n}>{n}</option>)}
+                      </select>
+                      <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
+                    </div>
+                  </div>
                 </div>
+                {totalPaginas > 1 && (
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      className="h-7 text-xs px-2.5"
+                      disabled={paginaAtual === 0}
+                      onClick={() => setPaginaUsuarios(p => Math.max(0, p - 1))}
+                    >
+                      Anterior
+                    </Button>
+                    <span className="text-xs text-[#6b7280]">
+                      {paginaAtual + 1} / {totalPaginas}
+                    </span>
+                    <Button
+                      variant="outline"
+                      className="h-7 text-xs px-2.5"
+                      disabled={paginaAtual >= totalPaginas - 1}
+                      onClick={() => setPaginaUsuarios(p => Math.min(totalPaginas - 1, p + 1))}
+                    >
+                      Próxima
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
           </div>
