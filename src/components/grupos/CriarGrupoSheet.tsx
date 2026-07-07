@@ -297,22 +297,53 @@ export function CriarGrupoSheet({ open, onClose, accountId, componentesAtivos: _
                 )}
               </div>
 
-              {/* Dropdown de sugestões */}
+              {/* Dropdown de sugestões — checkbox para compor lote, clique para ação */}
               {sugestoes.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20 overflow-hidden">
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20 overflow-hidden max-h-[320px] overflow-y-auto">
+                  {/* Selecionar todos os resultados da busca (mesmo os fora do recorte exibido) */}
+                  <div
+                    onClick={toggleSelecionarTodosMatches}
+                    className="w-full flex items-center gap-3 px-3 py-2 bg-gray-50 border-b border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors sticky top-0"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={todosMatchesSelecionados}
+                      onChange={toggleSelecionarTodosMatches}
+                      onClick={e => e.stopPropagation()}
+                      className="w-4 h-4 rounded border-gray-300 accent-blue-600 shrink-0 cursor-pointer"
+                    />
+                    <p className="text-xs font-medium text-[#374151]">
+                      Selecionar todos os <strong>{matches.length}</strong> {matches.length === 1 ? 'resultado' : 'resultados'} da busca
+                    </p>
+                  </div>
                   {sugestoes.map(user => (
-                    <button
+                    <div
                       key={user.id}
-                      onClick={() => addMembro(user)}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 transition-colors text-left"
+                      onClick={() => handleSugestaoClick(user)}
+                      className={cn(
+                        'w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 transition-colors text-left cursor-pointer',
+                        selecionadosBusca.has(user.id) && 'bg-blue-50/60 hover:bg-blue-50',
+                      )}
                     >
+                      <input
+                        type="checkbox"
+                        checked={selecionadosBusca.has(user.id)}
+                        onChange={() => toggleSelecaoBusca(user)}
+                        onClick={e => e.stopPropagation()}
+                        className="w-4 h-4 rounded border-gray-300 accent-blue-600 shrink-0 cursor-pointer"
+                      />
                       <Avatar nome={user.nomeCompleto} size="md" />
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-[#030712] truncate">{user.nomeCompleto}</p>
                         <p className="text-xs text-[#6b7280] truncate">{user.email}</p>
                       </div>
-                    </button>
+                    </div>
                   ))}
+                  {matches.length > sugestoes.length && (
+                    <p className="px-3 py-2 text-xs text-[#6b7280] bg-gray-50 border-t border-gray-100">
+                      +{matches.length - sugestoes.length} {matches.length - sugestoes.length === 1 ? 'resultado não exibido' : 'resultados não exibidos'} — refine a busca ou use "Selecionar todos".
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -324,7 +355,25 @@ export function CriarGrupoSheet({ open, onClose, accountId, componentesAtivos: _
               )}
             </div>
 
-            {membros.length === 0 && (
+            {/* Lote em composição */}
+            {selecionadosBusca.size > 0 && (
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-xs text-[#6b7280]">
+                  <strong className="text-[#030712]">{selecionadosBusca.size}</strong> {selecionadosBusca.size === 1 ? 'selecionado' : 'selecionados'}
+                </p>
+                <button
+                  onClick={() => setSelecionadosBusca(new Map())}
+                  className="text-xs text-gray-500 hover:text-gray-700 underline underline-offset-2"
+                >
+                  limpar
+                </button>
+                <Button onClick={addSelecionadosBusca} className="ml-auto h-7 text-xs px-3">
+                  {`Adicionar selecionados (${selecionadosBusca.size})`}
+                </Button>
+              </div>
+            )}
+
+            {membros.length === 0 && selecionadosBusca.size === 0 && (
               <p className="text-xs text-[#6b7280]">
                 Você pode adicionar membros agora ou depois, no detalhe do grupo.
               </p>
