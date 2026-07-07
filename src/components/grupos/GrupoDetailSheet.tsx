@@ -491,6 +491,16 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
           </button>
         </div>
 
+        {showAdd && (
+          <AddMembroSection
+            allUsers={allUsers}
+            membros={membros}
+            onAdd={handleAdd}
+            onAddBulk={handleAddBulk}
+            disabled={!!addingId}
+          />
+        )}
+
         <div>
           {loadingMembros ? (
             <div className="flex items-center justify-center py-8 text-sm text-gray-500">
