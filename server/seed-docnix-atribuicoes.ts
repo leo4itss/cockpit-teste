@@ -150,7 +150,7 @@ async function seed() {
   await db.update(componentes).set({ status: 'Ativo', tipoModelo: 'docnix' }).where(eq(componentes.id, docactionId))
   await seedAtribuicoes(docactionId, DOCACTION_ATRIBUICOES)
 
-  console.log('\nSeed concluído. Ver docs/ATRIBUICOES_DOCNIX_CATALOGO.md')
+  console.log('\nSeed concluído. Ver docs/06-catalogo-acoes.md')
 }
 
 seed().catch(err => {
