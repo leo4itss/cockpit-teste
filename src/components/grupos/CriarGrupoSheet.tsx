@@ -280,6 +280,25 @@ export function CriarGrupoSheet({ open, onClose, accountId, componentesAtivos: _
               </div>
             )}
 
+            {/* Lote em composição — fica acima da busca para não ser encoberto pelo
+                dropdown de sugestões (que é posicionado absolute sobre o conteúdo abaixo). */}
+            {selecionadosBusca.size > 0 && (
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-xs text-[#6b7280]">
+                  <strong className="text-[#030712]">{selecionadosBusca.size}</strong> {selecionadosBusca.size === 1 ? 'selecionado' : 'selecionados'}
+                </p>
+                <button
+                  onClick={() => setSelecionadosBusca(new Map())}
+                  className="text-xs text-gray-500 hover:text-gray-700 underline underline-offset-2"
+                >
+                  limpar
+                </button>
+                <Button onClick={addSelecionadosBusca} className="ml-auto h-7 text-xs px-3">
+                  {`Adicionar selecionados (${selecionadosBusca.size})`}
+                </Button>
+              </div>
+            )}
+
             {/* Campo de busca */}
             <div className="relative">
               <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-colors">
