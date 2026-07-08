@@ -374,24 +374,6 @@ export function CriarGrupoSheet({ open, onClose, accountId, componentesAtivos: _
               )}
             </div>
 
-            {/* Lote em composição */}
-            {selecionadosBusca.size > 0 && (
-              <div className="flex items-center gap-2 flex-wrap">
-                <p className="text-xs text-[#6b7280]">
-                  <strong className="text-[#030712]">{selecionadosBusca.size}</strong> {selecionadosBusca.size === 1 ? 'selecionado' : 'selecionados'}
-                </p>
-                <button
-                  onClick={() => setSelecionadosBusca(new Map())}
-                  className="text-xs text-gray-500 hover:text-gray-700 underline underline-offset-2"
-                >
-                  limpar
-                </button>
-                <Button onClick={addSelecionadosBusca} className="ml-auto h-7 text-xs px-3">
-                  {`Adicionar selecionados (${selecionadosBusca.size})`}
-                </Button>
-              </div>
-            )}
-
             {membros.length === 0 && selecionadosBusca.size === 0 && (
               <p className="text-xs text-[#6b7280]">
                 Você pode adicionar membros agora ou depois, no detalhe do grupo.
