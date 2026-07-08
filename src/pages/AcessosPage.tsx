@@ -1164,15 +1164,6 @@ export function AcessosPage() {
                                 ? <Badge variant="success">Ativo</Badge>
                                 : <Badge variant="secondary">Inativo</Badge>}
                             </td>
-                            <td className="px-4 py-3 text-center" onClick={e => e.stopPropagation()}>
-                              <button
-                                onClick={() => navigate(`/instancia/${inst.id}`)}
-                                className="p-2 hover:bg-gray-100 rounded-md transition-colors"
-                                title="Gerenciar membros"
-                              >
-                                <Search className="w-4 h-4 text-gray-500" />
-                              </button>
-                            </td>
                           </tr>
                         ))}
                       </tbody>
