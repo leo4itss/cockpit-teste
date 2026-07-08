@@ -161,6 +161,28 @@ function AddMembroSection({ allUsers, membros, onAdd, onAddBulk, disabled }: Add
 
   return (
     <div className="px-6 py-3 border-t border-gray-100 bg-gray-50/60 space-y-2">
+      {/* Lote em composição — fica acima da busca para não ser encoberto pelo
+          dropdown de sugestões (que é posicionado absolute sobre o conteúdo abaixo). */}
+      {selecionados.size > 0 && (
+        <div className="flex items-center gap-2 flex-wrap">
+          <p className="text-xs text-[#6b7280]">
+            <strong className="text-[#030712]">{selecionados.size}</strong> {selecionados.size === 1 ? 'selecionado' : 'selecionados'}
+          </p>
+          <button
+            onClick={() => setSelecionados(new Map())}
+            disabled={addingBulk}
+            className="text-xs text-gray-500 hover:text-gray-700 underline underline-offset-2"
+          >
+            limpar
+          </button>
+          <Button onClick={handleAddSelecionados} disabled={addingBulk} className="ml-auto h-7 text-xs px-3">
+            {addingBulk
+              ? <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />Adicionando...</>
+              : `Adicionar selecionados (${selecionados.size})`}
+          </Button>
+        </div>
+      )}
+
       <div className="relative">
         <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-colors">
           <Search className="w-4 h-4 text-gray-400 shrink-0" />
