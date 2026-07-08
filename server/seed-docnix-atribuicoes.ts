@@ -3,7 +3,7 @@ import { db } from './db'
 import { componentes, componenteAtribuicoes } from './schema'
 import { eq } from 'drizzle-orm'
 
-// Catálogo alinhado a docs/ATRIBUICOES_DOCNIX_CATALOGO.md
+// Catálogo alinhado a docs/06-catalogo-acoes.md
 // MaxDoc: 47 · DocAction: 19
 
 type AtribSeed = { id: string; nome: string; modulo: string | null }
