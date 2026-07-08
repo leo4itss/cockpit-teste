@@ -256,27 +256,6 @@ function AddMembroSection({ allUsers, membros, onAdd, onAddBulk, disabled }: Add
           </div>
         )}
       </div>
-
-      {/* Lote em composição */}
-      {selecionados.size > 0 && (
-        <div className="flex items-center gap-2 flex-wrap">
-          <p className="text-xs text-[#6b7280]">
-            <strong className="text-[#030712]">{selecionados.size}</strong> {selecionados.size === 1 ? 'selecionado' : 'selecionados'}
-          </p>
-          <button
-            onClick={() => setSelecionados(new Map())}
-            disabled={addingBulk}
-            className="text-xs text-gray-500 hover:text-gray-700 underline underline-offset-2"
-          >
-            limpar
-          </button>
-          <Button onClick={handleAddSelecionados} disabled={addingBulk} className="ml-auto h-7 text-xs px-3">
-            {addingBulk
-              ? <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />Adicionando...</>
-              : `Adicionar selecionados (${selecionados.size})`}
-          </Button>
-        </div>
-      )}
     </div>
   )
 }
