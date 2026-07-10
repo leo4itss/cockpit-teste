@@ -94,6 +94,9 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
   const showOrganizacoes = !isAccountAdminOnly   // todos exceto Account Admin puro
   const showAcessos      = !isPasArchitectOnly   // PAS Architect puro não vê Acessos
   const showComponentes  = isPlatformAdmin || isPasArchitect  // só quem gerencia componentes
+  // Grupos (rota /grupos): mesmo perfil que a própria página aceita — reflete o
+  // guard de acesso em GruposPage.tsx (Platform Admin, Org Admin, Account Admin).
+  const showGrupos       = isPlatformAdmin || isOrgAdmin || isAccountAdmin
 
   return (
     <aside
