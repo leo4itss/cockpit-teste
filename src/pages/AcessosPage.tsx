@@ -553,6 +553,7 @@ export function AcessosPage() {
   const [loadingGrupos, setLoadingGrupos] = useState(true)
   const [searchGrupos, setSearchGrupos]   = useState('')
   const [showCriarGrupoSheet, setShowCriarGrupoSheet]       = useState(false)
+  const [showCriarGrupoOrgSheet, setShowCriarGrupoOrgSheet] = useState(false)
   const [showGrupoDetailSheet, setShowGrupoDetailSheet]     = useState(false)
   const [selectedGrupo, setSelectedGrupo]                   = useState<Grupo | null>(null)
 
