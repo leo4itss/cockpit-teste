@@ -1218,6 +1218,16 @@ export function AcessosPage() {
         componentesAtivos={componentesAtivos}
         onSuccess={grupo => setGrupos(prev => [...prev, grupo])}
       />
+      <CriarGrupoOrgSheet
+        open={showCriarGrupoOrgSheet}
+        onClose={() => setShowCriarGrupoOrgSheet(false)}
+        orgId={effectiveOrgId}
+        orgs={allOrgs}
+        contas={allAccounts}
+        grupos={grupos}
+        isPlatformAdmin={isPlatformAdmin}
+        onSuccess={grupo => setGrupos(prev => [...prev, grupo])}
+      />
       <GrupoDetailSheet
         open={showGrupoDetailSheet}
         onClose={() => setShowGrupoDetailSheet(false)}
