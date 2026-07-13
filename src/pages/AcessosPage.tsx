@@ -694,6 +694,10 @@ export function AcessosPage() {
             <Button onClick={() => setShowCriarGrupoSheet(true)}>
               <Plus className="w-4 h-4 mr-1.5" />Criar grupo
             </Button>
+          ) : abaAtiva === 'grupos' && isPlatformAdmin ? (
+            <Button onClick={() => setShowCriarGrupoOrgSheet(true)}>
+              <Plus className="w-4 h-4 mr-1.5" />Criar grupo
+            </Button>
           ) : null}
         </div>
       </div>
