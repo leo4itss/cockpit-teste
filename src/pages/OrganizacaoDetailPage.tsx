@@ -658,8 +658,8 @@ export function OrganizacaoDetailPage() {
               </p>
             </div>
             <div className="flex items-center gap-3 shrink-0">
-              {/* Botão global — criação de Org Admin (Platform Admin only) */}
-              {isPlatformAdmin && (
+              {/* Criação de Org Admin (Platform Admin only) — só na aba Usuários, onde os usuários da org são listados */}
+              {isPlatformAdmin && tab === 'usuarios' && (
                 <Button variant="outline" onClick={() => setShowCriarOrgAdmin(true)}>
                   <UserPlus className="w-4 h-4 mr-1.5" />
                   Criar Org Admin
