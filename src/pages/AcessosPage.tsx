@@ -17,6 +17,7 @@ import { cn } from '@/lib/utils'
 import type { User, Grupo } from '@/types'
 
 import { CriarGrupoSheet } from '@/components/grupos/CriarGrupoSheet'
+import { CriarGrupoOrgSheet } from '@/components/grupos/CriarGrupoOrgSheet'
 import { GrupoDetailSheet } from '@/components/grupos/GrupoDetailSheet'
 import { AtribuirGrupoEmMassaSheet } from '@/components/usuarios/AtribuirGrupoEmMassaSheet'
 import { InstanciaDetailSheet } from '@/components/instancias/InstanciaDetailSheet'
