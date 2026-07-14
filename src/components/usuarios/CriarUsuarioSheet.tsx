@@ -509,7 +509,7 @@ export function CriarUsuarioSheet({ open, onClose, onSuccess, accountId, variant
           )}
           <Button variant="outline" onClick={handleClose} disabled={saving}>Cancelar</Button>
           <Button onClick={handleCriar} disabled={saving}>
-            {saving ? 'Criando...' : 'Criar usuário'}
+            {saving ? copy.botaoSalvando : copy.botaoCriar}
           </Button>
         </NestedSheetFooter>
       </NestedSheet>
