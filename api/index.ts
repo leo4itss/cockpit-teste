@@ -1293,9 +1293,18 @@ app.get('/instancias/:id/permissoes-efetivas', async (c) => {
     todosGrupos.map((g: any) => [g.id, g.nome])
   )
 
-  const fontes: { atribuicaoId: string; fonte: string; entidadeId: string; displayName?: string }[] = [
+  const fontes: { atribuicaoId: string; fonte: string; entidadeId: string; displayName?: string; viaChain?: string[] }[] = [
     ...directPerms.map((p: any) => ({ atribuicaoId: p.acao, fonte: 'direto', entidadeId: userId })),
-    ...groupPerms.map((p: any) => ({ atribuicaoId: p.acao, fonte: 'grupo', entidadeId: p.entidadeId, displayName: grupoNomeMap[p.entidadeId] })),
+    ...groupPerms.map((p: any) => {
+      const caminho = caminhoPorGrupoId[p.entidadeId]
+      return {
+        atribuicaoId: p.acao,
+        fonte: 'grupo',
+        entidadeId: p.entidadeId,
+        displayName: grupoNomeMap[p.entidadeId],
+        viaChain: caminho && caminho.length > 1 ? caminho : undefined,
+      }
+    }),
   ]
 
   const atribuicoes = [...new Set(fontes.map((f) => f.atribuicaoId))]
