@@ -1283,6 +1283,7 @@ export function OrganizacaoDetailPage() {
       <CriarUsuarioSheet
         open={showCriarOrgAdmin}
         onClose={() => setShowCriarOrgAdmin(false)}
+        variant="org-admin"
       />
       <CriarUsuarioSheet
         open={showCriarUsuario}
