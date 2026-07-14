@@ -89,11 +89,28 @@ interface Props {
   onClose:    () => void
   onSuccess?: (user: User) => void
   accountId?: string   // quando fornecido, habilita seleção de papel e grupo
+  variant?:   'usuario' | 'org-admin'   // 'org-admin' ajusta título/descrição/label do botão
 }
+
+const VARIANT_COPY = {
+  'usuario': {
+    titulo:     'Criar usuário',
+    descricao:  'Preencha os dados para criar um novo usuário na plataforma.',
+    botaoCriar: 'Criar usuário',
+    botaoSalvando: 'Criando...',
+  },
+  'org-admin': {
+    titulo:     'Criar Org Admin',
+    descricao:  'Preencha os dados para criar um novo Administrador da Organização — terá acesso para gerenciar contas, usuários e grupos desta organização.',
+    botaoCriar: 'Criar Org Admin',
+    botaoSalvando: 'Criando...',
+  },
+} as const
 
 // ── Componente ────────────────────────────────────────────────
 
-export function CriarUsuarioSheet({ open, onClose, onSuccess, accountId }: Props) {
+export function CriarUsuarioSheet({ open, onClose, onSuccess, accountId, variant = 'usuario' }: Props) {
+  const copy = VARIANT_COPY[variant]
   const [form, setForm]                   = useState({ ...EMPTY_FORM })
   const [etiquetaDialogOpen, setEtiquetaDialogOpen] = useState(false)
   const [saving, setSaving]               = useState(false)
