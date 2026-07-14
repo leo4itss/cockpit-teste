@@ -244,7 +244,7 @@ export function PermissoesEfetivasSheet({
                         ) : (
                           <div className="flex flex-wrap gap-1.5">
                             {fontesDoAtrib.map((f, idx) => (
-                              <FonteBadge key={idx} fonte={f.fonte} entidadeId={f.entidadeId} displayName={f.displayName} />
+                              <FonteBadge key={idx} fonte={f.fonte} entidadeId={f.entidadeId} displayName={f.displayName} viaChain={f.viaChain} />
                             ))}
                           </div>
                         )}
