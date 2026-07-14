@@ -43,7 +43,7 @@ interface PermissoesEfetivasSheetProps {
 
 // ── Badges de origem ──────────────────────────────────────────
 
-function FonteBadge({ fonte, entidadeId, displayName }: { fonte: string; entidadeId: string; displayName?: string }) {
+function FonteBadge({ fonte, entidadeId, displayName, viaChain }: { fonte: string; entidadeId: string; displayName?: string; viaChain?: string[] }) {
   if (fonte === 'direto') {
     return (
       <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
@@ -52,8 +52,15 @@ function FonteBadge({ fonte, entidadeId, displayName }: { fonte: string; entidad
     )
   }
   if (fonte === 'grupo') {
+    const temCadeia = viaChain && viaChain.length > 1
     return (
-      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
+      <span
+        className={cn(
+          'inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200',
+          temCadeia && 'cursor-help border-dashed'
+        )}
+        title={temCadeia ? `Herdado via ${viaChain!.join(' → ')}` : undefined}
+      >
         Via Grupo · {displayName ?? entidadeId}
       </span>
     )
