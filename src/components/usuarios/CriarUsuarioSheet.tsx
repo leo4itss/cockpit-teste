@@ -201,9 +201,9 @@ export function CriarUsuarioSheet({ open, onClose, onSuccess, accountId, variant
     <>
       <NestedSheet open={open} onClose={handleClose} width="w-[640px]">
         <NestedSheetHeader onClose={handleClose}>
-          <NestedSheetTitle>Criar usuário</NestedSheetTitle>
+          <NestedSheetTitle>{copy.titulo}</NestedSheetTitle>
           <NestedSheetDescription>
-            Preencha os dados para criar um novo usuário na plataforma.
+            {copy.descricao}
           </NestedSheetDescription>
         </NestedSheetHeader>
 
