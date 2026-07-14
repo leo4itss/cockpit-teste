@@ -280,7 +280,7 @@ export const api = {
   // Permissões Efetivas (legado DocNix — retorna atribuicaoIds, não acao strings)
   // @deprecated Endpoint legado — permissões agora em component_permissions
   getPermissoesEfetivas: (instanciaId: string, userId: string) =>
-    request<{ atribuicoes: string[]; fontes: { atribuicaoId: string; fonte: string; entidadeId: string }[] }>(
+    request<{ atribuicoes: string[]; fontes: { atribuicaoId: string; fonte: string; entidadeId: string; displayName?: string; viaChain?: string[] }[] }>(
       `/api/instancias/${instanciaId}/permissoes-efetivas?userId=${userId}`
     ),
 
