@@ -1255,6 +1255,26 @@ app.get('/instancias/:id/permissoes-efetivas', async (c) => {
 
   const grupoIds = expandirComAncestors(gruposDiretos)
 
+  // Caminho de nomes do grupo direto até cada grupo alcançado via ancestralidade —
+  // usado para exibir a cadeia de herança no badge "Via Grupo" quando o grupo que
+  // detém a permissão no objeto é um ancestral do grupo em que o usuário está.
+  const caminhoPorGrupoId: Record<string, string[]> = {}
+  for (const diretoId of gruposDiretos) {
+    let cursor = diretoId
+    const caminho: string[] = []
+    const visitados = new Set<string>()
+    while (cursor && !visitados.has(cursor)) {
+      const g = grupoById.get(cursor)
+      if (!g) break
+      caminho.push(g.nome)
+      if (!caminhoPorGrupoId[cursor] || caminhoPorGrupoId[cursor].length > caminho.length) {
+        caminhoPorGrupoId[cursor] = [...caminho]
+      }
+      visitados.add(cursor)
+      cursor = g.parentId ?? null
+    }
+  }
+
   const directPerms = await db.select().from(componentPermissions)
     .where(and(
       eq(componentPermissions.instanciaId, instanceId),
