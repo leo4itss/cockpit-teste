@@ -16,6 +16,8 @@ interface EfetivaFonte {
   fonte: string
   entidadeId: string
   displayName?: string
+  /** Cadeia de herança do grupo direto até o grupo que detém a permissão (ex: ['Farmacêuticos Sênior', 'Farmacêuticos']) */
+  viaChain?: string[]
 }
 
 interface InstanciaOpcao {
