@@ -484,8 +484,6 @@ export function NewAccountSheet({ open, onClose, orgId, onSave }: Props) {
         onClose={() => { setShowAdminDialog(false); setEditingAdminIdx(null) }}
         onAdd={handleAdminAdd}
         initialAdmin={editingAdminIdx !== null ? admins[editingAdminIdx] : undefined}
-      />
-      <ToastContainer toasts={toasts} onDismiss={dismiss} />
-    </>
+      />    </>
   )
 }
