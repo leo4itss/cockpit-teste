@@ -310,7 +310,7 @@ export function NewUserSheet({ open, onClose, onSave }: Props) {
               options={FUSOS}
               placeholder="Selecione o fuso horário"
               value={form.fusoHorario}
-              onChange={e => set('fusoHorario', e.target.value)}
+              onChange={value => set('fusoHorario', value ?? '')}
             />
           </div>
 
