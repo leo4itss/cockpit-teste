@@ -106,7 +106,7 @@ export function NewContactDialog({ open, onClose, onAdd, initialData }: Props) {
               label="País / Região"
               options={COUNTRIES}
               value={form.country}
-              onChange={e => set('country', e.target.value)}
+              onChange={value => set('country', value ?? '')}
             />
           </div>
 
