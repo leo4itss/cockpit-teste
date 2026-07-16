@@ -138,7 +138,7 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
               options={activeAccounts.map(a => ({ value: a.name, label: a.name }))}
               placeholder="Selecione"
               value={contratante}
-              onChange={e => setContratante(e.target.value)}
+              onChange={value => setContratante(value ?? '')}
             />
 
             {/* Card soluções / planos / licenciamentos */}
