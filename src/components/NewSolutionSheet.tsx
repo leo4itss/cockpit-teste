@@ -337,7 +337,7 @@ export function NewSolutionSheet({
             placeholder="Escolha o arquiteto"
             options={arquitetoOptions}
             value={form.arquitetoPAS}
-            onChange={e => set('arquitetoPAS', e.target.value)}
+            onChange={value => set('arquitetoPAS', value ?? '')}
           />
           <Divider />
         </div>
