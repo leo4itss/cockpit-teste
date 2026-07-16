@@ -361,7 +361,7 @@ export function CriarUsuarioSheet({ open, onClose, onSuccess, accountId, variant
                 options={FUSOS}
                 placeholder="Selecione o fuso horário"
                 value={form.fusoHorario}
-                onChange={e => set('fusoHorario', e.target.value)}
+                onChange={value => set('fusoHorario', value ?? '')}
               />
             </div>
 
