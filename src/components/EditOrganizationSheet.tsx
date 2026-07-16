@@ -300,7 +300,7 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete, on
             <SectionTitle>Endereço</SectionTitle>
             <div className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-4">
-                <Select label="País / Região" required options={PAISES} value={form.country} onChange={e => set('country', e.target.value)} disabled={isInactive} />
+                <Select label="País / Região" required options={PAISES} value={form.country} onChange={value => set('country', value ?? '')} disabled={isInactive} />
                 <Input label="CEP" required placeholder="00000-000" value={form.zipCode} onChange={e => set('zipCode', e.target.value)} disabled={isInactive} />
               </div>
               <Input label="Endereço postal" required placeholder="Digite o endereço completo, inclusive número" value={form.address} onChange={e => set('address', e.target.value)} disabled={isInactive} />
