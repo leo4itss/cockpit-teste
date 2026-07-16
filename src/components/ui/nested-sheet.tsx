@@ -234,7 +234,7 @@ export function NestedSheetFooter({ children, className }: NestedSheetFooterProp
   return (
     <div
       className={cn(
-        'border-t border-[#e5e7eb] px-6 py-4 flex items-center justify-end gap-3 shrink-0',
+        'border-t border-border px-6 py-4 flex items-center justify-end gap-3 shrink-0',
         className,
       )}
     >
