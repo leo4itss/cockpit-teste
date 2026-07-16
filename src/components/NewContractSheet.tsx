@@ -221,7 +221,7 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
               options={RENOVACAO_OPTIONS}
               placeholder="Selecione"
               value={form.renovacao}
-              onChange={e => set('renovacao', e.target.value)}
+              onChange={value => set('renovacao', value ?? '')}
             />
           </div>
 
