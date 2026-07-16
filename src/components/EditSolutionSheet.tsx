@@ -185,7 +185,7 @@ export function EditSolutionSheet({
   contracts,
 }: Props) {
   const { arquitetoOptions } = useUsers()
-  const { toasts, toast, dismiss } = useToast()
+  const { toast } = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
   // Planos ativos = o que o usuário vê e edita; inativas ficam no histórico
   function activePlans(s: Solution | null): Plan[] {
