@@ -462,8 +462,6 @@ export function AccountDetailSheet({ open, onClose, account, org, onEdit }: Prop
         </div>
       )}
 
-    </Sheet>
-    <ToastContainer toasts={toasts} onDismiss={dismiss} />
-    </>
+    </Sheet>    </>
   )
 }
