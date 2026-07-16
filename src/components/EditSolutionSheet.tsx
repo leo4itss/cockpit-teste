@@ -908,8 +908,6 @@ export function EditSolutionSheet({
           Existem alterações não salvas. Deseja sair mesmo assim?
         </p>
       </Dialog>
-
-      <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </>
   )
 }
