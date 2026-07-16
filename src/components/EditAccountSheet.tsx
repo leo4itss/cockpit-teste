@@ -637,8 +637,6 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
         onClose={() => { setShowAdminDialog(false); setEditingAdminIdx(null) }}
         onAdd={handleAdminAdd}
         initialAdmin={editingAdminIdx !== null ? admins[editingAdminIdx] : undefined}
-      />
-      <ToastContainer toasts={toasts} onDismiss={dismiss} />
-    </>
+      />    </>
   )
 }
