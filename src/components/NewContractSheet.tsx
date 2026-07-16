@@ -35,7 +35,7 @@ const RENOVACAO_OPTIONS = [
 const COLS = ['Solução', 'Organização contratada', 'Plano', 'Licenciamento']
 
 export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solutions, onSave }: Props) {
-  const { toasts, toast, dismiss } = useToast()
+  const { toast } = useToast()
   const activeAccounts = accounts.filter(a => !a.deletedAt)
   const activeSolutions = solutions.filter(s => s.status !== 'Inativo')
 
