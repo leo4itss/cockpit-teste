@@ -17,6 +17,7 @@ import CanvasPermissoesPage from './pages/CanvasPermissoesPage'
 import CanvasOrgPage from './pages/CanvasOrgPage'
 import { InstanciaPage } from './pages/InstanciaPage'
 import { FigmaCaptureSession } from './components/FigmaCaptureSession'
+import { Toaster } from './components/ui/Toast'
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
     <UsersProvider>
     <ComponentesProvider>
     <BrowserRouter>
+      <Toaster richColors />
       <FigmaCaptureSession />
       <Routes>
         <Route path="/home" element={<HomePage />} />
