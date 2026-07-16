@@ -251,7 +251,7 @@ export function EditUserSheet({ open, onClose, user, onSave, onDelete }: Props) 
                 label="País / Região"
                 options={COUNTRIES}
                 value={form.pais}
-                onChange={e => set('pais', e.target.value)}
+                onChange={value => set('pais', value ?? '')}
               />
               <Input
                 label="Número"
