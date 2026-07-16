@@ -8,14 +8,14 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      // @pas/ui publica uma condição "development" no exports map apontando
-      // para ./src/index.ts, mas o pacote publicado só inclui dist/ (src/ não
-      // é publicado). O Vite prioriza essa condição em dev e a resolução
-      // quebra — força a entrada real do pacote até isso ser corrigido na lib.
-      '@pas/ui': path.resolve(__dirname, 'node_modules/@pas/ui/dist/index.js'),
     },
     // Força uma única cópia de React — necessário para @xyflow/react
     dedupe: ['react', 'react-dom'],
+    // @pas/ui publica uma condição "development" no exports map apontando para
+    // ./src/index.ts, mas o pacote publicado só inclui dist/ (src/ não é
+    // publicado). O Vite prioriza "development" em modo dev e a resolução
+    // quebra — omitimos essa condição até o pacote ser corrigido rio acima.
+    conditions: ['module', 'browser', 'production'],
   },
   server: {
     proxy: {
