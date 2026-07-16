@@ -336,7 +336,7 @@ export function NewAccountSheet({ open, onClose, orgId, onSave }: Props) {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <Select label="Segmento de negócio" required options={BUSINESS_SEGMENTS} placeholder="Escolha o segmento" value={form.segmento} onChange={e => set('segmento', e.target.value)} />
+              <Select label="Segmento de negócio" required options={BUSINESS_SEGMENTS} placeholder="Escolha o segmento" value={form.segmento} onChange={value => set('segmento', value ?? '')} />
               <Input label="Site oficial" required placeholder="http://" value={form.siteOficial} onChange={e => set('siteOficial', e.target.value)} />
             </div>
 
