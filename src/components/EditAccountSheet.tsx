@@ -481,7 +481,7 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <Select label="Segmento de negócio" required placeholder="Selecione" options={SEGMENTOS} value={form.segmentoNegocio} onChange={e => set('segmentoNegocio', e.target.value)} disabled={isInactive} />
+              <Select label="Segmento de negócio" required placeholder="Selecione" options={SEGMENTOS} value={form.segmentoNegocio} onChange={value => set('segmentoNegocio', value ?? '')} disabled={isInactive} />
               <Input label="Site oficial" required placeholder="https://" value={form.siteOficial} onChange={e => set('siteOficial', e.target.value)} disabled={isInactive} />
             </div>
 
