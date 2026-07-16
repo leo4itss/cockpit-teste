@@ -313,8 +313,6 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
           Existem alterações não salvas. Deseja sair mesmo assim?
         </p>
       </Dialog>
-
-      <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </>
   )
 }
