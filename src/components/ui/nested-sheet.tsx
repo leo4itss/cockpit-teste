@@ -186,7 +186,7 @@ export function NestedSheetHeader({ children, onClose, action }: NestedSheetHead
 
 export function NestedSheetTitle({ children }: { children: ReactNode }) {
   return (
-    <h2 className="text-xl font-semibold text-[#030712] leading-7">
+    <h2 className="text-xl font-semibold text-foreground leading-7">
       {children}
     </h2>
   )
