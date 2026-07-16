@@ -323,7 +323,7 @@ export function EditUserSheet({ open, onClose, user, onSave, onDelete }: Props) 
               options={FORMATOS_HORA}
               placeholder="Selecione o formato de hora"
               value={form.formatoHora}
-              onChange={e => set('formatoHora', e.target.value)}
+              onChange={value => set('formatoHora', value ?? '')}
             />
 
             <Select
