@@ -365,7 +365,7 @@ export function NewAccountSheet({ open, onClose, orgId, onSave }: Props) {
           <div className="flex flex-col gap-7">
             <p className="text-base font-bold text-[#030712] leading-6">Configuração PAS</p>
 
-            <Select label="Arquiteto PAS responsável" required options={arquitetoOptions} placeholder="Escolha o arquiteto" value={form.arquitetoPAS} onChange={e => set('arquitetoPAS', e.target.value)} />
+            <Select label="Arquiteto PAS responsável" required options={arquitetoOptions} placeholder="Escolha o arquiteto" value={form.arquitetoPAS} onChange={value => set('arquitetoPAS', value ?? '')} />
             <Input label="Subdomínio" required placeholder="Nome do domínio" value={form.subdomain} onChange={e => set('subdomain', e.target.value)} />
           </div>
 
