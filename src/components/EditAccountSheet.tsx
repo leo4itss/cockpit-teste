@@ -493,7 +493,7 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
             <p className="text-base font-bold text-[#030712] leading-6">Endereço</p>
 
             <div className="grid grid-cols-2 gap-4">
-              <Select label="País / Região" required options={PAISES} value={form.pais} onChange={e => set('pais', e.target.value)} disabled={isInactive} />
+              <Select label="País / Região" required options={PAISES} value={form.pais} onChange={value => set('pais', value ?? '')} disabled={isInactive} />
               <Input label="CEP" required placeholder="00000-000" value={form.cep} onChange={e => set('cep', e.target.value)} disabled={isInactive} />
             </div>
             <Input label="Endereço postal" required placeholder="Rua, Avenida..." value={form.endereco} onChange={e => set('endereco', e.target.value)} disabled={isInactive} />
