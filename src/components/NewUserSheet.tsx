@@ -253,7 +253,7 @@ export function NewUserSheet({ open, onClose, onSave }: Props) {
               options={AREAS}
               placeholder="Selecione a área"
               value={form.area}
-              onChange={e => set('area', e.target.value)}
+              onChange={value => set('area', value ?? '')}
             />
 
             <Select
