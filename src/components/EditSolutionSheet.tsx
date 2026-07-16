@@ -10,7 +10,7 @@ import { NewPlanDialog } from './NewPlanDialog'
 import { Dialog } from './ui/Dialog'
 import { ComponenteSelector } from './ComponenteSelector'
 import { ComponenteSelecaoSheet } from './ComponenteSelecaoSheet'
-import { useToast, ToastContainer } from './ui/Toast'
+import { useToast } from './ui/Toast'
 import type { Solution, Plan, TipoLicenca, Componente, Contract } from '@/types'
 
 const THRESHOLD_INLINE = 5  // ≤ este valor: inline; > este valor: sheet
