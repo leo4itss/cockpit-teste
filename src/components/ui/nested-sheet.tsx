@@ -194,7 +194,7 @@ export function NestedSheetTitle({ children }: { children: ReactNode }) {
 
 export function NestedSheetDescription({ children }: { children: ReactNode }) {
   return (
-    <p className="text-sm text-[#6b7280] leading-5">
+    <p className="text-sm text-muted-foreground leading-5">
       {children}
     </p>
   )
