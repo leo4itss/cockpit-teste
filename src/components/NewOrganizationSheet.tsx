@@ -297,7 +297,7 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
             <SectionTitle>Endereço</SectionTitle>
             <div className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-4">
-                <Select label="País / Região" required options={[{ value: 'Brasil', label: 'Brasil' }]} value={form.country} onChange={e => setField('country', e.target.value)} />
+                <Select label="País / Região" required options={[{ value: 'Brasil', label: 'Brasil' }]} value={form.country} onChange={value => setField('country', value ?? '')} />
                 <Input label="CEP" required placeholder="Digite o CEP" value={form.zipCode} onChange={e => setField('zipCode', e.target.value)} />
               </div>
               <Input label="Endereço postal" required placeholder="Digite o endereço completo, inclusive número" value={form.address} onChange={e => setField('address', e.target.value)} />
