@@ -305,7 +305,7 @@ export function CriarUsuarioSheet({ open, onClose, onSuccess, accountId, variant
                 options={AREAS}
                 placeholder="Selecione a área"
                 value={form.area}
-                onChange={e => set('area', e.target.value)}
+                onChange={value => set('area', value ?? '')}
               />
 
               <Select
