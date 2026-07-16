@@ -9,7 +9,7 @@ import { PlanCard } from './PlanCard'
 import { NewPlanDialog } from './NewPlanDialog'
 import { ComponenteSelector } from './ComponenteSelector'
 import { ComponenteSelecaoSheet } from './ComponenteSelecaoSheet'
-import { useToast, ToastContainer } from './ui/Toast'
+import { useToast } from './ui/Toast'
 import { useComponentes } from '@/context/ComponentesContext'
 import type { Solution, Plan, TipoLicenca } from '@/types'
 
