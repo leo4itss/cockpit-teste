@@ -273,7 +273,7 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
               label="Tipo de renovação"
               options={RENOVACAO_OPTIONS}
               value={renovacao}
-              onChange={e => setRenovacao(e.target.value)}
+              onChange={value => setRenovacao(value ?? '')}
               disabled={isInactive}
             />
           </div>
