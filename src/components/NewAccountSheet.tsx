@@ -354,7 +354,7 @@ export function NewAccountSheet({ open, onClose, orgId, onSave }: Props) {
             <Input label="Endereço postal" required placeholder="Digite o endereço completo, inclusive número" value={form.enderecoPostal} onChange={e => set('enderecoPostal', e.target.value)} />
             <Input label="Complemento" required placeholder="Complemento do local" value={form.complemento} onChange={e => set('complemento', e.target.value)} />
             <div className="grid grid-cols-2 gap-4">
-              <Select label="Estado" required options={STATES} placeholder="Selecione" value={form.estado} onChange={e => set('estado', e.target.value)} />
+              <Select label="Estado" required options={STATES} placeholder="Selecione" value={form.estado} onChange={value => set('estado', value ?? '')} />
               <Input label="Cidade" required placeholder="Digite a cidade" value={form.cidade} onChange={e => set('cidade', e.target.value)} />
             </div>
 
