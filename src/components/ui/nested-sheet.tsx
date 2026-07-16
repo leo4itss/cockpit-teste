@@ -162,7 +162,7 @@ export interface NestedSheetHeaderProps {
 
 export function NestedSheetHeader({ children, onClose, action }: NestedSheetHeaderProps) {
   return (
-    <div className="flex items-start justify-between px-6 py-5 border-b border-[#e5e7eb] shrink-0">
+    <div className="flex items-start justify-between px-6 py-5 border-b border-border shrink-0">
       <div className="flex flex-col gap-1 min-w-0 flex-1 pr-3">
         {children}
       </div>
@@ -171,7 +171,7 @@ export function NestedSheetHeader({ children, onClose, action }: NestedSheetHead
         {onClose && (
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-accent text-muted-foreground hover:text-accent-foreground transition-colors"
             aria-label="Fechar"
           >
             <X className="w-4 h-4" />
