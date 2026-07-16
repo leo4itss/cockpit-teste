@@ -235,8 +235,6 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
         orgName={orgName}
         onSave={handleObjetosSave}
       />
-
-      <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </>
   )
 }
