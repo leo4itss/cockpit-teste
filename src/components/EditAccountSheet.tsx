@@ -200,7 +200,7 @@ const ESTADOS = [
 
 export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdateContacts, onDelete, onInativar, onActivate, canDelete }: Props) {
   const { arquitetoOptions } = useUsers()
-  const { toasts, toast, dismiss } = useToast()
+  const { toast } = useToast()
   const isInactive = account.status === 'Inativo'
   const [logo, setLogo] = useState(account.logo ?? '')
   const [favicon, setFavicon] = useState('')
