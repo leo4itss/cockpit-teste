@@ -229,8 +229,6 @@ export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca
           )}
         </div>
       </div>
-
-      <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </Sheet>
   )
 }
