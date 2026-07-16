@@ -230,7 +230,7 @@ export function NewUserSheet({ open, onClose, onSave }: Props) {
                 label="País / Região"
                 options={COUNTRIES}
                 value={form.pais}
-                onChange={e => set('pais', e.target.value)}
+                onChange={value => set('pais', value ?? '')}
               />
               <Input
                 label="Número"
