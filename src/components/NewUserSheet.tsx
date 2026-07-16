@@ -294,7 +294,7 @@ export function NewUserSheet({ open, onClose, onSave }: Props) {
               options={FORMATOS_DATA}
               placeholder="Selecione o formato da data"
               value={form.formatoData}
-              onChange={e => set('formatoData', e.target.value)}
+              onChange={value => set('formatoData', value ?? '')}
             />
 
             <Select
