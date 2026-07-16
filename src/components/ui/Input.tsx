@@ -2,7 +2,7 @@ import { Input as PrizmInput } from '@pas/ui'
 import { cn } from '@/lib/utils'
 import type { InputHTMLAttributes } from 'react'
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
   label?: string
   required?: boolean
   error?: string
