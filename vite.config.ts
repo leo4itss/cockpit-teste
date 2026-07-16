@@ -14,7 +14,7 @@ export default defineConfig({
     // @pas/ui publica uma condição "development" no exports map apontando para
     // ./src/index.ts, mas o pacote publicado só inclui dist/ (src/ não é
     // publicado). O Vite prioriza "development" em modo dev e a resolução
-    // quebra — omitimos essa condição até o pacote ser corrigido rio acima.
+    // quebra — omitimos essa condição até o pacote ser corrigido na lib.
     conditions: ['module', 'browser', 'production'],
   },
   server: {
