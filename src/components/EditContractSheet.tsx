@@ -7,7 +7,7 @@ import { Button } from './ui/Button'
 import { Dialog } from './ui/Dialog'
 import { AddObjetoDialog } from './AddObjetoDialog'
 import { EditLicencaDialog } from './EditLicencaDialog'
-import { useToast, ToastContainer } from './ui/Toast'
+import { useToast } from './ui/Toast'
 import type { Contract, Solution, ObjetoContrato, ContractHistoricoEntry } from '@/types'
 
 interface Props {
