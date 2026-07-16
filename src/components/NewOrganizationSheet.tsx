@@ -280,7 +280,7 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-3">
-                  <Select label="Segmento de negócio" required options={SEGMENTS} placeholder="Escolha o segmento" value={form.businessSegment} onChange={e => setField('businessSegment', e.target.value)} />
+                  <Select label="Segmento de negócio" required options={SEGMENTS} placeholder="Escolha o segmento" value={form.businessSegment} onChange={value => setField('businessSegment', value ?? '')} />
                   {form.businessSegment === 'outro' && (
                     <Input placeholder="Descreva o segmento de negócio" value={outroSegmento} onChange={e => setOutroSegmento(e.target.value)} />
                   )}
