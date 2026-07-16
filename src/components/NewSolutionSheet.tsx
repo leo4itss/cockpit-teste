@@ -364,7 +364,7 @@ export function NewSolutionSheet({
                 <Input label="Título do Link 02" required placeholder="Digite o título" value={form.titleLink02} onChange={e => set('titleLink02', e.target.value)} />
               </div>
               <div className="w-1/2">
-                <Select label="Status" placeholder="Selecione o status" options={STATUS_OPTIONS} value={form.marketplaceStatus} onChange={e => set('marketplaceStatus', e.target.value)} />
+                <Select label="Status" placeholder="Selecione o status" options={STATUS_OPTIONS} value={form.marketplaceStatus} onChange={value => set('marketplaceStatus', value ?? '')} />
               </div>
             </div>
           )}
