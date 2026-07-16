@@ -42,7 +42,7 @@ export const METADATA_MOCK_TIPOS = [
  */
 export function ComponenteSheet({ open, onClose, onSave, onDelete, isLinked, initialComponente }: Props) {
   const isEditing = !!initialComponente
-  const { toasts, toast, dismiss } = useToast()
+  const { toast } = useToast()
 
   const [nome, setNome]                           = useState('')
   const [descricao, setDescricao]                 = useState('')
