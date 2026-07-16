@@ -287,7 +287,7 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete, on
                 <Input label="Número do documento" required placeholder="00.000.000/0000-00" value={form.docNumber} onChange={e => set('docNumber', e.target.value)} disabled={isInactive} />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <Select label="Segmento de negócio" required placeholder="Selecione" options={SEGMENTS} value={form.businessSegment} onChange={e => set('businessSegment', e.target.value)} disabled={isInactive} />
+                <Select label="Segmento de negócio" required placeholder="Selecione" options={SEGMENTS} value={form.businessSegment} onChange={value => set('businessSegment', value ?? '')} disabled={isInactive} />
                 <Input label="Site oficial" required placeholder="https://" value={form.officialSite} onChange={e => set('officialSite', e.target.value)} disabled={isInactive} />
               </div>
             </div>
