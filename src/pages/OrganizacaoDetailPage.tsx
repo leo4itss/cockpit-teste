@@ -1309,9 +1309,7 @@ export function OrganizacaoDetailPage() {
             ),
           }))
         }}
-      />
-      <ToastContainer toasts={toasts} onDismiss={dismiss} />
-    </div>
+      />    </div>
   )
 }
 
