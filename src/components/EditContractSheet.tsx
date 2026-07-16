@@ -46,7 +46,7 @@ const RENOVACAO_OPTIONS = [
 ]
 
 export function EditContractSheet({ open, onClose, contract, solutions, onSave, onInativar, onActivate }: Props) {
-  const { toasts, toast, dismiss } = useToast()
+  const { toast } = useToast()
   const [dataTermino, setDataTermino] = useState(contract.dataTermino)
   const [renovacao, setRenovacao] = useState(contract.renovacao)
   const [objetos, setObjetos] = useState<ObjetoContrato[]>(contract.objetos ?? [])
