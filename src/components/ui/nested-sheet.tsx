@@ -136,7 +136,7 @@ export function NestedSheet({
       <div
         style={{ zIndex: panelZ }}
         className={cn(
-          'fixed top-0 left-0 h-full bg-white shadow-xl flex flex-col',
+          'fixed top-0 left-0 h-full bg-background shadow-xl flex flex-col',
           'transition-transform ease-[cubic-bezier(0.4,0,0.2,1)]',
           `duration-[${DURATION}ms]`,
           visible ? 'translate-x-0' : '-translate-x-full',
