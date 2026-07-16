@@ -3,7 +3,7 @@ import { Copy, MessageCircle, Mail, ExternalLink, Bot, Database, Layers, FileTex
 import { Sheet } from './ui/Sheet'
 import { Button } from './ui/Button'
 import { Badge } from './ui/Badge'
-import { useToast, ToastContainer } from './ui/Toast'
+import { useToast } from './ui/Toast'
 import { cn } from '@/lib/utils'
 import { api } from '@/api/client'
 import { accountEntitlements as mockEntitlements } from '@/data/mock'
