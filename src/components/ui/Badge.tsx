@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils'
+import { Badge as PrizmBadge } from '@pas/ui'
 import { BadgeCheck, CircleMinus } from 'lucide-react'
 
 interface BadgeProps {
@@ -8,25 +8,24 @@ interface BadgeProps {
   className?: string
 }
 
+const VARIANT_MAP = {
+  success: 'success',
+  warning: 'warning',
+  error: 'destructive',
+  info: 'info',
+  default: 'default',
+  secondary: 'secondary',
+} as const
+
 export function Badge({ children, variant = 'default', showIcon = false, className }: BadgeProps) {
   const Icon = variant === 'secondary' ? CircleMinus : BadgeCheck
   return (
-    <span
-      className={cn(
-        'inline-flex items-center gap-1 rounded-[2px] px-2 py-1 text-xs font-semibold w-fit',
-        {
-          'bg-green-200 text-green-700': variant === 'success',
-          'bg-yellow-50 text-yellow-700 border border-yellow-200': variant === 'warning',
-          'bg-red-50 text-red-700 border border-red-200': variant === 'error',
-          'bg-blue-50 text-blue-700 border border-blue-200': variant === 'info',
-          'bg-gray-100 text-gray-700': variant === 'default',
-          'bg-gray-100 text-gray-500': variant === 'secondary',
-        },
-        className
-      )}
+    <PrizmBadge
+      variant={VARIANT_MAP[variant]}
+      className={className}
+      startIcon={showIcon ? <Icon className="w-3 h-3 shrink-0" /> : undefined}
     >
-      {showIcon && <Icon className="w-3 h-3 shrink-0" />}
       {children}
-    </span>
+    </PrizmBadge>
   )
 }
