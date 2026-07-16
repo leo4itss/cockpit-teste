@@ -751,7 +751,7 @@ export function EditSolutionSheet({
               placeholder="Selecione"
               options={arquitetoOptions}
               value={form.arquitetoPAS}
-              onChange={e => set('arquitetoPAS', e.target.value)}
+              onChange={value => set('arquitetoPAS', value ?? '')}
               disabled={isInactive}
             />
 
