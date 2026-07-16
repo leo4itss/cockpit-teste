@@ -306,7 +306,7 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete, on
               <Input label="Endereço postal" required placeholder="Digite o endereço completo, inclusive número" value={form.address} onChange={e => set('address', e.target.value)} disabled={isInactive} />
               <Input label="Complemento" required placeholder="Complemento do local" value={form.complement} onChange={e => set('complement', e.target.value)} disabled={isInactive} />
               <div className="grid grid-cols-2 gap-4">
-                <Select label="Estado" required placeholder="Selecione" options={STATES} value={form.state} onChange={e => set('state', e.target.value)} disabled={isInactive} />
+                <Select label="Estado" required placeholder="Selecione" options={STATES} value={form.state} onChange={value => set('state', value ?? '')} disabled={isInactive} />
                 <Input label="Cidade" required placeholder="Cidade" value={form.city} onChange={e => set('city', e.target.value)} disabled={isInactive} />
               </div>
             </div>
