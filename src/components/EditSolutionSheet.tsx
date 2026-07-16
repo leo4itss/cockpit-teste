@@ -835,7 +835,7 @@ export function EditSolutionSheet({
                     label="Status"
                     options={MARKETPLACE_STATUS}
                     value={form.marketplaceStatus}
-                    onChange={e => set('marketplaceStatus', e.target.value)}
+                    onChange={value => set('marketplaceStatus', value ?? '')}
                     disabled={isInactive}
                   />
                 </div>
