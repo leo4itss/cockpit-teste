@@ -198,7 +198,7 @@ export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca
                           placeholder="Selecione o tipo"
                           options={availableOptions(lic.tipoLicencaId)}
                           value={lic.tipoLicencaId}
-                          onChange={e => handleLicensingChange(i, 'tipoLicencaId', e.target.value)}
+                          onChange={value => handleLicensingChange(i, 'tipoLicencaId', value ?? '')}
                         />
                       </div>
                       <div className="flex-1">
