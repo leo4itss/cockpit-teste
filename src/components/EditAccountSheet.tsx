@@ -476,7 +476,7 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <Select label="Tipo do documento" required options={DOC_TYPES} value={form.tipoDocumento} onChange={e => set('tipoDocumento', e.target.value)} disabled={isInactive} />
+              <Select label="Tipo do documento" required options={DOC_TYPES} value={form.tipoDocumento} onChange={value => set('tipoDocumento', value ?? '')} disabled={isInactive} />
               <Input label="Número do documento" required placeholder="00.000.000/0000-00" value={form.numeroDocumento} onChange={e => set('numeroDocumento', e.target.value)} disabled={isInactive} />
             </div>
 
