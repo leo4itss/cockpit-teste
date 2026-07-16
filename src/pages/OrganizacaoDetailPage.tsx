@@ -35,7 +35,7 @@ type Tab = 'conta' | 'solucoes' | 'contrato' | 'marketplace' | 'usuarios'
 export function OrganizacaoDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { toasts, toast, dismiss } = useToast()
+  const { toast } = useToast()
   const { relations } = useAuthz()
   const isPlatformAdmin = useIsPlatformAdmin()
   const isOrgAdmin = useIsOrgAdmin()
