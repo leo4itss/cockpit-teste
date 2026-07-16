@@ -3,7 +3,7 @@ import { Sheet } from './ui/Sheet'
 import { Input } from './ui/Input'
 import { Button } from './ui/Button'
 import { Dialog } from './ui/Dialog'
-import { useToast, ToastContainer } from './ui/Toast'
+import { useToast } from './ui/Toast'
 import type { Componente } from '@/types'
 
 interface Props {
