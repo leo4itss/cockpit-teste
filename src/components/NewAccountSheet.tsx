@@ -331,7 +331,7 @@ export function NewAccountSheet({ open, onClose, orgId, onSave }: Props) {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <Select label="Tipo do documento" required options={DOCUMENT_TYPES} placeholder="Selecione" value={form.tipoDocumento} onChange={e => set('tipoDocumento', e.target.value)} />
+              <Select label="Tipo do documento" required options={DOCUMENT_TYPES} placeholder="Selecione" value={form.tipoDocumento} onChange={value => set('tipoDocumento', value ?? '')} />
               <Input label="Número do documento" required placeholder="Escolha um tipo" disabled={!form.tipoDocumento} value={form.numeroDocumento} onChange={e => set('numeroDocumento', e.target.value)} />
             </div>
 
