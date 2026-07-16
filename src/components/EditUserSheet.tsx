@@ -282,7 +282,7 @@ export function EditUserSheet({ open, onClose, user, onSave, onDelete }: Props) 
               options={CARGOS}
               placeholder="Selecione o cargo"
               value={form.cargo}
-              onChange={e => set('cargo', e.target.value)}
+              onChange={value => set('cargo', value ?? '')}
             />
 
             {/* Etiquetas de classificação */}
