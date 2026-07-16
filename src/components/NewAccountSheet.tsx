@@ -348,7 +348,7 @@ export function NewAccountSheet({ open, onClose, orgId, onSave }: Props) {
             <p className="text-base font-bold text-[#030712] leading-6">Endereço</p>
 
             <div className="grid grid-cols-2 gap-4">
-              <Select label="País / Região" required options={[{ value: 'Brasil', label: 'Brasil' }]} value={form.pais} onChange={e => set('pais', e.target.value)} />
+              <Select label="País / Região" required options={[{ value: 'Brasil', label: 'Brasil' }]} value={form.pais} onChange={value => set('pais', value ?? '')} />
               <Input label="CEP" required placeholder="Código postal" value={form.cep} onChange={e => set('cep', e.target.value)} />
             </div>
             <Input label="Endereço postal" required placeholder="Digite o endereço completo, inclusive número" value={form.enderecoPostal} onChange={e => set('enderecoPostal', e.target.value)} />
