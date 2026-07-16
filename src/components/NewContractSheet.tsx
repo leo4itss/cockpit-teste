@@ -5,7 +5,7 @@ import { Select } from './ui/Select'
 import { Input } from './ui/Input'
 import { Button } from './ui/Button'
 import { AddObjetoDialog } from './AddObjetoDialog'
-import { useToast, ToastContainer } from './ui/Toast'
+import { useToast } from './ui/Toast'
 import type { Account, Contract, Solution, ObjetoContrato } from '@/types'
 
 interface Props {
