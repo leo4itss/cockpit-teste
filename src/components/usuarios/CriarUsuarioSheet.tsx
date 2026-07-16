@@ -353,7 +353,7 @@ export function CriarUsuarioSheet({ open, onClose, onSuccess, accountId, variant
                 options={FORMATOS_HORA}
                 placeholder="Selecione o formato de hora"
                 value={form.formatoHora}
-                onChange={e => set('formatoHora', e.target.value)}
+                onChange={value => set('formatoHora', value ?? '')}
               />
 
               <Select
