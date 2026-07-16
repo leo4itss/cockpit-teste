@@ -456,7 +456,7 @@ export function NewOrganizationSheet({ open, onClose, onSave, onDelete }: Props)
                 options={arquitetoOptions}
                 placeholder="Escolha o arquiteto"
                 value={form.arquitetoPAS}
-                onChange={e => setField('arquitetoPAS', e.target.value)}
+                onChange={value => setField('arquitetoPAS', value ?? '')}
               />
               <div className="flex flex-col gap-2">
                 <Input
