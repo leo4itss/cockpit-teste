@@ -14,7 +14,7 @@ import type { Componente } from '@/types'
 
 export function ComponentesPage() {
   const { componentes, loading, error, addComponente, updateComponente, deleteComponente, reativarComponente } = useComponentes()
-  const { toasts, toast, dismiss } = useToast()
+  const { toast } = useToast()
   const isPlatformAdmin = useIsPlatformAdmin()
   const isPasArchitect  = useIsPasArchitect()
   const canCreate = isPlatformAdmin || isPasArchitect
