@@ -129,22 +129,15 @@ function PromoverAdminDialog({ open, onClose, account, elegíveis, onConfirm }: 
           </p>
         ) : (
           <>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-[#030712]">
-                Usuário <span className="text-red-500">*</span>
-              </label>
-              <select
-                value={selectedId}
-                onChange={e => setSelectedId(e.target.value)}
-                disabled={saving}
-                className="w-full appearance-none px-3 py-2 pr-8 text-sm border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:bg-gray-50"
-              >
-                <option value="">Selecione o usuário...</option>
-                {elegíveis.map(m => (
-                  <option key={m.id} value={m.id}>{m.nomeCompleto} — {m.email}</option>
-                ))}
-              </select>
-            </div>
+            <Select
+              label="Usuário"
+              required
+              placeholder="Selecione o usuário..."
+              options={elegíveis.map(m => ({ value: m.id, label: `${m.nomeCompleto} — ${m.email}` }))}
+              value={selectedId}
+              onChange={value => setSelectedId(value ?? '')}
+              disabled={saving}
+            />
             <p className="text-xs text-[#6b7280]">
               Somente usuários já vinculados a esta conta podem ser promovidos. O papel Member permanece até a promoção ser confirmada.
             </p>
