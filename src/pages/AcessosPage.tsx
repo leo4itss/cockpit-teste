@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Search, Plus, Ellipsis, FilePen, UserX, UserCheck, Eye, Trash2, ChevronDown, HelpCircle, ShieldCheck, Globe, Lock, AlertTriangle, SlidersHorizontal, GitBranch, Info, Users, Columns3, UserPlus } from 'lucide-react'
+import { Search, Plus, Ellipsis, FilePen, UserX, UserCheck, Eye, Trash2, HelpCircle, ShieldCheck, Globe, Lock, AlertTriangle, SlidersHorizontal, GitBranch, Info, Users, Columns3, UserPlus } from 'lucide-react'
 import { useSessionState } from '@/hooks/useSessionState'
 import { useLocalState } from '@/hooks/useLocalState'
 import { useAdminOrgId } from '@/authz/hooks'
