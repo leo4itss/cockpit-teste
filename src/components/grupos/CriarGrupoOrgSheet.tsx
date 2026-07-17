@@ -266,19 +266,14 @@ export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, grupos 
 
             {/* Seletor de org — só para Platform Admin com escopo='org' */}
             {escopo === 'org' && isPlatformAdmin && (
-              <div className="relative mt-1">
-                <select
+              <div className="mt-1">
+                <Select
+                  placeholder="Selecione a organização..."
+                  options={orgs.filter((o: any) => o.status !== 'Inativo').map((o: any) => ({ value: o.id, label: o.name }))}
                   value={orgSelecionada}
-                  onChange={e => setOrgSelecionada(e.target.value)}
+                  onChange={value => setOrgSelecionada(value ?? '')}
                   disabled={saving || orgs.length === 0}
-                  className="w-full appearance-none pl-3 pr-8 py-2.5 text-sm border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-colors disabled:bg-gray-50 text-[#030712]"
-                >
-                  <option value="">Selecione a organização...</option>
-                  {orgs.filter(o => o.status !== 'Inativo').map((o: any) => (
-                    <option key={o.id} value={o.id}>{o.name}</option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                />
               </div>
             )}
 
