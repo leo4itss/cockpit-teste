@@ -959,18 +959,13 @@ export function AcessosPage() {
                     de <strong>{filteredUsers.length.toLocaleString('pt-BR')}</strong> usuários
                   </p>
                   <div className="flex items-center gap-1.5">
-                    <label htmlFor="page-size-select" className="text-xs text-[#6b7280]">Por página</label>
-                    <div className="relative">
-                      <select
-                        id="page-size-select"
-                        value={pageSize}
-                        onChange={e => setPageSize(Number(e.target.value))}
-                        className="appearance-none pl-2 pr-6 py-1 text-xs bg-white border border-gray-200 rounded-md outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
-                      >
-                        {PAGE_SIZE_OPTIONS.map(n => <option key={n} value={n}>{n}</option>)}
-                      </select>
-                      <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
-                    </div>
+                    <span className="text-xs text-[#6b7280]">Por página</span>
+                    <Select
+                      options={PAGE_SIZE_OPTIONS.map(n => ({ value: String(n), label: String(n) }))}
+                      value={String(pageSize)}
+                      onChange={value => setPageSize(Number(value))}
+                      className="pl-2 pr-6 h-auto py-1 text-xs"
+                    />
                   </div>
                 </div>
                 {totalPaginas > 1 && (
