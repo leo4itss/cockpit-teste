@@ -692,16 +692,12 @@ export function ContasPage() {
             }
             {/* Seletor de org — Platform Admin */}
             {isPlatformAdmin && allOrgs.length > 0 && (
-              <div className="relative">
-                <select
-                  value={selectedOrgId}
-                  onChange={e => setSelectedOrgId(e.target.value)}
-                  className="appearance-none pl-2 pr-6 py-0.5 text-[11px] font-medium border border-gray-200 rounded-full bg-gray-50 text-gray-700 outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
-                >
-                  {allOrgs.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
-                </select>
-                <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
-              </div>
+              <Select
+                options={allOrgs.map(o => ({ value: o.id, label: o.name }))}
+                value={selectedOrgId}
+                onChange={value => setSelectedOrgId(value ?? '')}
+                className="pl-2 pr-6 h-auto py-0.5 text-[11px] font-medium rounded-full bg-gray-50"
+              />
             )}
           </div>
           <h1 className="text-2xl font-bold leading-8 text-[#030712]">Contas</h1>
