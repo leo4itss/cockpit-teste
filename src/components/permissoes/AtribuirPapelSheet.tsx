@@ -93,24 +93,17 @@ function PapelSelect({
 }: { tipo: ComponenteTipo; value: string; onChange: (v: string) => void; disabled?: boolean }) {
   const isNenhum = value === 'Nenhum'
   return (
-    <div className="relative">
-      <select
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        disabled={disabled}
-        className={cn(
-          'appearance-none w-full pl-3 pr-8 py-1.5 text-sm rounded-md border transition-colors outline-none cursor-pointer',
-          'focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
-          isNenhum
-            ? 'border-gray-200 bg-gray-50 text-[#6b7280]'
-            : 'border-blue-200 bg-blue-50 text-blue-700 font-medium',
-          disabled && 'opacity-50 cursor-not-allowed',
-        )}
-      >
-        {getPapeis(tipo).map(p => <option key={p} value={p}>{PAPEL_LABEL[p] ?? p}</option>)}
-      </select>
-      <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
-    </div>
+    <Select
+      options={getPapeis(tipo).map(p => ({ value: p, label: PAPEL_LABEL[p] ?? p }))}
+      value={value}
+      onChange={v => onChange(v ?? 'Nenhum')}
+      disabled={disabled}
+      className={cn(
+        isNenhum
+          ? 'border-gray-200 bg-gray-50 text-[#6b7280]'
+          : 'border-blue-200 bg-blue-50 text-blue-700 font-medium',
+      )}
+    />
   )
 }
 
