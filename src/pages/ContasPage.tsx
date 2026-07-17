@@ -667,16 +667,13 @@ export function ContasPage() {
             Esta página exibe as contas de uma organização específica. Escolha a organização que deseja visualizar.
           </p>
         </div>
-        <div className="relative w-72">
-          <select
+        <div className="w-72">
+          <Select
+            placeholder="Selecione a organização..."
+            options={allOrgs.map(o => ({ value: o.id, label: o.name }))}
             value={selectedOrgId}
-            onChange={e => setSelectedOrgId(e.target.value)}
-            className="w-full appearance-none pl-3 pr-8 py-2.5 text-sm border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-[#030712]"
-          >
-            <option value="">Selecione a organização...</option>
-            {allOrgs.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
-          </select>
-          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            onChange={value => setSelectedOrgId(value ?? '')}
+          />
         </div>
       </div>
     )
