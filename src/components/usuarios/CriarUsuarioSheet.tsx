@@ -410,16 +410,12 @@ export function CriarUsuarioSheet({ open, onClose, onSuccess, accountId, variant
                         — opcional
                       </span>
                     </p>
-                    <select
+                    <Select
+                      placeholder="(Nenhum grupo)"
+                      options={grupos.filter(g => g.status === 'Ativo').map(g => ({ value: g.id, label: g.nome }))}
                       value={grupoId}
-                      onChange={e => setGrupoId(e.target.value)}
-                      className="w-full appearance-none pl-3 pr-8 py-2 text-sm border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-colors text-[#030712]"
-                    >
-                      <option value="">(Nenhum grupo)</option>
-                      {grupos.filter(g => g.status === 'Ativo').map(g => (
-                        <option key={g.id} value={g.id}>{g.nome}</option>
-                      ))}
-                    </select>
+                      onChange={value => setGrupoId(value ?? '')}
+                    />
                   </div>
 
                   {/* Preview das permissões resultantes */}
