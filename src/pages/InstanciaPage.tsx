@@ -13,6 +13,7 @@ import {
   ArrowLeft, UserPlus, UserMinus, Users, Loader2, Check, X, Shield, Search,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/Badge'
+import { Select as PrizmSelect } from '@pas/ui'
 import { api } from '@/api/client'
 import { mockDocNixPapeis } from '@/authz/mock'
 import { PermissoesMembroSheet } from '@/components/instancias/PermissoesMembroSheet'
