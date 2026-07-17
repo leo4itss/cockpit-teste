@@ -219,20 +219,11 @@ function TelefoneRow({ telefone, isFirst, onChange, onAdd }: TelefoneRowProps) {
         {isFirst && (
           <label className="text-sm font-medium text-[#030712]">País / Região</label>
         )}
-        <div className="relative">
-          <select
-            className="h-9 w-full appearance-none rounded-md border border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#030712] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500 pr-7"
-            value={telefone.pais}
-            onChange={e => onChange('pais', e.target.value)}
-          >
-            {PAISES.map(p => (
-              <option key={p.value} value={p.value}>{p.label}</option>
-            ))}
-          </select>
-          <svg className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6b7280] pointer-events-none" fill="none" viewBox="0 0 16 16">
-            <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
+        <Select
+          options={PAISES}
+          value={telefone.pais}
+          onChange={value => onChange('pais', value ?? '')}
+        />
       </div>
 
       {/* Número */}
