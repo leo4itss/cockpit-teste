@@ -15,7 +15,7 @@
  */
 
 import { useState, useEffect, useMemo } from 'react'
-import { Search, Bot, Database, Layers, Users, ChevronDown } from 'lucide-react'
+import { Search, Bot, Database, Layers, Users } from 'lucide-react'
 import {
   NestedSheet,
   NestedSheetHeader,
