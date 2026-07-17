@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/nested-sheet'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
+import { Select as PrizmSelect } from '@pas/ui'
 import { PermissoesMembroSheet } from '@/components/instancias/PermissoesMembroSheet'
 import { api } from '@/api/client'
 import { useCanManageInstanciaMembros, useComponenteConfig } from '@/authz/hooks'
