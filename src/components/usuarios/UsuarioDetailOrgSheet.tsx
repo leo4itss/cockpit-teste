@@ -19,6 +19,7 @@ import {
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Dialog } from '@/components/ui/Dialog'
+import { Select } from '@/components/ui/Select'
 import { api } from '@/api/client'
 import { cn } from '@/lib/utils'
 import type { User, Account } from '@/types'
