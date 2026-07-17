@@ -131,15 +131,17 @@ function PapelEditorDocNix({
   )
   return (
     <div className="flex items-center gap-1.5">
-      <select value={draft} onChange={e => setDraft(e.target.value)} disabled={saving} autoFocus
-        className="text-sm border border-gray-300 rounded-md px-2 py-1.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-        {draft === 'personalizado' && (
-          <option value="personalizado" disabled>Personalizado (selecione um papel)</option>
-        )}
-        {papeis.map(p => (
-          <option key={p.value} value={p.value}>{p.label}</option>
-        ))}
-      </select>
+      <PrizmSelect
+        options={[
+          ...(draft === 'personalizado' ? [{ value: 'personalizado', label: 'Personalizado (selecione um papel)', disabled: true }] : []),
+          ...papeis.map(p => ({ value: p.value, label: p.label })),
+        ]}
+        value={draft}
+        onChange={value => setDraft(value ?? draft)}
+        disabled={saving}
+        defaultOpen
+        className="text-sm h-auto py-1.5"
+      />
       <button onClick={async () => { setSaving(true); try { await onSave(draft) } finally { setSaving(false); setEditing(false) } }}
         disabled={saving} className="p-1 rounded text-green-600 hover:bg-green-50" title="Confirmar">
         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
