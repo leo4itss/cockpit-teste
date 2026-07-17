@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Plus, MessageCircle, Phone } from 'lucide-react'
 import { Modal } from './ui/Modal'
 import { Button } from './ui/Button'
+import { Select } from './ui/Select'
 
 interface Props {
   open: boolean
