@@ -133,24 +133,15 @@ function VincularContaDialog({ open, onClose, user, disponiveis, onVincular }: V
             Este usuário já está vinculado a todas as contas disponíveis.
           </p>
         ) : (
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-[#030712]">
-              Conta <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <select
-                value={selectedId}
-                onChange={e => setSelectedId(e.target.value)}
-                disabled={saving}
-                className="w-full appearance-none px-3 py-2 pr-8 text-sm border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:bg-gray-50"
-              >
-                <option value="">Selecione uma conta...</option>
-                {disponiveis.map(a => (
-                  <option key={a.id} value={a.id}>{a.name}</option>
-                ))}
-              </select>
-            </div>
-          </div>
+          <Select
+            label="Conta"
+            required
+            placeholder="Selecione uma conta..."
+            options={disponiveis.map(a => ({ value: a.id, label: a.name }))}
+            value={selectedId}
+            onChange={value => setSelectedId(value ?? '')}
+            disabled={saving}
+          />
         )}
         {error && <p className="text-sm text-red-600">{error}</p>}
       </div>
