@@ -727,52 +727,36 @@ export function AcessosPage() {
 
           {/* Filtros + colunas configuráveis */}
           <div className="flex items-center gap-2 flex-wrap">
-            <div className="relative">
-              <select
-                value={filtroGrupo}
-                onChange={e => setFiltroGrupo(e.target.value)}
-                className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
-              >
-                <option value="">Todos os grupos</option>
-                {grupos.filter(g => g.status === 'Ativo').map(g => <option key={g.id} value={g.id}>{g.nome}</option>)}
-              </select>
-              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
-            </div>
-            <div className="relative">
-              <select
-                value={filtroObjeto}
-                onChange={e => setFiltroObjeto(e.target.value)}
-                className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
-              >
-                <option value="">Todos os objetos</option>
-                {instancias.filter(i => i.status === 'Ativo').map(i => <option key={i.id} value={i.id}>{i.nome}</option>)}
-              </select>
-              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
-            </div>
-            <div className="relative">
-              <select
-                value={filtroPapel}
-                onChange={e => setFiltroPapel(e.target.value)}
-                className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
-              >
-                <option value="">Todos os papéis</option>
-                <option value="member">Membro</option>
-                <option value="account_admin">Administrador da Conta</option>
-              </select>
-              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
-            </div>
-            <div className="relative">
-              <select
-                value={filtroStatus}
-                onChange={e => setFiltroStatus(e.target.value)}
-                className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
-              >
-                <option value="">Todos os status</option>
-                <option value="Ativo">Ativo</option>
-                <option value="Inativo">Inativo</option>
-              </select>
-              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
-            </div>
+            <Select
+              placeholder="Todos os grupos"
+              options={grupos.filter(g => g.status === 'Ativo').map(g => ({ value: g.id, label: g.nome }))}
+              value={filtroGrupo}
+              onChange={value => setFiltroGrupo(value ?? '')}
+            />
+            <Select
+              placeholder="Todos os objetos"
+              options={instancias.filter(i => i.status === 'Ativo').map(i => ({ value: i.id, label: i.nome }))}
+              value={filtroObjeto}
+              onChange={value => setFiltroObjeto(value ?? '')}
+            />
+            <Select
+              placeholder="Todos os papéis"
+              options={[
+                { value: 'member', label: 'Membro' },
+                { value: 'account_admin', label: 'Administrador da Conta' },
+              ]}
+              value={filtroPapel}
+              onChange={value => setFiltroPapel(value ?? '')}
+            />
+            <Select
+              placeholder="Todos os status"
+              options={[
+                { value: 'Ativo', label: 'Ativo' },
+                { value: 'Inativo', label: 'Inativo' },
+              ]}
+              value={filtroStatus}
+              onChange={value => setFiltroStatus(value ?? '')}
+            />
 
             <div className="ml-auto">
               <Popover
