@@ -92,12 +92,14 @@ function PapelEditorFGA({
   )
   return (
     <div className="flex items-center gap-1.5">
-      <select value={draft} onChange={e => setDraft(e.target.value)} disabled={saving} autoFocus
-        className="text-xs border border-gray-300 rounded-md px-2 py-1 outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-        {PAPEIS_FGA.map(p => (
-          <option key={p.value} value={p.value}>{p.label}</option>
-        ))}
-      </select>
+      <PrizmSelect
+        options={PAPEIS_FGA.map(p => ({ value: p.value, label: p.label }))}
+        value={draft}
+        onChange={value => setDraft(value ?? draft)}
+        disabled={saving}
+        defaultOpen
+        className="text-xs h-auto py-1"
+      />
       <button onClick={async () => { setSaving(true); try { await onSave(draft) } finally { setSaving(false); setEditing(false) } }}
         disabled={saving} className="p-1 rounded text-green-600 hover:bg-green-50" title="Confirmar">
         {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
