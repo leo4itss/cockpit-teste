@@ -279,17 +279,12 @@ export function UsuariosPage() {
           </div>
 
           {/* Filtro Função */}
-          <div className="relative">
-            <select
-              value={funcaoFilter}
-              onChange={e => setFuncaoFilter(e.target.value)}
-              className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer text-[#030712]"
-            >
-              <option value="">Todas as funções</option>
-              {funcoes.map(f => <option key={f} value={f}>{f}</option>)}
-            </select>
-            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
-          </div>
+          <Select
+            placeholder="Todas as funções"
+            options={funcoes.map(f => ({ value: f, label: f }))}
+            value={funcaoFilter}
+            onChange={value => setFuncaoFilter(value ?? '')}
+          />
         </div>
 
         {/* Tabela */}
