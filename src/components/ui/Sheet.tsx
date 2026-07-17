@@ -28,7 +28,10 @@ export function Sheet({ open, onClose, title, description, children, footer, wid
       description={description}
       body={children}
       footer={footer}
-      contentClassName={width}
+      // @pas/ui aplica "sm:max-w-sm" por padrão nos lados left/right — sem
+      // sobrescrever o mesmo breakpoint, o limite de largura vence e o
+      // painel fica travado em ~384px independente do "width" pedido aqui.
+      contentClassName={`${width} ${width.replace(/^w-/, 'sm:max-w-')}`}
     />
   )
 }
