@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Popover } from '@/components/ui/Popover'
 import { Dialog } from '@/components/ui/Dialog'
+import { Select } from '@/components/ui/Select'
 import { useSessionState } from '@/hooks/useSessionState'
 import {
   NestedSheet,
