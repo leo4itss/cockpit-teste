@@ -17,6 +17,7 @@ import {
   NestedSheetFooter,
 } from '@/components/ui/nested-sheet'
 import { Button } from '@/components/ui/Button'
+import { Select } from '@/components/ui/Select'
 import { api } from '@/api/client'
 import { cn } from '@/lib/utils'
 import type { User, Account, Grupo } from '@/types'
