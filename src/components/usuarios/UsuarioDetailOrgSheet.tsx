@@ -8,7 +8,7 @@
  */
 
 import { useState, useMemo } from 'react'
-import { Building2, BadgeCheck, Clock, Mail, Briefcase, ShieldCheck, ShieldMinus, Loader2 } from 'lucide-react'
+import { Building2, BadgeCheck, Clock, Briefcase, ShieldCheck, ShieldMinus, Loader2 } from 'lucide-react'
 import {
   NestedSheet,
   NestedSheetHeader,
