@@ -223,10 +223,6 @@ export function UsuarioDetailOrgSheet({
                   </div>
                 )}
                 <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-gray-400 shrink-0" />
-                  <span className="text-sm text-[#030712] truncate">{user.email}</span>
-                </div>
-                <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-gray-400 shrink-0" />
                   <span className="text-sm text-[#030712]">{user.ultimoAcesso || '—'}</span>
                 </div>
