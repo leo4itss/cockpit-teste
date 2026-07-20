@@ -51,6 +51,25 @@
 
   --color-tooltip: var(--tooltip);
   --color-tooltip-foreground: var(--tooltip-foreground);
+
+  /*
+   * Raio: hoje "rounded-md" etc. já saem certos (8/10/14/16px) por
+   * coincidência de ordem de @import — o CSS do @pas/ui é importado depois
+   * do Tailwind e vence a cascata. Registrar aqui transforma essa sorte em
+   * garantia: se algum dia a ordem dos imports mudar, o raio continua certo.
+   */
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+  --radius-3xl: var(--radius-3xl);
+
+  /* Fonte: só registra o token — carregar os arquivos de fonte de fato
+   * (Inter/Geist Mono) e apontar o body para var(--font-sans) é a fase 1. */
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
 }
 
 @layer base {
