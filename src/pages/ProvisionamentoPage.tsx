@@ -19,7 +19,7 @@ import { useCanViewProvisioning } from '@/authz/hooks'
 import { getProvisioning, ProvisioningNotFoundError } from '@/services/provisioning'
 import { api } from '@/api/client'
 import { accounts as mockAccounts } from '@/data/mock'
-import type { Account, ProvisioningFetchState, ProvisioningOverallStatus } from '@/types'
+import type { Account, ProvisioningFetchState, ProvisioningOverallStatus, ProvisioningSnapshot } from '@/types'
 
 const STATUS_BADGE: Record<ProvisioningOverallStatus, { variant: 'success' | 'info' | 'default' | 'error'; label: string }> = {
   COMPLETED: { variant: 'success', label: 'Concluído' },
