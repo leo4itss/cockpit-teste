@@ -268,7 +268,7 @@ export const accounts: Account[] = [
     orgId: '1',
     name: 'Apple Retail Brasil',
     subdomain: 'apple-retail',
-    provisioningStatus: 'PENDING',
+    provisioningStatus: 'FAILED',
     arquitetoPAS: 'Marcelo Gomes',
     isDefault: false,
     status: 'Criado',
