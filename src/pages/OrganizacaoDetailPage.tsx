@@ -796,7 +796,18 @@ export function OrganizacaoDetailPage() {
                                 </div>
                               </td>
                               <td className="px-2 py-2 h-[52px]">
-                                {isInativo ? <span className="text-xs text-[#9ca3af]">—</span> : <ProvisioningDots status={a.provisioningStatus} />}
+                                {isInativo ? (
+                                  <span className="text-xs text-[#9ca3af]">—</span>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    title="Ver detalhes do provisionamento"
+                                    onClick={e => { e.stopPropagation(); navigate(`/contas/${a.id}/provisionamento`) }}
+                                    className="inline-flex items-center rounded p-1 -m-1 hover:bg-gray-100 transition-colors"
+                                  >
+                                    <ProvisioningDots status={a.provisioningStatus} />
+                                  </button>
+                                )}
                               </td>
                               <td className={`px-2 py-2 h-[52px] text-sm ${isInativo ? 'text-[#9ca3af]' : 'text-[#030712]'}`}>{a.subdomain}</td>
                               <td className={`px-2 py-2 h-[52px] text-sm text-center ${isInativo ? 'text-[#9ca3af]' : 'text-[#030712]'}`}>{a.arquitetoPAS}</td>
