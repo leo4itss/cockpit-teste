@@ -145,18 +145,82 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
     <>
       <Sheet
         open={open}
-        onClose={onClose}
-        title="Novo Contrato"
+        onClose={handleClose}
+        title={step === 1 ? 'Novo Contrato' : 'Revisar contrato'}
         width="w-[640px]"
         footer={
-          <>
-            <Button variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button onClick={handleSave}>
-              Criar Contrato
-            </Button>
-          </>
+          step === 1 ? (
+            <>
+              <Button variant="outline" onClick={handleClose}>Cancelar</Button>
+              <Button onClick={handleReview}>Revisar</Button>
+            </>
+          ) : (
+            <>
+              <Button variant="outline" onClick={() => setStep(1)}>Voltar</Button>
+              <Button onClick={handleConfirm} disabled={fase1Bloqueada}>
+                Criar contrato
+              </Button>
+            </>
+          )
         }
       >
+        {step === 2 ? (
+          <div className="flex flex-col gap-7">
+            <div className="flex flex-col gap-3">
+              <SectionTitle>Conta contratante</SectionTitle>
+              <div className="flex items-center justify-between border border-[#e5e7eb] rounded-2xl p-4">
+                <p className="text-sm font-medium text-[#030712]">{contratante || '—'}</p>
+                {selectedAccount && (
+                  <Badge variant={FASE1_BADGE[selectedAccount.provisioningStatus].variant} showIcon>
+                    Fase 1: {FASE1_BADGE[selectedAccount.provisioningStatus].label}
+                  </Badge>
+                )}
+              </div>
+            </div>
+
+            {fase1Bloqueada && (
+              <div className="flex items-start gap-3 bg-red-50 border border-red-300 rounded-lg p-3">
+                <AlertTriangle className="w-5 h-5 text-red-700 shrink-0" />
+                <p className="text-xs font-medium text-red-700 leading-4">
+                  A Fase 1 do provisionamento desta conta (banco, Keycloak, DNS, ingress) ainda não
+                  foi concluída. O contrato não pode ser criado — provisionar soluções exige a conta
+                  totalmente provisionada primeiro.
+                </p>
+              </div>
+            )}
+
+            <Divider />
+
+            <div className="flex flex-col gap-3">
+              <SectionTitle>Soluções que serão provisionadas (Fase 2)</SectionTitle>
+              <div className="border border-[#e5e7eb] rounded-2xl p-4 flex flex-col gap-3">
+                <div className="grid grid-cols-4 gap-2">
+                  {COLS.map(col => (
+                    <p key={col} className="text-xs text-[#6b7280] leading-4">{col}</p>
+                  ))}
+                </div>
+                <Divider />
+                {objetos.map((obj, i) => (
+                  <div key={i} className="grid grid-cols-4 gap-2 items-center">
+                    <p className="text-sm text-[#030712] truncate">{obj.solucao}</p>
+                    <p className="text-sm text-[#030712] truncate">{obj.orgContratada}</p>
+                    <p className="text-sm text-[#030712] truncate">{obj.plano}</p>
+                    <p className="text-sm text-[#030712] truncate">{obj.licenciamento}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 bg-blue-50 border border-blue-300 rounded-lg p-3">
+              <CircleAlert className="w-5 h-5 text-blue-700 shrink-0" />
+              <p className="text-xs font-medium text-blue-700 leading-4">
+                Ao confirmar, o contrato será criado e a Fase 2 do provisionamento
+                ({objetos.length} solução{objetos.length === 1 ? '' : 'ões'}) será disparada
+                automaticamente para esta conta.
+              </p>
+            </div>
+          </div>
+        ) : (
         <div className="flex flex-col gap-10">
 
           {/* ── Dados do contrato ─────────────────────────────── */}
