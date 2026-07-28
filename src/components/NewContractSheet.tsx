@@ -1,12 +1,21 @@
 import { useState } from 'react'
-import { Plus, CircleAlert } from 'lucide-react'
+import { Plus, CircleAlert, AlertTriangle } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Select } from './ui/Select'
 import { Input } from './ui/Input'
 import { Button } from './ui/Button'
+import { Badge } from './ui/Badge'
 import { AddObjetoDialog } from './AddObjetoDialog'
 import { useToast, ToastContainer } from './ui/Toast'
-import type { Account, Contract, Solution, ObjetoContrato } from '@/types'
+import type { Account, Contract, Solution, ObjetoContrato, ProvisioningOverallStatus } from '@/types'
+
+/** Mesmo mapeamento usado em ProvisionamentoPage — status da Fase 1 do tenant. */
+const FASE1_BADGE: Record<ProvisioningOverallStatus, { variant: 'success' | 'info' | 'default' | 'error'; label: string }> = {
+  COMPLETED: { variant: 'success', label: 'Concluído' },
+  IN_PROGRESS: { variant: 'info', label: 'Em andamento' },
+  PENDING: { variant: 'default', label: 'Pendente' },
+  FAILED: { variant: 'error', label: 'Falhou' },
+}
 
 interface Props {
   open: boolean
