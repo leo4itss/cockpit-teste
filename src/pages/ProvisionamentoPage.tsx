@@ -14,12 +14,23 @@ import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { EmptyState } from '@/components/provisionamento/ProvisioningCard'
+import { TenantInfoCard } from '@/components/provisionamento/TenantInfoCard'
+import { ProvisioningSummaryBar } from '@/components/provisionamento/ProvisioningSummaryBar'
+import { ProvisioningStepsTimeline } from '@/components/provisionamento/ProvisioningStepsTimeline'
+import { LinkedSolutionsCard } from '@/components/provisionamento/LinkedSolutionsCard'
+import { ActiveContractsCard } from '@/components/provisionamento/ActiveContractsCard'
 import { useToast, ToastContainer } from '@/components/ui/Toast'
 import { useCanViewProvisioning } from '@/authz/hooks'
-import { getProvisioning, ProvisioningNotFoundError } from '@/services/provisioning'
+import {
+  getProvisioning,
+  ProvisioningNotFoundError,
+  deriveSummary,
+  resolveAccountContracts,
+  resolveAccountSolutionNames,
+} from '@/services/provisioning'
 import { api } from '@/api/client'
-import { accounts as mockAccounts } from '@/data/mock'
-import type { Account, ProvisioningFetchState, ProvisioningOverallStatus, ProvisioningSnapshot } from '@/types'
+import { accounts as mockAccounts, contracts as mockContracts, solutions as mockSolutions } from '@/data/mock'
+import type { Account, Contract, Solution, ProvisioningFetchState, ProvisioningOverallStatus, ProvisioningSnapshot } from '@/types'
 
 const STATUS_BADGE: Record<ProvisioningOverallStatus, { variant: 'success' | 'info' | 'default' | 'error'; label: string }> = {
   COMPLETED: { variant: 'success', label: 'Concluído' },
