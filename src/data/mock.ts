@@ -1468,6 +1468,9 @@ export const provisioningSnapshots: Record<string, ProvisioningSnapshot> = {
       { id: 'ingress', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
       { id: 'env-vars', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
     ],
+    // Fase 2 bloqueada — Fase 1 ainda IN_PROGRESS. Também consistente com
+    // "Nenhum contrato ativo encontrado" já visto ao vivo para esta conta.
+    solucoes: [],
   },
 }
 
