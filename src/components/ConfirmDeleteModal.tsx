@@ -481,6 +481,64 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
     )
   }
 
+  // --- REPROVISIONAR ---
+  if (variant === 'reprovisionar') {
+    const canConfirm = typed === name
+    return (
+      <Modal
+        open={open}
+        onClose={handleClose}
+        title="Reprovisionar tenant"
+        maxWidth="max-w-[480px]"
+        footer={
+          <>
+            <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
+            <Button variant="destructive" onClick={handleConfirm} disabled={!canConfirm}>
+              Reprovisionar
+            </Button>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-4 text-sm text-[#030712]">
+          <p>
+            O worker vai reexecutar as etapas de provisionamento deste tenant, recriando
+            os recursos de infraestrutura pendentes ou com falha:
+          </p>
+          <div className="bg-red-50 border border-red-300 rounded-md p-4">
+            <ul className="flex flex-col gap-1 text-sm font-medium text-red-700 list-disc list-outside pl-5">
+              <li>Banco de dados PostgreSQL do tenant</li>
+              <li>Realm e configurações no Keycloak</li>
+              <li>Registro DNS (CNAME) no Cloudflare</li>
+              <li>Ingress e certificado TLS</li>
+              <li>Variáveis de ambiente no Infisical</li>
+            </ul>
+          </div>
+
+          <div className="flex items-start gap-4 bg-blue-50 border border-blue-300 rounded-md p-4">
+            <CircleAlert className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
+            <p className="text-sm font-medium text-blue-700 leading-5">
+              Usuários deste tenant podem perder acesso temporariamente enquanto o
+              provisionamento é reexecutado.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-[#030712]">
+              Digite <strong>"{name}"</strong> para confirmar:
+            </label>
+            <input
+              type="text"
+              value={typed}
+              onChange={e => setTyped(e.target.value)}
+              placeholder={name}
+              className="w-full rounded-md border border-[#e5e7eb] px-3 py-2 text-sm text-[#030712] placeholder:text-[#9ca3af] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-red-500"
+            />
+          </div>
+        </div>
+      </Modal>
+    )
+  }
+
   // --- ORG ---
   const canConfirm = typed === name
 
