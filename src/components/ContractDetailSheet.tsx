@@ -173,7 +173,7 @@ export function ContractDetailSheet({ open, onClose, contract, onEdit }: Props) 
                   <ObjetoField label="Organização contratada" value={obj.orgContratada} />
                   <div className="flex flex-col gap-0.5">
                     <p className="text-sm font-semibold text-[#030712]">Status da publicação</p>
-                    <ProvisioningDots status="COMPLETED" />
+                    <ProvisioningDots status="COMPLETED" catalog={PUBLICACAO_STEPS} tooltipTitulo="Status da publicação" />
                   </div>
                 </div>
               ))}
