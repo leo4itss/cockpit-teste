@@ -9,7 +9,7 @@ export function ProvisioningStepsTimeline({ steps }: { steps: ProvisioningStep[]
 
   return (
     <Card className="flex flex-col gap-1">
-      <SectionTitle>Etapas do provisionamento</SectionTitle>
+      <SectionTitle>Fase 1 — Provisionamento da conta</SectionTitle>
       <Divider />
       <div className="flex flex-col divide-y divide-[#f3f4f6]">
         {PROVISIONING_STEPS.map(def => {
