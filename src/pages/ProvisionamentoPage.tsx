@@ -176,7 +176,7 @@ export function ProvisionamentoPage() {
 function ProvisioningContent({
   snapshot,
 }: {
-  snapshot: NonNullable<Extract<ProvisioningFetchState, { fase: 'ok' }>>['dados']
+  snapshot: ProvisioningSnapshot
   account: Account
   onToast: ReturnType<typeof useToast>['toast']
 }) {
