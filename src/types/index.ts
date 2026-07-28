@@ -1,3 +1,5 @@
+export * from './provisioning'
+
 export interface Contact {
   name: string
   role: string
