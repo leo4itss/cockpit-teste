@@ -88,30 +88,46 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
     setDialogOpen(true)
   }
 
-  function handleSave() {
-    // Validação de campos obrigatórios
+  function reset() {
+    setContratante('')
+    setObjetos([])
+    setForm({ dataInicio: '', dataTermino: '', renovacao: '' })
+    setStep(1)
+  }
+
+  function handleClose() {
+    reset()
+    onClose()
+  }
+
+  /** Passo 1 → 2: mesma validação de sempre, mas agora só avança para a revisão. */
+  function handleReview() {
     const missing: string[] = []
     if (!form.dataInicio) missing.push('Informe a data de início.')
     if (!form.dataTermino) missing.push('Informe a data de término.')
     if (!form.renovacao) missing.push('Selecione o tipo de renovação.')
 
     if (missing.length > 0) {
-      toast(`Não foi possível criar o contrato.\n${missing.join('\n')}`, 'warning')
+      toast(`Não foi possível continuar.\n${missing.join('\n')}`, 'warning')
       return
     }
 
-    // Validação de vigência
     if (form.dataInicio && form.dataTermino && form.dataTermino <= form.dataInicio) {
       toast('A data de término deve ser posterior à data de início.', 'warning')
       return
     }
 
-    // Validação de objetos
     if (objetos.length === 0) {
       toast('Adicione ao menos um objeto ao contrato para continuar.', 'warning')
       return
     }
 
+    setStep(2)
+  }
+
+  /** Passo 2: confirma e efetivamente cria o contrato (dispara a Fase 2). */
+  function handleConfirm() {
+    if (fase1Bloqueada) return // segundo gate — defesa contra estado obsoleto do botão
     onSave({
       orgId,
       contratante: contratante || activeAccounts[0]?.name || orgName,
@@ -121,9 +137,7 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
       renovacao: form.renovacao,
       status: 'Ativo',
     })
-    setContratante('')
-    setObjetos([])
-    setForm({ dataInicio: '', dataTermino: '', renovacao: '' })
+    reset()
     onClose()
   }
 
