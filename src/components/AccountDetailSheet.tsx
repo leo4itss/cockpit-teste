@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Copy, MessageCircle, Mail, ExternalLink, Bot, Database, Layers, FileText, Zap, Loader2, CheckCircle2, XCircle } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Button } from './ui/Button'
@@ -6,6 +7,7 @@ import { Badge } from './ui/Badge'
 import { useToast, ToastContainer } from './ui/Toast'
 import { cn } from '@/lib/utils'
 import { api } from '@/api/client'
+import { buildTenantDomain } from '@/services/provisioning'
 import { accountEntitlements as mockEntitlements } from '@/data/mock'
 import type { Account, Organization } from '@/types'
 
