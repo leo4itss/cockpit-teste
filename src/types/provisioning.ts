@@ -102,18 +102,49 @@ export interface TenantInfo {
   criadoEm: string
 }
 
+// ── Fase 2 — provisionamento por solução, disparado pelo contrato ──
+//
+// A Fase 1 (acima) é o workflow `tenantProvisioning`: roda na criação da
+// conta, cria banco/realm/secrets/DNS/ingress. A Fase 2 é um workflow
+// SEPARADO (`solutionPublicationByContract`): roda quando um contrato é
+// criado, provisiona cada solução coberta pelo contrato e libera acesso.
+// Não mexe em DNS/Ingress. Exige Fase 1 concluída (regra confirmada com o
+// arquiteto do worker).
+
+/** Estado de provisionamento de UMA solução na Fase 2. Reusa os 4 estados da Fase 1. */
+export interface SolutionProvisioning {
+  /** = Solution.name — mesmo join por string já usado no resto do app. */
+  solucaoNome: string
+  estado: ProvisioningStepState
+  iniciadoEm: string | null
+  concluidoEm: string | null
+  duracaoMs: number | null
+  detalhes?: Record<string, string>
+  erro?: ProvisioningStepError | null
+}
+
+/**
+ * 'bloqueada'    → Fase 1 não concluída; Fase 2 nem pode começar.
+ * 'sem-contrato' → Fase 1 OK, mas nenhum contrato ativo cobre este tenant ainda.
+ * ProvisioningOverallStatus → há contrato; status derivado de `solucoes[]`.
+ */
+export type Fase2Status = 'bloqueada' | 'sem-contrato' | ProvisioningOverallStatus
+
 // ── Snapshot completo ─────────────────────────────────────────
 
 export interface ProvisioningSnapshot {
   tenant: TenantInfo
+  /** Fase 1 — status consolidado. */
   status: ProvisioningOverallStatus
-  /** Sempre os 5 steps, sempre em ordem. */
+  /** Fase 1 — sempre os 5 steps, sempre em ordem. */
   steps: ProvisioningStep[]
   iniciadoEm: string | null
   finalizadoEm: string | null
   workerVersion: string | null
   correlationId: string | null
   atualizadoEm: string
+  /** Fase 2 — uma entrada por solução coberta pelo contrato ativo. Vazio = sem contrato ainda. */
+  solucoes: SolutionProvisioning[]
 }
 
 // ── Health check sob demanda ──────────────────────────────────
