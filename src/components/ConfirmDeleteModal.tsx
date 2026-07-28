@@ -7,6 +7,7 @@
 // - 'inativar-contrato': inativação simples de contrato
 // - 'excluir-componente': exclusão permanente sem vínculos
 // - 'inativar-componente': soft delete por vínculo com soluções
+// - 'reprovisionar': reexecuta o provisionamento de um tenant (infra destrutiva)
 
 import { useState } from 'react'
 import { Modal } from './ui/Modal'
