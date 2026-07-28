@@ -167,10 +167,8 @@ export function AccountDetailSheet({ open, onClose, account, org, onEdit }: Prop
 
   if (!account || !org) return null
 
-  const hasSubdomain = !!account.subdomain?.trim()
-  const accessUrl = hasSubdomain
-    ? `http://${account.subdomain}.hml.pas.app.br`
-    : ''
+  const accessUrl = buildTenantDomain(account.subdomain) ?? ''
+  const hasSubdomain = !!accessUrl
 
   const enderecoPartes = [
     account.endereco || org.address,
