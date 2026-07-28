@@ -16,6 +16,7 @@ import SchemaVisualizerPage from './pages/SchemaVisualizerPage'
 import CanvasPermissoesPage from './pages/CanvasPermissoesPage'
 import CanvasOrgPage from './pages/CanvasOrgPage'
 import { InstanciaPage } from './pages/InstanciaPage'
+import { ProvisionamentoPage } from './pages/ProvisionamentoPage'
 import { FigmaCaptureSession } from './components/FigmaCaptureSession'
 
 export default function App() {
