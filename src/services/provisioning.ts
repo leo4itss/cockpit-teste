@@ -217,6 +217,23 @@ export function deriveStepsFromStatus(status: ProvisioningOverallStatus): Provis
   }))
 }
 
+/**
+ * Deriva o status consolidado da Fase 2 a partir do status da Fase 1 e das
+ * soluções em provisionamento. Regra confirmada com o arquiteto do worker:
+ * a Fase 2 não pode nem começar se a Fase 1 não estiver concluída.
+ */
+export function deriveFase2Status(
+  fase1Status: ProvisioningOverallStatus,
+  solucoes: SolutionProvisioning[],
+): Fase2Status {
+  if (fase1Status !== 'COMPLETED') return 'bloqueada'
+  if (solucoes.length === 0) return 'sem-contrato'
+  if (solucoes.some(s => s.estado === 'erro')) return 'FAILED'
+  if (solucoes.every(s => s.estado === 'criado')) return 'COMPLETED'
+  if (solucoes.some(s => s.estado === 'em-andamento' || s.estado === 'criado')) return 'IN_PROGRESS'
+  return 'PENDING'
+}
+
 // ── Join contratos/soluções (frágil por design — ver nota) ────
 
 /**
