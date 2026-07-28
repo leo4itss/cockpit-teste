@@ -435,3 +435,78 @@ export function canActWithAtribuicao(
   if (atribuicoes.includes('*')) return true
   return atribuicoes.includes(atribuicaoId)
 }
+
+// ── Provisionamento de tenant ─────────────────────────────────
+//
+// PLUGGABLE: estes 4 gates são stubs para o PoC. Quando o modelo OpenFGA
+// estiver definido, substituir o corpo de cada função pela chamada real:
+//   await fga.check({ user: `user:${userId}`, relation: '<nome>', object: `account:${accountId}` })
+// Assinatura e retorno boolean permanecem — hooks e UI não mudam.
+//
+// AVISO: estes gates são apenas de UI. Quando o worker real expuser
+// endpoints, a MESMA verificação precisa existir no servidor — esconder
+// um botão não é controle de acesso.
+
+/**
+ * Pode ver a tela de detalhes de provisionamento de uma conta.
+ * FGA (futuro): user:<id> can_view_provisioning account:<accountId>
+ */
+export function canViewProvisioning(
+  userId: string,
+  accountId: string,
+  orgId: string,
+  rel: FGARelations,
+): boolean {
+  if (isPlatformAdmin(userId, rel)) return true
+  if (isOrgAdmin(userId, orgId, rel)) return true
+  if (isPasArchitect(userId, orgId, rel)) return true
+  if (isAccountAdmin(userId, accountId, rel)) return true
+  return false
+}
+
+/**
+ * Pode disparar um reprovisionamento (destrutivo/irreversível a nível de
+ * infraestrutura). Restrito a Platform Admin no PoC.
+ * FGA (futuro): user:<id> can_reprovision account:<accountId>
+ */
+export function canReprovisionTenant(
+  userId: string,
+  _accountId: string,
+  _orgId: string,
+  rel: FGARelations,
+): boolean {
+  return isPlatformAdmin(userId, rel)
+}
+
+/**
+ * Pode visualizar os logs do worker de provisionamento. Logs expõem host,
+ * realm e IDs de zona DNS — gate mais restrito que `canViewProvisioning`.
+ * FGA (futuro): user:<id> can_view_provisioning_logs account:<accountId>
+ */
+export function canViewTenantLogs(
+  userId: string,
+  _accountId: string,
+  orgId: string,
+  rel: FGARelations,
+): boolean {
+  if (isPlatformAdmin(userId, rel)) return true
+  if (isOrgAdmin(userId, orgId, rel)) return true
+  return false
+}
+
+/**
+ * Pode disparar um health check sob demanda do tenant. Somente leitura,
+ * mas gera carga em serviços externos — não liberado para `member`.
+ * FGA (futuro): user:<id> can_run_health_check account:<accountId>
+ */
+export function canRunTenantHealthCheck(
+  userId: string,
+  accountId: string,
+  orgId: string,
+  rel: FGARelations,
+): boolean {
+  if (isPlatformAdmin(userId, rel)) return true
+  if (isOrgAdmin(userId, orgId, rel)) return true
+  if (isAccountAdmin(userId, accountId, rel)) return true
+  return false
+}
