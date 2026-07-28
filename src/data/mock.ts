@@ -1302,3 +1302,186 @@ export const accountEntitlements: Record<string, string[]> = {
   'a1':         ['assistant.use', 'knowledge.use', 'analytics.use'],
   'a2':         ['assistant.use', 'knowledge.use', 'analytics.use', 'maxdoc.use', 'docaction.use'],
 }
+
+// ── Provisionamento de tenant — fallback mock (não existe em produção) ──
+// Contrato com o pas-cockpit-worker. accountId → snapshot.
+// 'a1-dev' e 'acc-comgas' propositalmente SEM entrada, para exercitar o
+// estado "vazio" da tela (conta ainda sem registro de provisionamento).
+export const provisioningSnapshots: Record<string, ProvisioningSnapshot> = {
+  a1: {
+    tenant: {
+      accountId: 'a1', accountName: 'Apple',
+      slug: 'appletecgo', dominio: 'https://appletecgo.hml.pas.app.br',
+      ambiente: 'hml', orgId: '1', orgNome: 'Apple', criadoEm: '23/03/2026',
+    },
+    status: 'COMPLETED',
+    iniciadoEm: '2026-03-23T17:50:02.000Z',
+    finalizadoEm: '2026-03-23T17:56:47.000Z',
+    workerVersion: 'provisioner@2.7.1',
+    correlationId: 'prv_01HXA7QK3M9APPLE00001',
+    atualizadoEm: '2026-03-23T17:56:47.000Z',
+    steps: [
+      { id: 'database', estado: 'criado', iniciadoEm: '2026-03-23T17:50:02.000Z', concluidoEm: '2026-03-23T17:50:41.000Z', duracaoMs: 39000,
+        detalhes: { host: 'pg-shared-01.hml.internal', database: 'tenant_appletecgo', usuario: 'tenant_appletecgo_app' }, erro: null },
+      { id: 'keycloak', estado: 'criado', iniciadoEm: '2026-03-23T17:50:41.000Z', concluidoEm: '2026-03-23T17:51:12.000Z', duracaoMs: 31000,
+        detalhes: { realm: 'appletecgo', clientId: 'pas-web', issuer: 'https://auth.hml.pas.app.br/realms/appletecgo' }, erro: null },
+      { id: 'dns', estado: 'criado', iniciadoEm: '2026-03-23T17:51:12.000Z', concluidoEm: '2026-03-23T17:52:03.000Z', duracaoMs: 51000,
+        detalhes: { zona: 'pas.app.br', registro: 'appletecgo.hml', tipo: 'CNAME', alvo: 'ingress-hml.pas.app.br' }, erro: null },
+      { id: 'ingress', estado: 'criado', iniciadoEm: '2026-03-23T17:52:03.000Z', concluidoEm: '2026-03-23T17:54:30.000Z', duracaoMs: 147000,
+        detalhes: { host: 'appletecgo.hml.pas.app.br', certificado: 'letsencrypt-prod', ingressClass: 'nginx' }, erro: null },
+      { id: 'env-vars', estado: 'criado', iniciadoEm: '2026-03-23T17:54:30.000Z', concluidoEm: '2026-03-23T17:56:47.000Z', duracaoMs: 137000,
+        detalhes: { projeto: 'appletecgo', ambiente: 'hml', segredosInjetados: '14' }, erro: null },
+    ],
+  },
+  a2: {
+    tenant: {
+      accountId: 'a2', accountName: 'Santacruz',
+      slug: 'santacruzltda', dominio: 'https://santacruzltda.hml.pas.app.br',
+      ambiente: 'hml', orgId: '2', orgNome: 'Santacruz', criadoEm: '10/01/2026',
+    },
+    status: 'IN_PROGRESS',
+    iniciadoEm: '2026-07-28T09:12:00.000Z',
+    finalizadoEm: null,
+    workerVersion: 'provisioner@2.7.1',
+    correlationId: 'prv_01HXA7QK3M9SANTACRUZ01',
+    atualizadoEm: '2026-07-28T09:13:40.000Z',
+    steps: [
+      { id: 'database', estado: 'criado', iniciadoEm: '2026-07-28T09:12:00.000Z', concluidoEm: '2026-07-28T09:12:38.000Z', duracaoMs: 38000,
+        detalhes: { host: 'pg-shared-01.hml.internal', database: 'tenant_santacruzltda', usuario: 'tenant_santacruzltda_app' }, erro: null },
+      { id: 'keycloak', estado: 'em-andamento', iniciadoEm: '2026-07-28T09:12:38.000Z', concluidoEm: null, duracaoMs: null,
+        detalhes: { realm: 'santacruzltda' }, erro: null },
+      { id: 'dns', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
+      { id: 'ingress', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
+      { id: 'env-vars', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
+    ],
+  },
+  a3: {
+    tenant: {
+      accountId: 'a3', accountName: 'Margatastiltda',
+      slug: 'margatastiltda', dominio: 'https://margatastiltda.hml.pas.app.br',
+      ambiente: 'hml', orgId: '3', orgNome: 'Margatastiltda', criadoEm: '05/02/2026',
+    },
+    status: 'PENDING',
+    iniciadoEm: null,
+    finalizadoEm: null,
+    workerVersion: null,
+    correlationId: null,
+    atualizadoEm: '2026-02-05T00:00:00.000Z',
+    steps: [
+      { id: 'database', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
+      { id: 'keycloak', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
+      { id: 'dns', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
+      { id: 'ingress', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
+      { id: 'env-vars', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
+    ],
+  },
+  'a1-retail': {
+    tenant: {
+      accountId: 'a1-retail', accountName: 'Apple Retail Brasil',
+      slug: 'apple-retail', dominio: 'https://apple-retail.hml.pas.app.br',
+      ambiente: 'hml', orgId: '1', orgNome: 'Apple', criadoEm: '01/03/2026',
+    },
+    status: 'FAILED',
+    iniciadoEm: '2026-03-01T14:22:03.118Z',
+    finalizadoEm: '2026-03-01T14:24:47.902Z',
+    workerVersion: 'provisioner@2.7.1',
+    correlationId: 'prv_01HXA7QK3M9RETAIL0001',
+    atualizadoEm: '2026-03-01T14:24:47.902Z',
+    steps: [
+      {
+        id: 'database', estado: 'criado',
+        iniciadoEm: '2026-03-01T14:22:03.118Z', concluidoEm: '2026-03-01T14:22:41.556Z', duracaoMs: 38438,
+        detalhes: {
+          host: 'pg-shared-01.hml.internal', database: 'tenant_apple_retail',
+          schemaVersion: '2026.02.14-migrations', usuario: 'tenant_apple_retail_app',
+        },
+        erro: null,
+      },
+      {
+        id: 'keycloak', estado: 'criado',
+        iniciadoEm: '2026-03-01T14:22:41.560Z', concluidoEm: '2026-03-01T14:23:12.004Z', duracaoMs: 30444,
+        detalhes: {
+          realm: 'apple-retail', clientId: 'pas-web',
+          issuer: 'https://auth.hml.pas.app.br/realms/apple-retail',
+        },
+        erro: null,
+      },
+      {
+        id: 'dns', estado: 'erro',
+        iniciadoEm: '2026-03-01T14:23:12.010Z', concluidoEm: '2026-03-01T14:24:47.902Z', duracaoMs: 95892,
+        detalhes: {
+          zona: 'pas.app.br', registro: 'apple-retail.hml',
+          tipo: 'CNAME', alvo: 'ingress-hml.pas.app.br',
+        },
+        erro: {
+          codigo: 'DNS_RECORD_CONFLICT',
+          mensagem: 'Já existe um registro DNS para apple-retail.hml.pas.app.br apontando para outro destino.',
+          detalhe: 'Cloudflare API 400 — code 81053: An A, AAAA, or CNAME record with that host already exists.\nzone_id=7b4f2c9e1a8d4f0b93c2e5a61d0f8b34',
+          ocorridoEm: '2026-03-01T14:24:47.880Z',
+          tentativas: 3,
+          podeReexecutar: true,
+          docUrl: 'https://runbooks.itss.internal/pas/provisionamento/dns-record-conflict',
+        },
+      },
+      { id: 'ingress', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
+      { id: 'env-vars', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
+    ],
+  },
+}
+
+export const provisioningHealth: Record<string, HealthCheckResult> = {
+  a1: {
+    accountId: 'a1', executadoEm: '2026-07-28T10:00:00.000Z', duracaoMs: 820, estadoGeral: 'ok',
+    itens: [
+      { id: 'database', estado: 'ok', latenciaMs: 12, mensagem: 'Conexão estabelecida, query de verificação respondeu.' },
+      { id: 'keycloak', estado: 'ok', latenciaMs: 34, mensagem: 'Realm ativo, endpoint de discovery respondeu.' },
+      { id: 'dns', estado: 'ok', latenciaMs: 41, mensagem: 'Registro CNAME resolve para o ingress esperado.' },
+      { id: 'ingress', estado: 'ok', latenciaMs: 58, mensagem: 'Certificado válido, TLS handshake bem-sucedido.' },
+      { id: 'env-vars', estado: 'ok', latenciaMs: 9, mensagem: 'Segredos acessíveis pelo runtime do tenant.' },
+    ],
+  },
+  a2: {
+    accountId: 'a2', executadoEm: '2026-07-28T10:00:00.000Z', duracaoMs: 410, estadoGeral: 'degradado',
+    itens: [
+      { id: 'database', estado: 'ok', latenciaMs: 15, mensagem: 'Conexão estabelecida.' },
+      { id: 'keycloak', estado: 'degradado', latenciaMs: 890, mensagem: 'Realm ainda em criação — respondendo com latência alta.' },
+      { id: 'dns', estado: 'nao-verificado', latenciaMs: null, mensagem: 'Etapa ainda não iniciada.' },
+      { id: 'ingress', estado: 'nao-verificado', latenciaMs: null, mensagem: 'Etapa ainda não iniciada.' },
+      { id: 'env-vars', estado: 'nao-verificado', latenciaMs: null, mensagem: 'Etapa ainda não iniciada.' },
+    ],
+  },
+  'a1-retail': {
+    accountId: 'a1-retail', executadoEm: '2026-03-01T14:25:10.000Z', duracaoMs: 640, estadoGeral: 'falha',
+    itens: [
+      { id: 'database', estado: 'ok', latenciaMs: 18, mensagem: 'Conexão estabelecida.' },
+      { id: 'keycloak', estado: 'ok', latenciaMs: 29, mensagem: 'Realm ativo.' },
+      { id: 'dns', estado: 'falha', latenciaMs: null, mensagem: 'NXDOMAIN — o host não resolve.' },
+      { id: 'ingress', estado: 'nao-verificado', latenciaMs: null, mensagem: 'Etapa nunca foi criada — não é possível verificar.' },
+      { id: 'env-vars', estado: 'nao-verificado', latenciaMs: null, mensagem: 'Etapa nunca foi criada — não é possível verificar.' },
+    ],
+  },
+}
+
+export const provisioningLogs: Record<string, ProvisioningLogPage> = {
+  'a1-retail': {
+    accountId: 'a1-retail',
+    temMais: false,
+    proximoCursor: null,
+    entradas: [
+      { id: 'log-01', timestamp: '2026-03-01T14:22:03.118Z', nivel: 'info', stepId: null, mensagem: 'Job de provisionamento iniciado.', contexto: { correlationId: 'prv_01HXA7QK3M9RETAIL0001' } },
+      { id: 'log-02', timestamp: '2026-03-01T14:22:03.200Z', nivel: 'info', stepId: 'database', mensagem: 'Iniciando criação da database do tenant.' },
+      { id: 'log-03', timestamp: '2026-03-01T14:22:20.500Z', nivel: 'debug', stepId: 'database', mensagem: 'Aplicando migration 2026.02.14-migrations.' },
+      { id: 'log-04', timestamp: '2026-03-01T14:22:41.556Z', nivel: 'info', stepId: 'database', mensagem: 'Database tenant_apple_retail criada com sucesso.' },
+      { id: 'log-05', timestamp: '2026-03-01T14:22:41.560Z', nivel: 'info', stepId: 'keycloak', mensagem: 'Iniciando criação do realm no Keycloak.' },
+      { id: 'log-06', timestamp: '2026-03-01T14:23:01.200Z', nivel: 'debug', stepId: 'keycloak', mensagem: 'Client OIDC pas-web registrado.' },
+      { id: 'log-07', timestamp: '2026-03-01T14:23:12.004Z', nivel: 'info', stepId: 'keycloak', mensagem: 'Realm apple-retail pronto.' },
+      { id: 'log-08', timestamp: '2026-03-01T14:23:12.010Z', nivel: 'info', stepId: 'dns', mensagem: 'Solicitando criação de registro CNAME no Cloudflare.' },
+      { id: 'log-09', timestamp: '2026-03-01T14:23:42.300Z', nivel: 'warn', stepId: 'dns', mensagem: 'Tentativa 1 falhou — reagendando retry.' },
+      { id: 'log-10', timestamp: '2026-03-01T14:24:10.100Z', nivel: 'warn', stepId: 'dns', mensagem: 'Tentativa 2 falhou — reagendando retry.' },
+      { id: 'log-11', timestamp: '2026-03-01T14:24:47.880Z', nivel: 'error', stepId: 'dns', mensagem: 'Tentativa 3 falhou — registro já existe (DNS_RECORD_CONFLICT).', contexto: { code: 81053, zone_id: '7b4f2c9e1a8d4f0b93c2e5a61d0f8b34' } },
+      { id: 'log-12', timestamp: '2026-03-01T14:24:47.900Z', nivel: 'error', stepId: 'dns', mensagem: 'Etapa DNS marcada como falha após 3 tentativas.' },
+      { id: 'log-13', timestamp: '2026-03-01T14:24:47.901Z', nivel: 'info', stepId: null, mensagem: 'Execução pausada — etapas seguintes aguardam intervenção manual.' },
+      { id: 'log-14', timestamp: '2026-03-01T14:24:47.902Z', nivel: 'error', stepId: null, mensagem: 'Job de provisionamento finalizado com falha.', contexto: { correlationId: 'prv_01HXA7QK3M9RETAIL0001' } },
+    ],
+  },
+}
