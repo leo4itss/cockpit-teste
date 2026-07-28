@@ -1282,6 +1282,7 @@ export function OrganizacaoDetailPage() {
           onClose={() => setEditingContract(null)}
           contract={editingContract}
           solutions={solutions}
+          accounts={accounts}
           onSave={handleSaveContract}
           onInativar={() => {
             setContractInativarTarget(editingContract)
