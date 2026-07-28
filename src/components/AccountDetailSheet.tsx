@@ -183,9 +183,14 @@ export function AccountDetailSheet({ open, onClose, account, org, onEdit }: Prop
       onClose={onClose}
       title="Detalhes da Conta"
       width="w-[640px]"
-      headerAction={onEdit ? (
-        <Button variant="outline" size="sm" onClick={onEdit}>Editar</Button>
-      ) : undefined}
+      headerAction={
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => navigate(`/contas/${account.id}/provisionamento`)}>
+            Ver provisionamento
+          </Button>
+          {onEdit && <Button variant="outline" size="sm" onClick={onEdit}>Editar</Button>}
+        </div>
+      }
     >
       {/* ── Tabs ── */}
       <div className="flex border-b border-[#e5e7eb] -mx-6 px-6 mb-6">
