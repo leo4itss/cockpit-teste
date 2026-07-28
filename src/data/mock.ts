@@ -1441,6 +1441,8 @@ export const provisioningSnapshots: Record<string, ProvisioningSnapshot> = {
       { id: 'ingress', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
       { id: 'env-vars', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
     ],
+    // Fase 2 bloqueada — Fase 1 falhou na etapa DNS.
+    solucoes: [],
   },
   // Conta criada manualmente via NewAccountSheet durante teste do fluxo —
   // id real do Neon, não um id de fixture (a1/a2/a3). Cenário: em andamento.
