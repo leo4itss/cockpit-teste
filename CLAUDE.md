@@ -128,3 +128,4 @@ In production, `engine.ts` functions would be replaced by OpenFGA SDK calls; the
 - The floating canvas pages (`/canvas`, `/canvas-org`) use `@xyflow/react` for interactive graph visualization of permissions and org structure.
 - `SchemaVisualizerPage` (`/schema`) renders the DB schema as an interactive graph — useful for understanding table relationships.
 - **Terminology**: UI uses "Objeto" (not "Instância") when referring to configured copies of components (`Instancia` table). Use "Objeto" in labels, legends, and user-facing text.
+- **`VITE_PAS_ENV`** (optional, defaults to `'hml'`): environment segment used by `buildTenantDomain()` (`src/services/provisioning.ts`) to build a tenant's domain as `https://{slug}.{env}.pas.app.br`, where `{slug}` is `accounts.subdomain`.
