@@ -234,12 +234,80 @@ function ProvisioningContent({
   )
 }
 
-// Placeholder — substituído no próximo passo pelas ações reais
-// (reprovisionar / health check / logs).
-function ProvisioningActionsBar(_props: {
+// ── Ações: reprovisionar, health check, logs ───────────────────
+//
+// AVISO: os gates abaixo (useCanReprovisionTenant, useCanViewTenantLogs,
+// useCanRunTenantHealthCheck) são apenas de UI. Quando o worker real expuser
+// endpoints, a MESMA verificação precisa existir no servidor — esconder um
+// botão não é controle de acesso.
+
+function ProvisioningActionsBar({
+  account,
+  onToast,
+  onReload,
+}: {
   account: Account
   onToast: ReturnType<typeof useToast>['toast']
   onReload: () => void
 }) {
-  return null
+  const canReprovision = useCanReprovisionTenant(account.id, account.orgId)
+  const canViewLogs = useCanViewTenantLogs(account.id, account.orgId)
+  const canRunHealthCheck = useCanRunTenantHealthCheck(account.id, account.orgId)
+
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [reprovisioning, setReprovisioning] = useState(false)
+  const [logsOpen, setLogsOpen] = useState(false)
+
+  async function handleReprovision() {
+    // Segundo gate — defesa contra atalho de teclado / estado obsoleto do botão.
+    if (!canReprovision) return
+    setReprovisioning(true)
+    try {
+      const result = await reprovisionTenant(account.id)
+      onToast(result.mensagem, result.aceito ? 'success' : 'error')
+      onReload()
+    } catch {
+      onToast('Não foi possível disparar o reprovisionamento. Tente novamente.', 'error')
+    } finally {
+      setReprovisioning(false)
+      setConfirmOpen(false)
+    }
+  }
+
+  return (
+    <>
+      <div className="flex flex-col gap-4">
+        {(canReprovision || canViewLogs) && (
+          <div className="flex items-center gap-3">
+            {canReprovision && (
+              <Button variant="destructive" size="sm" onClick={() => setConfirmOpen(true)} disabled={reprovisioning}>
+                <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
+                Reprovisionar
+              </Button>
+            )}
+            {canViewLogs && (
+              <Button variant="outline" size="sm" onClick={() => setLogsOpen(true)}>
+                <ScrollText className="w-3.5 h-3.5 mr-1.5" />
+                Visualizar logs
+              </Button>
+            )}
+          </div>
+        )}
+
+        <HealthCheckPanel accountId={account.id} canRun={canRunHealthCheck} onToast={onToast} />
+      </div>
+
+      <ConfirmDeleteModal
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        variant="reprovisionar"
+        name={account.name}
+        onConfirm={handleReprovision}
+      />
+
+      {canViewLogs && (
+        <LogsSheet open={logsOpen} onClose={() => setLogsOpen(false)} accountId={account.id} />
+      )}
+    </>
+  )
 }
