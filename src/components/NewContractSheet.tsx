@@ -52,6 +52,13 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
   const [form, setForm] = useState({ dataInicio: '', dataTermino: '', renovacao: '' })
   const [objetos, setObjetos] = useState<ObjetoContrato[]>([])
   const [dialogOpen, setDialogOpen] = useState(false)
+  // step 1 = formulário; step 2 = revisão/checkout antes de confirmar
+  const [step, setStep] = useState<1 | 2>(1)
+
+  const selectedAccount = activeAccounts.find(a => a.name === contratante)
+  // Fase 2 (provisionamento das soluções deste contrato) exige a Fase 1 da
+  // conta concluída — regra confirmada com o arquiteto do worker.
+  const fase1Bloqueada = selectedAccount?.provisioningStatus !== 'COMPLETED'
 
   // Sincroniza contratante quando accounts carrega depois do mount
   const [lastAccounts, setLastAccounts] = useState(accounts)
