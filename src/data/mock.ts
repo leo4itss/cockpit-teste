@@ -1427,6 +1427,31 @@ export const provisioningSnapshots: Record<string, ProvisioningSnapshot> = {
       { id: 'env-vars', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
     ],
   },
+  // Conta criada manualmente via NewAccountSheet durante teste do fluxo —
+  // id real do Neon, não um id de fixture (a1/a2/a3). Cenário: em andamento.
+  'ec745c8b-3440-4bc3-b990-b698dce8c480': {
+    tenant: {
+      accountId: 'ec745c8b-3440-4bc3-b990-b698dce8c480', accountName: 'Nexora Tecnologia',
+      slug: 'nexora', dominio: 'https://nexora.hml.pas.app.br',
+      ambiente: 'hml', orgId: '1', orgNome: 'Apple', criadoEm: '28/07/2026',
+    },
+    status: 'IN_PROGRESS',
+    iniciadoEm: '2026-07-28T11:40:00.000Z',
+    finalizadoEm: null,
+    workerVersion: 'provisioner@2.7.1',
+    correlationId: 'prv_01HXA7QK3M9NEXORA00001',
+    atualizadoEm: '2026-07-28T11:41:52.000Z',
+    steps: [
+      { id: 'database', estado: 'criado', iniciadoEm: '2026-07-28T11:40:00.000Z', concluidoEm: '2026-07-28T11:40:35.000Z', duracaoMs: 35000,
+        detalhes: { host: 'pg-shared-01.hml.internal', database: 'tenant_nexora', usuario: 'tenant_nexora_app' }, erro: null },
+      { id: 'keycloak', estado: 'criado', iniciadoEm: '2026-07-28T11:40:35.000Z', concluidoEm: '2026-07-28T11:41:10.000Z', duracaoMs: 35000,
+        detalhes: { realm: 'nexora', clientId: 'pas-web', issuer: 'https://auth.hml.pas.app.br/realms/nexora' }, erro: null },
+      { id: 'dns', estado: 'em-andamento', iniciadoEm: '2026-07-28T11:41:10.000Z', concluidoEm: null, duracaoMs: null,
+        detalhes: { zona: 'pas.app.br', registro: 'nexora.hml', tipo: 'CNAME', alvo: 'ingress-hml.pas.app.br' }, erro: null },
+      { id: 'ingress', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
+      { id: 'env-vars', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
+    ],
+  },
 }
 
 export const provisioningHealth: Record<string, HealthCheckResult> = {
