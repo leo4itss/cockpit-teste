@@ -1332,6 +1332,17 @@ export const provisioningSnapshots: Record<string, ProvisioningSnapshot> = {
       { id: 'env-vars', estado: 'criado', iniciadoEm: '2026-03-23T17:54:30.000Z', concluidoEm: '2026-03-23T17:56:47.000Z', duracaoMs: 137000,
         detalhes: { projeto: 'appletecgo', ambiente: 'hml', segredosInjetados: '14' }, erro: null },
     ],
+    // Fase 2 (solutionPublicationByContract) — contrato ativo desta conta cobre
+    // estas 2 soluções (ver `contracts` acima, contratante: 'Apple'). Ambas já
+    // provisionadas — bate com o cenário Fase 1 COMPLETED.
+    solucoes: [
+      { solucaoNome: 'Assistente de Design', estado: 'criado',
+        iniciadoEm: '2026-03-23T17:57:00.000Z', concluidoEm: '2026-03-23T17:58:20.000Z', duracaoMs: 80000,
+        detalhes: { plano: 'Pro', componentRef: 'comp-assistant' }, erro: null },
+      { solucaoNome: 'Base de Conhecimento PAS', estado: 'criado',
+        iniciadoEm: '2026-03-23T17:58:20.000Z', concluidoEm: '2026-03-23T17:59:35.000Z', duracaoMs: 75000,
+        detalhes: { plano: 'Enterprise', componentRef: 'comp-knowledge' }, erro: null },
+    ],
   },
   a2: {
     tenant: {
