@@ -43,6 +43,193 @@ const RENOVACAO_OPTIONS = [
 
 const COLS = ['Solução', 'Organização contratada', 'Plano', 'Licenciamento']
 
+// ── Passo 1 — formulário ─────────────────────────────────────
+
+function StepForm({
+  activeAccounts, contratante, setContratante, objetos, handleOpenAddObjeto,
+  form, set,
+}: {
+  activeAccounts: Account[]
+  contratante: string
+  setContratante: (v: string) => void
+  objetos: ObjetoContrato[]
+  handleOpenAddObjeto: () => void
+  form: { dataInicio: string; dataTermino: string; renovacao: string }
+  set: (field: string, value: string) => void
+}) {
+  return (
+    <div className="flex flex-col gap-10">
+
+      {/* ── Dados do contrato ─────────────────────────────── */}
+      <div className="flex flex-col gap-7">
+        <SectionTitle>Dados do contrato</SectionTitle>
+
+        <Select
+          label="Conta contratante (onde as soluções desse contrato vão aparecer)"
+          options={activeAccounts.map(a => ({ value: a.name, label: a.name }))}
+          placeholder="Selecione"
+          value={contratante}
+          onChange={e => setContratante(e.target.value)}
+        />
+
+        {/* Card soluções / planos / licenciamentos */}
+        <div className="border border-[#e5e7eb] rounded-2xl p-4 flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium text-[#030712]">
+              Soluções, planos e licenciamentos<span className="text-[#dc2626]">*</span>
+            </p>
+            <button
+              type="button"
+              onClick={handleOpenAddObjeto}
+              className="inline-flex items-center gap-1.5 h-8 px-3 border border-[#e5e7eb] rounded-md text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Adicionar
+            </button>
+          </div>
+
+          {objetos.length > 0 && (
+            <>
+              <Divider />
+              {/* Cabeçalho */}
+              <div className="grid grid-cols-4 gap-2">
+                {COLS.map(col => (
+                  <p key={col} className="text-xs text-[#6b7280] leading-4">{col}</p>
+                ))}
+              </div>
+              <Divider />
+              {/* Linhas */}
+              {objetos.map((obj, i) => (
+                <div key={i} className="grid grid-cols-4 gap-2 items-center">
+                  <p className="text-sm text-[#030712] truncate">{obj.solucao}</p>
+                  <p className="text-sm text-[#030712] truncate">{obj.orgContratada}</p>
+                  <p className="text-sm text-[#030712] truncate">{obj.plano}</p>
+                  <p className="text-sm text-[#030712] truncate">{obj.licenciamento}</p>
+                </div>
+              ))}
+            </>
+          )}
+        </div>
+
+        {/* Info box */}
+        <div className="flex items-center gap-3 bg-blue-50 border border-blue-300 rounded-lg p-3">
+          <CircleAlert className="w-5 h-5 text-blue-700 shrink-0" />
+          <p className="text-xs font-medium text-blue-700 leading-4">
+            Objetos do contrato reúnem soluções, planos e licenciamentos, definindo as condições e limites para atender às necessidades do cliente.
+          </p>
+        </div>
+
+        <Divider />
+      </div>
+
+      {/* ── Vigência ─────────────────────────────────────── */}
+      <div className="flex flex-col gap-7">
+        <SectionTitle>Vigência</SectionTitle>
+        <div className="grid grid-cols-2 gap-7">
+          <Input
+            label="Data de início"
+            required
+            type="date"
+            value={form.dataInicio}
+            onChange={e => set('dataInicio', e.target.value)}
+          />
+          <Input
+            label="Data de término"
+            required
+            type="date"
+            value={form.dataTermino}
+            onChange={e => set('dataTermino', e.target.value)}
+          />
+        </div>
+        <Divider />
+      </div>
+
+      {/* ── Renovação ─────────────────────────────────────── */}
+      <div className="flex flex-col gap-7">
+        <SectionTitle>Renovação</SectionTitle>
+        <Select
+          label="Tipo de renovação"
+          options={RENOVACAO_OPTIONS}
+          placeholder="Selecione"
+          value={form.renovacao}
+          onChange={e => set('renovacao', e.target.value)}
+        />
+      </div>
+
+    </div>
+  )
+}
+
+// ── Passo 2 — revisão / checkout ──────────────────────────────
+
+function StepReview({
+  contratante, selectedAccount, fase1Bloqueada, objetos,
+}: {
+  contratante: string
+  selectedAccount: Account | undefined
+  fase1Bloqueada: boolean
+  objetos: ObjetoContrato[]
+}) {
+  return (
+    <div className="flex flex-col gap-7">
+      <div className="flex flex-col gap-3">
+        <SectionTitle>Conta contratante</SectionTitle>
+        <div className="flex items-center justify-between border border-[#e5e7eb] rounded-2xl p-4">
+          <p className="text-sm font-medium text-[#030712]">{contratante || '—'}</p>
+          {selectedAccount && (
+            <Badge variant={FASE1_BADGE[selectedAccount.provisioningStatus].variant} showIcon>
+              Fase 1: {FASE1_BADGE[selectedAccount.provisioningStatus].label}
+            </Badge>
+          )}
+        </div>
+      </div>
+
+      {fase1Bloqueada && (
+        <div className="flex items-start gap-3 bg-red-50 border border-red-300 rounded-lg p-3">
+          <AlertTriangle className="w-5 h-5 text-red-700 shrink-0" />
+          <p className="text-xs font-medium text-red-700 leading-4">
+            A Fase 1 do provisionamento desta conta (banco, Keycloak, DNS, ingress) ainda não
+            foi concluída. O contrato não pode ser criado — provisionar soluções exige a conta
+            totalmente provisionada primeiro.
+          </p>
+        </div>
+      )}
+
+      <Divider />
+
+      <div className="flex flex-col gap-3">
+        <SectionTitle>Soluções que serão provisionadas (Fase 2)</SectionTitle>
+        <div className="border border-[#e5e7eb] rounded-2xl p-4 flex flex-col gap-3">
+          <div className="grid grid-cols-4 gap-2">
+            {COLS.map(col => (
+              <p key={col} className="text-xs text-[#6b7280] leading-4">{col}</p>
+            ))}
+          </div>
+          <Divider />
+          {objetos.map((obj, i) => (
+            <div key={i} className="grid grid-cols-4 gap-2 items-center">
+              <p className="text-sm text-[#030712] truncate">{obj.solucao}</p>
+              <p className="text-sm text-[#030712] truncate">{obj.orgContratada}</p>
+              <p className="text-sm text-[#030712] truncate">{obj.plano}</p>
+              <p className="text-sm text-[#030712] truncate">{obj.licenciamento}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3 bg-blue-50 border border-blue-300 rounded-lg p-3">
+        <CircleAlert className="w-5 h-5 text-blue-700 shrink-0" />
+        <p className="text-xs font-medium text-blue-700 leading-4">
+          Ao confirmar, o contrato será criado e a Fase 2 do provisionamento será disparada
+          automaticamente para esta conta, cobrindo {objetos.length} solução(ões).
+        </p>
+      </div>
+    </div>
+  )
+}
+
+// ── Sheet principal ────────────────────────────────────────────
+
 export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solutions, onSave }: Props) {
   const { toasts, toast, dismiss } = useToast()
   const activeAccounts = accounts.filter(a => !a.deletedAt)
@@ -141,6 +328,20 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
     onClose()
   }
 
+  const footerStep1 = (
+    <>
+      <Button variant="outline" onClick={handleClose}>Cancelar</Button>
+      <Button onClick={handleReview}>Revisar</Button>
+    </>
+  )
+
+  const footerStep2 = (
+    <>
+      <Button variant="outline" onClick={() => setStep(1)}>Voltar</Button>
+      <Button onClick={handleConfirm} disabled={fase1Bloqueada}>Criar contrato</Button>
+    </>
+  )
+
   return (
     <>
       <Sheet
@@ -148,178 +349,25 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
         onClose={handleClose}
         title={step === 1 ? 'Novo Contrato' : 'Revisar contrato'}
         width="w-[640px]"
-        footer={
-          step === 1 ? (
-            <>
-              <Button variant="outline" onClick={handleClose}>Cancelar</Button>
-              <Button onClick={handleReview}>Revisar</Button>
-            </>
-          ) : (
-            <>
-              <Button variant="outline" onClick={() => setStep(1)}>Voltar</Button>
-              <Button onClick={handleConfirm} disabled={fase1Bloqueada}>
-                Criar contrato
-              </Button>
-            </>
-          )
-        }
+        footer={step === 1 ? footerStep1 : footerStep2}
       >
-        {step === 2 ? (
-          <div className="flex flex-col gap-7">
-            <div className="flex flex-col gap-3">
-              <SectionTitle>Conta contratante</SectionTitle>
-              <div className="flex items-center justify-between border border-[#e5e7eb] rounded-2xl p-4">
-                <p className="text-sm font-medium text-[#030712]">{contratante || '—'}</p>
-                {selectedAccount && (
-                  <Badge variant={FASE1_BADGE[selectedAccount.provisioningStatus].variant} showIcon>
-                    Fase 1: {FASE1_BADGE[selectedAccount.provisioningStatus].label}
-                  </Badge>
-                )}
-              </div>
-            </div>
-
-            {fase1Bloqueada && (
-              <div className="flex items-start gap-3 bg-red-50 border border-red-300 rounded-lg p-3">
-                <AlertTriangle className="w-5 h-5 text-red-700 shrink-0" />
-                <p className="text-xs font-medium text-red-700 leading-4">
-                  A Fase 1 do provisionamento desta conta (banco, Keycloak, DNS, ingress) ainda não
-                  foi concluída. O contrato não pode ser criado — provisionar soluções exige a conta
-                  totalmente provisionada primeiro.
-                </p>
-              </div>
-            )}
-
-            <Divider />
-
-            <div className="flex flex-col gap-3">
-              <SectionTitle>Soluções que serão provisionadas (Fase 2)</SectionTitle>
-              <div className="border border-[#e5e7eb] rounded-2xl p-4 flex flex-col gap-3">
-                <div className="grid grid-cols-4 gap-2">
-                  {COLS.map(col => (
-                    <p key={col} className="text-xs text-[#6b7280] leading-4">{col}</p>
-                  ))}
-                </div>
-                <Divider />
-                {objetos.map((obj, i) => (
-                  <div key={i} className="grid grid-cols-4 gap-2 items-center">
-                    <p className="text-sm text-[#030712] truncate">{obj.solucao}</p>
-                    <p className="text-sm text-[#030712] truncate">{obj.orgContratada}</p>
-                    <p className="text-sm text-[#030712] truncate">{obj.plano}</p>
-                    <p className="text-sm text-[#030712] truncate">{obj.licenciamento}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 bg-blue-50 border border-blue-300 rounded-lg p-3">
-              <CircleAlert className="w-5 h-5 text-blue-700 shrink-0" />
-              <p className="text-xs font-medium text-blue-700 leading-4">
-                Ao confirmar, o contrato será criado e a Fase 2 do provisionamento
-                ({objetos.length} solução{objetos.length === 1 ? '' : 'ões'}) será disparada
-                automaticamente para esta conta.
-              </p>
-            </div>
-          </div>
+        {step === 1 ? (
+          <StepForm
+            activeAccounts={activeAccounts}
+            contratante={contratante}
+            setContratante={setContratante}
+            objetos={objetos}
+            handleOpenAddObjeto={handleOpenAddObjeto}
+            form={form}
+            set={set}
+          />
         ) : (
-        <div className="flex flex-col gap-10">
-
-          {/* ── Dados do contrato ─────────────────────────────── */}
-          <div className="flex flex-col gap-7">
-            <SectionTitle>Dados do contrato</SectionTitle>
-
-            <Select
-              label="Conta contratante (onde as soluções desse contrato vão aparecer)"
-              options={activeAccounts.map(a => ({ value: a.name, label: a.name }))}
-              placeholder="Selecione"
-              value={contratante}
-              onChange={e => setContratante(e.target.value)}
-            />
-
-            {/* Card soluções / planos / licenciamentos */}
-            <div className="border border-[#e5e7eb] rounded-2xl p-4 flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-[#030712]">
-                  Soluções, planos e licenciamentos<span className="text-[#dc2626]">*</span>
-                </p>
-                <button
-                  type="button"
-                  onClick={handleOpenAddObjeto}
-                  className="inline-flex items-center gap-1.5 h-8 px-3 border border-[#e5e7eb] rounded-md text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  Adicionar
-                </button>
-              </div>
-
-              {objetos.length > 0 && (
-                <>
-                  <Divider />
-                  {/* Cabeçalho */}
-                  <div className="grid grid-cols-4 gap-2">
-                    {COLS.map(col => (
-                      <p key={col} className="text-xs text-[#6b7280] leading-4">{col}</p>
-                    ))}
-                  </div>
-                  <Divider />
-                  {/* Linhas */}
-                  {objetos.map((obj, i) => (
-                    <div key={i} className="grid grid-cols-4 gap-2 items-center">
-                      <p className="text-sm text-[#030712] truncate">{obj.solucao}</p>
-                      <p className="text-sm text-[#030712] truncate">{obj.orgContratada}</p>
-                      <p className="text-sm text-[#030712] truncate">{obj.plano}</p>
-                      <p className="text-sm text-[#030712] truncate">{obj.licenciamento}</p>
-                    </div>
-                  ))}
-                </>
-              )}
-            </div>
-
-            {/* Info box */}
-            <div className="flex items-center gap-3 bg-blue-50 border border-blue-300 rounded-lg p-3">
-              <CircleAlert className="w-5 h-5 text-blue-700 shrink-0" />
-              <p className="text-xs font-medium text-blue-700 leading-4">
-                Objetos do contrato reúnem soluções, planos e licenciamentos, definindo as condições e limites para atender às necessidades do cliente.
-              </p>
-            </div>
-
-            <Divider />
-          </div>
-
-          {/* ── Vigência ─────────────────────────────────────── */}
-          <div className="flex flex-col gap-7">
-            <SectionTitle>Vigência</SectionTitle>
-            <div className="grid grid-cols-2 gap-7">
-              <Input
-                label="Data de início"
-                required
-                type="date"
-                value={form.dataInicio}
-                onChange={e => set('dataInicio', e.target.value)}
-              />
-              <Input
-                label="Data de término"
-                required
-                type="date"
-                value={form.dataTermino}
-                onChange={e => set('dataTermino', e.target.value)}
-              />
-            </div>
-            <Divider />
-          </div>
-
-          {/* ── Renovação ─────────────────────────────────────── */}
-          <div className="flex flex-col gap-7">
-            <SectionTitle>Renovação</SectionTitle>
-            <Select
-              label="Tipo de renovação"
-              options={RENOVACAO_OPTIONS}
-              placeholder="Selecione"
-              value={form.renovacao}
-              onChange={e => set('renovacao', e.target.value)}
-            />
-          </div>
-
-        </div>
+          <StepReview
+            contratante={contratante}
+            selectedAccount={selectedAccount}
+            fase1Bloqueada={fase1Bloqueada}
+            objetos={objetos}
+          />
         )}
       </Sheet>
 
