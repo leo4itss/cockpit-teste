@@ -182,22 +182,59 @@ export function ProvisionamentoPage() {
   )
 }
 
-// ── Conteúdo (preenchido nos passos seguintes) ────────────────
+// ── Conteúdo principal ─────────────────────────────────────────
 
 function ProvisioningContent({
   snapshot,
+  account,
+  onToast,
+  onReload,
 }: {
   snapshot: ProvisioningSnapshot
   account: Account
   onToast: ReturnType<typeof useToast>['toast']
+  onReload: () => void
 }) {
+  // Contratos e soluções são recursos da ORG (sem FK para account — ver
+  // resolveAccountContracts/resolveAccountSolutionNames). Carregados aqui,
+  // igual ao padrão de OrganizacaoDetailPage: mock imediato + API em background.
+  const [contracts, setContracts] = useState<Contract[]>(() => mockContracts.filter(c => c.orgId === account.orgId))
+  const [solutions, setSolutions] = useState<Solution[]>(() => mockSolutions.filter(s => s.orgId === account.orgId))
+
+  useEffect(() => {
+    Promise.allSettled([api.getContracts(account.orgId), api.getSolutions(account.orgId)]).then(([c, s]) => {
+      if (c.status === 'fulfilled') setContracts(c.value)
+      if (s.status === 'fulfilled') setSolutions(s.value)
+    })
+  }, [account.orgId])
+
+  const linkedContracts = resolveAccountContracts(account.name, contracts)
+  const linkedSolutionNames = resolveAccountSolutionNames(linkedContracts)
+  const linkedSolutions = solutions.filter(s => linkedSolutionNames.has(s.name) && s.status !== 'Inativo')
+
+  const summary = deriveSummary(snapshot.steps)
+
   return (
     <div className="flex flex-col gap-6">
-      <p className="text-sm text-[#6b7280]">
-        Tenant <Link to={`/organizacoes/${snapshot.tenant.orgId}`} className="text-[#2563eb] hover:underline">
-          {snapshot.tenant.orgNome}
-        </Link> — conteúdo detalhado em construção.
-      </p>
+      <ProvisioningSummaryBar summary={summary} />
+      <TenantInfoCard
+        tenant={snapshot.tenant}
+        onCopy={() => onToast('Domínio copiado.', 'success')}
+      />
+      <ProvisioningStepsTimeline steps={snapshot.steps} />
+      <ProvisioningActionsBar account={account} onToast={onToast} onReload={onReload} />
+      <LinkedSolutionsCard solutions={linkedSolutions} accountName={account.name} />
+      <ActiveContractsCard contracts={linkedContracts} accountName={account.name} />
     </div>
   )
+}
+
+// Placeholder — substituído no próximo passo pelas ações reais
+// (reprovisionar / health check / logs).
+function ProvisioningActionsBar(_props: {
+  account: Account
+  onToast: ReturnType<typeof useToast>['toast']
+  onReload: () => void
+}) {
+  return null
 }
