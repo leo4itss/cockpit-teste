@@ -9,7 +9,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
-import { Loader2, ShieldOff, AlertTriangle, RefreshCw, Building2 } from 'lucide-react'
+import { Loader2, ShieldOff, AlertTriangle, RefreshCw, Building2, RotateCcw, ScrollText } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -19,10 +19,14 @@ import { ProvisioningSummaryBar } from '@/components/provisionamento/Provisionin
 import { ProvisioningStepsTimeline } from '@/components/provisionamento/ProvisioningStepsTimeline'
 import { LinkedSolutionsCard } from '@/components/provisionamento/LinkedSolutionsCard'
 import { ActiveContractsCard } from '@/components/provisionamento/ActiveContractsCard'
+import { HealthCheckPanel } from '@/components/provisionamento/HealthCheckPanel'
+import { LogsSheet } from '@/components/provisionamento/LogsSheet'
+import { ConfirmDeleteModal } from '@/components/ConfirmDeleteModal'
 import { useToast, ToastContainer } from '@/components/ui/Toast'
-import { useCanViewProvisioning } from '@/authz/hooks'
+import { useCanViewProvisioning, useCanReprovisionTenant, useCanViewTenantLogs, useCanRunTenantHealthCheck } from '@/authz/hooks'
 import {
   getProvisioning,
+  reprovisionTenant,
   ProvisioningNotFoundError,
   deriveSummary,
   resolveAccountContracts,
