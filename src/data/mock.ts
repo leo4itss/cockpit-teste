@@ -279,7 +279,7 @@ export const accounts: Account[] = [
     orgId: '2',
     name: 'Santacruz',
     subdomain: 'santacruzltda',
-    provisioningStatus: 'PENDING',
+    provisioningStatus: 'IN_PROGRESS',
     arquitetoPAS: 'Marcelo Gomes',
     isDefault: true,
     status: 'Criado',
