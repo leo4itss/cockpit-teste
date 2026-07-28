@@ -320,6 +320,7 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
           </div>
 
         </div>
+        )}
       </Sheet>
 
       <AddObjetoDialog
