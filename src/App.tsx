@@ -44,6 +44,9 @@ export default function App() {
         <Route path="/organizacoes/:id" element={<DetailLayout />}>
           <Route index element={<OrganizacaoDetailPage />} />
         </Route>
+        <Route path="/contas/:id/provisionamento" element={<DetailLayout />}>
+          <Route index element={<ProvisionamentoPage />} />
+        </Route>
       </Routes>
     </BrowserRouter>
     </ComponentesProvider>
