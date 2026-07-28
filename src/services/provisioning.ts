@@ -15,6 +15,8 @@ import type {
   ProvisioningOverallStatus,
   ProvisioningSummary,
   ProvisioningSnapshot,
+  SolutionProvisioning,
+  Fase2Status,
   HealthCheckResult,
   ProvisioningLogPage,
   ReprovisionResult,
