@@ -173,6 +173,7 @@ export function ProvisionamentoPage() {
             snapshot={fetchState.dados}
             account={account}
             onToast={toast}
+            onReload={loadProvisioning}
           />
         )}
       </div>
