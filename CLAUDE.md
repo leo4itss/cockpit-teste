@@ -110,6 +110,7 @@ In production, `engine.ts` functions would be replaced by OpenFGA SDK calls; the
 | `/canvas` | `CanvasPermissoesPage` | **Operational** — visualize and manage fine-grained permissions within one account. Seletor: conta. |
 | `/canvas-org` | `CanvasOrgPage` | **Structural** — explore org → account hierarchy, expand accounts to see groups/users/objects. Seletor: organização. |
 | `/schema` | `SchemaVisualizerPage` | Interactive graph of the DB schema — useful for understanding table relationships. |
+| `/contas/:id/provisionamento` | `ProvisionamentoPage` | Tenant provisioning details — consolidated status, per-step timeline (database, Keycloak, DNS, ingress/TLS, env vars), linked solutions/contracts, and actions (reprovision, health check, logs). Data comes from `src/services/provisioning.ts`, a mock front-end contract for the (not-yet-integrated) `pas-cockpit-worker` — see `USE_MOCK_PROVISIONING` in that file for the single swap point. |
 
 ### Role-based UI rules
 
