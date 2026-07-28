@@ -117,6 +117,7 @@ function StatusBadge({ status }: { status: Account['status'] }) {
 /* ── main component ─────────────────────────────────────────── */
 
 export function AccountDetailSheet({ open, onClose, account, org, onEdit }: Props) {
+  const navigate = useNavigate()
   const { toasts, toast, dismiss } = useToast()
   const [tab, setTab] = useState<DetailTab>('detalhes')
 
