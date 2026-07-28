@@ -3,6 +3,7 @@ import { Button } from './ui/Button'
 import { Badge } from './ui/Badge'
 import { ProvisioningDots } from './ProvisioningDots'
 import { History } from 'lucide-react'
+import { PUBLICACAO_STEPS } from '@/services/provisioning'
 import type { Contract } from '@/types'
 
 interface Props {
