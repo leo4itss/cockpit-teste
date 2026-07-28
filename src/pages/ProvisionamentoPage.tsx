@@ -228,6 +228,7 @@ function ProvisioningContent({
         onCopy={() => onToast('Domínio copiado.', 'success')}
       />
       <ProvisioningStepsTimeline steps={snapshot.steps} />
+      <Fase2ProvisioningCard fase1Status={snapshot.status} solucoes={snapshot.solucoes} />
       <ProvisioningActionsBar account={account} onToast={onToast} onReload={onReload} />
       <LinkedSolutionsCard solutions={linkedSolutions} accountName={account.name} />
       <ActiveContractsCard contracts={linkedContracts} accountName={account.name} />
