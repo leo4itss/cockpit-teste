@@ -27,19 +27,16 @@ import {
 
 // ── Catálogo de passos ───────────────────────────────────────
 
-/** Fonte única de verdade dos 5 passos do worker de provisionamento. */
+/**
+ * Fonte única de verdade dos 5 passos da Fase 1 (workflow `tenantProvisioning`
+ * do worker, confirmado com o dev e o arquiteto). Ordem real de execução:
+ * Keycloak → Banco → Secrets (Infisical) → DNS → Ingress. A Fase 2
+ * (`solutionPublicationByContract`, disparada pelo contrato) é modelada
+ * separadamente — ver `SolutionProvisioning` em src/types/provisioning.ts.
+ */
 export const PROVISIONING_STEPS: readonly ProvisioningStepDef[] = [
   {
-    id: 'database', ordem: 1,
-    nome: 'Banco de dados', subtitulo: 'PostgreSQL do tenant',
-    descricao: 'Cria a base de dados isolada do tenant e aplica as migrations iniciais.',
-    recursoGlobal: 'Cluster PostgreSQL compartilhado da plataforma',
-    recursoTenant: 'Database `tenant_<slug>` exclusiva desta conta',
-    escopo: 'tenant',
-    notaEscopo: 'O cluster é compartilhado, mas os dados desta conta ficam em uma database própria e isolada.',
-  },
-  {
-    id: 'keycloak', ordem: 2,
+    id: 'keycloak', ordem: 1,
     nome: 'Keycloak', subtitulo: 'Realm e configurações',
     descricao: 'Cria o realm do tenant, clients OIDC, mappers e políticas de senha.',
     recursoGlobal: 'Instância Keycloak compartilhada da plataforma',
@@ -48,7 +45,25 @@ export const PROVISIONING_STEPS: readonly ProvisioningStepDef[] = [
     notaEscopo: 'A instância do Keycloak é global; os usuários desta conta vivem apenas no realm dela.',
   },
   {
-    id: 'dns', ordem: 3,
+    id: 'database', ordem: 2,
+    nome: 'Banco de dados', subtitulo: 'PostgreSQL do tenant',
+    descricao: 'Cria a base de dados isolada do tenant e aplica as migrations iniciais.',
+    recursoGlobal: 'Cluster PostgreSQL compartilhado da plataforma',
+    recursoTenant: 'Database `tenant_<slug>` exclusiva desta conta',
+    escopo: 'tenant',
+    notaEscopo: 'O cluster é compartilhado, mas os dados desta conta ficam em uma database própria e isolada.',
+  },
+  {
+    id: 'env-vars', ordem: 3,
+    nome: 'Variáveis de ambiente', subtitulo: 'Infisical',
+    descricao: 'Provisiona o projeto/ambiente no Infisical e injeta os segredos do tenant.',
+    recursoGlobal: 'Instância Infisical compartilhada',
+    recursoTenant: 'Ambiente `<slug>` com segredos exclusivos',
+    escopo: 'tenant',
+    notaEscopo: 'O cofre é global; os segredos desta conta ficam em um ambiente separado e não são legíveis por outros tenants.',
+  },
+  {
+    id: 'dns', ordem: 4,
     nome: 'DNS Cloudflare', subtitulo: 'Registro CNAME',
     descricao: 'Publica o CNAME do subdomínio do tenant apontando para o ingress da plataforma.',
     recursoGlobal: 'Zona DNS `pas.app.br` gerenciada no Cloudflare',
@@ -57,22 +72,13 @@ export const PROVISIONING_STEPS: readonly ProvisioningStepDef[] = [
     notaEscopo: 'A zona DNS é um recurso global da plataforma. Este passo apenas adiciona um registro dentro dela.',
   },
   {
-    id: 'ingress', ordem: 4,
+    id: 'ingress', ordem: 5,
     nome: 'Ingress com TLS', subtitulo: 'cert-manager + Let’s Encrypt',
-    descricao: 'Cria o Ingress do tenant e emite o certificado TLS via cert-manager/Let’s Encrypt.',
+    descricao: 'Aguarda ~60s de propagação do DNS e então cria o Ingress do tenant, emitindo o certificado TLS via cert-manager/Let’s Encrypt. Ao concluir, a URL do tenant resolve e a home abre — ainda sem soluções (isso é a Fase 2).',
     recursoGlobal: 'Ingress controller e cert-manager do cluster',
     recursoTenant: 'Ingress + Certificate do host do tenant',
     escopo: 'tenant',
     notaEscopo: 'O controller é compartilhado; o Ingress e o certificado são exclusivos deste host.',
-  },
-  {
-    id: 'env-vars', ordem: 5,
-    nome: 'Variáveis de ambiente', subtitulo: 'Infisical',
-    descricao: 'Provisiona o projeto/ambiente no Infisical e injeta os segredos do tenant.',
-    recursoGlobal: 'Instância Infisical compartilhada',
-    recursoTenant: 'Ambiente `<slug>` com segredos exclusivos',
-    escopo: 'tenant',
-    notaEscopo: 'O cofre é global; os segredos desta conta ficam em um ambiente separado e não são legíveis por outros tenants.',
   },
 ] as const
 
