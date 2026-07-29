@@ -237,6 +237,16 @@ app.put('/solutions/:id', async (c) => {
     }, 422)
   }
 
+  // ── Máximo de um componente por solução ───────────────────
+  // Soluções legadas com múltiplos componentes ficam isentas até serem
+  // editadas — só bloqueia se a quantidade estiver aumentando.
+  const existingComponenteIds: string[] = Array.isArray(existing.componenteIds) ? existing.componenteIds as string[] : []
+  if (incomingComponenteIds.length > 1 && incomingComponenteIds.length > existingComponenteIds.length) {
+    return c.json({
+      error: 'Uma solução pode ter no máximo um componente vinculado.',
+    }, 422)
+  }
+
   // ── Exclusividade de componente por conta ─────────────────
   const effectiveAccountId = ('accountId' in body) ? body.accountId : existing.accountId
   const conflicts = await findComponenteConflicts(body.orgId ?? existing.orgId, effectiveAccountId, incomingComponenteIds, id)
