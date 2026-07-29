@@ -100,6 +100,8 @@ export interface Licensing {
   valorMinimo?: string           // quantidade mínima (opcional)
   valorMaximo?: string           // quantidade máxima (opcional)
   valor?: string                 // valor livre por licença
+  excedente?: string             // valor absoluto máximo permitido acima do nominal (excedente)
+  excedenteSemLimite?: boolean   // se true, ignora `excedente` e considera excedente ilimitado
   definirPreco: boolean
   precoAnual: string
   descontoMensal: string
