@@ -383,10 +383,11 @@ export function OrganizacaoDetailPage() {
     setSheetEditOrg(false)
   }
 
-  // Inativa a conta. Contratos e soluções vinculados NÃO são tocados — o contrato é
-  // um registro jurídico que sobrevive à quarentena da conta (Ponto 8); a inativação
-  // só é permitida quando os contratos vinculados já foram inativados manualmente
-  // (checagem feita antes de abrir este fluxo, ver accountActiveContractsCount).
+  // Inativa a conta. Soluções (e, por consequência, contratos) vinculados NÃO são
+  // tocados aqui — a inativação só é permitida quando todas as soluções da conta já
+  // foram inativadas manualmente (checagem feita antes de abrir este fluxo, ver
+  // accountActiveSolutions). O contrato é um registro jurídico que sobrevive à
+  // quarentena da conta (Ponto 8).
   async function handleInativarAccount(account: Account) {
     try {
       const updated = await api.updateAccount(account.id, { ...account, status: 'Inativo' })
