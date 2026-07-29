@@ -315,8 +315,6 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
           <div className="flex items-start gap-4 bg-blue-50 border border-blue-300 rounded-md p-4">
             <CircleAlert className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
             <p className="text-sm font-medium text-blue-700 leading-5">
-              Os contratos vinculados a esta conta <strong>não são afetados</strong> — eles permanecem como
-              estavam e precisam ser inativados separadamente, se necessário.
               Esta ação <strong>pode ser desfeita</strong>. Para reativar a conta,
               acesse o menu de edição e clique em <strong>"Ativar conta"</strong>.
             </p>
