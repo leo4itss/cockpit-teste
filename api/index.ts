@@ -179,10 +179,22 @@ app.put('/accounts/:id', async (c) => {
   return row ? c.json(row) : c.json({ error: 'Not found' }, 404)
 })
 app.delete('/accounts/:id', async (c) => {
+  const id = c.req.param('id')
+
+  // ── Hierarquia: conta só entra em quarentena se não tiver soluções ativas vinculadas ──
+  const activeSolutions = await db.select().from(solutions).where(
+    and(eq(solutions.accountId, id), ne(solutions.status, 'Inativo'))
+  )
+  if (activeSolutions.length > 0) {
+    return c.json({
+      error: `Não é possível excluir a conta: existem ${activeSolutions.length} solução(ões) ativa(s) vinculada(s). Inative as soluções primeiro.`,
+    }, 422)
+  }
+
   const [row] = await db
     .update(accounts)
     .set({ deletedAt: new Date().toISOString() })
-    .where(eq(accounts.id, c.req.param('id')))
+    .where(eq(accounts.id, id))
     .returning()
   if (!row) return c.json({ error: 'Not found' }, 404)
   return c.json({ ok: true })
