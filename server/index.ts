@@ -300,6 +300,23 @@ app.put('/api/solutions/:id', async (c) => {
   const [existing] = await db.select().from(solutions).where(eq(solutions.id, id))
   if (!existing) return c.json({ error: 'Not found' }, 404)
 
+  // ── Hierarquia de inativação: solução só inativa se todos os contratos vinculados já estiverem inativos ──
+  // (Organização → Conta → Solução → Contrato — cada nível bloqueia no de baixo.)
+  if (body.status === 'Inativo' && existing.status !== 'Inativo') {
+    const { ne, and } = await import('drizzle-orm')
+    const orgContracts = await db.select().from(contracts).where(
+      and(eq(contracts.orgId, existing.orgId), ne(contracts.status, 'Inativo'))
+    )
+    const activeContracts = orgContracts.filter((ct: any) =>
+      Array.isArray(ct.objetos) && ct.objetos.some((o: any) => o.solucao === existing.name)
+    )
+    if (activeContracts.length > 0) {
+      return c.json({
+        error: `Não é possível inativar a solução: existem ${activeContracts.length} contrato(s) ativo(s) vinculado(s). Inative os contratos primeiro.`,
+      }, 422)
+    }
+  }
+
   // ── Componentes: ao menos 1 vinculado ────────────────────
   const incomingComponenteIds: string[] = body.componenteIds ?? []
   if (incomingComponenteIds.length === 0) {
