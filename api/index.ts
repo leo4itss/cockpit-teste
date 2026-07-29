@@ -3,7 +3,7 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { neon } from '@neondatabase/serverless'
 import { drizzle } from 'drizzle-orm/neon-http'
-import { eq, isNull, and, inArray, or } from 'drizzle-orm'
+import { eq, isNull, and, inArray, or, ne } from 'drizzle-orm'
 import * as schema from '../server/schema.js'
 import { getElegiveisParaSlot } from '../server/docnix-elegiveis.js'
 
