@@ -231,6 +231,7 @@ export function EditSolutionSheet({
     return {
       name:              s?.name              ?? '',
       description:       s?.description       ?? '',
+      accountId:         s?.accountId          ?? '',
       arquitetoPAS:      s?.arquitetoPAS      ?? '',
       marketplace:       s?.marketplace !== undefined && s?.marketplace !== null
                            ? s.marketplace !== 'Inativo'
