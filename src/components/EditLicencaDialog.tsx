@@ -19,7 +19,7 @@ function buildLicenciamentoLabel(valores: ValorLicencaContrato[]): string {
       const excedenteLabel = v.excedenteSemLimite
         ? ' (excedente: sem limite)'
         : v.excedente?.trim()
-          ? ` (excedente até ${v.excedente.trim()} ${unidade})`.trim()
+          ? ` (excedente até ${v.excedente.trim()} ${unidade})`.replace(/ \)/, ')')
           : ''
       return base + excedenteLabel
     })
