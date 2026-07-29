@@ -148,6 +148,7 @@ export function OrganizacaoDetailPage() {
   // Inativar solution modal
   const [solutionInativarTarget, setSolutionInativarTarget] = useState<Solution | null>(null)
   const [solutionInativarModal, setSolutionInativarModal] = useState(false)
+  const [solutionInativarBlockedTarget, setSolutionInativarBlockedTarget] = useState<Solution | null>(null)
 
   // Detail sheets
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null)
