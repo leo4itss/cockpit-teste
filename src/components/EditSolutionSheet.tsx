@@ -901,7 +901,7 @@ export function EditSolutionSheet({
       <ComponenteSelecaoSheet
         open={componenteSelecaoOpen}
         onClose={() => setComponenteSelecaoOpen(false)}
-        componentes={componentes}
+        componentes={availableComponentes}
         value={selectedComponenteIds}
         onChange={ids => {
           setSelectedComponenteIds(ids)
