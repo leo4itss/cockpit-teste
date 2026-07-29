@@ -16,6 +16,7 @@ import { AlertTriangle, CircleAlert, RotateCcw } from 'lucide-react'
 interface BlockedInfo {
   activeAccounts: number
   activeContracts: number
+  activeSolutions?: number
 }
 
 interface Props {
