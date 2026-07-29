@@ -166,6 +166,7 @@ export function EditLicencaDialog({ open, onClose, objeto, onSave }: Props) {
             {valores.map((v, i) => {
               const unidade = v.tipoLicencaUnidade ?? ''
               const semLimite = v.excedenteSemLimite === true
+              const isExcedenteOpen = excedenteOpen.has(i)
               return (
               <div key={i} className="flex flex-col gap-3">
                 <div className="flex flex-col gap-1.5">
