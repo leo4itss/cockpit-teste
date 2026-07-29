@@ -121,7 +121,9 @@ export function NewSolutionSheet({
   const availableComponentes = componentes.filter(
     c => !occupiedComponenteIds.has(c.id) || selectedComponenteIds.includes(c.id)
   )
-  const useInline = availableComponentes.length <= THRESHOLD_INLINE
+  // Baseado no catálogo total (não no filtrado) para não alternar entre
+  // seletor inline/sheet conforme a conta selecionada muda a disponibilidade.
+  const useInline = componentes.length <= THRESHOLD_INLINE
 
   // Ao trocar de conta, remove da seleção os componentes que ficaram
   // ocupados pela nova conta (avisando o usuário) e atualiza o campo.
