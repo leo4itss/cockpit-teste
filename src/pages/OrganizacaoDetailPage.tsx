@@ -937,6 +937,12 @@ export function OrganizacaoDetailPage() {
                               <span className="text-sm font-medium text-[#030712] truncate">{s.name}</span>
                             </div>
                           </td>
+                          {/* Conta */}
+                          <td className="px-2 py-2 h-[52px] w-[130px]">
+                            <span className="text-sm text-[#030712] block truncate">
+                              {accounts.find(a => a.id === s.accountId)?.name ?? '—'}
+                            </span>
+                          </td>
                           {/* Planos — count */}
                           <td className="px-2 py-2 h-[52px] w-[85px] text-sm text-[#030712]">
                             {s.plans.length}
