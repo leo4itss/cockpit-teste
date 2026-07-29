@@ -234,9 +234,10 @@ export function OrganizacaoDetailPage() {
       const saved = await api.createSolution(local)
       setSolutions(prev => [...prev, saved])
       toast('Solução criada com sucesso.', 'success')
-    } catch {
-      setSolutions(prev => [...prev, local])
-      toast('Não foi possível criar a solução. Revise os dados e tente novamente.', 'error')
+    } catch (err) {
+      // Não aplica fallback otimista: se o backend rejeitou (ex.: componente já
+      // em uso por outra solução da mesma conta), a UI não deve fingir que salvou.
+      toast(err instanceof Error ? err.message : 'Não foi possível criar a solução. Revise os dados e tente novamente.', 'error')
     }
   }
   async function handleAddContract(contract: Omit<Contract, 'id'>) {
