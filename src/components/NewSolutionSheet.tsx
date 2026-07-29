@@ -296,7 +296,7 @@ export function NewSolutionSheet({
           {useInline ? (
             /* ≤ 5 componentes: seletor inline — multi-select */
             <ComponenteSelector
-              componentes={componentes}
+              componentes={availableComponentes}
               value={selectedComponenteIds}
               onChange={setSelectedComponenteIds}
             />
