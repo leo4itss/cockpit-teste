@@ -115,6 +115,8 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
         tipoLicencaNome: l.tipoLicencaNome || l.tipoLicencaId,
         tipoLicencaUnidade: l.tipoLicencaUnidade,
         valor: l.valorMinimo?.trim() || l.valor?.trim() || '',
+        excedente: l.excedente,
+        excedenteSemLimite: l.excedenteSemLimite,
       })),
     }
   }
