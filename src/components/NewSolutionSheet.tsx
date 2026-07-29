@@ -270,6 +270,15 @@ export function NewSolutionSheet({
             onChange={e => set('description', e.target.value)}
           />
 
+          <Select
+            label="Conta"
+            required
+            placeholder="Selecione a conta"
+            options={activeAccounts.map(a => ({ value: a.id, label: a.name }))}
+            value={form.accountId}
+            onChange={e => handleAccountChange(e.target.value)}
+          />
+
           <InfoBox>
             Inclua informações relevantes para destacar o propósito e os diferenciais da solução, facilitando a compreensão e a comparação com outras opções.
           </InfoBox>
