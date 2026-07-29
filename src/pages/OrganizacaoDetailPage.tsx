@@ -137,6 +137,7 @@ export function OrganizacaoDetailPage() {
   const [accountInativarBlockedTarget, setAccountInativarBlockedTarget] = useState<Account | null>(null)
   const [accountExcluirTarget, setAccountExcluirTarget] = useState<Account | null>(null)
   const [accountExcluirModal, setAccountExcluirModal] = useState(false)
+  const [accountExcluirBlockedTarget, setAccountExcluirBlockedTarget] = useState<Account | null>(null)
   const [showInativosAccount, setShowInativosAccount] = useState(false)
 
   // Inativar contract modal
