@@ -1229,7 +1229,7 @@ export function OrganizacaoDetailPage() {
         onDelete={() => { setSheetEditOrg(false); setOrgExcluirModal(true) }}
         onInativar={() => {
           setSheetEditOrg(false)
-          if (orgActiveAccountsCount() > 0) setOrgInativarBlocked(true)
+          if (orgActiveAccounts().length > 0) setOrgInativarBlocked(true)
           else setOrgDeleteModal('inativar')
         }}
         onActivate={handleActivateOrg}
