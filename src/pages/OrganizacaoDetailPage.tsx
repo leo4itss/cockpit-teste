@@ -1234,9 +1234,13 @@ export function OrganizacaoDetailPage() {
             setEditingAccount(null)
           }}
           onInativar={() => {
-            setAccountInativarTarget(editingAccount)
-            setAccountInativarModal(true)
             setEditingAccount(null)
+            if (accountActiveContractsCount(editingAccount) > 0) {
+              setAccountInativarBlockedTarget(editingAccount)
+            } else {
+              setAccountInativarTarget(editingAccount)
+              setAccountInativarModal(true)
+            }
           }}
           onActivate={() => handleActivateAccount(editingAccount)}
         />
