@@ -433,7 +433,7 @@ export function NewSolutionSheet({
       <ComponenteSelecaoSheet
         open={componenteSelecaoOpen}
         onClose={() => setComponenteSelecaoOpen(false)}
-        componentes={componentes}
+        componentes={availableComponentes}
         value={selectedComponenteIds}
         onChange={setSelectedComponenteIds}
       />
