@@ -357,13 +357,19 @@ export function OrganizacaoDetailPage() {
   }
 
   // Contas ativas (não inativas, não em quarentena) que bloqueiam a inativação da org
-  function orgActiveAccountsCount() {
-    return accounts.filter(a => !a.deletedAt && a.status !== 'Inativo').length
+  function orgActiveAccounts() {
+    return accounts.filter(a => !a.deletedAt && a.status !== 'Inativo')
   }
 
-  // Contratos ativos vinculados a esta conta que bloqueiam sua inativação
-  function accountActiveContractsCount(account: Account) {
-    return contracts.filter(c => c.contratante === account.name && c.status !== 'Inativo').length
+  // Soluções ativas vinculadas a esta conta que bloqueiam sua inativação
+  // (hierarquia: Organização → Conta → Solução → Contrato — cada nível bloqueia no de baixo)
+  function accountActiveSolutions(account: Account) {
+    return solutions.filter(s => s.accountId === account.id && s.status !== 'Inativo')
+  }
+
+  // Contratos ativos vinculados a esta solução que bloqueiam sua inativação
+  function solutionActiveContracts(solution: Solution) {
+    return contracts.filter(c => c.status !== 'Inativo' && c.objetos.some(o => o.solucao === solution.name))
   }
 
   async function handleActivateOrg() {
