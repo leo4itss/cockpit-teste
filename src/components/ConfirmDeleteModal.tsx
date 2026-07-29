@@ -275,15 +275,13 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
       >
         <div className="flex flex-col gap-4 text-sm text-[#030712]">
           <p>
-            Ao inativar a conta <strong>"{name}"</strong>, os seguintes itens serão <strong>automaticamente inativados</strong>:
+            Tem certeza que deseja inativar a conta <strong>"{name}"</strong>?
           </p>
-          <ul className="flex flex-col gap-1.5 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-xs list-disc list-outside pl-6">
-            <li>Todos os contratos vinculados a esta conta</li>
-            <li>Todas as soluções vinculadas a esta conta</li>
-          </ul>
           <div className="flex items-start gap-4 bg-blue-50 border border-blue-300 rounded-md p-4">
             <CircleAlert className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
             <p className="text-sm font-medium text-blue-700 leading-5">
+              Os contratos vinculados a esta conta <strong>não são afetados</strong> — eles permanecem como
+              estavam e precisam ser inativados separadamente, se necessário.
               Esta ação <strong>pode ser desfeita</strong>. Para reativar a conta,
               acesse o menu de edição e clique em <strong>"Ativar conta"</strong>.
             </p>
