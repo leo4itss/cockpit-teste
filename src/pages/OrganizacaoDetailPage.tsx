@@ -903,6 +903,8 @@ export function OrganizacaoDetailPage() {
                       <tr className="border-b border-[#e5e7eb]">
                         {/* Nome da solução — 183px */}
                         <th className="text-left px-2 py-2.5 font-medium text-[#030712] opacity-40 h-10 w-[183px]">Nome da solução</th>
+                        {/* Conta — 130px */}
+                        <th className="text-left px-2 py-2.5 font-medium text-[#030712] opacity-40 h-10 w-[130px]">Conta</th>
                         {/* Planos — 85px */}
                         <th className="text-left px-2 py-2.5 font-medium text-[#030712] opacity-40 h-10 w-[85px]">Planos</th>
                         {/* Descrição — 169px */}
