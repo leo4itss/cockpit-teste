@@ -633,7 +633,7 @@ export function EditSolutionSheet({
             ) : useInline ? (
               /* ≤ 5 componentes: seletor inline */
               <ComponenteSelector
-                componentes={componentes}
+                componentes={availableComponentes}
                 value={selectedComponenteIds}
                 onChange={ids => {
                   // Aviso de órfãos ao remover
