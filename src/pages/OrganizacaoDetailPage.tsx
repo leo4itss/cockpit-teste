@@ -1154,6 +1154,7 @@ export function OrganizacaoDetailPage() {
         variant="blocked"
         name={org?.name ?? ''}
         blockedTitle="Não é possível inativar esta organização"
+        blockedDescription="Uma organização só pode ser inativada quando todas as contas vinculadas a ela já estiverem inativas. Inative cada conta abaixo (ou aguarde a inativação delas) e tente novamente."
         actionLabel="inativar"
         blocked={{ accounts: orgActiveAccounts().map(a => a.name) }}
       />
