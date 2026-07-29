@@ -110,19 +110,23 @@ app.put('/api/organizations/:id', async (c) => {
 app.delete('/api/organizations/:id', async (c) => {
   const id = c.req.param('id')
 
-  // Verificar dependências bloqueantes
+  // Verificar dependências bloqueantes — exclusão permanente só é permitida quando
+  // todas as contas já passaram pela quarentena (deletedAt preenchido) e todos os
+  // contratos estão inativos.
   const [orgAccounts, orgContracts] = await Promise.all([
     db.select().from(accounts).where(eq(accounts.orgId, id)),
     db.select().from(contracts).where(eq(contracts.orgId, id)),
   ])
-  const activeAccounts = orgAccounts.filter((a: any) => a.status !== 'Excluído')
-  const activeContracts = orgContracts.filter((ct: any) => ct.status === 'Ativo')
+  const activeAccounts = orgAccounts.filter((a: any) => !a.deletedAt)
+  const activeContracts = orgContracts.filter((ct: any) => ct.status !== 'Inativo')
 
   if (activeAccounts.length > 0 || activeContracts.length > 0) {
     return c.json({
       error: 'dependencies',
       activeAccounts: activeAccounts.length,
       activeContracts: activeContracts.length,
+      accountNames: activeAccounts.map((a: any) => a.name),
+      contractNames: activeContracts.map((ct: any) => ct.contratante),
     }, 422)
   }
 
