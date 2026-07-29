@@ -57,6 +57,9 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
         }
       >
         <div className="flex flex-col gap-4">
+          {blockedDescription && (
+            <p className="text-sm text-[#6b7280] leading-5">{blockedDescription}</p>
+          )}
           <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
             <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
             <p className="text-sm text-amber-800">
