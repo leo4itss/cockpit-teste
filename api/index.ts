@@ -149,7 +149,28 @@ app.post('/accounts', async (c) => {
   return c.json(row, 201)
 })
 app.put('/accounts/:id', async (c) => {
-  const [row] = await db.update(accounts).set(await c.req.json()).where(eq(accounts.id, c.req.param('id'))).returning()
+  const id = c.req.param('id')
+  const body = await c.req.json()
+
+  // ── Hierarquia de inativação: conta só inativa se todos os contratos vinculados já estiverem inativos ──
+  // O contrato NÃO é tocado por esta inativação (registro jurídico sobrevive à quarentena da conta) —
+  // ele precisa ser inativado manualmente antes.
+  if (body.status === 'Inativo') {
+    const [existing] = await db.select().from(accounts).where(eq(accounts.id, id))
+    if (existing && existing.status !== 'Inativo') {
+      const allContracts = await db.select().from(contracts).where(
+        and(eq(contracts.orgId, existing.orgId), ne(contracts.status, 'Inativo'))
+      )
+      const activeContracts = allContracts.filter((ct: any) => ct.contratante === existing.name)
+      if (activeContracts.length > 0) {
+        return c.json({
+          error: `Não é possível inativar a conta: existem ${activeContracts.length} contrato(s) ativo(s) vinculado(s). Inative os contratos primeiro.`,
+        }, 422)
+      }
+    }
+  }
+
+  const [row] = await db.update(accounts).set(body).where(eq(accounts.id, id)).returning()
   return row ? c.json(row) : c.json({ error: 'Not found' }, 404)
 })
 app.delete('/accounts/:id', async (c) => {
