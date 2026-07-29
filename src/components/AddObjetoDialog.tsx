@@ -64,7 +64,7 @@ function buildRows(solutions: Solution[], orgName: string): Row[] {
             const excedenteLabel = l.excedenteSemLimite
               ? ' (excedente: sem limite)'
               : l.excedente?.trim()
-                ? ` (excedente até ${l.excedente.trim()} ${unidade})`.trim()
+                ? ` (excedente até ${l.excedente.trim()} ${unidade})`.replace(/ \)/, ')')
                 : ''
             return (range ? `${nome}: ${range}` : nome) + excedenteLabel
           }).join(' · ') || '—'
