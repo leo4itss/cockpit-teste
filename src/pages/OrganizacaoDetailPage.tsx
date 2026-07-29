@@ -1145,6 +1145,15 @@ export function OrganizacaoDetailPage() {
         onConfirm={handleExcluirOrg}
       />
       <ConfirmDeleteModal
+        open={orgInativarBlocked}
+        onClose={() => setOrgInativarBlocked(false)}
+        variant="blocked"
+        name={org?.name ?? ''}
+        blockedTitle="Não é possível inativar esta organização"
+        actionLabel="inativar"
+        blocked={{ activeAccounts: orgActiveAccountsCount(), activeContracts: 0 }}
+      />
+      <ConfirmDeleteModal
         open={accountInativarModal}
         onClose={() => { setAccountInativarModal(false); setAccountInativarTarget(null) }}
         variant="inativar-conta"
@@ -1152,9 +1161,18 @@ export function OrganizacaoDetailPage() {
         onConfirm={() => accountInativarTarget && handleInativarAccount(accountInativarTarget)}
       />
       <ConfirmDeleteModal
+        open={!!accountInativarBlockedTarget}
+        onClose={() => setAccountInativarBlockedTarget(null)}
+        variant="blocked"
+        name={accountInativarBlockedTarget?.name ?? ''}
+        blockedTitle="Não é possível inativar esta conta"
+        actionLabel="inativar"
+        blocked={{ activeAccounts: 0, activeContracts: accountInativarBlockedTarget ? accountActiveContractsCount(accountInativarBlockedTarget) : 0 }}
+      />
+      <ConfirmDeleteModal
         open={accountExcluirModal}
         onClose={() => { setAccountExcluirModal(false); setAccountExcluirTarget(null) }}
-        variant="excluir-conta"
+        variant="account"
         name={accountExcluirTarget?.name ?? ''}
         onConfirm={() => accountExcluirTarget && handleDeleteAccount(accountExcluirTarget)}
       />
