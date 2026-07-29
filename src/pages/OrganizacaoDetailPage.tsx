@@ -1174,7 +1174,7 @@ export function OrganizacaoDetailPage() {
         name={accountInativarBlockedTarget?.name ?? ''}
         blockedTitle="Não é possível inativar esta conta"
         actionLabel="inativar"
-        blocked={{ activeAccounts: 0, activeContracts: accountInativarBlockedTarget ? accountActiveContractsCount(accountInativarBlockedTarget) : 0 }}
+        blocked={{ solutions: accountInativarBlockedTarget ? accountActiveSolutions(accountInativarBlockedTarget).map(s => s.name) : [] }}
       />
       <ConfirmDeleteModal
         open={accountExcluirModal}
