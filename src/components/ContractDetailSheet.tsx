@@ -133,13 +133,18 @@ export function ContractDetailSheet({ open, onClose, contract, onEdit }: Props) 
                   {/* Valores de licença contratados */}
                   {(() => {
                     // Linhas a exibir: preferência para valoresLicenca; fallback: parse da string licenciamento
-                    const linhas: { nome: string; valor: string }[] =
+                    const linhas: { nome: string; valor: string; excedente?: string }[] =
                       obj.valoresLicenca && obj.valoresLicenca.length > 0
                         ? obj.valoresLicenca.map(v => ({
                             nome: v.tipoLicencaNome,
                             valor: v.valor
                               ? `${v.valor}${v.tipoLicencaUnidade ? ` ${v.tipoLicencaUnidade}` : ''}`
                               : '—',
+                            excedente: v.excedenteSemLimite
+                              ? 'Sem limite'
+                              : v.excedente?.trim()
+                                ? `Até ${v.excedente.trim()}${v.tipoLicencaUnidade ? ` ${v.tipoLicencaUnidade}` : ''}`
+                                : undefined,
                           }))
                         : (obj.licenciamento && obj.licenciamento !== '—'
                             ? obj.licenciamento.split(' · ').map(item => {
@@ -154,11 +159,19 @@ export function ContractDetailSheet({ open, onClose, contract, onEdit }: Props) 
                       <div className="flex flex-col gap-1">
                         <p className="text-sm font-semibold text-[#030712]">Licenciamento</p>
                         {linhas.length > 0 ? (
-                          <div className="flex flex-col gap-1">
+                          <div className="flex flex-col gap-2">
                             {linhas.map((l, li) => (
-                              <div key={li} className="flex items-center justify-between">
-                                <p className="text-sm text-[#6b7280]">{l.nome}</p>
-                                <p className="text-sm font-medium text-[#030712]">{l.valor}</p>
+                              <div key={li} className="flex flex-col gap-0.5">
+                                <div className="flex items-center justify-between">
+                                  <p className="text-sm text-[#6b7280]">{l.nome}</p>
+                                  <p className="text-sm font-medium text-[#030712]">{l.valor}</p>
+                                </div>
+                                {l.excedente && (
+                                  <div className="flex items-center justify-between">
+                                    <p className="text-xs text-[#9ca3af]">Excedente</p>
+                                    <p className="text-xs text-[#6b7280]">{l.excedente}</p>
+                                  </div>
+                                )}
                               </div>
                             ))}
                           </div>
