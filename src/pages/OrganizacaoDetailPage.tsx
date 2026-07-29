@@ -1292,9 +1292,13 @@ export function OrganizacaoDetailPage() {
           onUpdateContacts={handleUpdateContacts}
           canDelete={accountCanDelete(editingAccount)}
           onDelete={() => {
-            setAccountExcluirTarget(editingAccount)
-            setAccountExcluirModal(true)
             setEditingAccount(null)
+            if (accountActiveSolutions(editingAccount).length > 0) {
+              setAccountExcluirBlockedTarget(editingAccount)
+            } else {
+              setAccountExcluirTarget(editingAccount)
+              setAccountExcluirModal(true)
+            }
           }}
           onInativar={() => {
             setEditingAccount(null)
