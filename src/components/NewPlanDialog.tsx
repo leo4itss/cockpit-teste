@@ -263,7 +263,11 @@ export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca
             <>
               <div className="border-t border-gray-100" />
               <div className="flex flex-col gap-6">
-                {licensings.map((lic, i) => (
+                {licensings.map((lic, i) => {
+                  const isExcedenteOpen = excedenteOpen.has(i)
+                  const semLimite = lic.excedenteSemLimite === true
+                  const unidade = lic.tipoLicencaUnidade ?? ''
+                  return (
                   <div key={i} className="flex flex-col gap-4">
 
                     {/* Tipo de Licença + Valor + remover */}
@@ -296,11 +300,54 @@ export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca
                       </button>
                     </div>
 
+                    {/* Excedente — toggle + campo condicional */}
+                    <div className="flex flex-col gap-3">
+                      <label className="flex items-center gap-2 cursor-pointer w-fit">
+                        <input
+                          type="checkbox"
+                          checked={isExcedenteOpen}
+                          onChange={() => toggleExcedente(i)}
+                          className="w-4 h-4 rounded border-[#e5e7eb] text-blue-600 accent-[#2563eb] cursor-pointer"
+                        />
+                        <span className="text-sm font-medium text-[#030712]">Definir excedente</span>
+                      </label>
+
+                      {isExcedenteOpen && (
+                        <div className="flex flex-col gap-2 pl-6">
+                          <div className="flex items-end gap-3">
+                            <div className="flex-1">
+                              <Input
+                                label={`Valor máximo do excedente${unidade ? ` (${unidade})` : ''}`}
+                                placeholder={semLimite ? 'Sem limite' : 'digite o valor máximo'}
+                                value={semLimite ? '' : (lic.excedente ?? '')}
+                                disabled={semLimite}
+                                onChange={e => handleLicensingChange(i, 'excedente', e.target.value)}
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => toggleExcedenteSemLimite(i)}
+                              className={`shrink-0 h-9 px-3 border rounded-md text-sm font-medium transition-colors mb-0.5 ${
+                                semLimite
+                                  ? 'border-[#2563eb] bg-blue-50 text-[#2563eb]'
+                                  : 'border-gray-200 bg-white text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]'
+                              }`}
+                            >
+                              {semLimite ? 'Sem limite (ativo)' : 'Sem limite'}
+                            </button>
+                          </div>
+                          <p className="text-xs text-[#6b7280]">
+                            Valor absoluto máximo permitido acima do nominal. Ao consumir além do nominal, o excedente é cobrado na próxima fatura.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
                     {i < licensings.length - 1 && (
                       <div className="border-t border-gray-100" />
                     )}
                   </div>
-                ))}
+                )})}
               </div>
             </>
           )}
