@@ -471,23 +471,15 @@ export function OrganizacaoDetailPage() {
     setEditingSolution(null)
   }
 
+  // Inativa a solução. Contratos vinculados NÃO são tocados aqui — a inativação só é
+  // permitida quando eles já foram inativados manualmente (checagem feita antes de
+  // abrir este fluxo, ver requestInactivateSolution/solutionActiveContracts).
   async function handleInactivateSolution(solution: Solution) {
     try {
       const updated = await api.updateSolution(solution.id, { ...solution, status: 'Inativo' })
       setSolutions(prev => prev.map(s => s.id === updated.id ? updated : s))
       toast('Solução inativada com sucesso.', 'success')
-      // Inativa contratos vinculados
-      const linkedContracts = contracts.filter(c =>
-        c.objetos.some(o => o.solucao === solution.name) && c.status !== 'Inativo'
-      )
-      await Promise.allSettled(
-        linkedContracts.map(c => api.updateContract(c.id, { ...c, status: 'Inativo' }))
-      )
-      setContracts(prev => prev.map(c =>
-        linkedContracts.some(lc => lc.id === c.id) ? { ...c, status: 'Inativo' } : c
-      ))
     } catch {
-      setSolutions(prev => prev.map(s => s.id === solution.id ? { ...solution, status: 'Inativo' } : s))
       toast('Não foi possível inativar a solução. Tente novamente.', 'error')
     }
     setSolutionInativarModal(false)
@@ -496,9 +488,13 @@ export function OrganizacaoDetailPage() {
   }
 
   function requestInactivateSolution(solution: Solution) {
-    setSolutionInativarTarget(solution)
-    setSolutionInativarModal(true)
     setEditingSolution(null)
+    if (solutionActiveContracts(solution).length > 0) {
+      setSolutionInativarBlockedTarget(solution)
+    } else {
+      setSolutionInativarTarget(solution)
+      setSolutionInativarModal(true)
+    }
   }
 
   async function handleActivateSolution(solution: Solution) {
