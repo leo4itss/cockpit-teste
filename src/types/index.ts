@@ -150,6 +150,7 @@ export interface ObjetoContrato {
 export interface Solution {
   id: string
   orgId: string
+  accountId?: string  // conta à qual a solução pertence; ausente/vazio = solução legada (isenta da exclusividade por conta)
   name: string
   plans: Plan[]
   componenteIds?: string[]  // IDs dos componentes utilizados por esta solução
