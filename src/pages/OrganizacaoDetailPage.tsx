@@ -1205,6 +1205,16 @@ export function OrganizacaoDetailPage() {
         name={accountExcluirTarget?.name ?? ''}
         onConfirm={() => accountExcluirTarget && handleDeleteAccount(accountExcluirTarget)}
       />
+      <ConfirmDeleteModal
+        open={!!accountExcluirBlockedTarget}
+        onClose={() => setAccountExcluirBlockedTarget(null)}
+        variant="blocked"
+        name={accountExcluirBlockedTarget?.name ?? ''}
+        blockedTitle="Não é possível excluir esta conta"
+        blockedDescription="Uma conta só pode ser excluída (colocada em quarentena) quando não houver mais nenhuma solução ativa vinculada a ela. Inative ou desvincule cada solução abaixo primeiro e tente novamente."
+        actionLabel="excluir"
+        blocked={{ solutions: accountExcluirBlockedTarget ? accountActiveSolutions(accountExcluirBlockedTarget).map(s => s.name) : [] }}
+      />
 
       <ConfirmDeleteModal
         open={contractInativarModal}
