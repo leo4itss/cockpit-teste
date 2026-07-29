@@ -1204,6 +1204,15 @@ export function OrganizacaoDetailPage() {
         name={solutionInativarTarget?.name ?? ''}
         onConfirm={() => solutionInativarTarget && handleInactivateSolution(solutionInativarTarget)}
       />
+      <ConfirmDeleteModal
+        open={!!solutionInativarBlockedTarget}
+        onClose={() => setSolutionInativarBlockedTarget(null)}
+        variant="blocked"
+        name={solutionInativarBlockedTarget?.name ?? ''}
+        blockedTitle="Não é possível inativar esta solução"
+        actionLabel="inativar"
+        blocked={{ contracts: solutionInativarBlockedTarget ? solutionActiveContracts(solutionInativarBlockedTarget).map(c => c.contratante) : [] }}
+      />
 
       {/* Create sheets */}
       <NewAccountSheet open={sheetAccount} onClose={() => setSheetAccount(false)} orgId={org.id} onSave={handleAddAccount} />
