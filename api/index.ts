@@ -230,6 +230,16 @@ app.put('/solutions/:id', async (c) => {
     }, 422)
   }
 
+  // ── Exclusividade de componente por conta ─────────────────
+  const effectiveAccountId = ('accountId' in body) ? body.accountId : existing.accountId
+  const conflicts = await findComponenteConflicts(body.orgId ?? existing.orgId, effectiveAccountId, incomingComponenteIds, id)
+  if (conflicts.length > 0) {
+    const solNames = [...new Set(conflicts.map(cf => cf.solutionName))]
+    return c.json({
+      error: `Os componentes já estão em uso por outra solução ativa desta conta (${solNames.join(', ')}).`,
+    }, 422)
+  }
+
   // ── Versionamento de planos ───────────────────────────────
   // O frontend envia apenas os planos ATIVOS (o que o usuário vê/edita).
   // O backend faz o merge: marca versões alteradas como 'inativo' e cria
