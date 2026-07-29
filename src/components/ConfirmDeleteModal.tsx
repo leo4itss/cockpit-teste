@@ -58,7 +58,7 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
           <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
             <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
             <p className="text-sm text-amber-800">
-              Resolva as dependências abaixo antes de excluir.
+              Resolva as dependências abaixo antes de {actionLabel}.
             </p>
           </div>
           <ul className="flex flex-col gap-2 text-sm text-[#030712]">
