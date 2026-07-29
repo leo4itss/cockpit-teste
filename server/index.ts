@@ -173,20 +173,19 @@ app.put('/api/accounts/:id', async (c) => {
   const id = c.req.param('id')
   const body = await c.req.json()
 
-  // ── Hierarquia de inativação: conta só inativa se todos os contratos vinculados já estiverem inativos ──
-  // O contrato NÃO é tocado por esta inativação (registro jurídico sobrevive à quarentena da conta) —
-  // ele precisa ser inativado manualmente antes.
+  // ── Hierarquia de inativação: conta só inativa se todas as soluções vinculadas já estiverem inativas ──
+  // (Organização → Conta → Solução → Contrato — cada nível bloqueia no de baixo.)
+  // Soluções/contratos NÃO são tocados por esta inativação — precisam ser inativados manualmente antes.
   if (body.status === 'Inativo') {
     const [existing] = await db.select().from(accounts).where(eq(accounts.id, id))
     if (existing && existing.status !== 'Inativo') {
       const { ne, and } = await import('drizzle-orm')
-      const allContracts = await db.select().from(contracts).where(
-        and(eq(contracts.orgId, existing.orgId), ne(contracts.status, 'Inativo'))
+      const activeSolutions = await db.select().from(solutions).where(
+        and(eq(solutions.accountId, id), ne(solutions.status, 'Inativo'))
       )
-      const activeContracts = allContracts.filter((ct: any) => ct.contratante === existing.name)
-      if (activeContracts.length > 0) {
+      if (activeSolutions.length > 0) {
         return c.json({
-          error: `Não é possível inativar a conta: existem ${activeContracts.length} contrato(s) ativo(s) vinculado(s). Inative os contratos primeiro.`,
+          error: `Não é possível inativar a conta: existem ${activeSolutions.length} solução(ões) ativa(s) vinculada(s). Inative as soluções primeiro.`,
         }, 422)
       }
     }
