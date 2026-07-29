@@ -112,10 +112,16 @@ app.delete('/organizations/:id', async (c) => {
     db.select().from(accounts).where(eq(accounts.orgId, id)),
     db.select().from(contracts).where(eq(contracts.orgId, id)),
   ])
-  const activeAccounts = orgAccounts.filter((a: any) => a.status !== 'Excluído')
-  const activeContracts = orgContracts.filter((ct: any) => ct.status === 'Ativo')
+  const activeAccounts = orgAccounts.filter((a: any) => !a.deletedAt)
+  const activeContracts = orgContracts.filter((ct: any) => ct.status !== 'Inativo')
   if (activeAccounts.length > 0 || activeContracts.length > 0) {
-    return c.json({ error: 'dependencies', activeAccounts: activeAccounts.length, activeContracts: activeContracts.length }, 422)
+    return c.json({
+      error: 'dependencies',
+      activeAccounts: activeAccounts.length,
+      activeContracts: activeContracts.length,
+      accountNames: activeAccounts.map((a: any) => a.name),
+      contractNames: activeContracts.map((ct: any) => ct.contratante),
+    }, 422)
   }
   await db.delete(accounts).where(eq(accounts.orgId, id))
   await db.delete(contracts).where(eq(contracts.orgId, id))
