@@ -46,13 +46,22 @@ export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca
   const [description, setDescription] = useState('')
   const [upgradeUrl, setUpgradeUrl] = useState('')
   const [licensings, setLicensings] = useState<Licensing[]>([])
+  // Índices das linhas com a seção de excedente expandida na UI.
+  const [excedenteOpen, setExcedenteOpen] = useState<Set<number>>(new Set())
 
   useEffect(() => {
     if (open) {
       setName(initialPlan?.name ?? '')
       setDescription(initialPlan?.description ?? '')
       setUpgradeUrl(initialPlan?.upgradeUrl ?? '')
-      setLicensings(initialPlan?.licensings ?? [])
+      const initialLics = initialPlan?.licensings ?? []
+      setLicensings(initialLics)
+      // Abre automaticamente as seções de excedente já preenchidas
+      const openIndices = new Set<number>()
+      initialLics.forEach((lic, i) => {
+        if (hasExcedenteConfigurado(lic)) openIndices.add(i)
+      })
+      setExcedenteOpen(openIndices)
     }
   }, [open, initialPlan])
 
