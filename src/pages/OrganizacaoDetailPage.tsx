@@ -377,37 +377,17 @@ export function OrganizacaoDetailPage() {
     setSheetEditOrg(false)
   }
 
+  // Inativa a conta. Contratos e soluções vinculados NÃO são tocados — o contrato é
+  // um registro jurídico que sobrevive à quarentena da conta (Ponto 8); a inativação
+  // só é permitida quando os contratos vinculados já foram inativados manualmente
+  // (checagem feita antes de abrir este fluxo, ver accountActiveContractsCount).
   async function handleInativarAccount(account: Account) {
     try {
       const updated = await api.updateAccount(account.id, { ...account, status: 'Inativo' })
       setAccounts(prev => prev.map(a => a.id === updated.id ? updated : a))
       toast('Conta inativada com sucesso.', 'success')
     } catch {
-      setAccounts(prev => prev.map(a => a.id === account.id ? { ...account, status: 'Inativo' } : a))
       toast('Não foi possível inativar a conta. Tente novamente.', 'error')
-    }
-    // Cascata: inativa contratos vinculados
-    const linkedContracts = contracts.filter(c => c.contratante === account.name && c.status !== 'Inativo')
-    await Promise.allSettled(
-      linkedContracts.map(c => api.updateContract(c.id, { ...c, status: 'Inativo' }))
-    )
-    if (linkedContracts.length > 0) {
-      setContracts(prev => prev.map(c =>
-        linkedContracts.some(lc => lc.id === c.id) ? { ...c, status: 'Inativo' } : c
-      ))
-    }
-    // Cascata: inativa soluções vinculadas via contratos dessa conta
-    const linkedSolutionNames = new Set(
-      linkedContracts.flatMap(c => c.objetos.map(o => o.solucao))
-    )
-    const linkedSolutions = solutions.filter(s => linkedSolutionNames.has(s.name) && s.status !== 'Inativo')
-    await Promise.allSettled(
-      linkedSolutions.map(s => api.updateSolution(s.id, { ...s, status: 'Inativo' }))
-    )
-    if (linkedSolutions.length > 0) {
-      setSolutions(prev => prev.map(s =>
-        linkedSolutions.some(ls => ls.id === s.id) ? { ...s, status: 'Inativo' } : s
-      ))
     }
     setAccountInativarModal(false)
     setAccountInativarTarget(null)
