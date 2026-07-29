@@ -125,7 +125,9 @@ export interface Plan {
 export interface ValorLicencaContrato {
   tipoLicencaNome: string
   tipoLicencaUnidade?: string
-  valor: string   // valor contratado (ex: "15", "500")
+  valor: string                  // valor contratado (ex: "15", "500")
+  excedente?: string             // valor absoluto máximo de excedente contratado (independente do plano)
+  excedenteSemLimite?: boolean   // se true, ignora `excedente` e considera excedente ilimitado
 }
 
 // ── Entrada de histórico do contrato ─────────────────────────
