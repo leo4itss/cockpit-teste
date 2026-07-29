@@ -185,30 +185,41 @@ export function EditLicencaDialog({ open, onClose, objeto, onSave }: Props) {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-medium text-[#6b7280]">
-                    Excedente{unidade ? ` (${unidade})` : ''}
-                  </label>
-                  <div className="flex items-center gap-2">
+                  <label className="flex items-center gap-1.5 cursor-pointer w-fit">
                     <input
-                      type="text"
-                      value={semLimite ? '' : (v.excedente ?? '')}
-                      disabled={semLimite}
-                      onChange={e => handleExcedenteChange(i, e.target.value)}
-                      placeholder={semLimite ? 'Sem limite' : 'ex: 20'}
-                      className="h-9 flex-1 rounded-md border border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#030712] placeholder:text-[#9ca3af] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors disabled:bg-gray-50 disabled:text-[#9ca3af]"
+                      type="checkbox"
+                      checked={isExcedenteOpen}
+                      onChange={() => toggleExcedente(i)}
+                      className="w-3.5 h-3.5 rounded border-[#e5e7eb] text-blue-600 accent-[#2563eb] cursor-pointer"
                     />
-                    <button
-                      type="button"
-                      onClick={() => handleToggleExcedenteSemLimite(i)}
-                      className={`shrink-0 h-9 px-3 border rounded-md text-xs font-medium transition-colors ${
-                        semLimite
-                          ? 'border-[#2563eb] bg-blue-50 text-[#2563eb]'
-                          : 'border-gray-200 bg-white text-[#030712] hover:bg-gray-50'
-                      }`}
-                    >
-                      {semLimite ? 'Sem limite (ativo)' : 'Sem limite'}
-                    </button>
-                  </div>
+                    <span className="text-xs font-medium text-[#6b7280]">
+                      Excedente{unidade ? ` (${unidade})` : ''}
+                    </span>
+                  </label>
+
+                  {isExcedenteOpen && (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={semLimite ? '' : (v.excedente ?? '')}
+                        disabled={semLimite}
+                        onChange={e => handleExcedenteChange(i, e.target.value)}
+                        placeholder={semLimite ? 'Sem limite' : 'ex: 20'}
+                        className="h-9 flex-1 rounded-md border border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#030712] placeholder:text-[#9ca3af] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors disabled:bg-gray-50 disabled:text-[#9ca3af]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleToggleExcedenteSemLimite(i)}
+                        className={`shrink-0 h-9 px-3 border rounded-md text-xs font-medium transition-colors ${
+                          semLimite
+                            ? 'border-[#2563eb] bg-blue-50 text-[#2563eb]'
+                            : 'border-gray-200 bg-white text-[#030712] hover:bg-gray-50'
+                        }`}
+                      >
+                        {semLimite ? 'Sem limite (ativo)' : 'Sem limite'}
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             )})}
