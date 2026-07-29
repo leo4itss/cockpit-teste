@@ -198,20 +198,12 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
       >
         <div className="flex flex-col gap-4 text-sm text-[#030712]">
           <p>
-            Ao inativar esta organização, os seguintes itens serão <strong>automaticamente inativados</strong>:
+            Tem certeza que deseja inativar a organização <strong>"{name}"</strong>?
           </p>
-          <div className="bg-yellow-50 border border-yellow-300 rounded-md p-4">
-            <ul className="flex flex-col gap-1 text-sm font-medium text-yellow-700 list-disc list-outside pl-5">
-              <li>Todas as contas vinculadas</li>
-              <li>Todos os contratos</li>
-              <li>Todas as soluções</li>
-            </ul>
-          </div>
-
           <div className="flex items-start gap-4 bg-blue-50 border border-blue-300 rounded-md p-4">
             <CircleAlert className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
             <p className="text-sm font-medium text-blue-700 leading-5">
-              Esta ação <strong>pode ser desfeita</strong>. Para reativar a organização e seus vínculos,
+              Esta ação <strong>pode ser desfeita</strong>. Para reativar a organização,
               acesse o menu de ações da organização e selecione <strong>"Reativar organização"</strong>.
             </p>
           </div>
