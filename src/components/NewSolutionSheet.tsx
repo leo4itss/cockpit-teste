@@ -437,6 +437,7 @@ export function NewSolutionSheet({
         componentes={availableComponentes}
         value={selectedComponenteIds}
         onChange={setSelectedComponenteIds}
+        single
       />
 
       <ToastContainer toasts={toasts} onDismiss={dismiss} />
