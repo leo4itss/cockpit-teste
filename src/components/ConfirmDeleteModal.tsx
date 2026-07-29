@@ -62,20 +62,54 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
               Resolva as dependências abaixo antes de {actionLabel}.
             </p>
           </div>
-          <ul className="flex flex-col gap-2 text-sm text-[#030712]">
-            {(blocked?.activeAccounts ?? 0) > 0 && (
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
-                <span><strong>{blocked!.activeAccounts}</strong> conta{blocked!.activeAccounts !== 1 ? 's' : ''} ativa{blocked!.activeAccounts !== 1 ? 's' : ''} vinculada{blocked!.activeAccounts !== 1 ? 's' : ''}</span>
-              </li>
-            )}
-            {(blocked?.activeContracts ?? 0) > 0 && (
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
-                <span><strong>{blocked!.activeContracts}</strong> contrato{blocked!.activeContracts !== 1 ? 's' : ''} ativo{blocked!.activeContracts !== 1 ? 's' : ''} vigente{blocked!.activeContracts !== 1 ? 's' : ''}</span>
-              </li>
-            )}
-          </ul>
+
+          {(blocked?.accounts?.length ?? 0) > 0 && (
+            <div className="flex flex-col gap-1.5">
+              <p className="text-sm font-medium text-[#030712]">
+                {blocked!.accounts!.length} conta{blocked!.accounts!.length !== 1 ? 's' : ''} ativa{blocked!.accounts!.length !== 1 ? 's' : ''} vinculada{blocked!.accounts!.length !== 1 ? 's' : ''}
+              </p>
+              <ul className="flex flex-col gap-1 pl-1">
+                {blocked!.accounts!.map((name, i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm text-[#6b7280]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+                    <span>{name}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {(blocked?.solutions?.length ?? 0) > 0 && (
+            <div className="flex flex-col gap-1.5">
+              <p className="text-sm font-medium text-[#030712]">
+                {blocked!.solutions!.length} solução{blocked!.solutions!.length !== 1 ? 'ões' : ''} ativa{blocked!.solutions!.length !== 1 ? 's' : ''} vinculada{blocked!.solutions!.length !== 1 ? 's' : ''}
+              </p>
+              <ul className="flex flex-col gap-1 pl-1">
+                {blocked!.solutions!.map((name, i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm text-[#6b7280]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+                    <span>{name}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {(blocked?.contracts?.length ?? 0) > 0 && (
+            <div className="flex flex-col gap-1.5">
+              <p className="text-sm font-medium text-[#030712]">
+                {blocked!.contracts!.length} contrato{blocked!.contracts!.length !== 1 ? 's' : ''} ativo{blocked!.contracts!.length !== 1 ? 's' : ''} vigente{blocked!.contracts!.length !== 1 ? 's' : ''}
+              </p>
+              <ul className="flex flex-col gap-1 pl-1">
+                {blocked!.contracts!.map((name, i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm text-[#6b7280]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+                    <span>{name}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </Modal>
     )
