@@ -128,10 +128,12 @@ export function OrganizacaoDetailPage() {
   // Delete / inativar org modals
   const [orgDeleteModal, setOrgDeleteModal] = useState<'inativar' | null>(null)
   const [orgExcluirModal, setOrgExcluirModal] = useState(false)
+  const [orgInativarBlocked, setOrgInativarBlocked] = useState(false)
 
   // Inativar / excluir account modal
   const [accountInativarTarget, setAccountInativarTarget] = useState<Account | null>(null)
   const [accountInativarModal, setAccountInativarModal] = useState(false)
+  const [accountInativarBlockedTarget, setAccountInativarBlockedTarget] = useState<Account | null>(null)
   const [accountExcluirTarget, setAccountExcluirTarget] = useState<Account | null>(null)
   const [accountExcluirModal, setAccountExcluirModal] = useState(false)
   const [showInativosAccount, setShowInativosAccount] = useState(false)
