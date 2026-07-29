@@ -302,12 +302,13 @@ export function OrganizacaoDetailPage() {
         // Atualiza selectedContract se estiver aberto (para refletir novos dados no detalhe)
         setSelectedContract(prev => prev ? (fresh.find(c => c.id === prev.id) ?? prev) : null)
       }).catch(() => {})
-    } catch {
-      setSolutions(prev => prev.map(s => s.id === updated.id ? updated : s))
-      setSelectedSolution(updated)
-      toast('Não foi possível salvar as alterações. Tente novamente.', 'error')
+      setEditingSolution(null)
+    } catch (err) {
+      // Não aplica fallback otimista nem fecha o sheet: se o backend rejeitou
+      // (ex.: componente já em uso por outra solução da mesma conta), o
+      // usuário precisa ver o erro real e poder corrigir sem perder a edição.
+      toast(err instanceof Error ? err.message : 'Não foi possível salvar as alterações. Tente novamente.', 'error')
     }
-    setEditingSolution(null)
   }
   async function handleSaveContract(updated: Contract) {
     try {
