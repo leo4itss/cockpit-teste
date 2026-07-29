@@ -103,10 +103,41 @@ export function NewSolutionSheet({
   const [planDialogOpen, setPlanDialogOpen] = useState(false)
   const [componenteSelecaoOpen, setComponenteSelecaoOpen] = useState(false)
 
-  const useInline = componentes.length <= THRESHOLD_INLINE
-
   function set(field: string, value: string | boolean) {
     setForm(f => ({ ...f, [field]: value }))
+  }
+
+  const activeAccounts = accounts.filter(a => !a.deletedAt)
+
+  // Componentes já em uso por outra solução ATIVA da mesma conta selecionada —
+  // ficam indisponíveis para esta solução (exclusividade componente↔conta).
+  const occupiedComponenteIds = new Set(
+    form.accountId
+      ? solutions
+          .filter(s => s.accountId === form.accountId && s.status !== 'Inativo')
+          .flatMap(s => s.componenteIds ?? [])
+      : []
+  )
+  const availableComponentes = componentes.filter(
+    c => !occupiedComponenteIds.has(c.id) || selectedComponenteIds.includes(c.id)
+  )
+  const useInline = availableComponentes.length <= THRESHOLD_INLINE
+
+  // Ao trocar de conta, remove da seleção os componentes que ficaram
+  // ocupados pela nova conta (avisando o usuário) e atualiza o campo.
+  function handleAccountChange(newAccountId: string) {
+    const newOccupied = new Set(
+      solutions
+        .filter(s => s.accountId === newAccountId && s.status !== 'Inativo')
+        .flatMap(s => s.componenteIds ?? [])
+    )
+    const removed = selectedComponenteIds.filter(id => newOccupied.has(id))
+    if (removed.length > 0) {
+      const names = componentes.filter(c => removed.includes(c.id)).map(c => c.nome).join(', ')
+      setSelectedComponenteIds(prev => prev.filter(id => !newOccupied.has(id)))
+      toast(`Componentes removidos por já estarem em uso nesta conta: ${names}.`, 'warning')
+    }
+    set('accountId', newAccountId)
   }
 
   // Tipos disponíveis para planos = union dos componentes selecionados (ou todos se nenhum)
