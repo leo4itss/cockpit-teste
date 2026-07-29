@@ -346,16 +346,26 @@ export function OrganizacaoDetailPage() {
     try {
       await api.deleteOrganization(org.id)
       toast('Organização excluída com sucesso.', 'success')
+      setOrgExcluirModal(false)
+      navigate('/organizacoes')
     } catch {
       toast('Não foi possível excluir a organização. Verifique se existem contas, soluções ou contratos vinculados.', 'error')
+      setOrgExcluirModal(false)
     }
-    setOrgExcluirModal(false)
-    navigate('/organizacoes')
   }
 
   // Org pode ser excluída permanentemente quando não tem soluções nem contratos
   function orgCanDelete() {
     return solutions.length === 0 && contracts.length === 0
+  }
+
+  // Contas que ainda não passaram pela quarentena completa (exclusão definitiva) e
+  // contratos ainda não inativados — ambos bloqueiam a exclusão permanente da org.
+  function orgAccountsBlockingExclusao() {
+    return accounts.filter(a => !a.deletedAt)
+  }
+  function orgContractsBlockingExclusao() {
+    return contracts.filter(c => c.status !== 'Inativo')
   }
 
   // Contas ativas (não inativas, não em quarentena) que bloqueiam a inativação da org
