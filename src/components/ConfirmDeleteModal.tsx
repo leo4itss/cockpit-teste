@@ -350,15 +350,6 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
           <p>
             Tem certeza que deseja inativar a solução <strong>"{name}"</strong>?
           </p>
-          <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-            <div className="flex flex-col gap-1 text-xs text-amber-800">
-              <p>
-                Ao inativar esta solução, <strong>todos os contratos vinculados</strong> serão
-                automaticamente inativados.
-              </p>
-            </div>
-          </div>
           <div className="flex items-start gap-4 bg-blue-50 border border-blue-300 rounded-md p-4">
             <CircleAlert className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
             <p className="text-sm font-medium text-blue-700 leading-5">
