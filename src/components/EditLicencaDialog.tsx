@@ -74,6 +74,22 @@ export function EditLicencaDialog({ open, onClose, objeto, onSave }: Props) {
     }))
   }
 
+  function toggleExcedente(index: number) {
+    setExcedenteOpen(prev => {
+      const next = new Set(prev)
+      if (next.has(index)) {
+        next.delete(index)
+        // Ao fechar, limpa os campos de excedente para não persistir estado oculto.
+        setValores(vs => vs.map((v, i) =>
+          i === index ? { ...v, excedente: '', excedenteSemLimite: false } : v
+        ))
+      } else {
+        next.add(index)
+      }
+      return next
+    })
+  }
+
   function handleSave() {
     if (!objeto) return
     // Detecta o que mudou para gerar descrição no histórico
