@@ -48,7 +48,7 @@ function buildRows(solutions: Solution[], orgName: string): Row[] {
     }
 
     activePlans.forEach(plan => {
-      // Monta label de licenciamento a partir do novo formato (tipoLicencaNome + range)
+      // Monta label de licenciamento a partir do novo formato (tipoLicencaNome + range + excedente)
       const licenciamento = plan.licensings.length > 0
         ? plan.licensings.map(l => {
             const unidade = l.tipoLicencaUnidade ?? ''
@@ -61,7 +61,12 @@ function buildRows(solutions: Solution[], orgName: string): Row[] {
             else if (min) range = `${min} ${unidade}`.trim()
             else if (max) range = `Até ${max} ${unidade}`.trim()
             else if (val) range = `${val} ${unidade}`.trim()
-            return range ? `${nome}: ${range}` : nome
+            const excedenteLabel = l.excedenteSemLimite
+              ? ' (excedente: sem limite)'
+              : l.excedente?.trim()
+                ? ` (excedente até ${l.excedente.trim()} ${unidade})`.trim()
+                : ''
+            return (range ? `${nome}: ${range}` : nome) + excedenteLabel
           }).join(' · ') || '—'
         : '—'
 
@@ -77,6 +82,8 @@ function buildRows(solutions: Solution[], orgName: string): Row[] {
           tipoLicencaNome: l.tipoLicencaNome || l.tipoLicencaId,
           tipoLicencaUnidade: l.tipoLicencaUnidade,
           valor: l.valorMinimo?.trim() || l.valor?.trim() || '',
+          excedente: l.excedente,
+          excedenteSemLimite: l.excedenteSemLimite,
         })),
       })
     })
