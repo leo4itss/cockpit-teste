@@ -1248,6 +1248,8 @@ export function OrganizacaoDetailPage() {
           open={!!editingSolution}
           onClose={() => setEditingSolution(null)}
           solution={editingSolution}
+          accounts={accounts}
+          solutions={solutions}
           onSave={handleSaveSolution}
           onDelete={() => {
             setSolutionDeleteTarget(editingSolution)
