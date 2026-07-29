@@ -437,12 +437,10 @@ export function OrganizacaoDetailPage() {
     setEditingAccount(null)
   }
 
+  // Consistente com a mesma trava usada em "Inativar conta": só pode excluir
+  // (colocar em quarentena) uma conta sem soluções ativas vinculadas a ela.
   function accountCanDelete(account: Account) {
-    const hasContracts = contracts.some(c => c.contratante === account.name)
-    const hasLinkedSolutions = solutions.some(s =>
-      contracts.some(c => c.contratante === account.name && c.objetos.some(o => o.solucao === s.name))
-    )
-    return !hasContracts && !hasLinkedSolutions
+    return accountActiveSolutions(account).length === 0
   }
 
   async function handleInativarContract(contract: Contract) {
