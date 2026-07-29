@@ -356,6 +356,16 @@ export function OrganizacaoDetailPage() {
     return solutions.length === 0 && contracts.length === 0
   }
 
+  // Contas ativas (não inativas, não em quarentena) que bloqueiam a inativação da org
+  function orgActiveAccountsCount() {
+    return accounts.filter(a => !a.deletedAt && a.status !== 'Inativo').length
+  }
+
+  // Contratos ativos vinculados a esta conta que bloqueiam sua inativação
+  function accountActiveContractsCount(account: Account) {
+    return contracts.filter(c => c.contratante === account.name && c.status !== 'Inativo').length
+  }
+
   async function handleActivateOrg() {
     if (!org) return
     try {
