@@ -77,6 +77,8 @@ export function NewSolutionSheet({
   open,
   onClose,
   orgId,
+  accounts,
+  solutions,
   onSave,
   tiposLicenca,
 }: Props) {
@@ -87,6 +89,7 @@ export function NewSolutionSheet({
   const [form, setForm] = useState({
     name: '',
     description: '',
+    accountId: '',
     arquitetoPAS: '',
     marketplace: false,
     link01: '',
