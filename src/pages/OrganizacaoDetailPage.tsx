@@ -1187,6 +1187,8 @@ export function OrganizacaoDetailPage() {
         open={sheetSolution}
         onClose={() => setSheetSolution(false)}
         orgId={org.id}
+        accounts={accounts}
+        solutions={solutions}
         onSave={handleAddSolution}
         tiposLicenca={tiposLicenca}
       />
