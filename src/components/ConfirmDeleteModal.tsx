@@ -27,10 +27,11 @@ interface Props {
   onConfirm?: () => void  // não usado em 'blocked'
   blocked?: BlockedInfo   // usado em 'blocked'
   blockedTitle?: string   // título customizável para o variant 'blocked'
+  blockedDescription?: string  // corpo de texto explicando a regra específica (ex: por que está bloqueado)
   actionLabel?: string    // verbo usado no texto do variant 'blocked' (ex: 'excluir', 'inativar') — padrão 'excluir'
 }
 
-export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, blocked, blockedTitle, actionLabel = 'excluir' }: Props) {
+export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, blocked, blockedTitle, blockedDescription, actionLabel = 'excluir' }: Props) {
   const [typed, setTyped] = useState('')
 
   function handleClose() {
