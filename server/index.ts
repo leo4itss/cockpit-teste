@@ -83,8 +83,26 @@ app.post('/api/organizations', async (c) => {
 })
 
 app.put('/api/organizations/:id', async (c) => {
+  const id = c.req.param('id')
   const body = await c.req.json()
-  const [row] = await db.update(organizations).set(body).where(eq(organizations.id, c.req.param('id'))).returning()
+
+  // ── Hierarquia de inativação: org só inativa se todas as contas já estiverem inativas ──
+  if (body.status === 'Inativo') {
+    const [existing] = await db.select().from(organizations).where(eq(organizations.id, id))
+    if (existing && existing.status !== 'Inativo') {
+      const { isNull, and, ne } = await import('drizzle-orm')
+      const activeAccounts = await db.select().from(accounts).where(
+        and(eq(accounts.orgId, id), isNull(accounts.deletedAt), ne(accounts.status, 'Inativo'))
+      )
+      if (activeAccounts.length > 0) {
+        return c.json({
+          error: `Não é possível inativar a organização: existem ${activeAccounts.length} conta(s) ativa(s) vinculada(s). Inative as contas primeiro.`,
+        }, 422)
+      }
+    }
+  }
+
+  const [row] = await db.update(organizations).set(body).where(eq(organizations.id, id)).returning()
   if (!row) return c.json({ error: 'Not found' }, 404)
   return c.json(row)
 })
