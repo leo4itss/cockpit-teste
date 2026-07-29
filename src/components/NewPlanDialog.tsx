@@ -23,11 +23,19 @@ function emptyLicensing(): Licensing {
     tipoLicencaNome: '',
     tipoLicencaUnidade: '',
     valor: '',
+    excedente: '',
+    excedenteSemLimite: false,
     definirPreco: false,
     precoAnual: '',
     descontoMensal: '',
     precoMes: '',
   }
+}
+
+// Detecta se a linha de excedente deve nascer "expandida" ao editar
+// (mantém consistente com o que foi salvo antes).
+function hasExcedenteConfigurado(lic: Licensing): boolean {
+  return lic.excedenteSemLimite === true || (lic.excedente ?? '').trim() !== ''
 }
 
 /* ── main ───────────────────────────────────────────────── */
