@@ -192,6 +192,16 @@ app.get('/solutions/:id', async (c) => {
 })
 app.post('/solutions', async (c) => {
   const body = await c.req.json()
+
+  // ── Exclusividade de componente por conta ─────────────────
+  const conflicts = await findComponenteConflicts(body.orgId, body.accountId, body.componenteIds ?? [])
+  if (conflicts.length > 0) {
+    const solNames = [...new Set(conflicts.map(cf => cf.solutionName))]
+    return c.json({
+      error: `Os componentes já estão em uso por outra solução ativa desta conta (${solNames.join(', ')}).`,
+    }, 422)
+  }
+
   // Garante que todo plano criado já nasce com v1 registrada no histórico
   const now = new Date().toISOString()
   if (Array.isArray(body.plans)) {
