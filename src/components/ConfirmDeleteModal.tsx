@@ -14,9 +14,9 @@ import { Button } from './ui/Button'
 import { AlertTriangle, CircleAlert, RotateCcw } from 'lucide-react'
 
 interface BlockedInfo {
-  activeAccounts: number
-  activeContracts: number
-  activeSolutions?: number
+  accounts?: string[]    // nomes das contas ativas que bloqueiam (ex: inativar org)
+  contracts?: string[]   // nomes/identificadores dos contratos ativos que bloqueiam (ex: inativar solução)
+  solutions?: string[]   // nomes das soluções ativas que bloqueiam (ex: inativar conta)
 }
 
 interface Props {
