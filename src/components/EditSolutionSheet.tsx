@@ -214,6 +214,44 @@ export function EditSolutionSheet({
   // Componentes vinculados derivados do estado editável
   const componentesVinculados = componentes.filter(c => selectedComponenteIds.includes(c.id))
 
+  const activeAccounts = accounts.filter(a => !a.deletedAt)
+  // Se a conta atual da solução estiver inativa/em quarentena, mantém ela nas
+  // opções (senão o campo mostraria vazio uma conta que na verdade está setada).
+  const currentAccount = accounts.find(a => a.id === form.accountId)
+  const accountOptions = currentAccount && !activeAccounts.some(a => a.id === currentAccount.id)
+    ? [...activeAccounts, currentAccount]
+    : activeAccounts
+
+  // Componentes já em uso por outra solução ATIVA da mesma conta (exclui a
+  // própria solução sendo editada) — ficam indisponíveis no seletor.
+  const occupiedComponenteIds = new Set(
+    form.accountId
+      ? solutions
+          .filter(s => s.id !== solution?.id && s.accountId === form.accountId && s.status !== 'Inativo')
+          .flatMap(s => s.componenteIds ?? [])
+      : []
+  )
+  const availableComponentes = componentes.filter(
+    c => !occupiedComponenteIds.has(c.id) || selectedComponenteIds.includes(c.id)
+  )
+
+  // Ao trocar de conta, remove da seleção os componentes que ficaram
+  // ocupados pela nova conta (avisando o usuário) e atualiza o campo.
+  function handleAccountChange(newAccountId: string) {
+    const newOccupied = new Set(
+      solutions
+        .filter(s => s.id !== solution?.id && s.accountId === newAccountId && s.status !== 'Inativo')
+        .flatMap(s => s.componenteIds ?? [])
+    )
+    const removed = selectedComponenteIds.filter(id => newOccupied.has(id))
+    if (removed.length > 0) {
+      const names = componentes.filter(c => removed.includes(c.id)).map(c => c.nome).join(', ')
+      setSelectedComponenteIds(prev => prev.filter(id => !newOccupied.has(id)))
+      toast(`Componentes removidos por já estarem em uso na conta selecionada: ${names}.`, 'warning')
+    }
+    set('accountId', newAccountId)
+  }
+
   // Re-sync form when solution changes
   const [lastSolution, setLastSolution] = useState(solution)
   if (solution !== lastSolution) {
