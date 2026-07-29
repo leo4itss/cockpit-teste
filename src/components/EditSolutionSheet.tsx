@@ -388,6 +388,7 @@ export function EditSolutionSheet({
       ...solution,
       name:              form.name,
       description:       form.description,
+      accountId:         form.accountId || undefined,
       arquitetoPAS:      form.arquitetoPAS,
       plans,
       componenteIds:     selectedComponenteIds,
