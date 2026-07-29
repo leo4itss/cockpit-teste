@@ -135,6 +135,28 @@ export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca
       toast('Selecione o tipo de licença.', 'warning')
       return
     }
+
+    // Excedente: se ativo e não é "sem limite", precisa ter valor numérico >= valor nominal
+    for (const lic of licensings) {
+      const semLimite = lic.excedenteSemLimite === true
+      const excedenteInformado = (lic.excedente ?? '').trim()
+      // Se sem limite, nada a validar (o campo numérico é ignorado)
+      if (semLimite) continue
+      // Se o campo está vazio, tratamos como "excedente não configurado" — sem regra
+      if (excedenteInformado === '') continue
+
+      const nominal = Number((lic.valor ?? '').trim())
+      const excedente = Number(excedenteInformado)
+      if (Number.isNaN(excedente)) {
+        toast(`Excedente inválido em "${lic.tipoLicencaNome || 'tipo de licença'}". Informe um número.`, 'warning')
+        return
+      }
+      if (!Number.isNaN(nominal) && excedente < nominal) {
+        toast(`Excedente deve ser maior ou igual ao valor nominal em "${lic.tipoLicencaNome || 'tipo de licença'}".`, 'warning')
+        return
+      }
+    }
+
     if (!canSave) return
     onSave({ name: name.trim(), description: description.trim(), upgradeUrl: upgradeUrl.trim(), licensings })
     handleClose()
