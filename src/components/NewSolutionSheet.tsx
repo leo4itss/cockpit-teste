@@ -161,17 +161,20 @@ export function NewSolutionSheet({
     (form.link01.trim() !== '' && form.titleLink01.trim() !== '') ||
     (form.link02.trim() !== '' && form.titleLink02.trim() !== '')
   )
-  const canSave = baseValid && marketplaceValid && selectedComponenteIds.length > 0
+  const canSave = baseValid && marketplaceValid && selectedComponenteIds.length > 0 && form.accountId !== ''
 
   function handleSave() {
     if (!canSave) {
       if (selectedComponenteIds.length === 0) {
         toast('Selecione pelo menos um componente para criar a solução.', 'warning')
+      } else if (form.accountId === '') {
+        toast('Selecione a conta desta solução.', 'warning')
       }
       return
     }
     onSave({
       orgId,
+      accountId: form.accountId,
       name: form.name,
       description: form.description,
       arquitetoPAS: form.arquitetoPAS,
