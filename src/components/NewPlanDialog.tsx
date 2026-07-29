@@ -167,6 +167,7 @@ export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca
     setDescription('')
     setUpgradeUrl('')
     setLicensings([])
+    setExcedenteOpen(new Set())
     onClose()
   }
 
