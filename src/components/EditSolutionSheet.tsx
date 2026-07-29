@@ -621,6 +621,12 @@ export function EditSolutionSheet({
               </p>
             )}
 
+            {!isInactive && (
+              <p className="text-sm text-[#6b7280] -mt-2">
+                Uma solução pode ter no máximo um componente vinculado.
+              </p>
+            )}
+
             {isInactive ? (
               /* Solução inativa: componentes somente leitura */
               <div className="flex flex-col gap-2">
