@@ -15,9 +15,23 @@ function buildLicenciamentoLabel(valores: ValorLicencaContrato[]): string {
   return valores
     .map(v => {
       const unidade = v.tipoLicencaUnidade ?? ''
-      return v.valor ? `${v.tipoLicencaNome}: ${v.valor} ${unidade}`.trim() : v.tipoLicencaNome
+      const base = v.valor ? `${v.tipoLicencaNome}: ${v.valor} ${unidade}`.trim() : v.tipoLicencaNome
+      const excedenteLabel = v.excedenteSemLimite
+        ? ' (excedente: sem limite)'
+        : v.excedente?.trim()
+          ? ` (excedente até ${v.excedente.trim()} ${unidade})`.trim()
+          : ''
+      return base + excedenteLabel
     })
     .join(' · ') || '—'
+}
+
+/** Descreve a mudança de excedente para o histórico, se houve alteração */
+function excedenteChangeDescription(ant: ValorLicencaContrato | undefined, atual: ValorLicencaContrato): string | null {
+  const antLabel = ant?.excedenteSemLimite ? 'sem limite' : (ant?.excedente?.trim() || '—')
+  const atualLabel = atual.excedenteSemLimite ? 'sem limite' : (atual.excedente?.trim() || '—')
+  if (antLabel === atualLabel) return null
+  return `${atual.tipoLicencaNome} (excedente): ${antLabel} → ${atualLabel}`
 }
 
 export function EditLicencaDialog({ open, onClose, objeto, onSave }: Props) {
