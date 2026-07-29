@@ -34,14 +34,25 @@ function excedenteChangeDescription(ant: ValorLicencaContrato | undefined, atual
   return `${atual.tipoLicencaNome} (excedente): ${antLabel} → ${atualLabel}`
 }
 
+/** Detecta se a linha de excedente deve nascer "expandida" ao abrir o modal */
+function hasExcedenteConfigurado(v: ValorLicencaContrato): boolean {
+  return v.excedenteSemLimite === true || (v.excedente ?? '').trim() !== ''
+}
+
 export function EditLicencaDialog({ open, onClose, objeto, onSave }: Props) {
   const [valores, setValores] = useState<ValorLicencaContrato[]>([])
+  // Índices das linhas com a seção de excedente expandida na UI.
+  const [excedenteOpen, setExcedenteOpen] = useState<Set<number>>(new Set())
 
   useEffect(() => {
     if (open && objeto) {
-      setValores(
-        (objeto.valoresLicenca ?? []).map(v => ({ ...v }))
-      )
+      const initial = (objeto.valoresLicenca ?? []).map(v => ({ ...v }))
+      setValores(initial)
+      const openIndices = new Set<number>()
+      initial.forEach((v, i) => {
+        if (hasExcedenteConfigurado(v)) openIndices.add(i)
+      })
+      setExcedenteOpen(openIndices)
     }
   }, [open, objeto])
 
