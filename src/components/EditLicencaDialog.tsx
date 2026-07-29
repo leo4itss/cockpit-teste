@@ -51,11 +51,23 @@ export function EditLicencaDialog({ open, onClose, objeto, onSave }: Props) {
     setValores(prev => prev.map((v, i) => i === index ? { ...v, valor: novoValor } : v))
   }
 
+  function handleExcedenteChange(index: number, novoExcedente: string) {
+    setValores(prev => prev.map((v, i) => i === index ? { ...v, excedente: novoExcedente } : v))
+  }
+
+  function handleToggleExcedenteSemLimite(index: number) {
+    setValores(prev => prev.map((v, i) => {
+      if (i !== index) return v
+      const willBeUnlimited = !v.excedenteSemLimite
+      return { ...v, excedenteSemLimite: willBeUnlimited, excedente: willBeUnlimited ? '' : (v.excedente ?? '') }
+    }))
+  }
+
   function handleSave() {
     if (!objeto) return
     // Detecta o que mudou para gerar descrição no histórico
     const original = objeto.valoresLicenca ?? []
-    const alteracoes = valores
+    const alteracoesValor = valores
       .map((v, i) => {
         const ant = original[i]?.valor ?? ''
         if (ant === v.valor) return null
@@ -63,6 +75,10 @@ export function EditLicencaDialog({ open, onClose, objeto, onSave }: Props) {
         return `${v.tipoLicencaNome}: ${ant || '—'} → ${v.valor || '—'} ${unidade}`.trim()
       })
       .filter(Boolean)
+    const alteracoesExcedente = valores
+      .map((v, i) => excedenteChangeDescription(original[i], v))
+      .filter(Boolean)
+    const alteracoes = [...alteracoesValor, ...alteracoesExcedente]
 
     const updatedObjeto: ObjetoContrato = {
       solucao: objeto.solucao ?? '',
