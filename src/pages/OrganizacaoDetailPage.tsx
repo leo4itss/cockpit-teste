@@ -1158,7 +1158,7 @@ export function OrganizacaoDetailPage() {
         name={org?.name ?? ''}
         blockedTitle="Não é possível inativar esta organização"
         actionLabel="inativar"
-        blocked={{ activeAccounts: orgActiveAccountsCount(), activeContracts: 0 }}
+        blocked={{ accounts: orgActiveAccounts().map(a => a.name) }}
       />
       <ConfirmDeleteModal
         open={accountInativarModal}
