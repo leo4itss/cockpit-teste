@@ -1212,6 +1212,7 @@ export function OrganizacaoDetailPage() {
         variant="blocked"
         name={solutionInativarBlockedTarget?.name ?? ''}
         blockedTitle="Não é possível inativar esta solução"
+        blockedDescription="Uma solução só pode ser inativada quando não houver mais nenhum contrato ativo vinculado a ela. Inative cada contrato abaixo primeiro e tente novamente."
         actionLabel="inativar"
         blocked={{ contracts: solutionInativarBlockedTarget ? solutionActiveContracts(solutionInativarBlockedTarget).map(c => c.contratante) : [] }}
       />
