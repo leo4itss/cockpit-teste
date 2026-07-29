@@ -71,6 +71,43 @@ export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca
 
   function handleRemoveLicensing(index: number) {
     setLicensings(ls => ls.filter((_, i) => i !== index))
+    setExcedenteOpen(prev => {
+      const next = new Set<number>()
+      prev.forEach(i => {
+        if (i < index) next.add(i)
+        else if (i > index) next.add(i - 1)
+      })
+      return next
+    })
+  }
+
+  function toggleExcedente(index: number) {
+    setExcedenteOpen(prev => {
+      const next = new Set(prev)
+      if (next.has(index)) {
+        next.delete(index)
+        // Ao fechar, limpa os campos de excedente para não persistir estado oculto.
+        setLicensings(ls => ls.map((l, i) =>
+          i === index ? { ...l, excedente: '', excedenteSemLimite: false } : l
+        ))
+      } else {
+        next.add(index)
+      }
+      return next
+    })
+  }
+
+  function toggleExcedenteSemLimite(index: number) {
+    setLicensings(ls => ls.map((l, i) => {
+      if (i !== index) return l
+      const willBeUnlimited = !l.excedenteSemLimite
+      return {
+        ...l,
+        excedenteSemLimite: willBeUnlimited,
+        // Ao marcar "sem limite", zera o número; ao desmarcar, deixa vazio pro usuário digitar.
+        excedente: willBeUnlimited ? '' : (l.excedente ?? ''),
+      }
+    }))
   }
 
   function handleLicensingChange(index: number, field: keyof Licensing, value: string | boolean) {
