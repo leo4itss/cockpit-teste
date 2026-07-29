@@ -1160,6 +1160,19 @@ export function OrganizacaoDetailPage() {
         onConfirm={handleExcluirOrg}
       />
       <ConfirmDeleteModal
+        open={orgExcluirBlocked}
+        onClose={() => setOrgExcluirBlocked(false)}
+        variant="blocked"
+        name={org?.name ?? ''}
+        blockedTitle="Não é possível excluir esta organização"
+        blockedDescription="Uma organização só pode ser excluída permanentemente quando todas as contas vinculadas já tiverem sido excluídas (quarentena concluída) e todos os contratos estiverem inativos. Essa ação é irreversível, por isso as dependências precisam estar totalmente resolvidas antes."
+        actionLabel="excluir"
+        blocked={{
+          accounts: orgAccountsBlockingExclusao().map(a => a.name),
+          contracts: orgContractsBlockingExclusao().map(c => c.contratante),
+        }}
+      />
+      <ConfirmDeleteModal
         open={orgInativarBlocked}
         onClose={() => setOrgInativarBlocked(false)}
         variant="blocked"
