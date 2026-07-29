@@ -11,12 +11,14 @@ import { ComponenteSelector } from './ComponenteSelector'
 import { ComponenteSelecaoSheet } from './ComponenteSelecaoSheet'
 import { useToast, ToastContainer } from './ui/Toast'
 import { useComponentes } from '@/context/ComponentesContext'
-import type { Solution, Plan, TipoLicenca } from '@/types'
+import type { Solution, Plan, TipoLicenca, Account } from '@/types'
 
 interface Props {
   open: boolean
   onClose: () => void
   orgId: string
+  accounts: Account[]
+  solutions: Solution[]
   onSave: (solution: Omit<Solution, 'id'>) => void
   tiposLicenca: TipoLicenca[]
 }
