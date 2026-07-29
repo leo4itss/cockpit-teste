@@ -1260,7 +1260,7 @@ export function OrganizacaoDetailPage() {
           }}
           onInativar={() => {
             setEditingAccount(null)
-            if (accountActiveContractsCount(editingAccount) > 0) {
+            if (accountActiveSolutions(editingAccount).length > 0) {
               setAccountInativarBlockedTarget(editingAccount)
             } else {
               setAccountInativarTarget(editingAccount)
