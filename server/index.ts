@@ -224,6 +224,13 @@ app.get('/api/solutions/:id', async (c) => {
 app.post('/api/solutions', async (c) => {
   const body = await c.req.json()
 
+  // ── Máximo de um componente por solução ───────────────────
+  if ((body.componenteIds ?? []).length > 1) {
+    return c.json({
+      error: 'Uma solução pode ter no máximo um componente vinculado.',
+    }, 422)
+  }
+
   // ── Exclusividade de componente por conta ─────────────────
   const conflicts = await findComponenteConflicts(body.orgId, body.accountId, body.componenteIds ?? [])
   if (conflicts.length > 0) {
