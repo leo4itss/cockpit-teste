@@ -201,11 +201,24 @@ app.put('/api/accounts/:id', async (c) => {
 })
 
 app.delete('/api/accounts/:id', async (c) => {
+  const id = c.req.param('id')
+
+  // ── Hierarquia: conta só entra em quarentena se não tiver soluções ativas vinculadas ──
+  const { ne, and } = await import('drizzle-orm')
+  const activeSolutions = await db.select().from(solutions).where(
+    and(eq(solutions.accountId, id), ne(solutions.status, 'Inativo'))
+  )
+  if (activeSolutions.length > 0) {
+    return c.json({
+      error: `Não é possível excluir a conta: existem ${activeSolutions.length} solução(ões) ativa(s) vinculada(s). Inative as soluções primeiro.`,
+    }, 422)
+  }
+
   // Soft delete: marca deletedAt, não remove fisicamente
   const [row] = await db
     .update(accounts)
     .set({ deletedAt: new Date().toISOString() })
-    .where(eq(accounts.id, c.req.param('id')))
+    .where(eq(accounts.id, id))
     .returning()
   if (!row) return c.json({ error: 'Not found' }, 404)
   return c.json({ ok: true })
