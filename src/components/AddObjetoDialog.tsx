@@ -21,11 +21,10 @@ interface Props {
   open: boolean
   onClose: () => void
   solutions: Solution[]
-  orgName: string
   onSave: (objetos: ObjetoContrato[]) => void
 }
 
-function buildRows(solutions: Solution[], orgName: string): Row[] {
+function buildRows(solutions: Solution[]): Row[] {
   const rows: Row[] = []
   solutions.forEach(sol => {
     // Apenas planos ativos (versão vigente) estão disponíveis para novos contratos
@@ -36,7 +35,6 @@ function buildRows(solutions: Solution[], orgName: string): Row[] {
       rows.push({
         id: sol.id,
         solucao: sol.name,
-        orgContratada: orgName,
         plano: '—',
         planoVersao: 1,
         licenciamento: '—',
