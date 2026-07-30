@@ -109,7 +109,6 @@ export function EditLicencaDialog({ open, onClose, objeto, onSave }: Props) {
 
     const updatedObjeto: ObjetoContrato = {
       solucao: objeto.solucao ?? '',
-      orgContratada: objeto.orgContratada ?? '',
       plano: objeto.plano ?? '',
       licenciamento: buildLicenciamentoLabel(valores),
       planoVersao: objeto.planoVersao,
