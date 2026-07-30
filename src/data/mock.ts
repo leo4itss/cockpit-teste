@@ -606,7 +606,6 @@ export const contracts: Contract[] = [
     objetos: [
       {
         solucao: 'Assistente de Design',
-        orgContratada: 'Apple',
         plano: 'Pro',
         licenciamento: 'Usuário nominal: 5–50 usuários',
         qtdContratada: 50,
