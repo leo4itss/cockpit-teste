@@ -143,7 +143,6 @@ export interface ContractHistoricoEntry {
 // combinação de solução + plano + licenciamento + organização contratada.
 export interface ObjetoContrato {
   solucao: string
-  orgContratada: string
   plano: string
   licenciamento: string
   qtdContratada?: number  // deprecated — preservado apenas para dados históricos
