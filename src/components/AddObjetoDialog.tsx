@@ -158,7 +158,7 @@ export function AddObjetoDialog({ open, onClose, solutions, onSave }: Props) {
                     onChange={toggleAll}
                   />
                 </th>
-                {['Solução', 'Organização contratada', 'Plano', 'Licença', 'Status'].map(col => (
+                {['Solução', 'Plano', 'Licença', 'Status'].map(col => (
                   <th
                     key={col}
                     className="px-2 py-2.5 text-left text-sm font-medium text-[#030712] opacity-40 whitespace-nowrap"
