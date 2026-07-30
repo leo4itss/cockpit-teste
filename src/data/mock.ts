@@ -624,7 +624,6 @@ export const contracts: Contract[] = [
     objetos: [
       {
         solucao: 'Atlas',
-        orgContratada: 'Docnix',
         plano: 'Atlas Enterprise',
         licenciamento: '50 Usuários nominais',
         qtdContratada: 50,
