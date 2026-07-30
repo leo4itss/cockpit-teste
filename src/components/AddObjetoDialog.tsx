@@ -109,7 +109,6 @@ export function AddObjetoDialog({ open, onClose, solutions, onSave }: Props) {
       .filter(r => selected.has(r.id))
       .map(r => ({
         solucao: r.solucao,
-        orgContratada: r.orgContratada,
         plano: r.plano,
         licenciamento: r.licenciamento,
         planoVersao: r.planoVersao,
