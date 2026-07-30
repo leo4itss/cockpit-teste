@@ -231,7 +231,6 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         solutions={solutions}
-        orgName={orgName}
         onSave={handleObjetosSave}
       />
 
