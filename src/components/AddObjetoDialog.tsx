@@ -195,7 +195,6 @@ export function AddObjetoDialog({ open, onClose, solutions, onSave }: Props) {
                         <span className="text-sm text-[#030712] truncate max-w-[140px]">{row.solucao}</span>
                       </div>
                     </td>
-                    <td className="px-2 py-3 text-sm text-[#030712] whitespace-nowrap">{row.orgContratada}</td>
                     <td className="px-2 py-3 text-sm text-[#030712] whitespace-nowrap">
                       <span className="flex items-center gap-1.5">
                         {row.plano}
