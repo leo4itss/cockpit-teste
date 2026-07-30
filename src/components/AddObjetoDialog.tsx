@@ -10,7 +10,6 @@ export type { ObjetoContrato as ObjetoSelecionado }
 interface Row {
   id: string
   solucao: string
-  orgContratada: string
   plano: string
   planoVersao: number
   licenciamento: string
