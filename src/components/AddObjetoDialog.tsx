@@ -87,8 +87,8 @@ function buildRows(solutions: Solution[]): Row[] {
   return rows
 }
 
-export function AddObjetoDialog({ open, onClose, solutions, orgName, onSave }: Props) {
-  const rows = buildRows(solutions, orgName)
+export function AddObjetoDialog({ open, onClose, solutions, onSave }: Props) {
+  const rows = buildRows(solutions)
   const [selected, setSelected] = useState<Set<string>>(new Set())
 
   function toggleAll() {
