@@ -286,7 +286,6 @@ export function EditContractSheet({ open, onClose, contract, solutions, onSave, 
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         solutions={solutions}
-        orgName={contract.contratante}
         onSave={handleObjetosSave}
       />
 
