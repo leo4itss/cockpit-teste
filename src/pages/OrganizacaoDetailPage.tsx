@@ -1036,10 +1036,6 @@ export function OrganizacaoDetailPage() {
                               <span className="text-sm font-medium text-[#030712] truncate">{c.contratante}</span>
                             </div>
                           </td>
-                          {/* Organização contratada */}
-                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712] truncate max-w-0">
-                            <span className="block truncate">{c.objetos[0]?.orgContratada ?? '—'}</span>
-                          </td>
                           {/* Soluções */}
                           <td className="px-2 py-2 h-[52px] text-sm text-[#030712] w-[169px]">
                             <div className="flex items-center gap-1.5 min-w-0">
