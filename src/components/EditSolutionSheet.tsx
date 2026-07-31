@@ -183,8 +183,6 @@ export function EditSolutionSheet({
   tiposLicenca,
   componentes,
   contracts,
-  accounts,
-  solutions,
 }: Props) {
   const { arquitetoOptions } = useUsers()
   const { toasts, toast, dismiss } = useToast()
