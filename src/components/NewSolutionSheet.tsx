@@ -149,7 +149,7 @@ export function NewSolutionSheet({
       titleLink02:       form.titleLink02,
       marketplaceStatus: form.marketplaceStatus,
     })
-    setForm({ name: '', description: '', accountId: '', arquitetoPAS: '', marketplace: false, link01: '', titleLink01: '', link02: '', titleLink02: '', marketplaceStatus: '' })
+    setForm({ name: '', description: '', arquitetoPAS: '', marketplace: false, link01: '', titleLink01: '', link02: '', titleLink02: '', marketplaceStatus: '' })
     setPlans([])
     setSelectedComponenteIds([])
     onClose()
