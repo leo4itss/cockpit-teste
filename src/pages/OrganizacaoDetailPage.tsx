@@ -1254,7 +1254,7 @@ export function OrganizacaoDetailPage() {
         onSave={handleAddSolution}
         tiposLicenca={tiposLicenca}
       />
-      <NewContractSheet open={sheetContract} onClose={() => setSheetContract(false)} orgId={org.id} orgName={org.name} accounts={accounts} solutions={solutions} onSave={handleAddContract} />
+      <NewContractSheet open={sheetContract} onClose={() => setSheetContract(false)} orgId={org.id} orgName={org.name} accounts={accounts} solutions={solutions} contracts={contracts} onSave={handleAddContract} />
       <EditOrganizationSheet
         open={sheetEditOrg}
         onClose={() => setSheetEditOrg(false)}
