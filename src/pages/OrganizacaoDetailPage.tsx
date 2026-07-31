@@ -374,10 +374,11 @@ export function OrganizacaoDetailPage() {
     return accounts.filter(a => !a.deletedAt && a.status !== 'Inativo')
   }
 
-  // Soluções ativas vinculadas a esta conta que bloqueiam sua inativação
-  // (hierarquia: Organização → Conta → Solução → Contrato — cada nível bloqueia no de baixo)
-  function accountActiveSolutions(account: Account) {
-    return solutions.filter(s => s.accountId === account.id && s.status !== 'Inativo')
+  // Contratos ativos vinculados a esta conta (via contratante) que bloqueiam sua
+  // inativação — o vínculo conta↔solução existe apenas através do contrato.
+  // (hierarquia: Organização → Conta → Contrato — cada nível bloqueia no de baixo)
+  function accountActiveContracts(account: Account) {
+    return contracts.filter(c => c.contratante === account.name && c.status !== 'Inativo')
   }
 
   // Contratos ativos vinculados a esta solução que bloqueiam sua inativação
