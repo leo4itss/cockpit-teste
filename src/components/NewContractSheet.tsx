@@ -15,6 +15,7 @@ interface Props {
   orgName: string
   accounts: Account[]
   solutions: Solution[]
+  contracts: Contract[]
   onSave: (contract: Omit<Contract, 'id'>) => void
 }
 
