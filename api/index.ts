@@ -424,7 +424,18 @@ app.get('/contracts/:id', async (c) => {
   return row ? c.json(row) : c.json({ error: 'Not found' }, 404)
 })
 app.post('/contracts', async (c) => {
-  const [row] = await db.insert(contracts).values(await c.req.json()).returning()
+  const body = await c.req.json()
+
+  // ── Exclusividade de componente por conta ─────────────────
+  const conflicts = await findComponenteConflictsForContract(body.orgId, body.contratante, body.objetos ?? [])
+  if (conflicts.length > 0) {
+    const solNames = [...new Set(conflicts.map(cf => cf.solutionName))]
+    return c.json({
+      error: `Os componentes das soluções selecionadas já estão em uso por outro contrato ativo desta conta (${solNames.join(', ')}).`,
+    }, 422)
+  }
+
+  const [row] = await db.insert(contracts).values(body).returning()
   return c.json(row, 201)
 })
 app.put('/contracts/:id', async (c) => {
@@ -434,6 +445,19 @@ app.put('/contracts/:id', async (c) => {
   // Busca o contrato atual para snapshot antes de sobrescrever
   const [existing] = await db.select().from(contracts).where(eq(contracts.id, id))
   if (!existing) return c.json({ error: 'Not found' }, 404)
+
+  // ── Exclusividade de componente por conta ─────────────────
+  const effectiveContratante = ('contratante' in body) ? body.contratante : existing.contratante
+  const effectiveObjetos = ('objetos' in body) ? body.objetos : existing.objetos
+  const conflicts = await findComponenteConflictsForContract(
+    body.orgId ?? existing.orgId, effectiveContratante, effectiveObjetos ?? [], id
+  )
+  if (conflicts.length > 0) {
+    const solNames = [...new Set(conflicts.map(cf => cf.solutionName))]
+    return c.json({
+      error: `Os componentes das soluções selecionadas já estão em uso por outro contrato ativo desta conta (${solNames.join(', ')}).`,
+    }, 422)
+  }
 
   const [row] = await db.update(contracts).set(body).where(eq(contracts.id, id)).returning()
   return row ? c.json(row) : c.json({ error: 'Not found' }, 404)
