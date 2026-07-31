@@ -1205,9 +1205,9 @@ export function OrganizacaoDetailPage() {
         variant="blocked"
         name={accountExcluirBlockedTarget?.name ?? ''}
         blockedTitle="Não é possível excluir esta conta"
-        blockedDescription="Uma conta só pode ser excluída (colocada em quarentena) quando não houver mais nenhuma solução ativa vinculada a ela. Inative ou desvincule cada solução abaixo primeiro e tente novamente."
+        blockedDescription="Uma conta só pode ser excluída (colocada em quarentena) quando não houver mais nenhum contrato ativo vinculado a ela. Inative cada contrato abaixo primeiro e tente novamente."
         actionLabel="excluir"
-        blocked={{ solutions: accountExcluirBlockedTarget ? accountActiveSolutions(accountExcluirBlockedTarget).map(s => s.name) : [] }}
+        blocked={{ contracts: accountExcluirBlockedTarget ? accountActiveContracts(accountExcluirBlockedTarget).map(c => c.contratante) : [] }}
       />
 
       <ConfirmDeleteModal
