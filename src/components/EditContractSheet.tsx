@@ -15,6 +15,7 @@ interface Props {
   onClose: () => void
   contract: Contract
   solutions: Solution[]
+  contracts: Contract[]
   onSave: (contract: Contract) => void
   onDelete?: () => void
   onInativar?: () => void
