@@ -287,6 +287,8 @@ export function EditContractSheet({ open, onClose, contract, solutions, contract
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         solutions={solutions}
+        contratante={contract.contratante}
+        contracts={contracts.filter(c => c.id !== contract.id)}
         onSave={handleObjetosSave}
       />
 
