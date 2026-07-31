@@ -373,6 +373,45 @@ app.delete('/solutions/:id', async (c) => {
 })
 
 // ── Contracts ─────────────────────────────────────────────────
+
+// Retorna os conflitos entre os componentes usados pelas soluções deste contrato
+// e os já usados por OUTROS contratos ATIVOS da MESMA conta (contratante) na
+// mesma organização. O vínculo conta↔solução existe apenas através do contrato
+// (Contract.objetos referencia a solução pelo nome) — por isso a resolução
+// solução → componentes é feita aqui, e não mais em Solution.accountId.
+async function findComponenteConflictsForContract(
+  orgId: string,
+  contratante: string,
+  objetos: Array<{ solucao: string }>,
+  excludeContractId?: string,
+) {
+  if (!contratante || objetos.length === 0) return []
+  const orgSolutions = await db.select().from(solutions).where(eq(solutions.orgId, orgId))
+  const componenteIdsPorSolucao = new Map<string, string[]>()
+  for (const sol of orgSolutions) {
+    componenteIdsPorSolucao.set(sol.name, Array.isArray(sol.componenteIds) ? sol.componenteIds as string[] : [])
+  }
+  const incomingComponenteIds = new Set(objetos.flatMap(o => componenteIdsPorSolucao.get(o.solucao) ?? []))
+  if (incomingComponenteIds.size === 0) return []
+
+  const orgContracts = await db.select().from(contracts).where(
+    and(eq(contracts.orgId, orgId), eq(contracts.contratante, contratante), ne(contracts.status, 'Inativo'))
+  )
+  const conflicts: { componenteId: string; solutionName: string; contractId: string }[] = []
+  for (const ct of orgContracts) {
+    if (ct.id === excludeContractId) continue
+    const ctObjetos: Array<{ solucao: string }> = Array.isArray(ct.objetos) ? ct.objetos as any[] : []
+    for (const obj of ctObjetos) {
+      for (const cid of componenteIdsPorSolucao.get(obj.solucao) ?? []) {
+        if (incomingComponenteIds.has(cid)) {
+          conflicts.push({ componenteId: cid, solutionName: obj.solucao, contractId: ct.id })
+        }
+      }
+    }
+  }
+  return conflicts
+}
+
 app.get('/contracts', async (c) => {
   const orgId = c.req.query('orgId')
   const rows = orgId
