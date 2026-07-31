@@ -201,18 +201,23 @@ export function AddObjetoDialog({ open, onClose, solutions, contratante, contrac
             <tbody>
               {rows.map(row => {
                 const checked = selected.has(row.id)
+                const blocked = isBlocked(row)
                 return (
                   <tr
                     key={row.id}
-                    className="border-b border-[#e5e7eb] last:border-0 hover:bg-gray-50 cursor-pointer"
-                    onClick={() => toggle(row.id)}
+                    title={blocked ? 'Um dos componentes desta solução já está em uso por outro contrato ativo desta conta.' : undefined}
+                    className={`border-b border-[#e5e7eb] last:border-0 transition-colors ${
+                      blocked ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50 cursor-pointer'
+                    }`}
+                    onClick={() => toggle(row)}
                   >
                     <td className="px-3 py-3">
                       <input
                         type="checkbox"
-                        className="rounded border-[#e5e7eb] text-blue-600 shadow-sm cursor-pointer"
+                        className="rounded border-[#e5e7eb] text-blue-600 shadow-sm cursor-pointer disabled:cursor-not-allowed"
                         checked={checked}
-                        onChange={() => toggle(row.id)}
+                        disabled={blocked}
+                        onChange={() => toggle(row)}
                         onClick={e => e.stopPropagation()}
                       />
                     </td>
@@ -223,6 +228,11 @@ export function AddObjetoDialog({ open, onClose, solutions, contratante, contrac
                           {row.solucao.charAt(0)}
                         </div>
                         <span className="text-sm text-[#030712] truncate max-w-[140px]">{row.solucao}</span>
+                        {blocked && (
+                          <span className="text-[11px] font-medium text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                            Em uso nesta conta
+                          </span>
+                        )}
                       </div>
                     </td>
                     <td className="px-2 py-3 text-sm text-[#030712] whitespace-nowrap">
