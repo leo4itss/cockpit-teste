@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Dialog } from './ui/Dialog'
 import { Button } from './ui/Button'
 import { Badge } from './ui/Badge'
-import type { Solution, ObjetoContrato, ValorLicencaContrato } from '@/types'
+import type { Solution, Contract, ObjetoContrato, ValorLicencaContrato } from '@/types'
 
 // Alias mantido para compatibilidade com importadores existentes
 export type { ObjetoContrato as ObjetoSelecionado }
@@ -10,6 +10,7 @@ export type { ObjetoContrato as ObjetoSelecionado }
 interface Row {
   id: string
   solucao: string
+  componenteIds: string[]
   plano: string
   planoVersao: number
   licenciamento: string
@@ -21,7 +22,27 @@ interface Props {
   open: boolean
   onClose: () => void
   solutions: Solution[]
+  /** Conta contratante deste contrato — usada para checar exclusividade de componente por conta */
+  contratante: string
+  /** Outros contratos existentes (o próprio contrato, se em edição, deve vir excluído pelo chamador) */
+  contracts: Contract[]
   onSave: (objetos: ObjetoContrato[]) => void
+}
+
+/** Componentes já em uso por outros contratos ATIVOS da mesma conta (contratante). */
+function occupiedComponenteIds(solutions: Solution[], contratante: string, contracts: Contract[]): Set<string> {
+  const componenteIdsPorSolucao = new Map<string, string[]>()
+  solutions.forEach(s => componenteIdsPorSolucao.set(s.name, s.componenteIds ?? []))
+
+  const occupied = new Set<string>()
+  contracts
+    .filter(ct => ct.contratante === contratante && ct.status !== 'Inativo')
+    .forEach(ct => {
+      ct.objetos.forEach(obj => {
+        (componenteIdsPorSolucao.get(obj.solucao) ?? []).forEach(cid => occupied.add(cid))
+      })
+    })
+  return occupied
 }
 
 function buildRows(solutions: Solution[]): Row[] {
