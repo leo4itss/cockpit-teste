@@ -110,19 +110,26 @@ function buildRows(solutions: Solution[]): Row[] {
   return rows
 }
 
-export function AddObjetoDialog({ open, onClose, solutions, onSave }: Props) {
+export function AddObjetoDialog({ open, onClose, solutions, contratante, contracts, onSave }: Props) {
   const rows = buildRows(solutions)
   const [selected, setSelected] = useState<Set<string>>(new Set())
 
+  const occupied = occupiedComponenteIds(solutions, contratante, contracts)
+  function isBlocked(row: Row) {
+    return row.componenteIds.some(cid => occupied.has(cid))
+  }
+  const selectableRows = rows.filter(r => !isBlocked(r))
+
   function toggleAll() {
-    if (selected.size === rows.length) setSelected(new Set())
-    else setSelected(new Set(rows.map(r => r.id)))
+    if (selected.size === selectableRows.length) setSelected(new Set())
+    else setSelected(new Set(selectableRows.map(r => r.id)))
   }
 
-  function toggle(id: string) {
+  function toggle(row: Row) {
+    if (isBlocked(row)) return
     setSelected(prev => {
       const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
+      next.has(row.id) ? next.delete(row.id) : next.add(row.id)
       return next
     })
   }
