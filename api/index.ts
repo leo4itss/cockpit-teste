@@ -158,18 +158,19 @@ app.put('/accounts/:id', async (c) => {
   const id = c.req.param('id')
   const body = await c.req.json()
 
-  // ── Hierarquia de inativação: conta só inativa se todas as soluções vinculadas já estiverem inativas ──
-  // (Organização → Conta → Solução → Contrato — cada nível bloqueia no de baixo.)
-  // Soluções/contratos NÃO são tocados por esta inativação — precisam ser inativados manualmente antes.
+  // ── Hierarquia de inativação: conta só inativa se todos os contratos vinculados já estiverem inativos ──
+  // (Organização → Conta → Contrato — cada nível bloqueia no de baixo. O vínculo conta↔solução
+  // existe apenas através do contrato, então a trava aqui é por contrato, não por solução.)
+  // Contratos NÃO são tocados por esta inativação — precisam ser inativados manualmente antes.
   if (body.status === 'Inativo') {
     const [existing] = await db.select().from(accounts).where(eq(accounts.id, id))
     if (existing && existing.status !== 'Inativo') {
-      const activeSolutions = await db.select().from(solutions).where(
-        and(eq(solutions.accountId, id), ne(solutions.status, 'Inativo'))
+      const activeContracts = await db.select().from(contracts).where(
+        and(eq(contracts.contratante, existing.name), ne(contracts.status, 'Inativo'))
       )
-      if (activeSolutions.length > 0) {
+      if (activeContracts.length > 0) {
         return c.json({
-          error: `Não é possível inativar a conta: existem ${activeSolutions.length} solução(ões) ativa(s) vinculada(s). Inative as soluções primeiro.`,
+          error: `Não é possível inativar a conta: existem ${activeContracts.length} contrato(s) ativo(s) vinculado(s). Inative os contratos primeiro.`,
         }, 422)
       }
     }
@@ -181,13 +182,15 @@ app.put('/accounts/:id', async (c) => {
 app.delete('/accounts/:id', async (c) => {
   const id = c.req.param('id')
 
-  // ── Hierarquia: conta só entra em quarentena se não tiver soluções ativas vinculadas ──
-  const activeSolutions = await db.select().from(solutions).where(
-    and(eq(solutions.accountId, id), ne(solutions.status, 'Inativo'))
+  // ── Hierarquia: conta só entra em quarentena se não tiver contratos ativos vinculados ──
+  const [existing] = await db.select().from(accounts).where(eq(accounts.id, id))
+  if (!existing) return c.json({ error: 'Not found' }, 404)
+  const activeContracts = await db.select().from(contracts).where(
+    and(eq(contracts.contratante, existing.name), ne(contracts.status, 'Inativo'))
   )
-  if (activeSolutions.length > 0) {
+  if (activeContracts.length > 0) {
     return c.json({
-      error: `Não é possível excluir a conta: existem ${activeSolutions.length} solução(ões) ativa(s) vinculada(s). Inative as soluções primeiro.`,
+      error: `Não é possível excluir a conta: existem ${activeContracts.length} contrato(s) ativo(s) vinculado(s). Inative os contratos primeiro.`,
     }, 422)
   }
 
