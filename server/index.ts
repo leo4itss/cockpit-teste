@@ -203,14 +203,15 @@ app.put('/api/accounts/:id', async (c) => {
 app.delete('/api/accounts/:id', async (c) => {
   const id = c.req.param('id')
 
-  // ── Hierarquia: conta só entra em quarentena se não tiver soluções ativas vinculadas ──
-  const { ne, and } = await import('drizzle-orm')
-  const activeSolutions = await db.select().from(solutions).where(
-    and(eq(solutions.accountId, id), ne(solutions.status, 'Inativo'))
+  // ── Hierarquia: conta só entra em quarentena se não tiver contratos ativos vinculados ──
+  const [existing] = await db.select().from(accounts).where(eq(accounts.id, id))
+  if (!existing) return c.json({ error: 'Not found' }, 404)
+  const activeContracts = await db.select().from(contracts).where(
+    and(eq(contracts.contratante, existing.name), ne(contracts.status, 'Inativo'))
   )
-  if (activeSolutions.length > 0) {
+  if (activeContracts.length > 0) {
     return c.json({
-      error: `Não é possível excluir a conta: existem ${activeSolutions.length} solução(ões) ativa(s) vinculada(s). Inative as soluções primeiro.`,
+      error: `Não é possível excluir a conta: existem ${activeContracts.length} contrato(s) ativo(s) vinculado(s). Inative os contratos primeiro.`,
     }, 422)
   }
 
