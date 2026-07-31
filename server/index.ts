@@ -237,31 +237,6 @@ app.patch('/api/accounts/:id/restaurar', async (c) => {
 
 // ── Solutions ─────────────────────────────────────────────────
 
-// Retorna os conflitos entre os componenteIds pedidos e os já usados por
-// OUTRAS soluções ativas da MESMA conta (mesma orgId). Soluções sem
-// accountId (legado) nunca entram nem geram conflito — regra é isenta
-// até a solução ser explicitamente vinculada a uma conta.
-async function findComponenteConflicts(
-  orgId: string,
-  accountId: string | null | undefined,
-  componenteIds: string[],
-  excludeSolutionId?: string,
-) {
-  if (!accountId) return []
-  const siblings = await db.select().from(solutions).where(eq(solutions.orgId, orgId))
-  const conflicts: { componenteId: string; solutionName: string }[] = []
-  for (const sib of siblings) {
-    if (sib.id === excludeSolutionId) continue
-    if (sib.accountId !== accountId) continue
-    if (sib.status === 'Inativo') continue
-    const sibIds: string[] = Array.isArray(sib.componenteIds) ? (sib.componenteIds as string[]) : []
-    for (const cid of componenteIds) {
-      if (sibIds.includes(cid)) conflicts.push({ componenteId: cid, solutionName: sib.name })
-    }
-  }
-  return conflicts
-}
-
 app.get('/api/solutions', async (c) => {
   const orgId = c.req.query('orgId')
   const rows = orgId
