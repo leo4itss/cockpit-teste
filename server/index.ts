@@ -28,7 +28,7 @@ import {
   instanciaPerfilSlotNomeacoes,
   faseAtribuicoesPermitidas,
 } from './schema'
-import { eq, and, or, inArray, isNull } from 'drizzle-orm'
+import { eq, and, or, inArray, isNull, ne } from 'drizzle-orm'
 import { getElegiveisParaSlot } from './docnix-elegiveis'
 
 const app = new Hono()
