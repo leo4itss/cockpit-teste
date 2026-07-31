@@ -75,8 +75,6 @@ export function NewSolutionSheet({
   open,
   onClose,
   orgId,
-  accounts,
-  solutions,
   onSave,
   tiposLicenca,
 }: Props) {
@@ -87,7 +85,6 @@ export function NewSolutionSheet({
   const [form, setForm] = useState({
     name: '',
     description: '',
-    accountId: '',
     arquitetoPAS: '',
     marketplace: false,
     link01: '',
@@ -105,40 +102,8 @@ export function NewSolutionSheet({
     setForm(f => ({ ...f, [field]: value }))
   }
 
-  const activeAccounts = accounts.filter(a => !a.deletedAt)
-
-  // Componentes já em uso por outra solução ATIVA da mesma conta selecionada —
-  // ficam indisponíveis para esta solução (exclusividade componente↔conta).
-  const occupiedComponenteIds = new Set(
-    form.accountId
-      ? solutions
-          .filter(s => s.accountId === form.accountId && s.status !== 'Inativo')
-          .flatMap(s => s.componenteIds ?? [])
-      : []
-  )
-  const availableComponentes = componentes.filter(
-    c => !occupiedComponenteIds.has(c.id) || selectedComponenteIds.includes(c.id)
-  )
-  // Baseado no catálogo total (não no filtrado) para não alternar entre
-  // seletor inline/sheet conforme a conta selecionada muda a disponibilidade.
+  const availableComponentes = componentes
   const useInline = componentes.length <= THRESHOLD_INLINE
-
-  // Ao trocar de conta, remove da seleção os componentes que ficaram
-  // ocupados pela nova conta (avisando o usuário) e atualiza o campo.
-  function handleAccountChange(newAccountId: string) {
-    const newOccupied = new Set(
-      solutions
-        .filter(s => s.accountId === newAccountId && s.status !== 'Inativo')
-        .flatMap(s => s.componenteIds ?? [])
-    )
-    const removed = selectedComponenteIds.filter(id => newOccupied.has(id))
-    if (removed.length > 0) {
-      const names = componentes.filter(c => removed.includes(c.id)).map(c => c.nome).join(', ')
-      setSelectedComponenteIds(prev => prev.filter(id => !newOccupied.has(id)))
-      toast(`Componentes removidos por já estarem em uso nesta conta: ${names}.`, 'warning')
-    }
-    set('accountId', newAccountId)
-  }
 
   // Tipos disponíveis para planos = union dos componentes selecionados (ou todos se nenhum)
   const tiposDisponiveis: TipoLicenca[] = selectedComponenteIds.length === 0
