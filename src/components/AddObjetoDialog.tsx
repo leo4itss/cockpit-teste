@@ -92,6 +92,7 @@ function buildRows(solutions: Solution[]): Row[] {
       rows.push({
         id: `${sol.id}-${plan.name}`,
         solucao: sol.name,
+        componenteIds: sol.componenteIds ?? [],
         plano: plan.name,
         planoVersao: plan.versao ?? 1,
         licenciamento,
