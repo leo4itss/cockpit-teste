@@ -154,8 +154,8 @@ export function AddObjetoDialog({ open, onClose, solutions, contratante, contrac
     onClose()
   }
 
-  const allChecked = rows.length > 0 && selected.size === rows.length
-  const someChecked = selected.size > 0 && selected.size < rows.length
+  const allChecked = selectableRows.length > 0 && selected.size === selectableRows.length
+  const someChecked = selected.size > 0 && selected.size < selectableRows.length
 
   return (
     <Dialog
