@@ -542,15 +542,6 @@ export function EditSolutionSheet({
               disabled={isInactive}
             />
 
-            <Select
-              label="Conta"
-              placeholder="Nenhuma conta vinculada (legado)"
-              options={accountOptions.map(a => ({ value: a.id, label: a.name }))}
-              value={form.accountId}
-              onChange={e => handleAccountChange(e.target.value)}
-              disabled={isInactive}
-            />
-
             {/* Info box */}
             <div className="flex items-center gap-3 bg-blue-50 border border-blue-300 rounded-lg p-3">
               <CircleAlert className="w-5 h-5 text-blue-700 shrink-0" />
