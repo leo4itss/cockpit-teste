@@ -1296,7 +1296,7 @@ export function OrganizacaoDetailPage() {
           canDelete={accountCanDelete(editingAccount)}
           onDelete={() => {
             setEditingAccount(null)
-            if (accountActiveSolutions(editingAccount).length > 0) {
+            if (accountActiveContracts(editingAccount).length > 0) {
               setAccountExcluirBlockedTarget(editingAccount)
             } else {
               setAccountExcluirTarget(editingAccount)
@@ -1305,7 +1305,7 @@ export function OrganizacaoDetailPage() {
           }}
           onInativar={() => {
             setEditingAccount(null)
-            if (accountActiveSolutions(editingAccount).length > 0) {
+            if (accountActiveContracts(editingAccount).length > 0) {
               setAccountInativarBlockedTarget(editingAccount)
             } else {
               setAccountInativarTarget(editingAccount)
