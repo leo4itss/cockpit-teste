@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, CircleAlert, AlertTriangle } from 'lucide-react'
+import { Plus, CircleAlert, AlertTriangle, ExternalLink } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Select } from './ui/Select'
 import { Input } from './ui/Input'
