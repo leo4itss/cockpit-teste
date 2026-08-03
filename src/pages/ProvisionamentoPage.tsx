@@ -105,14 +105,14 @@ export function ProvisionamentoPage() {
 
   return (
     // h-[calc(100vh-4rem)] + overflow-y-auto: cria um contêiner de scroll próprio,
-    // com altura limitada, para o `position: sticky` do header funcionar. O <main>
-    // do DetailLayout tem `overflow-auto` mas nunca fica com altura travada (o
-    // wrapper dele usa min-h-screen), então quem rola de fato é o `window` — e um
-    // ancestral com overflow != visible que não é o scroller real quebra o sticky.
+    // com altura limitada. O <main> do DetailLayout tem `overflow-auto` mas nunca
+    // fica com altura travada (o wrapper dele usa min-h-screen), então quem rola
+    // de fato é o `window` — isso também mantém o header do DetailLayout (voltar/
+    // apps/avatar) sempre visível, já que só este contêiner interno rola.
     <div className="h-[calc(100vh-4rem)] overflow-y-auto bg-gray-50 flex flex-col">
-      {/* Header — fica travado no topo ao rolar o conteúdo abaixo */}
-      <div className="sticky top-0 z-20 bg-gray-50 border-b border-gray-200">
-        <div className="max-w-6xl w-full mx-auto px-8 pt-8 pb-6 flex items-start justify-between gap-4">
+      <div className="max-w-6xl w-full mx-auto px-8 py-8 flex flex-col gap-6 flex-1">
+        {/* Header — rola junto com o conteúdo */}
+        <div className="flex items-start justify-between gap-4">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2 text-sm text-[#6b7280]">
               <Building2 className="w-4 h-4" />
@@ -136,9 +136,7 @@ export function ProvisionamentoPage() {
             </div>
           )}
         </div>
-      </div>
 
-      <div className="max-w-6xl w-full mx-auto px-8 py-8 flex flex-col gap-6 flex-1">
         {/* AVISO: os gates de ação abaixo são apenas de UI. Quando o worker real
             expuser endpoints, a MESMA verificação precisa existir no servidor —
             esconder um botão não é controle de acesso. */}
