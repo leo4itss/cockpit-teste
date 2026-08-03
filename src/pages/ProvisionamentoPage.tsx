@@ -105,9 +105,9 @@ export function ProvisionamentoPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <div className="max-w-6xl w-full mx-auto px-8 py-8 flex flex-col gap-6 flex-1">
-        {/* Header */}
-        <div className="flex items-start justify-between gap-4">
+      {/* Header — fica travado no topo ao rolar o conteúdo abaixo */}
+      <div className="sticky top-0 z-20 bg-gray-50 border-b border-gray-200">
+        <div className="max-w-6xl w-full mx-auto px-8 pt-8 pb-6 flex items-start justify-between gap-4">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2 text-sm text-[#6b7280]">
               <Building2 className="w-4 h-4" />
@@ -131,7 +131,9 @@ export function ProvisionamentoPage() {
             </div>
           )}
         </div>
+      </div>
 
+      <div className="max-w-6xl w-full mx-auto px-8 py-8 flex flex-col gap-6 flex-1">
         {/* AVISO: os gates de ação abaixo são apenas de UI. Quando o worker real
             expuser endpoints, a MESMA verificação precisa existir no servidor —
             esconder um botão não é controle de acesso. */}
