@@ -372,7 +372,7 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
   const footerStep1 = (
     <>
       <Button variant="outline" onClick={handleClose}>Cancelar</Button>
-      <Button onClick={handleReview}>Revisar</Button>
+      <Button onClick={handleReview} disabled={fase1Bloqueada}>Revisar</Button>
     </>
   )
 
