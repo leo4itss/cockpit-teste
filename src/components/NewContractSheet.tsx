@@ -75,12 +75,14 @@ const COLS = ['Solução', 'Organização contratada', 'Plano', 'Licenciamento']
 // ── Passo 1 — formulário ─────────────────────────────────────
 
 function StepForm({
-  activeAccounts, contratante, setContratante, objetos, handleOpenAddObjeto,
-  form, set,
+  activeAccounts, contratante, setContratante, selectedAccount, fase1Bloqueada,
+  objetos, handleOpenAddObjeto, form, set,
 }: {
   activeAccounts: Account[]
   contratante: string
   setContratante: (v: string) => void
+  selectedAccount: Account | undefined
+  fase1Bloqueada: boolean
   objetos: ObjetoContrato[]
   handleOpenAddObjeto: () => void
   form: { dataInicio: string; dataTermino: string; renovacao: string }
@@ -93,13 +95,28 @@ function StepForm({
       <div className="flex flex-col gap-7">
         <SectionTitle>Dados do contrato</SectionTitle>
 
-        <Select
-          label="Conta contratante (onde as soluções desse contrato vão aparecer)"
-          options={activeAccounts.map(a => ({ value: a.name, label: a.name }))}
-          placeholder="Selecione"
-          value={contratante}
-          onChange={e => setContratante(e.target.value)}
-        />
+        <div className="flex flex-col gap-3">
+          <Select
+            label="Conta contratante (onde as soluções desse contrato vão aparecer)"
+            // Só o label carrega o status — o value continua sendo a.name, que é
+            // a chave do join com Contract.contratante.
+            options={activeAccounts.map(a => ({
+              value: a.name,
+              label: a.provisioningStatus === 'COMPLETED'
+                ? a.name
+                : `${a.name} — Fase 1: ${FASE1_BADGE[a.provisioningStatus].label}`,
+            }))}
+            placeholder="Selecione"
+            value={contratante}
+            onChange={e => setContratante(e.target.value)}
+          />
+
+          {/* Exige selectedAccount: fase1Bloqueada também é true quando nada está
+              selecionado, e aí a mensagem "desta conta…" não faria sentido. */}
+          {fase1Bloqueada && selectedAccount && (
+            <Fase1BlockedWarning account={selectedAccount} />
+          )}
+        </div>
 
         {/* Card soluções / planos / licenciamentos */}
         <div className="border border-[#e5e7eb] rounded-2xl p-4 flex flex-col gap-3">
