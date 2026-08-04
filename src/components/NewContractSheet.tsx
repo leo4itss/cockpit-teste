@@ -397,6 +397,8 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
             activeAccounts={activeAccounts}
             contratante={contratante}
             setContratante={setContratante}
+            selectedAccount={selectedAccount}
+            fase1Bloqueada={fase1Bloqueada}
             objetos={objetos}
             handleOpenAddObjeto={handleOpenAddObjeto}
             form={form}
