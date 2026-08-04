@@ -230,27 +230,8 @@ function StepReview({
         </div>
       </div>
 
-      {fase1Bloqueada && (
-        <div className="flex items-start gap-3 bg-red-50 border border-red-300 rounded-lg p-3">
-          <AlertTriangle className="w-5 h-5 text-red-700 shrink-0" />
-          <div className="flex flex-col gap-1.5">
-            <p className="text-xs font-medium text-red-700 leading-4">
-              A Fase 1 do provisionamento desta conta (banco, Keycloak, DNS, ingress) ainda não
-              foi concluída. O contrato não pode ser criado — provisionar soluções exige a conta
-              totalmente provisionada primeiro.
-            </p>
-            {selectedAccount && (
-              <a
-                href={`/contas/${selectedAccount.id}/provisionamento`}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1 text-xs font-semibold text-red-700 hover:underline w-fit"
-              >
-                Ver detalhes do provisionamento <ExternalLink className="w-3 h-3" />
-              </a>
-            )}
-          </div>
-        </div>
+      {fase1Bloqueada && selectedAccount && (
+        <Fase1BlockedWarning account={selectedAccount} />
       )}
 
       <Divider />
