@@ -35,6 +35,35 @@ function Divider() {
   return <div className="border-t border-[#e5e7eb] w-full" />
 }
 
+/**
+ * Aviso de bloqueio da Fase 1. Aparece no passo 1 assim que uma conta com
+ * provisionamento incompleto é selecionada, e permanece no passo 2 como
+ * defesa (a conta pode mudar de status em background — ver comentário no
+ * footer do passo 2).
+ */
+function Fase1BlockedWarning({ account }: { account: Account }) {
+  return (
+    <div className="flex items-start gap-3 bg-red-50 border border-red-300 rounded-lg p-3">
+      <AlertTriangle className="w-5 h-5 text-red-700 shrink-0" />
+      <div className="flex flex-col gap-1.5">
+        <p className="text-xs font-medium text-red-700 leading-4">
+          A Fase 1 do provisionamento desta conta (banco, Keycloak, DNS, ingress) ainda não
+          foi concluída. O contrato não pode ser criado — provisionar soluções exige a conta
+          totalmente provisionada primeiro.
+        </p>
+        <a
+          href={`/contas/${account.id}/provisionamento`}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-1 text-xs font-semibold text-red-700 hover:underline w-fit"
+        >
+          Ver detalhes do provisionamento <ExternalLink className="w-3 h-3" />
+        </a>
+      </div>
+    </div>
+  )
+}
+
 const RENOVACAO_OPTIONS = [
   { value: 'Automática', label: 'Automática' },
   { value: 'Manual', label: 'Manual' },
