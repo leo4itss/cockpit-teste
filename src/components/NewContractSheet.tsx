@@ -328,6 +328,8 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
 
   /** Passo 1 → 2: mesma validação de sempre, mas agora só avança para a revisão. */
   function handleReview() {
+    if (fase1Bloqueada) return // gate — o botão já nasce desabilitado neste caso
+
     const missing: string[] = []
     if (!form.dataInicio) missing.push('Informe a data de início.')
     if (!form.dataTermino) missing.push('Informe a data de término.')
