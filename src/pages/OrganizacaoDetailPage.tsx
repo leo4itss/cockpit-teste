@@ -244,7 +244,7 @@ export function OrganizacaoDetailPage() {
     try {
       const saved = await api.createContract(local)
       setContracts(prev => [...prev, saved])
-      toast('Contrato criado com sucesso.', 'success')
+      toast('Contrato criado com sucesso.\nA Fase 2 do provisionamento foi disparada.', 'success')
     } catch {
       setContracts(prev => [...prev, local])
       toast('Não foi possível criar o contrato.\nRevise os dados e tente novamente.', 'error')
