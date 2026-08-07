@@ -330,7 +330,8 @@ export async function reprovisionTenant(accountId: string): Promise<ReprovisionR
       accountId,
       aceito: true,
       correlationId: `prv_mock_${Date.now()}`,
-      mensagem: 'Reprovisionamento aceito pelo worker (mock). Acompanhe o status nesta tela.',
+      // Texto exibido ao usuário — não citar "mock"/"worker" aqui.
+      mensagem: 'Reprovisionamento solicitado.\nAcompanhe o status nesta tela.',
     }, 600)
   }
   throw new Error('Backend de provisionamento ainda não implementado.')
