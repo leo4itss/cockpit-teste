@@ -506,11 +506,11 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
           </p>
           <div className="bg-red-50 border border-red-300 rounded-md p-4">
             <ul className="flex flex-col gap-1 text-sm font-medium text-red-700 list-disc list-outside pl-5">
-              <li>Banco de dados PostgreSQL do tenant</li>
-              <li>Realm e configurações no Keycloak</li>
-              <li>Registro DNS (CNAME) no Cloudflare</li>
+              <li>Banco de dados do tenant</li>
+              <li>Autenticação (login e usuários do tenant)</li>
+              <li>Registro DNS (CNAME)</li>
               <li>Ingress e certificado TLS</li>
-              <li>Variáveis de ambiente no Infisical</li>
+              <li>Variáveis de ambiente do tenant</li>
             </ul>
           </div>
 
