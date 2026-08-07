@@ -346,7 +346,7 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
     }
 
     if (objetos.length === 0) {
-      toast('Adicione ao menos um objeto ao contrato para continuar.', 'warning')
+      toast('Adicione ao menos uma solução ao contrato para continuar.', 'warning')
       return
     }
 
