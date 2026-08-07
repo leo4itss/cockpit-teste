@@ -227,9 +227,9 @@ function StepReview({
         <div className="flex items-start gap-3 bg-red-50 border border-red-300 rounded-lg p-3">
           <AlertTriangle className="w-5 h-5 text-red-700 shrink-0" />
           <p className="text-xs font-medium text-red-700 leading-4">
-            A Fase 1 do provisionamento desta conta (banco, Keycloak, DNS, ingress) ainda não
-            foi concluída. As soluções novas não podem ser adicionadas — provisionar soluções
-            exige a conta totalmente provisionada primeiro.
+            A Fase 1 do provisionamento desta conta (autenticação, banco de dados, DNS, ingress)
+            ainda não foi concluída. As soluções novas não podem ser adicionadas — provisionar
+            soluções exige a conta totalmente provisionada primeiro.
           </p>
         </div>
       )}
