@@ -45,11 +45,13 @@ export function HealthCheckPanel({
       .then(res => {
         setResult(res)
         onToast(
-          res.estadoGeral === 'ok' ? 'Health check concluído: tudo OK.' : `Health check concluído: ${ESTADO_LABEL[res.estadoGeral].toLowerCase()}.`,
+          res.estadoGeral === 'ok'
+            ? 'Verificação de saúde concluída.\nTodos os recursos estão OK.'
+            : 'Verificação de saúde concluída com pendências.\nUm ou mais recursos apresentaram problema.',
           res.estadoGeral === 'ok' ? 'success' : res.estadoGeral === 'falha' ? 'error' : 'warning',
         )
       })
-      .catch(() => onToast('Não foi possível executar o health check.', 'error'))
+      .catch(() => onToast('Não foi possível executar a verificação de saúde.\nTente novamente.', 'error'))
       .finally(() => setRunning(false))
   }
 
