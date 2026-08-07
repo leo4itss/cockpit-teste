@@ -302,7 +302,7 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
   function handleObjetosSave(novos: ObjetoContrato[]) {
     setObjetos(prev => [...prev, ...novos])
     if (novos.length > 0) {
-      toast('Objeto adicionado ao contrato.', 'success')
+      toast('Solução adicionada ao contrato.', 'success')
     }
   }
 
