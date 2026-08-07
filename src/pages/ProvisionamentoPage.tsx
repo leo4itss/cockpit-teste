@@ -274,7 +274,7 @@ function ProvisioningActionsBar({
       onToast(result.mensagem, result.aceito ? 'success' : 'error')
       onReload()
     } catch {
-      onToast('Não foi possível disparar o reprovisionamento. Tente novamente.', 'error')
+      onToast('Não foi possível solicitar o reprovisionamento.\nTente novamente.', 'error')
     } finally {
       setReprovisioning(false)
       setConfirmOpen(false)
