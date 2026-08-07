@@ -331,7 +331,7 @@ export function EditContractSheet({ open, onClose, contract, solutions, accounts
   function handleRemoveObjeto(index: number) {
     const removed = objetos[index]
     setObjetos(prev => prev.filter((_, i) => i !== index))
-    toast('Objeto removido do contrato.', 'success', {
+    toast('Solução removida do contrato.', 'success', {
       label: 'Desfazer',
       onClick: () => setObjetos(prev => {
         const copy = [...prev]
