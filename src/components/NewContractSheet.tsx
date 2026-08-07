@@ -47,9 +47,9 @@ function Fase1BlockedWarning({ account }: { account: Account }) {
       <AlertTriangle className="w-5 h-5 text-red-700 shrink-0" />
       <div className="flex flex-col gap-1.5">
         <p className="text-xs font-medium text-red-700 leading-4">
-          A Fase 1 do provisionamento desta conta (banco, Keycloak, DNS, ingress) ainda não
-          foi concluída. O contrato não pode ser criado — provisionar soluções exige a conta
-          totalmente provisionada primeiro.
+          A Fase 1 do provisionamento desta conta (autenticação, banco de dados, DNS, ingress)
+          ainda não foi concluída. O contrato não pode ser criado — provisionar soluções exige
+          a conta totalmente provisionada primeiro.
         </p>
         <a
           href={`/contas/${account.id}/provisionamento`}
