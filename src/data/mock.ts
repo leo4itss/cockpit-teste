@@ -1505,6 +1505,18 @@ export const provisioningHealth: Record<string, HealthCheckResult> = {
       { id: 'env-vars', estado: 'nao-verificado', latenciaMs: null, mensagem: 'Etapa nunca foi criada — não é possível verificar.' },
     ],
   },
+  // Nexora — conta real do Neon (ver provisioningSnapshots acima), Fase 1
+  // IN_PROGRESS com DNS em andamento. Cenário de referência para "Degradado".
+  'ec745c8b-3440-4bc3-b990-b698dce8c480': {
+    accountId: 'ec745c8b-3440-4bc3-b990-b698dce8c480', executadoEm: '2026-07-28T11:42:30.000Z', duracaoMs: 710, estadoGeral: 'degradado',
+    itens: [
+      { id: 'database', estado: 'ok', latenciaMs: 14, mensagem: 'Conexão estabelecida, query de verificação respondeu.' },
+      { id: 'keycloak', estado: 'ok', latenciaMs: 31, mensagem: 'Realm ativo, endpoint de discovery respondeu.' },
+      { id: 'dns', estado: 'degradado', latenciaMs: 860, mensagem: 'Registro CNAME em propagação — respondendo com latência alta.' },
+      { id: 'ingress', estado: 'nao-verificado', latenciaMs: null, mensagem: 'Etapa ainda não iniciada.' },
+      { id: 'env-vars', estado: 'nao-verificado', latenciaMs: null, mensagem: 'Etapa ainda não iniciada.' },
+    ],
+  },
 }
 
 export const provisioningLogs: Record<string, ProvisioningLogPage> = {
