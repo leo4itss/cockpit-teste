@@ -1321,6 +1321,11 @@ export function OrganizacaoDetailPage() {
         onClose={() => setSelectedContract(null)}
         contract={selectedContract}
         onEdit={() => selectedContract && handleEditContractFromDetail(selectedContract)}
+        provisionamentoHref={(() => {
+          // Vínculo conta↔contrato por nome — mesmo join usado no resto do app.
+          const conta = accounts.find(a => a.name === selectedContract?.contratante)
+          return conta ? `/contas/${conta.id}/provisionamento` : undefined
+        })()}
       />
       {editingContract && (
         <EditContractSheet
