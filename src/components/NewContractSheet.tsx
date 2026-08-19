@@ -259,8 +259,9 @@ function StepReview({
       <div className="flex items-center gap-3 bg-blue-50 border border-blue-300 rounded-lg p-3">
         <CircleAlert className="w-5 h-5 text-blue-700 shrink-0" />
         <p className="text-xs font-medium text-blue-700 leading-4">
-          Ao confirmar, o contrato será criado e a Fase 2 do provisionamento será disparada
-          automaticamente para esta conta, cobrindo {objetos.length} solução(ões).
+          Ao criar o contrato, as {objetos.length} solução(ões) selecionada(s) serão provisionadas
+          automaticamente no ambiente do cliente. Esse processo é executado em segundo plano e
+          pode levar alguns minutos.
         </p>
       </div>
     </div>
