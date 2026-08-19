@@ -368,7 +368,25 @@ export function EditContractSheet({ open, onClose, contract, solutions, accounts
   /** Salva de fato. Chamado direto (sem solução nova) ou após confirmar a revisão. */
   function handleSave() {
     if (temSolucaoNova && fase1Bloqueada) return // segundo gate
-    onSave({ ...contract, objetos, historico, dataTermino, renovacao })
+
+    // Solução nova dispara a Fase 2 e devolve o contrato ao estado de
+    // provisionamento — ele não pode continuar "Ativo" enquanto a solução
+    // recém-adicionada ainda está sendo provisionada.
+    if (temSolucaoNova) {
+      const conta = accounts.find(a => a.name === contract.contratante)
+      if (conta) {
+        startContractProvisioning(contract.id, conta.id, novosObjetos.map(o => o.solucao))
+      }
+    }
+
+    onSave({
+      ...contract,
+      objetos,
+      historico,
+      dataTermino,
+      renovacao,
+      status: temSolucaoNova ? 'Provisionando' : contract.status,
+    })
     setStep(1)
     onClose()
   }
