@@ -112,18 +112,21 @@ export const PUBLICACAO_STEPS: readonly ProvisioningStepDef[] = [
     id: 'database', ordem: 1,
     nome: 'Submetido', subtitulo: 'Envio para revisão',
     descricao: 'A solução foi submetida para revisão de publicação.',
+    impactoFalha: '',
     recursoGlobal: '', recursoTenant: '', escopo: 'global', notaEscopo: '',
   },
   {
     id: 'keycloak', ordem: 2,
     nome: 'Em revisão', subtitulo: 'Análise da submissão',
     descricao: 'A submissão está em análise antes da publicação.',
+    impactoFalha: '',
     recursoGlobal: '', recursoTenant: '', escopo: 'global', notaEscopo: '',
   },
   {
     id: 'dns', ordem: 3,
     nome: 'Publicado', subtitulo: 'Disponível no marketplace',
     descricao: 'A solução está publicada e disponível no marketplace.',
+    impactoFalha: '',
     recursoGlobal: '', recursoTenant: '', escopo: 'global', notaEscopo: '',
   },
 ] as const
