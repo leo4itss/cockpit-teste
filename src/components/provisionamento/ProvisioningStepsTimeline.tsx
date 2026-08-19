@@ -27,6 +27,13 @@ export function ProvisioningStepsTimeline({ steps }: { steps: ProvisioningStep[]
           )
         })}
       </div>
+
+      {/* Nota de fechamento — desfaz a leitura de que concluir a Fase 1 já
+          entrega as soluções ao cliente (handoff 19/08/2026). */}
+      <div className="mt-3 flex items-start gap-2 bg-[#f9fafb] border border-[#e5e7eb] rounded-lg p-3">
+        <Info className="w-4 h-4 text-[#9ca3af] shrink-0 mt-0.5" />
+        <p className="text-xs text-[#6b7280] leading-relaxed">{FASE1_NOTA_GERAL}</p>
+      </div>
     </Card>
   )
 }
