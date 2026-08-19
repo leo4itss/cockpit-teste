@@ -9,6 +9,7 @@ import { Dialog } from './ui/Dialog'
 import { AddObjetoDialog } from './AddObjetoDialog'
 import { EditLicencaDialog } from './EditLicencaDialog'
 import { useToast, ToastContainer } from './ui/Toast'
+import { startContractProvisioning } from '@/services/provisioning'
 import type { Account, Contract, Solution, ObjetoContrato, ContractHistoricoEntry, ProvisioningOverallStatus } from '@/types'
 
 /** Mesmo mapeamento usado em ProvisionamentoPage / NewContractSheet — status da Fase 1 do tenant. */
