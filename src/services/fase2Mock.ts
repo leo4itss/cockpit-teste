@@ -123,7 +123,7 @@ function derivar(exec: ExecucaoFase2): SolutionProvisioning[] {
       return { ...base, estado: 'em-andamento' as const, iniciadoEm: toIso(inicio), concluidoEm: null, duracaoMs: null, erro: null }
     }
 
-    if (FASE2_SOLUCOES_QUE_FALHAM.includes(nome)) {
+    if (solucoesQueFalham().includes(nome)) {
       return {
         ...base,
         estado: 'erro' as const,
