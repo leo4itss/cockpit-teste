@@ -60,9 +60,13 @@ export function ProvisionamentoPage() {
 
   const canView = useCanViewProvisioning(account?.id ?? '', account?.orgId ?? '')
 
-  const loadProvisioning = useCallback(() => {
+  /**
+   * `silencioso` = recarrega sem voltar ao skeleton. Usado pelo polling, que
+   * roda a cada 5s — sem isso a tela piscaria em loop enquanto provisiona.
+   */
+  const loadProvisioning = useCallback((silencioso = false) => {
     if (!id) return
-    setFetchState({ fase: 'carregando' })
+    if (!silencioso) setFetchState({ fase: 'carregando' })
     getProvisioning(id)
       .then(dados => setFetchState({ fase: 'ok', dados }))
       .catch(err => {
@@ -81,6 +85,20 @@ export function ProvisionamentoPage() {
   useEffect(() => {
     if (account && canView) loadProvisioning()
   }, [account, canView, loadProvisioning])
+
+  // Polling só enquanto há trabalho em execução — Fase 1 não concluída ou
+  // alguma solução da Fase 2 ainda provisionando. Ao atingir estado terminal
+  // o hook para sozinho, sem requisições indefinidas.
+  const emExecucao =
+    fetchState.fase === 'ok' &&
+    (fetchState.dados.status === 'PENDING' ||
+      fetchState.dados.status === 'IN_PROGRESS' ||
+      fetchState.dados.solucoes.some(s => s.estado === 'pendente' || s.estado === 'em-andamento'))
+
+  useProvisioningPolling({
+    enabled: Boolean(account) && canView && emExecucao,
+    onPoll: () => loadProvisioning(true),
+  })
 
   // ── Conta ainda não resolvida ──────────────────────────────
   if (account === undefined) {
