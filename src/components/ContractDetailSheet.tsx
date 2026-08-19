@@ -77,6 +77,41 @@ export function ContractDetailSheet({ open, onClose, contract, onEdit }: Props) 
           <StatusBadge status={contract.status} />
         </div>
 
+        {/* Estados da Fase 2 — provisionando ou falho. O caminho até o
+            diagnóstico por solução fica na tela de provisionamento do tenant. */}
+        {contract.status === 'Provisionando' && (
+          <div className="flex items-start gap-3 bg-blue-50 border border-blue-300 rounded-lg p-3">
+            <Loader2 className="w-4 h-4 text-blue-700 shrink-0 mt-0.5 animate-spin" />
+            <div className="flex flex-col gap-1">
+              <p className="text-xs font-medium text-blue-700 leading-4">
+                As soluções deste contrato estão sendo provisionadas no ambiente do cliente.
+                Esse processo pode levar alguns minutos.
+              </p>
+              {provisionamentoHref && (
+                <a href={provisionamentoHref} className="text-xs font-semibold text-blue-700 hover:underline w-fit">
+                  Acompanhar o provisionamento
+                </a>
+              )}
+            </div>
+          </div>
+        )}
+
+        {contract.status === 'Falha no provisionamento' && (
+          <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-lg p-3">
+            <AlertTriangle className="w-4 h-4 text-red-700 shrink-0 mt-0.5" />
+            <div className="flex flex-col gap-1">
+              <p className="text-xs font-medium text-red-700 leading-4">
+                Uma ou mais soluções deste contrato falharam ao provisionar.
+              </p>
+              {provisionamentoHref && (
+                <a href={provisionamentoHref} className="text-xs font-semibold text-red-700 hover:underline w-fit">
+                  Ver detalhes da falha
+                </a>
+              )}
+            </div>
+          </div>
+        )}
+
         <Divider />
 
         {/* ── Dados do contrato ─────────────────────────── */}
