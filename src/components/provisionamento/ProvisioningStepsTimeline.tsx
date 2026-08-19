@@ -1,7 +1,8 @@
 import { useState } from 'react'
+import { Info } from 'lucide-react'
 import { Card, SectionTitle, Divider } from './ProvisioningCard'
 import { ProvisioningStepRow } from './ProvisioningStepRow'
-import { PROVISIONING_STEPS } from '@/services/provisioning'
+import { PROVISIONING_STEPS, FASE1_NOTA_GERAL } from '@/services/provisioning'
 import type { ProvisioningStep, ProvisioningStepId } from '@/types'
 
 export function ProvisioningStepsTimeline({ steps }: { steps: ProvisioningStep[] }) {
