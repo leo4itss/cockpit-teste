@@ -148,7 +148,7 @@ export function ProvisionamentoPage() {
               <Badge variant={STATUS_BADGE[fetchState.dados.status].variant} showIcon>
                 {STATUS_BADGE[fetchState.dados.status].label}
               </Badge>
-              <Button variant="outline" size="sm" onClick={loadProvisioning}>
+              <Button variant="outline" size="sm" onClick={() => loadProvisioning()}>
                 <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
                 Atualizar
               </Button>
