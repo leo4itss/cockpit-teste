@@ -1,6 +1,5 @@
 import { Sheet } from './ui/Sheet'
 import { Button } from './ui/Button'
-import { Badge } from './ui/Badge'
 import { ContractStatusBadge } from './ContractStatusBadge'
 import { ProvisioningDots } from './ProvisioningDots'
 import { History } from 'lucide-react'
