@@ -20,6 +20,7 @@ import type {
   HealthCheckResult,
   ProvisioningLogPage,
   ReprovisionResult,
+  ContractStatus,
 } from '@/types'
 import {
   provisioningSnapshots,
