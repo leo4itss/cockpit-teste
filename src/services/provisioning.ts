@@ -40,7 +40,8 @@ export const PROVISIONING_STEPS: readonly ProvisioningStepDef[] = [
   {
     id: 'keycloak', ordem: 1,
     nome: 'Autenticação', subtitulo: 'Login e usuários do tenant',
-    descricao: 'Cria o espaço de autenticação isolado do tenant, clients OIDC, mappers e políticas de senha.',
+    descricao: 'Cria o espaço de identidade exclusivo da conta, onde os usuários do cliente serão posteriormente cadastrados.',
+    impactoFalha: 'Sem esse espaço, não há onde cadastrar nem autenticar os usuários do cliente.',
     recursoGlobal: 'Instância Keycloak compartilhada da plataforma',
     recursoTenant: 'Realm `<slug>` exclusivo desta conta',
     escopo: 'tenant',
@@ -49,7 +50,8 @@ export const PROVISIONING_STEPS: readonly ProvisioningStepDef[] = [
   {
     id: 'database', ordem: 2,
     nome: 'Banco de dados', subtitulo: 'Banco de dados do tenant',
-    descricao: 'Cria a base de dados isolada do tenant e aplica as migrations iniciais.',
+    descricao: 'Cria o armazenamento isolado da conta. As estruturas de dados de cada solução são criadas depois, no provisionamento por contrato.',
+    impactoFalha: 'Não há onde gravar os dados do cliente.',
     recursoGlobal: 'Cluster PostgreSQL compartilhado da plataforma',
     recursoTenant: 'Database `tenant_<slug>` exclusiva desta conta',
     escopo: 'tenant',
@@ -58,7 +60,8 @@ export const PROVISIONING_STEPS: readonly ProvisioningStepDef[] = [
   {
     id: 'env-vars', ordem: 3,
     nome: 'Variáveis de ambiente', subtitulo: 'Segredos do tenant',
-    descricao: 'Provisiona o projeto/ambiente de segredos e injeta as credenciais do tenant.',
+    descricao: 'Registra com segurança as configurações e credenciais de acesso específicas desta conta.',
+    impactoFalha: 'As soluções não conseguirão se conectar aos serviços de que dependem.',
     recursoGlobal: 'Instância Infisical compartilhada',
     recursoTenant: 'Ambiente `<slug>` com segredos exclusivos',
     escopo: 'tenant',
@@ -67,7 +70,8 @@ export const PROVISIONING_STEPS: readonly ProvisioningStepDef[] = [
   {
     id: 'dns', ordem: 4,
     nome: 'DNS', subtitulo: 'Registro CNAME',
-    descricao: 'Publica o CNAME do subdomínio do tenant apontando para o ingress da plataforma.',
+    descricao: 'Registra o endereço de internet da conta na zona de endereços da plataforma.',
+    impactoFalha: 'O endereço não existe e o navegador não localiza o site.',
     recursoGlobal: 'Zona DNS `pas.app.br` gerenciada no Cloudflare',
     recursoTenant: 'Registro CNAME `<slug>.<env>.pas.app.br`',
     escopo: 'global',
@@ -76,13 +80,23 @@ export const PROVISIONING_STEPS: readonly ProvisioningStepDef[] = [
   {
     id: 'ingress', ordem: 5,
     nome: 'Ingress com TLS', subtitulo: 'Certificado TLS do tenant',
-    descricao: 'Aguarda ~60s de propagação do DNS e então cria o Ingress do tenant, emitindo o certificado TLS. Ao concluir, a URL do tenant resolve e a home abre — ainda sem soluções (isso é a Fase 2).',
+    descricao: 'Publica esse endereço com conexão criptografada.',
+    impactoFalha: 'O endereço existe, mas não abre corretamente ou acusa problema de segurança.',
     recursoGlobal: 'Ingress controller e cert-manager do cluster',
     recursoTenant: 'Ingress + Certificate do host do tenant',
     escopo: 'tenant',
     notaEscopo: 'O controller é compartilhado; o Ingress e o certificado são exclusivos deste host.',
   },
 ] as const
+
+/**
+ * Nota de fechamento do bloco da Fase 1. Existe para desfazer a leitura de que
+ * concluir a Fase 1 já entrega as soluções ao cliente — o problema central
+ * levantado no handoff de 19/08/2026.
+ */
+export const FASE1_NOTA_GERAL =
+  'A conclusão do provisionamento da conta prepara a infraestrutura e o endereço de acesso. ' +
+  'As soluções que o cliente contratou são disponibilizadas no provisionamento por contrato.'
 
 export const PROVISIONING_STEP_IDS: readonly ProvisioningStepId[] =
   PROVISIONING_STEPS.map(s => s.id)
