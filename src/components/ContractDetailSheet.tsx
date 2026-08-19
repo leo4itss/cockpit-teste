@@ -33,11 +33,12 @@ function ReadonlyField({ label, value, half }: { label: string; value?: string |
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const variant = status === 'Ativo' || status === 'Criado' ? 'success' : status === 'Pendente' ? 'warning' : 'secondary'
-  const label = status === 'Criado' ? 'Ativo' : status
+  // Sem mascaramento: o rótulo exibido é o estado real. Antes, 'Criado' era
+  // exibido como 'Ativo' — o mesmo antipadrão que o handoff 19/08/2026 veio
+  // eliminar (nunca afirmar 'Ativo' antes de o provisionamento concluir).
   return (
     <div className="flex">
-      <Badge variant={variant} showIcon={variant !== 'warning'}>{label}</Badge>
+      <ContractStatusBadge status={status} />
     </div>
   )
 }
