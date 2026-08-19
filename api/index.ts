@@ -95,7 +95,10 @@ app.delete('/organizations/:id', async (c) => {
     db.select().from(contracts).where(eq(contracts.orgId, id)),
   ])
   const activeAccounts = orgAccounts.filter((a: any) => a.status !== 'Excluído')
-  const activeContracts = orgContracts.filter((ct: any) => ct.status === 'Ativo')
+  // Qualquer contrato não inativado bloqueia a exclusão — inclui os estados de
+  // provisionamento ('Provisionando', 'Falha no provisionamento'), que antes
+  // escapavam da trava por não serem literalmente 'Ativo'.
+  const activeContracts = orgContracts.filter((ct: any) => ct.status !== 'Inativo')
   if (activeAccounts.length > 0 || activeContracts.length > 0) {
     return c.json({ error: 'dependencies', activeAccounts: activeAccounts.length, activeContracts: activeContracts.length }, 422)
   }
