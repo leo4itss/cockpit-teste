@@ -22,6 +22,12 @@ import { UsuarioDetailOrgSheet, type ContaVinculada } from '@/components/usuario
 import { api } from '@/api/client'
 import { useAuthz, useIsPlatformAdmin, useIsOrgAdmin, useIsPasArchitect } from '@/authz/hooks'
 import { useComponentes } from '@/context/ComponentesContext'
+import { useProvisioningPolling } from '@/hooks/useProvisioningPolling'
+import {
+  startContractProvisioning,
+  getContractProvisioning,
+  deriveContractStatus,
+} from '@/services/provisioning'
 import {
   organizations as mockOrgs,
   accounts as mockAccounts,
