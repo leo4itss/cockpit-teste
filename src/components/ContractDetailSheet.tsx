@@ -55,7 +55,7 @@ function ObjetoField({ label, value }: { label: string; value?: string | number 
 }
 
 
-export function ContractDetailSheet({ open, onClose, contract, onEdit }: Props) {
+export function ContractDetailSheet({ open, onClose, contract, onEdit, provisionamentoHref }: Props) {
 
   if (!contract) return null
 
