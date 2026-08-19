@@ -242,13 +242,21 @@ export function OrganizacaoDetailPage() {
   }
   async function handleAddContract(contract: Omit<Contract, 'id'>) {
     const local: Contract = { ...contract, id: crypto.randomUUID() }
+    let criado = local
     try {
-      const saved = await api.createContract(local)
-      setContracts(prev => [...prev, saved])
-      toast('Contrato criado com sucesso.\nA Fase 2 do provisionamento foi disparada.', 'success')
+      criado = await api.createContract(local)
+      setContracts(prev => [...prev, criado])
+      toast('Contrato criado com sucesso.\nAs soluções estão sendo provisionadas.', 'success')
     } catch {
       setContracts(prev => [...prev, local])
       toast('Não foi possível criar o contrato.\nRevise os dados e tente novamente.', 'error')
+      return
+    }
+    // Dispara a Fase 2 para as soluções deste contrato. O estado de cada uma
+    // passa a ser observável na tela de provisionamento do tenant.
+    const conta = accounts.find(a => a.name === criado.contratante)
+    if (conta) {
+      startContractProvisioning(criado.id, conta.id, criado.objetos.map(o => o.solucao))
     }
   }
   async function handleEditOrg(data: Omit<Organization, 'id' | 'qtdContas' | 'qtdSolucoes' | 'qtdContratos' | 'contacts'>) {
