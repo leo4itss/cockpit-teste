@@ -127,6 +127,13 @@ export interface TenantInfo {
 export interface SolutionProvisioning {
   /** = Solution.name — mesmo join por string já usado no resto do app. */
   solucaoNome: string
+  /**
+   * Contrato que disparou o provisionamento desta solução. Opcional porque os
+   * fixtures anteriores ao handoff de 19/08/2026 não têm o vínculo. Quando
+   * ausente, a solução aparece na tela do tenant mas não é atribuível a um
+   * contrato específico.
+   */
+  contratoId?: string
   estado: ProvisioningStepState
   iniciadoEm: string | null
   concluidoEm: string | null
