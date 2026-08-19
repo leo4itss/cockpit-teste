@@ -2,7 +2,7 @@ import { Sheet } from './ui/Sheet'
 import { Button } from './ui/Button'
 import { ContractStatusBadge } from './ContractStatusBadge'
 import { ProvisioningDots } from './ProvisioningDots'
-import { History } from 'lucide-react'
+import { History, Loader2, AlertTriangle } from 'lucide-react'
 import { PUBLICACAO_STEPS } from '@/services/provisioning'
 import type { Contract } from '@/types'
 
@@ -11,6 +11,8 @@ interface Props {
   onClose: () => void
   contract: Contract | null
   onEdit?: () => void
+  /** Rota da tela de provisionamento do tenant — caminho até o diagnóstico da Fase 2. */
+  provisionamentoHref?: string
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
