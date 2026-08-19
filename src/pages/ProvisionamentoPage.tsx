@@ -191,7 +191,7 @@ export function ProvisionamentoPage() {
               <p className="text-sm font-medium text-[#030712]">Não foi possível carregar o provisionamento</p>
               <p className="text-xs text-[#6b7280]">{fetchState.mensagem}</p>
               {fetchState.podeTentarNovamente && (
-                <Button variant="outline" size="sm" onClick={loadProvisioning}>
+                <Button variant="outline" size="sm" onClick={() => loadProvisioning()}>
                   Tentar novamente
                 </Button>
               )}
