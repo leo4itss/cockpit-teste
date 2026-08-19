@@ -364,7 +364,10 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
       dataInicio: form.dataInicio,
       dataTermino: form.dataTermino,
       renovacao: form.renovacao,
-      status: 'Ativo',
+      // NÃO nasce 'Ativo': a Fase 2 é assíncrona, leva minutos e pode falhar.
+      // Vira 'Ativo' apenas quando todas as soluções terminarem de provisionar
+      // (deriveContractStatus). Regra do handoff 19/08/2026.
+      status: 'Provisionando',
     })
     reset()
     onClose()
