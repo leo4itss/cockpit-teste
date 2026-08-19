@@ -251,6 +251,34 @@ export function deriveFase2Status(
   return 'PENDING'
 }
 
+/**
+ * Deriva o status do contrato a partir do provisionamento das suas soluções.
+ *
+ * Regra do handoff 19/08/2026: **'Ativo' só pode ser exibido quando o
+ * provisionamento concluir integralmente**. Antes disso o contrato está
+ * 'Provisionando'; se qualquer solução falhar, 'Falha no provisionamento'.
+ *
+ * `statusAtual` é respeitado quando o contrato já saiu do ciclo de
+ * provisionamento — um contrato inativado não volta a "provisionando" só
+ * porque a lista de soluções está vazia.
+ */
+export function deriveContractStatus(
+  solucoes: SolutionProvisioning[],
+  statusAtual: ContractStatus,
+): ContractStatus {
+  if (statusAtual === 'Inativo') return 'Inativo'
+  // Sem nenhuma solução rastreada não há o que derivar — preserva o que já existe.
+  if (solucoes.length === 0) return statusAtual
+  if (solucoes.some(s => s.estado === 'erro')) return 'Falha no provisionamento'
+  if (solucoes.every(s => s.estado === 'criado')) return 'Ativo'
+  return 'Provisionando'
+}
+
+/** Estados em que a Fase 2 do contrato ainda está rodando — usado para parar o polling. */
+export function isContractStatusTerminal(status: ContractStatus): boolean {
+  return status !== 'Provisionando'
+}
+
 // ── Join contratos/soluções (frágil por design — ver nota) ────
 
 /**
