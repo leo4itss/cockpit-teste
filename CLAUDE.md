@@ -112,6 +112,19 @@ In production, `engine.ts` functions would be replaced by OpenFGA SDK calls; the
 | `/schema` | `SchemaVisualizerPage` | Interactive graph of the DB schema — useful for understanding table relationships. |
 | `/contas/:id/provisionamento` | `ProvisionamentoPage` | Tenant provisioning details, modeled as **two phases with different triggers**. **Phase 1** (`tenantProvisioning`, fires on account creation) is the 5-step timeline, in execution order: Autenticação → Banco de dados → Variáveis de ambiente → DNS → *(~60s DNS propagation)* → Ingress com TLS. When it completes the tenant URL resolves and the home page opens — still with no solutions. **Phase 2** (`solutionPublicationByContract`, fires on contract creation) provisions each solution the contract covers; it never touches DNS/Ingress and **requires Phase 1 to be COMPLETED** — that rule is what gates contract creation in `NewContractSheet`. Also shows linked solutions/contracts and actions (reprovision, health check, logs). Step labels are deliberately vendor-neutral; the real vendor (Keycloak, PostgreSQL, Infisical, Cloudflare, cert-manager) appears only in each step's expanded detail. Data comes from `src/services/provisioning.ts`, a mock front-end contract for the (not-yet-integrated) `pas-cockpit-worker` — see `USE_MOCK_PROVISIONING` in that file for the single swap point. |
 
+### Contract lifecycle and Phase 2 state
+
+`Contract.status` is `'Ativo' | 'Inativo' | 'Pendente' | 'Provisionando' | 'Falha no provisionamento'` (`ContractStatus` in `src/types/index.ts`). Phase 2 is asynchronous and takes minutes, so:
+
+- A new contract is created as **`'Provisionando'`**, never `'Ativo'`. It only becomes `'Ativo'` when every solution finishes provisioning — derived by `deriveContractStatus()` in `src/services/provisioning.ts`.
+- `ContractStatusBadge` (`src/components/ContractStatusBadge.tsx`) is the **single** status→colour/icon mapping. Never inline a new one; listing, detail and the provisioning screen must not diverge.
+- Progress is tracked **per solution**, not just per contract (`SolutionProvisioning.contratoId`). One failing solution puts the whole contract in `'Falha no provisionamento'`.
+- **Polling, not WebSocket** — `useProvisioningPolling` (`src/hooks/useProvisioningPolling.ts`) refreshes every 5s and stops at a terminal state. WebSocket was evaluated and rejected: the project has no support and the traffic is one-way.
+- `src/services/fase2Mock.ts` simulates Phase 2 on the browser clock (`FASE2_DURACAO_MS_POR_SOLUCAO`, compressed for demos; real times are ~4 min for the CMS and ~2 min for the knowledge base). **Delete this file** when the worker exposes per-contract status.
+- Contract filters must use `status !== 'Inativo'`, never `status === 'Ativo'` — the latter silently drops contracts that are provisioning. This bit the org-deletion guard in `server/index.ts` and `api/index.ts`.
+
+**Phase 1 step copy rule**: `ProvisioningStepDef.descricao` describes the **resource created**, never the capability the customer gains — no step may imply the customer can already log in or use the platform. `impactoFalha` states the functional consequence of that step failing. Both are set in `PROVISIONING_STEPS`; vendor names stay in `recursoGlobal`/`recursoTenant`, which only render in the expanded panel.
+
 ### Role-based UI rules
 
 - **Platform Admin**: cannot create groups (Criar grupo button hidden). Auto-selects first org/account on AcessosPage load. Can switch to "Todas as contas" to see aggregated view across all accounts of an org.
