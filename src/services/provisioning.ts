@@ -27,6 +27,12 @@ import {
   provisioningHealth,
   provisioningLogs,
 } from '@/data/mock'
+// Simulação temporal da Fase 2 — descartável, some quando o worker real entrar.
+import {
+  registrarExecucaoFase2,
+  solucoesDoContrato,
+  solucoesDaConta,
+} from './fase2Mock'
 
 // ── Catálogo de passos ───────────────────────────────────────
 
