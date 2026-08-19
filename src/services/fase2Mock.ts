@@ -25,14 +25,29 @@ import type { SolutionProvisioning } from '@/types'
  */
 export const FASE2_DURACAO_MS_POR_SOLUCAO = 20_000
 
+const STORAGE_KEY = 'pas.fase2.simulacao'
+const STORAGE_KEY_FALHAS = 'pas.fase2.falhas'
+
 /**
  * Escape hatch de validação: soluções cujo nome esteja aqui falham ao
  * provisionar, permitindo exercitar o caminho de erro sem editar fixtures.
- * Manter vazio fora de teste manual.
+ *
+ * Fica em sessionStorage para que quem valida a tela consiga acionar uma
+ * falha sem mexer no código. No console do navegador:
+ *
+ *   sessionStorage.setItem('pas.fase2.falhas', JSON.stringify(['PAS Flow']))
+ *
+ * Some ao fechar a aba.
  */
-const FASE2_SOLUCOES_QUE_FALHAM: readonly string[] = []
-
-const STORAGE_KEY = 'pas.fase2.simulacao'
+function solucoesQueFalham(): string[] {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY_FALHAS)
+    const lista = raw ? JSON.parse(raw) : []
+    return Array.isArray(lista) ? lista : []
+  } catch {
+    return []
+  }
+}
 
 interface ExecucaoFase2 {
   contratoId: string
