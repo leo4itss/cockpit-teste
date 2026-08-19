@@ -1,12 +1,6 @@
 import { Card, SectionTitle, Divider, EmptyState } from './ProvisioningCard'
-import { Badge } from '@/components/ui/Badge'
+import { ContractStatusBadge } from '@/components/ContractStatusBadge'
 import type { Contract } from '@/types'
-
-function statusBadge(status: Contract['status']) {
-  if (status === 'Ativo') return <Badge variant="success" showIcon>{status}</Badge>
-  if (status === 'Pendente') return <Badge variant="warning">{status}</Badge>
-  return <Badge variant="secondary">{status}</Badge>
-}
 
 export function ActiveContractsCard({
   contracts,
