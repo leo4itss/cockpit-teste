@@ -168,6 +168,26 @@ export interface Solution {
   marketplaceStatus?: string
 }
 
+/**
+ * Ciclo de vida do contrato.
+ *
+ * 'Provisionando' e 'Falha no provisionamento' refletem a execução assíncrona
+ * da Fase 2 (workflow `solutionPublicationByContract`), que leva minutos e pode
+ * falhar. Antes do handoff de 19/08/2026 o contrato nascia direto como 'Ativo',
+ * o que era factualmente incorreto: **'Ativo' só pode aparecer quando todas as
+ * soluções do contrato terminarem de provisionar**. Derivado por
+ * `deriveContractStatus` em src/services/provisioning.ts.
+ *
+ * 'Pendente' é anterior a este modelo (default da coluna no banco) e permanece
+ * para não invalidar registros existentes.
+ */
+export type ContractStatus =
+  | 'Ativo'
+  | 'Inativo'
+  | 'Pendente'
+  | 'Provisionando'
+  | 'Falha no provisionamento'
+
 export interface Contract {
   id: string
   orgId: string
@@ -176,7 +196,7 @@ export interface Contract {
   dataInicio: string
   dataTermino: string
   renovacao: string
-  status: 'Ativo' | 'Inativo' | 'Pendente'
+  status: ContractStatus
   historico?: ContractHistoricoEntry[]  // log de ajustes de licença
 }
 
