@@ -194,6 +194,43 @@ export function OrganizacaoDetailPage() {
     }, 340)
   }, [])
 
+  // ── Acompanhamento da Fase 2 dos contratos ───────────────────
+  // Enquanto houver contrato provisionando, consulta o status das soluções a
+  // cada 5s e promove o contrato quando o provisionamento termina. Para
+  // sozinho ao não sobrar nenhum contrato em execução.
+  const provisionando = contracts.filter(c => c.status === 'Provisionando')
+
+  useProvisioningPolling({
+    enabled: provisionando.length > 0,
+    onPoll: async () => {
+      const novos = await Promise.all(
+        provisionando.map(async c => ({
+          id: c.id,
+          statusAnterior: c.status,
+          status: deriveContractStatus(await getContractProvisioning(c.id), c.status),
+        })),
+      )
+      const mudaram = novos.filter(n => n.status !== n.statusAnterior)
+      if (mudaram.length === 0) return
+
+      const porId = new Map(mudaram.map(m => [m.id, m.status]))
+      const aplica = (c: Contract): Contract => {
+        const novo = porId.get(c.id)
+        return novo ? { ...c, status: novo } : c
+      }
+      setContracts(prev => prev.map(aplica))
+      setSelectedContract(prev => (prev ? aplica(prev) : prev))
+
+      // Persiste o estado terminal — sem isso o contrato voltaria a
+      // "Provisionando" no próximo carregamento vindo da API.
+      for (const m of mudaram) {
+        const alvo = contracts.find(c => c.id === m.id)
+        if (!alvo) continue
+        api.updateContract(m.id, { ...alvo, status: m.status }).catch(() => {})
+      }
+    },
+  })
+
   if (loading) return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3 p-6">
       <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
