@@ -31,9 +31,13 @@ export function useProvisioningPolling({
   onPoll: () => void
   intervalMs?: number
 }): void {
-  // Ref evita reiniciar o timer a cada render quando `onPoll` é uma closure nova.
+  // Ref evita reiniciar o timer a cada render quando `onPoll` é uma closure
+  // nova. A escrita fica num effect — atualizar ref durante o render pode
+  // deixar o valor dessincronizado do que foi renderizado.
   const onPollRef = useRef(onPoll)
-  onPollRef.current = onPoll
+  useEffect(() => {
+    onPollRef.current = onPoll
+  })
 
   useEffect(() => {
     if (!enabled) return
