@@ -25,6 +25,7 @@ import { LogsSheet } from '@/components/provisionamento/LogsSheet'
 import { ConfirmDeleteModal } from '@/components/ConfirmDeleteModal'
 import { useToast, ToastContainer } from '@/components/ui/Toast'
 import { useCanViewProvisioning, useCanReprovisionTenant, useCanViewTenantLogs, useCanRunTenantHealthCheck } from '@/authz/hooks'
+import { useProvisioningPolling } from '@/hooks/useProvisioningPolling'
 import {
   getProvisioning,
   reprovisionTenant,
