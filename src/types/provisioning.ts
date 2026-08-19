@@ -34,13 +34,25 @@ export type ProvisioningStepState =
  */
 export type ProvisioningResourceScope = 'global' | 'tenant'
 
-/** Metadados estáticos de um passo — não vêm do worker, vivem no catálogo do front. */
+/**
+ * Metadados estáticos de um passo — não vêm do worker, vivem no catálogo do front.
+ *
+ * Regra de escrita (handoff 19/08/2026): `descricao` narra o RECURSO QUE É
+ * CRIADO, nunca a capacidade que o cliente ganha. Nenhuma etapa isolada pode
+ * sugerir que o cliente já consegue entrar, acessar ou usar a plataforma — o
+ * acesso só existe com a Fase 1 inteira concluída, e o uso efetivo depende da
+ * Fase 2. Nomes de fornecedor ficam restritos a `recursoGlobal`/`recursoTenant`,
+ * que só aparecem no painel expandido da etapa.
+ */
 export interface ProvisioningStepDef {
   id: ProvisioningStepId
   ordem: number
   nome: string
+  /** Legado — não é mais renderizado na timeline; `descricao` ocupou seu lugar. */
   subtitulo: string
   descricao: string
+  /** Consequência funcional da falha desta etapa. Renderizado abaixo da descrição. */
+  impactoFalha: string
   recursoGlobal: string
   recursoTenant: string
   escopo: ProvisioningResourceScope
