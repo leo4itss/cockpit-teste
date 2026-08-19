@@ -67,7 +67,12 @@ export function ProvisioningStepRow({
             </Badge>
             <span className={cn('text-xs font-medium', ESTADO_TONE[step.estado])}>{ESTADO_LABEL[step.estado]}</span>
           </div>
-          <p className="text-xs text-[#6b7280] mt-0.5">{def.subtitulo}</p>
+          <p className="text-xs text-[#6b7280] mt-0.5">{def.descricao}</p>
+          {def.impactoFalha && (
+            <p className="text-xs text-[#6b7280] mt-1">
+              <span className="text-[#9ca3af]">Se ela falhar: </span>{def.impactoFalha}
+            </p>
+          )}
           <p className="text-xs text-[#9ca3af] mt-1">{def.notaEscopo}</p>
         </div>
         {(hasDetails || step.estado === 'criado') && (
