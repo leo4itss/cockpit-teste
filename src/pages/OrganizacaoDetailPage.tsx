@@ -1054,12 +1054,7 @@ export function OrganizacaoDetailPage() {
                           <td className="px-2 py-2 h-[52px] text-sm text-[#030712] text-center">{c.renovacao}</td>
                           {/* Status */}
                           <td className="px-2 py-2 h-[52px] text-center">
-                            <Badge
-                              variant={c.status === 'Ativo' ? 'success' : c.status === 'Pendente' ? 'warning' : 'secondary'}
-                              showIcon={c.status !== 'Pendente'}
-                            >
-                              {c.status}
-                            </Badge>
+                            <ContractStatusBadge status={c.status} />
                           </td>
                         </tr>
                       ))}
