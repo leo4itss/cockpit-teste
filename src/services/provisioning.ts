@@ -347,7 +347,45 @@ export async function getProvisioning(accountId: string): Promise<ProvisioningSn
   if (USE_MOCK_PROVISIONING) {
     const raw = provisioningSnapshots[accountId]
     if (!raw) throw new ProvisioningNotFoundError(accountId)
-    return delay(adaptWorkerSnapshot(raw))
+    const snapshot = adaptWorkerSnapshot(raw)
+    // Contratos criados durante a sessão têm Fase 2 simulada em tempo real —
+    // elas se somam às soluções que já vinham do fixture.
+    const simuladas = solucoesDaConta(accountId)
+    return delay(
+      simuladas.length > 0
+        ? { ...snapshot, solucoes: [...snapshot.solucoes, ...simuladas] }
+        : snapshot,
+    )
+  }
+  throw new Error('Backend de provisionamento ainda não implementado.')
+}
+
+/**
+ * Fase 2 de UM contrato — uma entrada por solução coberta.
+ *
+ * Swap point: quando o worker expuser status por contrato, trocar o corpo do
+ * `if` por uma chamada HTTP. O shape de retorno não muda.
+ */
+export async function getContractProvisioning(contratoId: string): Promise<SolutionProvisioning[]> {
+  if (USE_MOCK_PROVISIONING) {
+    return delay(solucoesDoContrato(contratoId), 200)
+  }
+  throw new Error('Backend de provisionamento ainda não implementado.')
+}
+
+/**
+ * Dispara a Fase 2 para um contrato. Chamado logo após a criação/alteração do
+ * contrato — é o equivalente ao worker iniciar o workflow
+ * `solutionPublicationByContract`.
+ */
+export function startContractProvisioning(
+  contratoId: string,
+  accountId: string,
+  solucoes: string[],
+): void {
+  if (USE_MOCK_PROVISIONING) {
+    registrarExecucaoFase2(contratoId, accountId, solucoes)
+    return
   }
   throw new Error('Backend de provisionamento ainda não implementado.')
 }
