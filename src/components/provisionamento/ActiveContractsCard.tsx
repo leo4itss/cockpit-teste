@@ -24,7 +24,7 @@ export function ActiveContractsCard({
             <div key={c.id} className="border border-[#e5e7eb] rounded-xl p-4 flex flex-col gap-3">
               <div className="flex items-center justify-between gap-2 flex-wrap">
                 <p className="text-sm font-semibold text-[#030712]">{c.contratante}</p>
-                {statusBadge(c.status)}
+                <ContractStatusBadge status={c.status} />
               </div>
               <p className="text-xs text-[#6b7280]">
                 Vigência: {c.dataInicio} até {c.dataTermino}
