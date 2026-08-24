@@ -2,6 +2,7 @@ import { ExternalLink } from 'lucide-react'
 import { Card, SectionTitle, Field, CopyButton } from './ProvisioningCard'
 import type { TenantInfo } from '@/types'
 import { Link } from 'react-router-dom'
+import { formatarData } from '@/lib/datas'
 
 export function TenantInfoCard({ tenant, onCopy }: { tenant: TenantInfo; onCopy?: () => void }) {
   return (
@@ -41,11 +42,11 @@ export function TenantInfoCard({ tenant, onCopy }: { tenant: TenantInfo; onCopy?
             to={`/organizacoes/${tenant.orgId}`}
             className="h-9 w-full rounded-md bg-[#f3f4f6] px-3 flex items-center text-sm text-[#2563eb] hover:underline truncate"
           >
-            {tenant.orgNome}
+            {tenant.orgNome || 'Ver organização'}
           </Link>
         </div>
 
-        <Field label="Criado em" value={tenant.criadoEm} />
+        <Field label="Criado em" value={formatarData(tenant.criadoEm)} />
       </div>
     </Card>
   )
