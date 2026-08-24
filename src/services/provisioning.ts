@@ -374,6 +374,60 @@ function adaptWorkerSnapshot(raw: ProvisioningSnapshot): ProvisioningSnapshot {
   }
 }
 
+/**
+ * Snapshot montado só a partir do status consolidado da conta.
+ *
+ * Contas provisionadas antes desta feature não têm registro detalhado, e a tela
+ * exibia "Nenhum registro de provisionamento" para contas que o banco dá como
+ * concluídas — contradição que aparecia em quatro contas.
+ *
+ * Só deriva quando o status diz, sem ambiguidade, o estado de **todas** as
+ * etapas: `COMPLETED` (todas criadas) e `PENDING` (nenhuma iniciada). Para
+ * `IN_PROGRESS` e `FAILED` não dá para saber em qual etapa o processo está ou
+ * parou — inventar um palpite seria pior que admitir a ausência do registro,
+ * então esses casos continuam caindo no estado vazio.
+ *
+ * Nada de histórico é fabricado: timestamps, duração e identificadores ficam
+ * nulos porque de fato não se sabe.
+ */
+export function buildDerivedSnapshot(
+  account: Account,
+  orgNome = '',
+): ProvisioningSnapshot | null {
+  const status = account.provisioningStatus
+  if (status !== 'COMPLETED' && status !== 'PENDING') return null
+
+  const estado: ProvisioningStepState = status === 'COMPLETED' ? 'criado' : 'pendente'
+
+  return {
+    tenant: {
+      accountId: account.id,
+      accountName: account.name,
+      slug: account.subdomain ?? '',
+      dominio: buildTenantDomain(account.subdomain),
+      ambiente: getPasEnv(),
+      orgId: account.orgId,
+      orgNome,
+      criadoEm: account.createdAt,
+    },
+    status,
+    steps: PROVISIONING_STEPS.map(def => ({
+      id: def.id,
+      estado,
+      iniciadoEm: null,
+      concluidoEm: null,
+      duracaoMs: null,
+      erro: null,
+    })),
+    iniciadoEm: null,
+    finalizadoEm: null,
+    workerVersion: null,
+    correlationId: null,
+    atualizadoEm: new Date().toISOString(),
+    solucoes: [],
+  }
+}
+
 export class ProvisioningNotFoundError extends Error {
   constructor(accountId: string) {
     super(`Nenhum registro de provisionamento encontrado para a conta ${accountId}.`)
