@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button'
 import { Card, SectionTitle, Divider } from './ProvisioningCard'
 import { cn } from '@/lib/utils'
 import { runHealthCheck, PROVISIONING_STEPS } from '@/services/provisioning'
+import { formatarDataHora, FUSO_LOCAL } from '@/lib/datas'
 import type { HealthCheckResult, HealthCheckState } from '@/types'
 
 const ESTADO_ICON: Record<HealthCheckState, typeof CheckCircle2> = {
@@ -73,7 +74,7 @@ export function HealthCheckPanel({
       ) : (
         <div className="flex flex-col gap-2">
           <p className="text-xs text-[#6b7280]">
-            Última verificação: {new Date(result.executadoEm).toLocaleString('pt-BR')} ({result.duracaoMs}ms)
+            Última verificação: {formatarDataHora(result.executadoEm)} ({FUSO_LOCAL}) · {result.duracaoMs}ms
           </p>
           {PROVISIONING_STEPS.map(def => {
             const item = result.itens.find(i => i.id === def.id)

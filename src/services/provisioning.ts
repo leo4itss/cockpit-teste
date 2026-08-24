@@ -21,6 +21,7 @@ import type {
   ProvisioningLogPage,
   ReprovisionResult,
   ContractStatus,
+  Account,
 } from '@/types'
 import {
   provisioningSnapshots,

@@ -1,5 +1,6 @@
 import { Card, SectionTitle, Divider, EmptyState } from './ProvisioningCard'
 import { ContractStatusBadge } from '@/components/ContractStatusBadge'
+import { formatarData } from '@/lib/datas'
 import type { Contract } from '@/types'
 
 export function ActiveContractsCard({
@@ -27,7 +28,7 @@ export function ActiveContractsCard({
                 <ContractStatusBadge status={c.status} />
               </div>
               <p className="text-xs text-[#6b7280]">
-                Vigência: {c.dataInicio} até {c.dataTermino}
+                Vigência: {formatarData(c.dataInicio)} até {formatarData(c.dataTermino)}
               </p>
               {c.objetos.length > 0 && (
                 <div className="flex flex-col gap-1.5 pt-2 border-t border-[#e5e7eb]">

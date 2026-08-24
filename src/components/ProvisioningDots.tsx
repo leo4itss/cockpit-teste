@@ -1,7 +1,8 @@
 import { Fragment } from 'react'
 import { Check, X } from 'lucide-react'
 import { Tooltip } from './ui/Tooltip'
-import { PROVISIONING_STEPS, deriveStepsFromStatus } from '@/services/provisioning'
+import { PROVISIONING_STEPS, deriveStepsFromStatus, PROVISIONING_STATUS_BADGE } from '@/services/provisioning'
+import { formatarDataHora } from '@/lib/datas'
 import type { ProvisioningOverallStatus, ProvisioningStep, ProvisioningStepDef } from '@/types'
 
 interface Props {
@@ -17,18 +18,6 @@ interface Props {
   tooltipTitulo?: string
 }
 
-const STATUS_LABEL: Record<ProvisioningOverallStatus, string> = {
-  PENDING: 'Pendente',
-  IN_PROGRESS: 'Em progresso',
-  COMPLETED: 'Concluído',
-  FAILED: 'Falhou',
-}
-
-function formatDate(iso: string | null | undefined): string {
-  if (!iso) return '—'
-  return new Date(iso).toLocaleString('pt-BR')
-}
-
 export function ProvisioningDots({
   status,
   steps,
@@ -41,7 +30,7 @@ export function ProvisioningDots({
   const errorIndex = resolvedSteps.findIndex(s => s.estado === 'erro')
   const currentEtapa =
     status === 'COMPLETED' ? 'Concluído'
-    : status === 'FAILED' ? (catalog.find(d => d.id === resolvedSteps[errorIndex]?.id)?.nome ?? 'Falhou')
+    : status === 'FAILED' ? (catalog.find(d => d.id === resolvedSteps[errorIndex]?.id)?.nome ?? 'Falha')
     : (catalog.find(d => d.id === resolvedSteps.find(s => s.estado === 'em-andamento' || s.estado === 'pendente')?.id)?.nome ?? '—')
 
   return (
@@ -49,10 +38,10 @@ export function ProvisioningDots({
       content={
         <>
           <p className="font-semibold mb-1">{tooltipTitulo}</p>
-          <p>• Status: <span className="font-medium">{STATUS_LABEL[status]}</span></p>
+          <p>• Status: <span className="font-medium">{PROVISIONING_STATUS_BADGE[status].label}</span></p>
           <p>• Etapa: <span className="font-medium">{currentEtapa}</span></p>
-          <p>• Início: <span className="font-medium">{formatDate(iniciadoEm)}</span></p>
-          <p>• Fim: <span className="font-medium">{formatDate(finalizadoEm)}</span></p>
+          <p>• Início: <span className="font-medium">{formatarDataHora(iniciadoEm)}</span></p>
+          <p>• Fim: <span className="font-medium">{formatarDataHora(finalizadoEm)}</span></p>
         </>
       }
     >

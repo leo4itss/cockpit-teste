@@ -32,12 +32,13 @@ import {
   ProvisioningNotFoundError,
   deriveSummary,
   PROVISIONING_STATUS_BADGE,
+  buildDerivedSnapshot,
   resolveAccountContracts,
   resolveAccountSolutionNames,
 } from '@/services/provisioning'
 import { api } from '@/api/client'
 import { accounts as mockAccounts, contracts as mockContracts, solutions as mockSolutions } from '@/data/mock'
-import type { Account, Contract, Solution, ProvisioningFetchState, ProvisioningOverallStatus, ProvisioningSnapshot } from '@/types'
+import type { Account, Contract, Solution, ProvisioningFetchState, ProvisioningSnapshot } from '@/types'
 
 export function ProvisionamentoPage() {
   const { id } = useParams<{ id: string }>()
@@ -81,7 +82,7 @@ export function ProvisionamentoPage() {
           })
         }
       })
-  }, [id])
+  }, [id, account])
 
   useEffect(() => {
     if (account && canView) loadProvisioning()

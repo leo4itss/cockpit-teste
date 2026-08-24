@@ -9,16 +9,9 @@ import { Dialog } from './ui/Dialog'
 import { AddObjetoDialog } from './AddObjetoDialog'
 import { EditLicencaDialog } from './EditLicencaDialog'
 import { useToast, ToastContainer } from './ui/Toast'
-import { startContractProvisioning } from '@/services/provisioning'
-import type { Account, Contract, Solution, ObjetoContrato, ContractHistoricoEntry, ProvisioningOverallStatus } from '@/types'
+import { startContractProvisioning, PROVISIONING_STATUS_BADGE } from '@/services/provisioning'
+import type { Account, Contract, Solution, ObjetoContrato, ContractHistoricoEntry } from '@/types'
 
-/** Mesmo mapeamento usado em ProvisionamentoPage / NewContractSheet — status da Fase 1 do tenant. */
-const FASE1_BADGE: Record<ProvisioningOverallStatus, { variant: 'success' | 'info' | 'default' | 'error'; label: string }> = {
-  COMPLETED: { variant: 'success', label: 'Concluído' },
-  IN_PROGRESS: { variant: 'info', label: 'Em andamento' },
-  PENDING: { variant: 'default', label: 'Pendente' },
-  FAILED: { variant: 'error', label: 'Falhou' },
-}
 
 interface Props {
   open: boolean
@@ -217,8 +210,8 @@ function StepReview({
         <div className="flex items-center justify-between border border-[#e5e7eb] rounded-2xl p-4">
           <p className="text-sm font-medium text-[#030712]">{contratante}</p>
           {selectedAccount && (
-            <Badge variant={FASE1_BADGE[selectedAccount.provisioningStatus].variant} showIcon>
-              Fase 1: {FASE1_BADGE[selectedAccount.provisioningStatus].label}
+            <Badge variant={PROVISIONING_STATUS_BADGE[selectedAccount.provisioningStatus].variant} showIcon>
+              Fase 1: {PROVISIONING_STATUS_BADGE[selectedAccount.provisioningStatus].label}
             </Badge>
           )}
         </div>
@@ -260,9 +253,10 @@ function StepReview({
       <div className="flex items-center gap-3 bg-blue-50 border border-blue-300 rounded-lg p-3">
         <CircleAlert className="w-5 h-5 text-blue-700 shrink-0" />
         <p className="text-xs font-medium text-blue-700 leading-4">
-          Ao salvar o contrato, as {novosObjetos.length} solução(ões) adicionada(s) serão
-          provisionadas automaticamente no ambiente do cliente. Esse processo é executado em
-          segundo plano e pode levar alguns minutos.
+          {novosObjetos.length === 1
+            ? 'Ao salvar o contrato, a solução adicionada será provisionada automaticamente no ambiente do cliente.'
+            : `Ao salvar o contrato, as ${novosObjetos.length} soluções adicionadas serão provisionadas automaticamente no ambiente do cliente.`}
+          {' '}Esse processo é executado em segundo plano e pode levar alguns minutos.
         </p>
       </div>
     </div>

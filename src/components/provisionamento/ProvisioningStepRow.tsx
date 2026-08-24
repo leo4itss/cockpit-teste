@@ -55,7 +55,7 @@ export function ProvisioningStepRow({
             <Badge variant={def.escopo === 'global' ? 'info' : 'default'}>
               {def.escopo === 'global' ? 'Recurso global' : 'Recurso do tenant'}
             </Badge>
-            <span className={cn('text-xs font-medium', ESTADO_TONE[step.estado])}>{ESTADO_LABEL[step.estado]}</span>
+            <span className={cn('text-xs font-medium', ESTADO_TONE[step.estado])}>{PROVISIONING_STEP_LABEL[step.estado]}</span>
           </div>
           <p className="text-xs text-[#6b7280] mt-0.5">{def.descricao}</p>
           {def.impactoFalha && (
@@ -75,10 +75,10 @@ export function ProvisioningStepRow({
         <div className="ml-8 mb-3 bg-red-50 border border-red-200 rounded-lg p-4 flex flex-col gap-2">
           <div className="flex items-center justify-between gap-2">
             <p className="text-sm font-semibold text-red-700">{step.erro.codigo}</p>
-            <span className="text-xs text-red-500">{step.erro.tentativas} tentativa(s)</span>
+            <span className="text-xs text-red-500">{step.erro.tentativas === 1 ? '1 tentativa' : `${step.erro.tentativas} tentativas`}</span>
           </div>
           <p className="text-sm text-red-700">{step.erro.mensagem}</p>
-          <p className="text-xs text-red-500">Ocorrido em {formatDate(step.erro.ocorridoEm)}</p>
+          <p className="text-xs text-red-500">Ocorrido em {formatarDataHora(step.erro.ocorridoEm)}</p>
           {step.erro.detalhe && (
             <pre className="text-xs text-red-800 bg-red-100/60 rounded p-2 overflow-x-auto whitespace-pre-wrap font-mono">
               {step.erro.detalhe}
@@ -103,11 +103,11 @@ export function ProvisioningStepRow({
           <div className="grid grid-cols-3 gap-3 text-xs">
             <div>
               <p className="text-[#9ca3af]">Início</p>
-              <p className="text-[#030712] font-medium">{formatDate(step.iniciadoEm)}</p>
+              <p className="text-[#030712] font-medium">{formatarDataHora(step.iniciadoEm)}</p>
             </div>
             <div>
               <p className="text-[#9ca3af]">Fim</p>
-              <p className="text-[#030712] font-medium">{formatDate(step.concluidoEm)}</p>
+              <p className="text-[#030712] font-medium">{formatarDataHora(step.concluidoEm)}</p>
             </div>
             <div>
               <p className="text-[#9ca3af]">Duração</p>

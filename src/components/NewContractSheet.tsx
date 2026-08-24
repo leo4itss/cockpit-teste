@@ -7,15 +7,9 @@ import { Button } from './ui/Button'
 import { Badge } from './ui/Badge'
 import { AddObjetoDialog } from './AddObjetoDialog'
 import { useToast, ToastContainer } from './ui/Toast'
-import type { Account, Contract, Solution, ObjetoContrato, ProvisioningOverallStatus } from '@/types'
+import { PROVISIONING_STATUS_BADGE } from '@/services/provisioning'
+import type { Account, Contract, Solution, ObjetoContrato } from '@/types'
 
-/** Mesmo mapeamento usado em ProvisionamentoPage — status da Fase 1 do tenant. */
-const FASE1_BADGE: Record<ProvisioningOverallStatus, { variant: 'success' | 'info' | 'default' | 'error'; label: string }> = {
-  COMPLETED: { variant: 'success', label: 'Concluído' },
-  IN_PROGRESS: { variant: 'info', label: 'Em andamento' },
-  PENDING: { variant: 'default', label: 'Pendente' },
-  FAILED: { variant: 'error', label: 'Falhou' },
-}
 
 interface Props {
   open: boolean
@@ -104,7 +98,7 @@ function StepForm({
               value: a.name,
               label: a.provisioningStatus === 'COMPLETED'
                 ? a.name
-                : `${a.name} — Fase 1: ${FASE1_BADGE[a.provisioningStatus].label}`,
+                : `${a.name} — Fase 1: ${PROVISIONING_STATUS_BADGE[a.provisioningStatus].label}`,
             }))}
             placeholder="Selecione"
             value={contratante}
@@ -223,8 +217,8 @@ function StepReview({
         <div className="flex items-center justify-between border border-[#e5e7eb] rounded-2xl p-4">
           <p className="text-sm font-medium text-[#030712]">{contratante || '—'}</p>
           {selectedAccount && (
-            <Badge variant={FASE1_BADGE[selectedAccount.provisioningStatus].variant} showIcon>
-              Fase 1: {FASE1_BADGE[selectedAccount.provisioningStatus].label}
+            <Badge variant={PROVISIONING_STATUS_BADGE[selectedAccount.provisioningStatus].variant} showIcon>
+              Fase 1: {PROVISIONING_STATUS_BADGE[selectedAccount.provisioningStatus].label}
             </Badge>
           )}
         </div>
@@ -259,9 +253,10 @@ function StepReview({
       <div className="flex items-center gap-3 bg-blue-50 border border-blue-300 rounded-lg p-3">
         <CircleAlert className="w-5 h-5 text-blue-700 shrink-0" />
         <p className="text-xs font-medium text-blue-700 leading-4">
-          Ao criar o contrato, as {objetos.length} solução(ões) selecionada(s) serão provisionadas
-          automaticamente no ambiente do cliente. Esse processo é executado em segundo plano e
-          pode levar alguns minutos.
+          {objetos.length === 1
+            ? 'Ao criar o contrato, a solução selecionada será provisionada automaticamente no ambiente do cliente.'
+            : `Ao criar o contrato, as ${objetos.length} soluções selecionadas serão provisionadas automaticamente no ambiente do cliente.`}
+          {' '}Esse processo é executado em segundo plano e pode levar alguns minutos.
         </p>
       </div>
     </div>
