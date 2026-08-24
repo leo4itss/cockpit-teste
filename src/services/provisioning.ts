@@ -108,6 +108,38 @@ export const FASE1_NOTA_GERAL =
 export const PROVISIONING_STEP_IDS: readonly ProvisioningStepId[] =
   PROVISIONING_STEPS.map(s => s.id)
 
+// ── Vocabulário de status ────────────────────────────────────
+//
+// Fonte única. Havia quatro cópias divergentes deste mapa (ProvisionamentoPage,
+// NewContractSheet, EditContractSheet, ProvisioningDots) e a mesma situação
+// aparecia com três palavras diferentes na mesma tela: "Falhou", "Erro" e
+// "Com erro". Editar um mapa e esquecer os outros era questão de tempo.
+//
+// Regra de escrita: a falha é sempre **"Falha"**, substantivo. A única exceção
+// é `ContractStatus`, onde o rótulo é "Falha no provisionamento" — ali a
+// palavra precisa dizer *o que* falhou, já que o contrato em si não falhou.
+
+export type ProvisioningBadgeVariant = 'success' | 'info' | 'default' | 'error'
+
+/** Status consolidado de uma fase (badge + rótulo). */
+export const PROVISIONING_STATUS_BADGE: Record<
+  ProvisioningOverallStatus,
+  { variant: ProvisioningBadgeVariant; label: string }
+> = {
+  COMPLETED:   { variant: 'success', label: 'Concluído' },
+  IN_PROGRESS: { variant: 'info',    label: 'Em andamento' },
+  PENDING:     { variant: 'default', label: 'Pendente' },
+  FAILED:      { variant: 'error',   label: 'Falha' },
+}
+
+/** Estado de UMA etapa da Fase 1 ou de UMA solução da Fase 2. */
+export const PROVISIONING_STEP_LABEL: Record<ProvisioningStepState, string> = {
+  criado: 'Criado',
+  pendente: 'Pendente',
+  'em-andamento': 'Em andamento',
+  erro: 'Falha',
+}
+
 /**
  * Catálogo alternativo usado por ContractDetailSheet ("Status da publicação").
  * NÃO é provisionamento de tenant — é o pipeline de publicação de um objeto
