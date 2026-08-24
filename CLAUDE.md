@@ -123,6 +123,14 @@ In production, `engine.ts` functions would be replaced by OpenFGA SDK calls; the
 - `src/services/fase2Mock.ts` simulates Phase 2 on the browser clock (`FASE2_DURACAO_MS_POR_SOLUCAO`, compressed for demos; real times are ~4 min for the CMS and ~2 min for the knowledge base). **Delete this file** when the worker exposes per-contract status.
 - Contract filters must use `status !== 'Inativo'`, never `status === 'Ativo'` — the latter silently drops contracts that are provisioning. This bit the org-deletion guard in `server/index.ts` and `api/index.ts`.
 
+### Provisioning vocabulary and dates
+
+- **One label map, not four.** `PROVISIONING_STATUS_BADGE` and `PROVISIONING_STEP_LABEL` (`src/services/provisioning.ts`) are the only place status→label/variant lives. Four divergent copies used to exist (`ProvisionamentoPage`, `NewContractSheet`, `EditContractSheet`, `ProvisioningDots`) and drifted into "Falhou"/"Erro"/"Com erro"/"Em progresso" on the same screen.
+- **Failure is always the noun "Falha".** The one exception is `ContractStatus`, labelled "Falha no provisionamento" — there the word must say *what* failed, since the contract itself did not.
+- **Dates go through `src/lib/datas.ts`.** `formatarData` (`dd/mm/aaaa`) and `formatarDataHora` (`dd/mm/aaaa HH:mm:ss`); never `toLocaleString` inline. Times are the viewer's clock — declare the zone once per panel with `FUSO_LOCAL`, never per row. `formatarData` tolerates ISO, ISO datetime and already-formatted `dd/mm/aaaa`, and avoids the UTC off-by-one on bare `YYYY-MM-DD`.
+- **No `(s)`/`(ões)` in UI copy.** Branch on the count and write both forms, verb included.
+- `buildDerivedSnapshot()` covers accounts whose `provisioningStatus` is `COMPLETED`/`PENDING` but have no fixture — it shows the real per-step state without fabricating timestamps. It deliberately refuses `IN_PROGRESS`/`FAILED`, where guessing which step is running or broke would be a lie.
+
 **Phase 1 step copy rule**: `ProvisioningStepDef.descricao` describes the **resource created**, never the capability the customer gains — no step may imply the customer can already log in or use the platform. `impactoFalha` states the functional consequence of that step failing. Both are set in `PROVISIONING_STEPS`; vendor names stay in `recursoGlobal`/`recursoTenant`, which only render in the expanded panel.
 
 ### Role-based UI rules
