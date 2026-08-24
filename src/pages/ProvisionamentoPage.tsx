@@ -31,19 +31,13 @@ import {
   reprovisionTenant,
   ProvisioningNotFoundError,
   deriveSummary,
+  PROVISIONING_STATUS_BADGE,
   resolveAccountContracts,
   resolveAccountSolutionNames,
 } from '@/services/provisioning'
 import { api } from '@/api/client'
 import { accounts as mockAccounts, contracts as mockContracts, solutions as mockSolutions } from '@/data/mock'
 import type { Account, Contract, Solution, ProvisioningFetchState, ProvisioningOverallStatus, ProvisioningSnapshot } from '@/types'
-
-const STATUS_BADGE: Record<ProvisioningOverallStatus, { variant: 'success' | 'info' | 'default' | 'error'; label: string }> = {
-  COMPLETED: { variant: 'success', label: 'Concluído' },
-  IN_PROGRESS: { variant: 'info', label: 'Em andamento' },
-  PENDING: { variant: 'default', label: 'Pendente' },
-  FAILED: { variant: 'error', label: 'Falhou' },
-}
 
 export function ProvisionamentoPage() {
   const { id } = useParams<{ id: string }>()
@@ -72,7 +66,13 @@ export function ProvisionamentoPage() {
       .then(dados => setFetchState({ fase: 'ok', dados }))
       .catch(err => {
         if (err instanceof ProvisioningNotFoundError) {
-          setFetchState({ fase: 'vazio', motivo: err.message })
+          // Sem registro detalhado, mas a conta pode ter um status consolidado
+          // que já diz o estado de todas as etapas — mostrar isso é melhor que
+          // dizer "nenhum registro" para uma conta que consta como concluída.
+          const derivado = account ? buildDerivedSnapshot(account) : null
+          setFetchState(derivado
+            ? { fase: 'ok', dados: derivado }
+            : { fase: 'vazio', motivo: err.message })
         } else {
           setFetchState({
             fase: 'erro',
@@ -145,8 +145,8 @@ export function ProvisionamentoPage() {
           </div>
           {fetchState.fase === 'ok' && (
             <div className="flex items-center gap-3 shrink-0">
-              <Badge variant={STATUS_BADGE[fetchState.dados.status].variant} showIcon>
-                {STATUS_BADGE[fetchState.dados.status].label}
+              <Badge variant={PROVISIONING_STATUS_BADGE[fetchState.dados.status].variant} showIcon>
+                {PROVISIONING_STATUS_BADGE[fetchState.dados.status].label}
               </Badge>
               <Button variant="outline" size="sm" onClick={() => loadProvisioning()}>
                 <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
