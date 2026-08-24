@@ -1,6 +1,8 @@
 import { CheckCircle2, Clock, Loader2, XCircle, ChevronDown, ExternalLink } from 'lucide-react'
 import { Badge } from '@/components/ui/Badge'
 import { cn } from '@/lib/utils'
+import { formatarDataHora } from '@/lib/datas'
+import { PROVISIONING_STEP_LABEL } from '@/services/provisioning'
 import type { ProvisioningStep, ProvisioningStepDef } from '@/types'
 
 const ESTADO_ICON: Record<ProvisioningStep['estado'], typeof CheckCircle2> = {
@@ -10,23 +12,11 @@ const ESTADO_ICON: Record<ProvisioningStep['estado'], typeof CheckCircle2> = {
   erro: XCircle,
 }
 
-const ESTADO_LABEL: Record<ProvisioningStep['estado'], string> = {
-  criado: 'Criado',
-  pendente: 'Pendente',
-  'em-andamento': 'Em andamento',
-  erro: 'Erro',
-}
-
 const ESTADO_TONE: Record<ProvisioningStep['estado'], string> = {
   criado: 'text-[#16a34a]',
   pendente: 'text-[#9ca3af]',
   'em-andamento': 'text-[#2563eb]',
   erro: 'text-[#dc2626]',
-}
-
-function formatDate(iso: string | null): string {
-  if (!iso) return '—'
-  return new Date(iso).toLocaleString('pt-BR')
 }
 
 function formatDuration(ms: number | null): string {
