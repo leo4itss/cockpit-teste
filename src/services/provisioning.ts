@@ -437,6 +437,26 @@ export class ProvisioningNotFoundError extends Error {
   }
 }
 
+/**
+ * Une as duas origens de Fase 2 e resolve o conflito: **a simulação vence o
+ * fixture** para a mesma solução do mesmo contrato.
+ *
+ * Sem essa precedência, reexecutar uma solução do cenário de erro não mudaria
+ * nada na tela — a entrada em falha do fixture continuaria aparecendo ao lado
+ * da execução nova, e a primeira é a que o usuário lê.
+ */
+function mergeSolucoes(
+  deFixture: SolutionProvisioning[],
+  simuladas: SolutionProvisioning[],
+): SolutionProvisioning[] {
+  if (simuladas.length === 0) return deFixture
+
+  const chave = (s: SolutionProvisioning) => `${s.contratoId ?? ''}:${s.solucaoNome}`
+  const substituidas = new Set(simuladas.map(chave))
+
+  return [...deFixture.filter(s => !substituidas.has(chave(s))), ...simuladas]
+}
+
 export async function getProvisioning(accountId: string): Promise<ProvisioningSnapshot> {
   if (USE_MOCK_PROVISIONING) {
     const raw = provisioningSnapshots[accountId]
