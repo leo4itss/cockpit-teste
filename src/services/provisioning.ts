@@ -478,13 +478,11 @@ export async function getContractProvisioning(contratoId: string): Promise<Solut
     // Une as duas origens: cenários fixos (que existem antes da sessão) e
     // contratos criados durante a sessão. Sem a primeira, um cenário de erro
     // montado em fixture nunca chegaria ao detalhe do contrato.
-    const simuladas = solucoesDoContrato(contratoId)
-    const jaSimuladas = new Set(simuladas.map(s => s.solucaoNome))
     const deFixture = Object.values(provisioningSnapshots)
       .flatMap(snap => snap.solucoes)
-      .filter(s => s.contratoId === contratoId && !jaSimuladas.has(s.solucaoNome))
+      .filter(s => s.contratoId === contratoId)
 
-    return delay([...deFixture, ...simuladas], 200)
+    return delay(mergeSolucoes(deFixture, solucoesDoContrato(contratoId)), 200)
   }
   throw new Error('Backend de provisionamento ainda não implementado.')
 }
