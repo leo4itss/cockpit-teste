@@ -99,18 +99,31 @@ export function ContractDetailSheet({ open, onClose, contract, onEdit, provision
         )}
 
         {contract.status === 'Falha no provisionamento' && (
-          <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-lg p-3">
-            <AlertTriangle className="w-4 h-4 text-red-700 shrink-0 mt-0.5" />
-            <div className="flex flex-col gap-1">
-              <p className="text-xs font-medium text-red-700 leading-4">
-                Uma ou mais soluções deste contrato falharam ao provisionar.
-              </p>
-              {provisionamentoHref && (
-                <a href={provisionamentoHref} className="text-xs font-semibold text-red-700 hover:underline w-fit">
-                  Ver detalhes da falha
-                </a>
-              )}
+          <div className="flex flex-col gap-3">
+            <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-lg p-3">
+              <AlertTriangle className="w-4 h-4 text-red-700 shrink-0 mt-0.5" />
+              <div className="flex flex-col gap-1">
+                <p className="text-xs font-medium text-red-700 leading-4">
+                  {solucoesComErro.length === 1
+                    ? 'Uma solução deste contrato falhou ao provisionar.'
+                    : `${solucoesComErro.length} soluções deste contrato falharam ao provisionar.`}
+                </p>
+                {provisionamentoHref && (
+                  <a href={provisionamentoHref} className="text-xs font-semibold text-red-700 hover:underline w-fit">
+                    Ver detalhes e tentar novamente
+                  </a>
+                )}
+              </div>
             </div>
+
+            {/* Motivo por solução. Aqui só se diagnostica — a reexecução vive
+                na tela de provisionamento, junto da linha da solução. */}
+            {solucoesComErro.map(s => (
+              <div key={s.solucaoNome} className="flex flex-col gap-1.5">
+                <p className="text-sm font-semibold text-[#030712]">{s.solucaoNome}</p>
+                <ProvisioningErrorBlock erro={s.erro!} />
+              </div>
+            ))}
           </div>
         )}
 
