@@ -65,10 +65,7 @@ export function ContractDetailSheet({ open, onClose, contract, onEdit, provision
   const emFalha = contract?.status === 'Falha no provisionamento'
 
   useEffect(() => {
-    if (!open || !contract || !emFalha) {
-      setSolucoes([])
-      return
-    }
+    if (!open || !contract || !emFalha) return
     let ativo = true
     getContractProvisioning(contract.id)
       .then(res => { if (ativo) setSolucoes(res) })
@@ -78,7 +75,10 @@ export function ContractDetailSheet({ open, onClose, contract, onEdit, provision
 
   if (!contract) return null
 
-  const solucoesComErro = solucoes.filter(s => s.erro)
+  // Derivado em vez de zerado no efeito: assim um resultado de um contrato
+  // anterior nunca vaza para o próximo, e o estado só é escrito no retorno
+  // da busca.
+  const solucoesComErro = emFalha ? solucoes.filter(s => s.erro && s.contratoId === contract.id) : []
   const shortId = contract.id.length > 8 ? `${contract.id.substring(0, 8)}…` : contract.id
 
   return (
