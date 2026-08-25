@@ -21,9 +21,35 @@ const ESTADO_TONE: Record<SolutionProvisioning['estado'], string> = {
   erro: 'text-[#dc2626]',
 }
 
-function SolutionRow({ solucao }: { solucao: SolutionProvisioning }) {
+function SolutionRow({
+  solucao,
+  podeReexecutar,
+  onRetry,
+}: {
+  solucao: SolutionProvisioning
+  /** Gate de permissão. O `podeReexecutar` do próprio erro é checado à parte. */
+  podeReexecutar: boolean
+  onRetry?: (solucaoNome: string) => Promise<void>
+}) {
   const Icon = ESTADO_ICON[solucao.estado]
   const hasDetails = Boolean(solucao.detalhes && Object.keys(solucao.detalhes).length > 0)
+  const [reexecutando, setReexecutando] = useState(false)
+
+  // Três condições: a permissão do usuário, o worker declarar a etapa
+  // reexecutável, e haver quem trate a ação nesta tela.
+  const mostraRetry = Boolean(
+    solucao.erro?.podeReexecutar && podeReexecutar && onRetry,
+  )
+
+  async function handleRetry() {
+    if (!onRetry) return
+    setReexecutando(true)
+    try {
+      await onRetry(solucao.solucaoNome)
+    } finally {
+      setReexecutando(false)
+    }
+  }
 
   return (
     <div className="flex flex-col py-3">
