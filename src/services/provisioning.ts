@@ -461,7 +461,37 @@ export async function getProvisioning(accountId: string): Promise<ProvisioningSn
  */
 export async function getContractProvisioning(contratoId: string): Promise<SolutionProvisioning[]> {
   if (USE_MOCK_PROVISIONING) {
-    return delay(solucoesDoContrato(contratoId), 200)
+    // Une as duas origens: cenários fixos (que existem antes da sessão) e
+    // contratos criados durante a sessão. Sem a primeira, um cenário de erro
+    // montado em fixture nunca chegaria ao detalhe do contrato.
+    const simuladas = solucoesDoContrato(contratoId)
+    const jaSimuladas = new Set(simuladas.map(s => s.solucaoNome))
+    const deFixture = Object.values(provisioningSnapshots)
+      .flatMap(snap => snap.solucoes)
+      .filter(s => s.contratoId === contratoId && !jaSimuladas.has(s.solucaoNome))
+
+    return delay([...deFixture, ...simuladas], 200)
+  }
+  throw new Error('Backend de provisionamento ainda não implementado.')
+}
+
+/**
+ * Reexecuta o provisionamento de UMA solução que falhou.
+ *
+ * É a única ação de recuperação da Fase 2. Deliberadamente por solução, e não
+ * por contrato: reexecutar um trabalho não altera vigência, licenciamento nem
+ * objetos do contrato, então não esbarra nas regras de edição e inativação —
+ * que foram justamente o motivo de "reprovisionar contrato" ter sido
+ * descartado.
+ */
+export async function retrySolutionProvisioning(
+  contratoId: string,
+  accountId: string,
+  solucaoNome: string,
+): Promise<void> {
+  if (USE_MOCK_PROVISIONING) {
+    reexecutarSolucao(contratoId, accountId, solucaoNome)
+    return delay(undefined, 400)
   }
   throw new Error('Backend de provisionamento ainda não implementado.')
 }
