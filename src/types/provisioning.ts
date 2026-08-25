@@ -66,8 +66,11 @@ export interface ProvisioningStepError {
   detalhe?: string
   ocorridoEm: string       // ISO 8601
   tentativas: number
+  /**
+   * Governa a exibição do botão "Tentar novamente" na linha da solução/etapa.
+   * O worker é quem sabe se o passo é idempotente; a UI só obedece.
+   */
   podeReexecutar: boolean
-  docUrl?: string
 }
 
 /** Estado runtime de um passo, vindo do worker. */
