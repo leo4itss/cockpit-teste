@@ -1,8 +1,10 @@
-import { CheckCircle2, Clock, Loader2, XCircle, Lock, FileQuestion, ExternalLink } from 'lucide-react'
+import { useState } from 'react'
+import { CheckCircle2, Clock, Loader2, XCircle, Lock, FileQuestion, RotateCcw } from 'lucide-react'
 import { Card, SectionTitle, Divider } from './ProvisioningCard'
+import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
 import { deriveFase2Status, PROVISIONING_STEP_LABEL } from '@/services/provisioning'
-import { formatarDataHora } from '@/lib/datas'
+import { ProvisioningErrorBlock } from './ProvisioningErrorBlock'
 import type { ProvisioningOverallStatus, SolutionProvisioning } from '@/types'
 
 const ESTADO_ICON: Record<SolutionProvisioning['estado'], typeof CheckCircle2> = {
