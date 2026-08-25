@@ -24,7 +24,7 @@ import { HealthCheckPanel } from '@/components/provisionamento/HealthCheckPanel'
 import { LogsSheet } from '@/components/provisionamento/LogsSheet'
 import { ConfirmDeleteModal } from '@/components/ConfirmDeleteModal'
 import { useToast, ToastContainer } from '@/components/ui/Toast'
-import { useCanViewProvisioning, useCanReprovisionTenant, useCanViewTenantLogs, useCanRunTenantHealthCheck } from '@/authz/hooks'
+import { useCanViewProvisioning, useCanReprovisionTenant, useCanViewTenantLogs, useCanRunTenantHealthCheck, useCanRetrySolutionProvisioning } from '@/authz/hooks'
 import { useProvisioningPolling } from '@/hooks/useProvisioningPolling'
 import {
   getProvisioning,
@@ -33,6 +33,7 @@ import {
   deriveSummary,
   PROVISIONING_STATUS_BADGE,
   buildDerivedSnapshot,
+  retrySolutionProvisioning,
   resolveAccountContracts,
   resolveAccountSolutionNames,
 } from '@/services/provisioning'
@@ -245,6 +246,33 @@ function ProvisioningContent({
 
   const summary = deriveSummary(snapshot.steps)
   const podeReexecutar = useCanRetrySolutionProvisioning(account.id, account.orgId)
+
+  /**
+   * Mantém o status dos contratos em dia a partir do que esta tela observa.
+   *
+   * Sem isso o fluxo de recuperação ficava pela metade: o usuário reexecutava
+   * a solução aqui, via ela concluir, e o contrato continuava em
+   * "Provisionando" até alguém abrir a tela da organização — que é quem fazia
+   * essa promoção. Reusa `deriveContractStatus`, sem duplicar a regra.
+   */
+  useEffect(() => {
+    const porContrato = new Map<string, SolutionProvisioning[]>()
+    for (const s of snapshot.solucoes) {
+      if (!s.contratoId) continue
+      porContrato.set(s.contratoId, [...(porContrato.get(s.contratoId) ?? []), s])
+    }
+
+    for (const [contratoId, solucoes] of porContrato) {
+      const alvo = contracts.find(c => c.id === contratoId)
+      if (!alvo) continue
+      const novo = deriveContractStatus(solucoes, alvo.status)
+      if (novo === alvo.status) continue
+
+      const atualizado: Contract = { ...alvo, status: novo }
+      setContracts(prev => prev.map(c => (c.id === contratoId ? atualizado : c)))
+      api.updateContract(contratoId, atualizado).catch(() => {})
+    }
+  }, [snapshot.solucoes, contracts])
 
   /**
    * Reexecuta uma solução que falhou e devolve o contrato ao acompanhamento.
