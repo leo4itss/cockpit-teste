@@ -121,6 +121,10 @@ In production, `engine.ts` functions would be replaced by OpenFGA SDK calls; the
 - Progress is tracked **per solution**, not just per contract (`SolutionProvisioning.contratoId`). One failing solution puts the whole contract in `'Falha no provisionamento'`.
 - **Polling, not WebSocket** — `useProvisioningPolling` (`src/hooks/useProvisioningPolling.ts`) refreshes every 5s and stops at a terminal state. WebSocket was evaluated and rejected: the project has no support and the traffic is one-way.
 - `src/services/fase2Mock.ts` simulates Phase 2 on the browser clock (`FASE2_DURACAO_MS_POR_SOLUCAO`, compressed for demos; real times are ~4 min for the CMS and ~2 min for the knowledge base). **Delete this file** when the worker exposes per-contract status.
+- **Recovery is per solution, never per contract.** `retrySolutionProvisioning()` re-runs one failed solution; there is deliberately no contract-level retry, because that would collide with the contract edit/inactivation rules — the reason "reprovisionar contrato" was rejected. Re-running a job changes no contract field. Gated by `canRetrySolutionProvisioning` (platform + org admin) and by the worker's own `podeReexecutar` flag on the error.
+- **`ProvisioningErrorBlock`** is the single error-detail block, shared by the Phase 1 step, the Phase 2 solution and the contract detail. Never inline a fourth copy.
+- **There is no runbook link.** `docUrl` was removed from `ProvisioningStepError` — the error→procedure mapping never existed, so the link pointed nowhere.
+- `mergeSolucoes()` gives the session simulation precedence over fixtures for the same solution+contract. Without it, retrying a fixture-based failure changes nothing on screen.
 - Contract filters must use `status !== 'Inativo'`, never `status === 'Ativo'` — the latter silently drops contracts that are provisioning. This bit the org-deletion guard in `server/index.ts` and `api/index.ts`.
 
 ### Provisioning vocabulary and dates
