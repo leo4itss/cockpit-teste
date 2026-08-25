@@ -122,7 +122,9 @@ function derivar(exec: ExecucaoFase2): SolutionProvisioning[] {
   const agora = Date.now()
 
   return exec.solucoes.map((nome, i) => {
-    const inicio = exec.iniciadoEm + i * FASE2_DURACAO_MS_POR_SOLUCAO
+    // Reexecutada: a janela recomeça no instante do retry, fora da fila.
+    const retry = exec.reexecucoes?.[nome]
+    const inicio = retry ?? exec.iniciadoEm + i * FASE2_DURACAO_MS_POR_SOLUCAO
     const fim = inicio + FASE2_DURACAO_MS_POR_SOLUCAO
     const base = { solucaoNome: nome, contratoId: exec.contratoId }
 
@@ -134,7 +136,7 @@ function derivar(exec: ExecucaoFase2): SolutionProvisioning[] {
       return { ...base, estado: 'em-andamento' as const, iniciadoEm: toIso(inicio), concluidoEm: null, duracaoMs: null, erro: null }
     }
 
-    if (solucoesQueFalham().includes(nome)) {
+    if (retry === undefined && solucoesQueFalham().includes(nome)) {
       return {
         ...base,
         estado: 'erro' as const,
