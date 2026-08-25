@@ -56,9 +56,27 @@ function ObjetoField({ label, value }: { label: string; value?: string | number 
 
 
 export function ContractDetailSheet({ open, onClose, contract, onEdit, provisionamentoHref }: Props) {
+  // Detalhe da Fase 2 buscado aqui, e não recebido por prop: o sheet já conhece
+  // o contrato, e assim quem o renderiza não precisa saber de provisionamento.
+  // Mesmo padrão de LogsSheet.
+  const [solucoes, setSolucoes] = useState<SolutionProvisioning[]>([])
+  const emFalha = contract?.status === 'Falha no provisionamento'
+
+  useEffect(() => {
+    if (!open || !contract || !emFalha) {
+      setSolucoes([])
+      return
+    }
+    let ativo = true
+    getContractProvisioning(contract.id)
+      .then(res => { if (ativo) setSolucoes(res) })
+      .catch(() => { if (ativo) setSolucoes([]) })
+    return () => { ativo = false }
+  }, [open, contract, emFalha])
 
   if (!contract) return null
 
+  const solucoesComErro = solucoes.filter(s => s.erro)
   const shortId = contract.id.length > 8 ? `${contract.id.substring(0, 8)}…` : contract.id
 
   return (
