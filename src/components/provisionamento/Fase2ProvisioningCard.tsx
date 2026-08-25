@@ -70,27 +70,22 @@ function SolutionRow({
         </div>
       </div>
 
-      {/* Bloco de erro — sempre visível, mesmo padrão da Fase 1 */}
+      {/* Bloco de erro — sempre visível, mesmo padrão da Fase 1. É aqui que
+          vive a única ação de recuperação da Fase 2: reexecutar UMA solução,
+          sem tocar no contrato. */}
       {solucao.erro && (
-        <div className="ml-8 mt-2 bg-red-50 border border-red-200 rounded-lg p-4 flex flex-col gap-2">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-red-700">{solucao.erro.codigo}</p>
-            <span className="text-xs text-red-500">{solucao.erro.tentativas === 1 ? '1 tentativa' : `${solucao.erro.tentativas} tentativas`}</span>
-          </div>
-          <p className="text-sm text-red-700">{solucao.erro.mensagem}</p>
-          <p className="text-xs text-red-500">Ocorrido em {formatarDataHora(solucao.erro.ocorridoEm)}</p>
-          {solucao.erro.detalhe && (
-            <pre className="text-xs text-red-800 bg-red-100/60 rounded p-2 overflow-x-auto whitespace-pre-wrap font-mono">
-              {solucao.erro.detalhe}
-            </pre>
-          )}
-          {solucao.erro.docUrl && (
-            <a href={solucao.erro.docUrl} target="_blank" rel="noreferrer"
-              className="inline-flex items-center gap-1 text-xs text-red-700 hover:underline w-fit">
-              Ver runbook <ExternalLink className="w-3 h-3" />
-            </a>
-          )}
-        </div>
+        <ProvisioningErrorBlock
+          erro={solucao.erro}
+          className="ml-8 mt-2"
+          acao={mostraRetry ? (
+            <Button variant="outline" size="sm" onClick={handleRetry} disabled={reexecutando}>
+              {reexecutando
+                ? <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                : <RotateCcw className="w-3.5 h-3.5 mr-1.5" />}
+              {reexecutando ? 'Reexecutando…' : 'Tentar novamente'}
+            </Button>
+          ) : undefined}
+        />
       )}
     </div>
   )
