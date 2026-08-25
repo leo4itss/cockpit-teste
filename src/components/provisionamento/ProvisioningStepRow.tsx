@@ -71,31 +71,7 @@ export function ProvisioningStepRow({
       </button>
 
       {/* Bloco de erro — sempre visível quando há falha, independente do expand */}
-      {step.erro && (
-        <div className="ml-8 mb-3 bg-red-50 border border-red-200 rounded-lg p-4 flex flex-col gap-2">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-red-700">{step.erro.codigo}</p>
-            <span className="text-xs text-red-500">{step.erro.tentativas === 1 ? '1 tentativa' : `${step.erro.tentativas} tentativas`}</span>
-          </div>
-          <p className="text-sm text-red-700">{step.erro.mensagem}</p>
-          <p className="text-xs text-red-500">Ocorrido em {formatarDataHora(step.erro.ocorridoEm)}</p>
-          {step.erro.detalhe && (
-            <pre className="text-xs text-red-800 bg-red-100/60 rounded p-2 overflow-x-auto whitespace-pre-wrap font-mono">
-              {step.erro.detalhe}
-            </pre>
-          )}
-          {step.erro.docUrl && (
-            <a
-              href={step.erro.docUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 text-xs text-red-700 hover:underline w-fit"
-            >
-              Ver runbook <ExternalLink className="w-3 h-3" />
-            </a>
-          )}
-        </div>
-      )}
+      {step.erro && <ProvisioningErrorBlock erro={step.erro} className="ml-8 mb-3" />}
 
       {/* Detalhes expansíveis — timestamps, duração e metadados do worker */}
       {expanded && (
