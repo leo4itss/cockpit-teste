@@ -2,9 +2,11 @@ import { Sheet } from './ui/Sheet'
 import { Button } from './ui/Button'
 import { ContractStatusBadge } from './ContractStatusBadge'
 import { ProvisioningDots } from './ProvisioningDots'
+import { useState, useEffect } from 'react'
 import { History, Loader2, AlertTriangle } from 'lucide-react'
-import { PUBLICACAO_STEPS } from '@/services/provisioning'
-import type { Contract } from '@/types'
+import { ProvisioningErrorBlock } from './provisionamento/ProvisioningErrorBlock'
+import { PUBLICACAO_STEPS, getContractProvisioning } from '@/services/provisioning'
+import type { Contract, SolutionProvisioning } from '@/types'
 
 interface Props {
   open: boolean
