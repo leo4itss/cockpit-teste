@@ -244,6 +244,36 @@ function ProvisioningContent({
   const linkedSolutions = solutions.filter(s => linkedSolutionNames.has(s.name) && s.status !== 'Inativo')
 
   const summary = deriveSummary(snapshot.steps)
+  const podeReexecutar = useCanRetrySolutionProvisioning(account.id, account.orgId)
+
+  /**
+   * Reexecuta uma solução que falhou e devolve o contrato ao acompanhamento.
+   *
+   * Sem gravar o contrato de volta em 'Provisionando', ele ficaria preso em
+   * "Falha no provisionamento": a listagem da organização só acompanha
+   * contratos em provisionamento e nunca perceberia a recuperação.
+   */
+  async function handleRetrySolucao(solucaoNome: string, contratoId?: string) {
+    if (!contratoId) {
+      onToast('Não foi possível identificar o contrato desta solução.\nAbra o contrato e tente por lá.', 'error')
+      return
+    }
+    try {
+      await retrySolutionProvisioning(contratoId, account.id, solucaoNome)
+
+      const alvo = contracts.find(c => c.id === contratoId)
+      if (alvo && alvo.status !== 'Provisionando') {
+        const atualizado: Contract = { ...alvo, status: 'Provisionando' }
+        setContracts(prev => prev.map(c => (c.id === contratoId ? atualizado : c)))
+        api.updateContract(contratoId, atualizado).catch(() => {})
+      }
+
+      onToast(`Reexecução solicitada para «${solucaoNome}».\nAcompanhe o status nesta tela.`, 'success')
+      onReload()
+    } catch {
+      onToast('Não foi possível reexecutar o provisionamento desta solução.\nTente novamente.', 'error')
+    }
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -253,7 +283,12 @@ function ProvisioningContent({
         onCopy={() => onToast('Domínio copiado.', 'success')}
       />
       <ProvisioningStepsTimeline steps={snapshot.steps} />
-      <Fase2ProvisioningCard fase1Status={snapshot.status} solucoes={snapshot.solucoes} />
+      <Fase2ProvisioningCard
+        fase1Status={snapshot.status}
+        solucoes={snapshot.solucoes}
+        podeReexecutar={podeReexecutar}
+        onRetry={handleRetrySolucao}
+      />
       <ProvisioningActionsBar account={account} onToast={onToast} onReload={onReload} />
       <LinkedSolutionsCard solutions={linkedSolutions} accountName={account.name} />
       <ActiveContractsCard contracts={linkedContracts} accountName={account.name} />
