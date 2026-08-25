@@ -31,6 +31,7 @@ import {
 // Simulação temporal da Fase 2 — descartável, some quando o worker real entrar.
 import {
   registrarExecucaoFase2,
+  reexecutarSolucao,
   solucoesDoContrato,
   solucoesDaConta,
 } from './fase2Mock'
