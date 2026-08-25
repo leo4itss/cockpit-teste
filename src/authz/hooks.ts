@@ -258,6 +258,11 @@ export function useCanViewTenantLogs(accountId: string, orgId: string): boolean 
   return engine.canViewTenantLogs(currentUser.id, accountId, orgId, relations)
 }
 
+export function useCanRetrySolutionProvisioning(accountId: string, orgId: string): boolean {
+  const { currentUser, relations } = useAuthz()
+  return engine.canRetrySolutionProvisioning(currentUser.id, accountId, orgId, relations)
+}
+
 export function useCanRunTenantHealthCheck(accountId: string, orgId: string): boolean {
   const { currentUser, relations } = useAuthz()
   return engine.canRunTenantHealthCheck(currentUser.id, accountId, orgId, relations)
