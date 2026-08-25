@@ -165,6 +165,37 @@ function derivar(exec: ExecucaoFase2): SolutionProvisioning[] {
   })
 }
 
+/**
+ * Reexecuta UMA solução de um contrato.
+ *
+ * Quando a solução veio de um fixture (cenário de erro pré-existente, sem
+ * execução em sessão), cria a execução na hora contendo só ela — assim o
+ * cenário de demonstração também é recuperável, e não só os contratos criados
+ * durante a sessão.
+ */
+export function reexecutarSolucao(
+  contratoId: string,
+  accountId: string,
+  solucaoNome: string,
+): void {
+  const exec = execucoes[contratoId]
+
+  if (!exec) {
+    execucoes[contratoId] = {
+      contratoId,
+      accountId,
+      solucoes: [solucaoNome],
+      iniciadoEm: Date.now(),
+      reexecucoes: { [solucaoNome]: Date.now() },
+    }
+  } else {
+    if (!exec.solucoes.includes(solucaoNome)) exec.solucoes.push(solucaoNome)
+    exec.reexecucoes = { ...exec.reexecucoes, [solucaoNome]: Date.now() }
+  }
+
+  persistir()
+}
+
 /** Soluções em provisionamento de UM contrato. Vazio = contrato não simulado. */
 export function solucoesDoContrato(contratoId: string): SolutionProvisioning[] {
   const exec = execucoes[contratoId]
