@@ -617,6 +617,28 @@ export const contracts: Contract[] = [
     renovacao: 'Anual',
     status: 'Ativo',
   },
+  // ── Cenário de erro da Fase 2 ────────────────────────────────────────
+  // Par do registro em `provisioningSnapshots.a1.solucoes` com estado 'erro'.
+  // Existe para que a falha do provisionamento por contrato seja demonstrável
+  // ao abrir a tela, sem depender do gatilho por console. Reexecutar a solução
+  // leva este contrato de volta a 'Provisionando' e depois a 'Ativo'.
+  {
+    id: 'ctr-apple-flow-falha',
+    orgId: '1',
+    contratante: 'Apple',
+    objetos: [
+      {
+        solucao: 'PAS Flow',
+        orgContratada: 'Apple',
+        plano: 'Starter',
+        licenciamento: 'Usuário nominal: 1–10 usuários',
+      },
+    ],
+    dataInicio: '24/03/2026',
+    dataTermino: '23/03/2027',
+    renovacao: 'Anual',
+    status: 'Falha no provisionamento',
+  },
   // ── Atlas ↔ Comgas — fallback local para cenário Docnix ──────────────
   {
     id: 'ctr-atlas-comgas',
