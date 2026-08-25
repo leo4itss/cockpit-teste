@@ -1435,7 +1435,6 @@ export const provisioningSnapshots: Record<string, ProvisioningSnapshot> = {
           ocorridoEm: '2026-03-01T14:24:47.880Z',
           tentativas: 3,
           podeReexecutar: true,
-          docUrl: 'https://runbooks.itss.internal/pas/provisionamento/dns-record-conflict',
         },
       },
       { id: 'ingress', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
