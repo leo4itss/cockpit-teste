@@ -1342,6 +1342,22 @@ export const provisioningSnapshots: Record<string, ProvisioningSnapshot> = {
       { solucaoNome: 'Base de Conhecimento PAS', estado: 'criado',
         iniciadoEm: '2026-03-23T17:58:20.000Z', concluidoEm: '2026-03-23T17:59:35.000Z', duracaoMs: 75000,
         detalhes: { plano: 'Enterprise', componentRef: 'comp-knowledge' }, erro: null },
+      // Cenário de erro da Fase 2 — visível ao abrir a tela, sem console.
+      // Vinculado a `ctr-apple-flow-falha` em `contracts`, que por isso nasce
+      // com status 'Falha no provisionamento'. `podeReexecutar: true` é o que
+      // faz o botão "Tentar novamente" aparecer nesta linha.
+      { solucaoNome: 'PAS Flow', estado: 'erro', contratoId: 'ctr-apple-flow-falha',
+        iniciadoEm: '2026-03-24T09:12:00.000Z', concluidoEm: '2026-03-24T09:14:38.000Z', duracaoMs: 158000,
+        detalhes: { plano: 'Starter', componentRef: 'comp-flow' },
+        erro: {
+          codigo: 'SOLUTION_SCHEMA_MIGRATION_FAILED',
+          mensagem: 'Falha ao criar as estruturas de dados da solução «PAS Flow» no ambiente do cliente.',
+          detalhe: 'migration 2026.03.11-flow-init: relation "flow_step" already exists\ndatabase=tenant_appletecgo schema=flow',
+          ocorridoEm: '2026-03-24T09:14:38.000Z',
+          tentativas: 3,
+          podeReexecutar: true,
+        },
+      },
     ],
   },
   a2: {
