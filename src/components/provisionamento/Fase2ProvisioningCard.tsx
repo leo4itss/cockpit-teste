@@ -101,9 +101,14 @@ function SolutionRow({
 export function Fase2ProvisioningCard({
   fase1Status,
   solucoes,
+  podeReexecutar = false,
+  onRetry,
 }: {
   fase1Status: ProvisioningOverallStatus
   solucoes: SolutionProvisioning[]
+  /** Gate de UI de `canRetrySolutionProvisioning`. */
+  podeReexecutar?: boolean
+  onRetry?: (solucaoNome: string, contratoId?: string) => Promise<void>
 }) {
   const fase2Status = deriveFase2Status(fase1Status, solucoes)
 
