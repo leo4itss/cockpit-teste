@@ -56,6 +56,17 @@ interface ExecucaoFase2 {
   solucoes: string[]
   /** Epoch ms do disparo. */
   iniciadoEm: number
+  /**
+   * Solução → epoch ms da reexecução. Uma solução aqui sai da fila sequencial
+   * e passa a contar a janela a partir do próprio instante do retry.
+   *
+   * **Limitação da simulação:** a reexecução sempre conclui com sucesso, mesmo
+   * que a solução esteja no gatilho de falha. É deliberado — o objetivo aqui é
+   * demonstrar a recuperação. Quem decide se uma reexecução falha de novo é o
+   * worker; para reproduzir isso, dispare uma nova execução com o gatilho
+   * ativo.
+   */
+  reexecucoes?: Record<string, number>
 }
 
 /**
