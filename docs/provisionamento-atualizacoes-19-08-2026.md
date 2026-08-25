@@ -61,13 +61,17 @@ duas telas, cada uma citando o seu próprio label.
 
 **Novo Contrato** — botão "Criar contrato":
 
-> Ao criar o contrato, as N solução(ões) selecionada(s) serão provisionadas automaticamente no ambiente do
-> cliente. Esse processo é executado em segundo plano e pode levar alguns minutos.
+> Ao criar o contrato, a solução selecionada será provisionada automaticamente no ambiente do cliente.
+> Esse processo é executado em segundo plano e pode levar alguns minutos.
+>
+> *(com duas ou mais: "as N soluções selecionadas serão provisionadas")*
 
 **Editar Contrato** — botão "Salvar contrato":
 
-> Ao salvar o contrato, as N solução(ões) adicionada(s) serão provisionadas automaticamente no ambiente do
-> cliente. Esse processo é executado em segundo plano e pode levar alguns minutos.
+> Ao salvar o contrato, a solução adicionada será provisionada automaticamente no ambiente do cliente.
+> Esse processo é executado em segundo plano e pode levar alguns minutos.
+>
+> *(com duas ou mais: "as N soluções adicionadas serão provisionadas")*
 
 O texto agora comunica os **dois** efeitos da ação (cria o contrato **e** dispara o provisionamento) e antecipa
 a duração.
@@ -118,10 +122,11 @@ sequência, uma de cada vez.
 ### Quando uma solução falha
 
 A linha da solução exibe o bloco de erro já usado na Fase 1 — código, mensagem funcional, número de tentativas,
-horário, resposta técnica e link de runbook quando houver. No detalhe do contrato aparece um aviso com o link
-**"Ver detalhes da falha"**, que leva à tela de provisionamento do tenant.
+horário e resposta técnica — junto de um botão **"Tentar novamente"**, que reexecuta apenas aquela solução. O
+detalhe do contrato mostra o mesmo motivo e leva à tela de provisionamento, onde a ação vive.
 
-**Nenhuma ação de recuperação em nível de contrato foi implementada** — ver "Fora de escopo".
+**Não há recuperação em nível de contrato** — a reexecução é sempre por solução, justamente para não esbarrar
+nas regras de edição e inativação do contrato.
 
 ### Atualização da tela
 

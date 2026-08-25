@@ -34,12 +34,13 @@ import {
   PROVISIONING_STATUS_BADGE,
   buildDerivedSnapshot,
   retrySolutionProvisioning,
+  deriveContractStatus,
   resolveAccountContracts,
   resolveAccountSolutionNames,
 } from '@/services/provisioning'
 import { api } from '@/api/client'
 import { accounts as mockAccounts, contracts as mockContracts, solutions as mockSolutions } from '@/data/mock'
-import type { Account, Contract, Solution, ProvisioningFetchState, ProvisioningSnapshot } from '@/types'
+import type { Account, Contract, Solution, ProvisioningFetchState, ProvisioningSnapshot, SolutionProvisioning } from '@/types'
 
 export function ProvisionamentoPage() {
   const { id } = useParams<{ id: string }>()
