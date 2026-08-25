@@ -495,6 +495,26 @@ export function canViewTenantLogs(
 }
 
 /**
+ * Pode reexecutar o provisionamento de UMA solução que falhou (Fase 2).
+ *
+ * Mesma régua de `canViewTenantLogs`: mexe em infraestrutura do tenant, mas
+ * não é destrutivo como reprovisionar a conta — que recria recursos e por isso
+ * segue restrito a Platform Admin.
+ *
+ * FGA (futuro): user:<id> can_retry_solution_provisioning account:<accountId>
+ */
+export function canRetrySolutionProvisioning(
+  userId: string,
+  _accountId: string,
+  orgId: string,
+  rel: FGARelations,
+): boolean {
+  if (isPlatformAdmin(userId, rel)) return true
+  if (isOrgAdmin(userId, orgId, rel)) return true
+  return false
+}
+
+/**
  * Pode disparar um health check sob demanda do tenant. Somente leitura,
  * mas gera carga em serviços externos — não liberado para `member`.
  * FGA (futuro): user:<id> can_run_health_check account:<accountId>
