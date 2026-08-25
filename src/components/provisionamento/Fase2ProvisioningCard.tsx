@@ -133,7 +133,14 @@ export function Fase2ProvisioningCard({
         </div>
       ) : (
         <div className="flex flex-col divide-y divide-[#f3f4f6]">
-          {solucoes.map(s => <SolutionRow key={s.solucaoNome} solucao={s} />)}
+          {solucoes.map(s => (
+            <SolutionRow
+              key={`${s.contratoId ?? 'sem-contrato'}:${s.solucaoNome}`}
+              solucao={s}
+              podeReexecutar={podeReexecutar}
+              onRetry={onRetry ? nome => onRetry(nome, s.contratoId) : undefined}
+            />
+          ))}
         </div>
       )}
     </Card>
