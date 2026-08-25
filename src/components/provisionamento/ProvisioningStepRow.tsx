@@ -1,7 +1,8 @@
-import { CheckCircle2, Clock, Loader2, XCircle, ChevronDown, ExternalLink } from 'lucide-react'
+import { CheckCircle2, Clock, Loader2, XCircle, ChevronDown } from 'lucide-react'
 import { Badge } from '@/components/ui/Badge'
 import { cn } from '@/lib/utils'
 import { formatarDataHora } from '@/lib/datas'
+import { ProvisioningErrorBlock } from './ProvisioningErrorBlock'
 import { PROVISIONING_STEP_LABEL } from '@/services/provisioning'
 import type { ProvisioningStep, ProvisioningStepDef } from '@/types'
 
