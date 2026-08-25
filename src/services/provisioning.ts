@@ -442,14 +442,7 @@ export async function getProvisioning(accountId: string): Promise<ProvisioningSn
     const raw = provisioningSnapshots[accountId]
     if (!raw) throw new ProvisioningNotFoundError(accountId)
     const snapshot = adaptWorkerSnapshot(raw)
-    // Contratos criados durante a sessão têm Fase 2 simulada em tempo real —
-    // elas se somam às soluções que já vinham do fixture.
-    const simuladas = solucoesDaConta(accountId)
-    return delay(
-      simuladas.length > 0
-        ? { ...snapshot, solucoes: [...snapshot.solucoes, ...simuladas] }
-        : snapshot,
-    )
+    return delay({ ...snapshot, solucoes: mergeSolucoes(snapshot.solucoes, solucoesDaConta(accountId)) })
   }
   throw new Error('Backend de provisionamento ainda não implementado.')
 }
