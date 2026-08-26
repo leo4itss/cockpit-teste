@@ -102,6 +102,8 @@ export interface Licensing {
   valorMinimo?: string           // quantidade mínima (opcional)
   valorMaximo?: string           // quantidade máxima (opcional)
   valor?: string                 // valor livre por licença
+  excedente?: string             // valor absoluto máximo permitido acima do nominal (excedente)
+  excedenteSemLimite?: boolean   // se true, ignora `excedente` e considera excedente ilimitado
   definirPreco: boolean
   precoAnual: string
   descontoMensal: string
@@ -125,7 +127,9 @@ export interface Plan {
 export interface ValorLicencaContrato {
   tipoLicencaNome: string
   tipoLicencaUnidade?: string
-  valor: string   // valor contratado (ex: "15", "500")
+  valor: string                  // valor contratado (ex: "15", "500")
+  excedente?: string             // valor absoluto máximo de excedente contratado (independente do plano)
+  excedenteSemLimite?: boolean   // se true, ignora `excedente` e considera excedente ilimitado
 }
 
 // ── Entrada de histórico do contrato ─────────────────────────
@@ -141,7 +145,6 @@ export interface ContractHistoricoEntry {
 // combinação de solução + plano + licenciamento + organização contratada.
 export interface ObjetoContrato {
   solucao: string
-  orgContratada: string
   plano: string
   licenciamento: string
   qtdContratada?: number  // deprecated — preservado apenas para dados históricos
@@ -152,6 +155,7 @@ export interface ObjetoContrato {
 export interface Solution {
   id: string
   orgId: string
+  accountId?: string  // conta à qual a solução pertence; ausente/vazio = solução legada (isenta da exclusividade por conta)
   name: string
   plans: Plan[]
   componenteIds?: string[]  // IDs dos componentes utilizados por esta solução

@@ -606,7 +606,6 @@ export const contracts: Contract[] = [
     objetos: [
       {
         solucao: 'Assistente de Design',
-        orgContratada: 'Apple',
         plano: 'Pro',
         licenciamento: 'Usuário nominal: 5–50 usuários',
         qtdContratada: 50,
@@ -629,7 +628,6 @@ export const contracts: Contract[] = [
     objetos: [
       {
         solucao: 'PAS Flow',
-        orgContratada: 'Apple',
         plano: 'Starter',
         licenciamento: 'Usuário nominal: 1–10 usuários',
       },
@@ -647,7 +645,6 @@ export const contracts: Contract[] = [
     objetos: [
       {
         solucao: 'Atlas',
-        orgContratada: 'Docnix',
         plano: 'Atlas Enterprise',
         licenciamento: '50 Usuários nominais',
         qtdContratada: 50,

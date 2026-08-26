@@ -15,19 +15,44 @@ function buildLicenciamentoLabel(valores: ValorLicencaContrato[]): string {
   return valores
     .map(v => {
       const unidade = v.tipoLicencaUnidade ?? ''
-      return v.valor ? `${v.tipoLicencaNome}: ${v.valor} ${unidade}`.trim() : v.tipoLicencaNome
+      const base = v.valor ? `${v.tipoLicencaNome}: ${v.valor} ${unidade}`.trim() : v.tipoLicencaNome
+      const excedenteLabel = v.excedenteSemLimite
+        ? ' (excedente: sem limite)'
+        : v.excedente?.trim()
+          ? ` (excedente até ${v.excedente.trim()} ${unidade})`.replace(/ \)/, ')')
+          : ''
+      return base + excedenteLabel
     })
     .join(' · ') || '—'
 }
 
+/** Descreve a mudança de excedente para o histórico, se houve alteração */
+function excedenteChangeDescription(ant: ValorLicencaContrato | undefined, atual: ValorLicencaContrato): string | null {
+  const antLabel = ant?.excedenteSemLimite ? 'sem limite' : (ant?.excedente?.trim() || '—')
+  const atualLabel = atual.excedenteSemLimite ? 'sem limite' : (atual.excedente?.trim() || '—')
+  if (antLabel === atualLabel) return null
+  return `${atual.tipoLicencaNome} (excedente): ${antLabel} → ${atualLabel}`
+}
+
+/** Detecta se a linha de excedente deve nascer "expandida" ao abrir o modal */
+function hasExcedenteConfigurado(v: ValorLicencaContrato): boolean {
+  return v.excedenteSemLimite === true || (v.excedente ?? '').trim() !== ''
+}
+
 export function EditLicencaDialog({ open, onClose, objeto, onSave }: Props) {
   const [valores, setValores] = useState<ValorLicencaContrato[]>([])
+  // Índices das linhas com a seção de excedente expandida na UI.
+  const [excedenteOpen, setExcedenteOpen] = useState<Set<number>>(new Set())
 
   useEffect(() => {
     if (open && objeto) {
-      setValores(
-        (objeto.valoresLicenca ?? []).map(v => ({ ...v }))
-      )
+      const initial = (objeto.valoresLicenca ?? []).map(v => ({ ...v }))
+      setValores(initial)
+      const openIndices = new Set<number>()
+      initial.forEach((v, i) => {
+        if (hasExcedenteConfigurado(v)) openIndices.add(i)
+      })
+      setExcedenteOpen(openIndices)
     }
   }, [open, objeto])
 
@@ -37,11 +62,39 @@ export function EditLicencaDialog({ open, onClose, objeto, onSave }: Props) {
     setValores(prev => prev.map((v, i) => i === index ? { ...v, valor: novoValor } : v))
   }
 
+  function handleExcedenteChange(index: number, novoExcedente: string) {
+    setValores(prev => prev.map((v, i) => i === index ? { ...v, excedente: novoExcedente } : v))
+  }
+
+  function handleToggleExcedenteSemLimite(index: number) {
+    setValores(prev => prev.map((v, i) => {
+      if (i !== index) return v
+      const willBeUnlimited = !v.excedenteSemLimite
+      return { ...v, excedenteSemLimite: willBeUnlimited, excedente: willBeUnlimited ? '' : (v.excedente ?? '') }
+    }))
+  }
+
+  function toggleExcedente(index: number) {
+    setExcedenteOpen(prev => {
+      const next = new Set(prev)
+      if (next.has(index)) {
+        next.delete(index)
+        // Ao fechar, limpa os campos de excedente para não persistir estado oculto.
+        setValores(vs => vs.map((v, i) =>
+          i === index ? { ...v, excedente: '', excedenteSemLimite: false } : v
+        ))
+      } else {
+        next.add(index)
+      }
+      return next
+    })
+  }
+
   function handleSave() {
     if (!objeto) return
     // Detecta o que mudou para gerar descrição no histórico
     const original = objeto.valoresLicenca ?? []
-    const alteracoes = valores
+    const alteracoesValor = valores
       .map((v, i) => {
         const ant = original[i]?.valor ?? ''
         if (ant === v.valor) return null
@@ -49,10 +102,13 @@ export function EditLicencaDialog({ open, onClose, objeto, onSave }: Props) {
         return `${v.tipoLicencaNome}: ${ant || '—'} → ${v.valor || '—'} ${unidade}`.trim()
       })
       .filter(Boolean)
+    const alteracoesExcedente = valores
+      .map((v, i) => excedenteChangeDescription(original[i], v))
+      .filter(Boolean)
+    const alteracoes = [...alteracoesValor, ...alteracoesExcedente]
 
     const updatedObjeto: ObjetoContrato = {
       solucao: objeto.solucao ?? '',
-      orgContratada: objeto.orgContratada ?? '',
       plano: objeto.plano ?? '',
       licenciamento: buildLicenciamentoLabel(valores),
       planoVersao: objeto.planoVersao,
@@ -105,24 +161,68 @@ export function EditLicencaDialog({ open, onClose, objeto, onSave }: Props) {
             Nenhum tipo de licença configurado neste plano.
           </p>
         ) : (
-          <div className="flex flex-col gap-4">
-            {valores.map((v, i) => (
-              <div key={i} className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-[#030712]">
-                  {v.tipoLicencaNome}
-                  {v.tipoLicencaUnidade && (
-                    <span className="text-xs text-[#6b7280] font-normal ml-1">({v.tipoLicencaUnidade})</span>
+          <div className="flex flex-col gap-5">
+            {valores.map((v, i) => {
+              const unidade = v.tipoLicencaUnidade ?? ''
+              const semLimite = v.excedenteSemLimite === true
+              const isExcedenteOpen = excedenteOpen.has(i)
+              return (
+              <div key={i} className="flex flex-col gap-3">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-[#030712]">
+                    {v.tipoLicencaNome}
+                    {unidade && (
+                      <span className="text-xs text-[#6b7280] font-normal ml-1">({unidade})</span>
+                    )}
+                  </label>
+                  <input
+                    type="text"
+                    value={v.valor}
+                    onChange={e => handleValorChange(i, e.target.value)}
+                    placeholder="ex: 15"
+                    className="h-9 w-full rounded-md border border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#030712] placeholder:text-[#9ca3af] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="flex items-center gap-1.5 cursor-pointer w-fit">
+                    <input
+                      type="checkbox"
+                      checked={isExcedenteOpen}
+                      onChange={() => toggleExcedente(i)}
+                      className="w-3.5 h-3.5 rounded border-[#e5e7eb] text-blue-600 accent-[#2563eb] cursor-pointer"
+                    />
+                    <span className="text-xs font-medium text-[#6b7280]">
+                      Excedente{unidade ? ` (${unidade})` : ''}
+                    </span>
+                  </label>
+
+                  {isExcedenteOpen && (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={semLimite ? '' : (v.excedente ?? '')}
+                        disabled={semLimite}
+                        onChange={e => handleExcedenteChange(i, e.target.value)}
+                        placeholder={semLimite ? 'Sem limite' : 'ex: 20'}
+                        className="h-9 flex-1 rounded-md border border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#030712] placeholder:text-[#9ca3af] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors disabled:bg-gray-50 disabled:text-[#9ca3af]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleToggleExcedenteSemLimite(i)}
+                        className={`shrink-0 h-9 px-3 border rounded-md text-xs font-medium transition-colors ${
+                          semLimite
+                            ? 'border-[#2563eb] bg-blue-50 text-[#2563eb]'
+                            : 'border-gray-200 bg-white text-[#030712] hover:bg-gray-50'
+                        }`}
+                      >
+                        {semLimite ? 'Sem limite (ativo)' : 'Sem limite'}
+                      </button>
+                    </div>
                   )}
-                </label>
-                <input
-                  type="text"
-                  value={v.valor}
-                  onChange={e => handleValorChange(i, e.target.value)}
-                  placeholder="ex: 15"
-                  className="h-9 w-full rounded-md border border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#030712] placeholder:text-[#9ca3af] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors"
-                />
+                </div>
               </div>
-            ))}
+            )})}
           </div>
         )}
       </div>

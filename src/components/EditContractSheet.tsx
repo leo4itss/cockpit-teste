@@ -20,6 +20,8 @@ interface Props {
   solutions: Solution[]
   /** Necessário para o gate de Fase 1 quando o usuário adiciona soluções novas. */
   accounts: Account[]
+  /** Demais contratos da org — usados para checar exclusividade de componente por conta. */
+  contracts: Contract[]
   onSave: (contract: Contract) => void
   onDelete?: () => void
   onInativar?: () => void
@@ -101,16 +103,15 @@ function StepForm({
           {objetos.length > 0 && (
             <>
               <Divider />
-              <div className="grid grid-cols-[1fr_1fr_1fr_1fr_32px_32px] gap-2">
-                {['Solução', 'Org. contratada', 'Plano', 'Licenciamento', '', ''].map((col, i) => (
+              <div className="grid grid-cols-[1fr_1fr_1fr_32px_32px] gap-2">
+                {['Solução', 'Plano', 'Licenciamento', '', ''].map((col, i) => (
                   <p key={i} className="text-xs text-[#6b7280] leading-4">{col}</p>
                 ))}
               </div>
               <Divider />
               {objetos.map((obj, i) => (
-                <div key={i} className="grid grid-cols-[1fr_1fr_1fr_1fr_32px_32px] gap-2 items-center">
+                <div key={i} className="grid grid-cols-[1fr_1fr_1fr_32px_32px] gap-2 items-center">
                   <p className="text-sm text-[#030712] truncate">{obj.solucao}</p>
-                  <p className="text-sm text-[#030712] truncate">{obj.orgContratada}</p>
                   <p className="text-sm text-[#030712] truncate">{obj.plano}</p>
                   <p className="text-sm text-[#030712] truncate">{obj.licenciamento}</p>
                   {!isInactive ? (
@@ -233,16 +234,15 @@ function StepReview({
       <div className="flex flex-col gap-3">
         <SectionTitle>Soluções novas que serão provisionadas (Fase 2)</SectionTitle>
         <div className="border border-[#e5e7eb] rounded-2xl p-4 flex flex-col gap-3">
-          <div className="grid grid-cols-4 gap-2">
-            {['Solução', 'Organização contratada', 'Plano', 'Licenciamento'].map(col => (
+          <div className="grid grid-cols-3 gap-2">
+            {['Solução', 'Plano', 'Licenciamento'].map(col => (
               <p key={col} className="text-xs text-[#6b7280] leading-4">{col}</p>
             ))}
           </div>
           <Divider />
           {novosObjetos.map((obj, i) => (
-            <div key={i} className="grid grid-cols-4 gap-2 items-center">
+            <div key={i} className="grid grid-cols-3 gap-2 items-center">
               <p className="text-sm text-[#030712] truncate">{obj.solucao}</p>
-              <p className="text-sm text-[#030712] truncate">{obj.orgContratada}</p>
               <p className="text-sm text-[#030712] truncate">{obj.plano}</p>
               <p className="text-sm text-[#030712] truncate">{obj.licenciamento}</p>
             </div>
@@ -265,7 +265,7 @@ function StepReview({
 
 // ── Sheet principal ────────────────────────────────────────────
 
-export function EditContractSheet({ open, onClose, contract, solutions, accounts, onSave, onInativar, onActivate }: Props) {
+export function EditContractSheet({ open, onClose, contract, solutions, accounts, contracts, onSave, onInativar, onActivate }: Props) {
   const { toasts, toast, dismiss } = useToast()
   const [dataTermino, setDataTermino] = useState(contract.dataTermino)
   const [renovacao, setRenovacao] = useState(contract.renovacao)
@@ -461,7 +461,8 @@ export function EditContractSheet({ open, onClose, contract, solutions, accounts
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         solutions={solutions}
-        orgName={contract.contratante}
+        contratante={contract.contratante}
+        contracts={contracts.filter(c => c.id !== contract.id)}
         onSave={handleObjetosSave}
       />
 

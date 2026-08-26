@@ -23,11 +23,19 @@ function emptyLicensing(): Licensing {
     tipoLicencaNome: '',
     tipoLicencaUnidade: '',
     valor: '',
+    excedente: '',
+    excedenteSemLimite: false,
     definirPreco: false,
     precoAnual: '',
     descontoMensal: '',
     precoMes: '',
   }
+}
+
+// Detecta se a linha de excedente deve nascer "expandida" ao editar
+// (mantém consistente com o que foi salvo antes).
+function hasExcedenteConfigurado(lic: Licensing): boolean {
+  return lic.excedenteSemLimite === true || (lic.excedente ?? '').trim() !== ''
 }
 
 /* ── main ───────────────────────────────────────────────── */
@@ -38,13 +46,22 @@ export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca
   const [description, setDescription] = useState('')
   const [upgradeUrl, setUpgradeUrl] = useState('')
   const [licensings, setLicensings] = useState<Licensing[]>([])
+  // Índices das linhas com a seção de excedente expandida na UI.
+  const [excedenteOpen, setExcedenteOpen] = useState<Set<number>>(new Set())
 
   useEffect(() => {
     if (open) {
       setName(initialPlan?.name ?? '')
       setDescription(initialPlan?.description ?? '')
       setUpgradeUrl(initialPlan?.upgradeUrl ?? '')
-      setLicensings(initialPlan?.licensings ?? [])
+      const initialLics = initialPlan?.licensings ?? []
+      setLicensings(initialLics)
+      // Abre automaticamente as seções de excedente já preenchidas
+      const openIndices = new Set<number>()
+      initialLics.forEach((lic, i) => {
+        if (hasExcedenteConfigurado(lic)) openIndices.add(i)
+      })
+      setExcedenteOpen(openIndices)
     }
   }, [open, initialPlan])
 
@@ -54,6 +71,43 @@ export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca
 
   function handleRemoveLicensing(index: number) {
     setLicensings(ls => ls.filter((_, i) => i !== index))
+    setExcedenteOpen(prev => {
+      const next = new Set<number>()
+      prev.forEach(i => {
+        if (i < index) next.add(i)
+        else if (i > index) next.add(i - 1)
+      })
+      return next
+    })
+  }
+
+  function toggleExcedente(index: number) {
+    setExcedenteOpen(prev => {
+      const next = new Set(prev)
+      if (next.has(index)) {
+        next.delete(index)
+        // Ao fechar, limpa os campos de excedente para não persistir estado oculto.
+        setLicensings(ls => ls.map((l, i) =>
+          i === index ? { ...l, excedente: '', excedenteSemLimite: false } : l
+        ))
+      } else {
+        next.add(index)
+      }
+      return next
+    })
+  }
+
+  function toggleExcedenteSemLimite(index: number) {
+    setLicensings(ls => ls.map((l, i) => {
+      if (i !== index) return l
+      const willBeUnlimited = !l.excedenteSemLimite
+      return {
+        ...l,
+        excedenteSemLimite: willBeUnlimited,
+        // Ao marcar "sem limite", zera o número; ao desmarcar, deixa vazio pro usuário digitar.
+        excedente: willBeUnlimited ? '' : (l.excedente ?? ''),
+      }
+    }))
   }
 
   function handleLicensingChange(index: number, field: keyof Licensing, value: string | boolean) {
@@ -81,6 +135,28 @@ export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca
       toast('Selecione o tipo de licença.', 'warning')
       return
     }
+
+    // Excedente: se ativo e não é "sem limite", precisa ter valor numérico >= valor nominal
+    for (const lic of licensings) {
+      const semLimite = lic.excedenteSemLimite === true
+      const excedenteInformado = (lic.excedente ?? '').trim()
+      // Se sem limite, nada a validar (o campo numérico é ignorado)
+      if (semLimite) continue
+      // Se o campo está vazio, tratamos como "excedente não configurado" — sem regra
+      if (excedenteInformado === '') continue
+
+      const nominal = Number((lic.valor ?? '').trim())
+      const excedente = Number(excedenteInformado)
+      if (Number.isNaN(excedente)) {
+        toast(`Excedente inválido em "${lic.tipoLicencaNome || 'tipo de licença'}". Informe um número.`, 'warning')
+        return
+      }
+      if (!Number.isNaN(nominal) && excedente < nominal) {
+        toast(`Excedente deve ser maior ou igual ao valor nominal em "${lic.tipoLicencaNome || 'tipo de licença'}".`, 'warning')
+        return
+      }
+    }
+
     if (!canSave) return
     onSave({ name: name.trim(), description: description.trim(), upgradeUrl: upgradeUrl.trim(), licensings })
     handleClose()
@@ -91,6 +167,7 @@ export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca
     setDescription('')
     setUpgradeUrl('')
     setLicensings([])
+    setExcedenteOpen(new Set())
     onClose()
   }
 
@@ -186,7 +263,11 @@ export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca
             <>
               <div className="border-t border-gray-100" />
               <div className="flex flex-col gap-6">
-                {licensings.map((lic, i) => (
+                {licensings.map((lic, i) => {
+                  const isExcedenteOpen = excedenteOpen.has(i)
+                  const semLimite = lic.excedenteSemLimite === true
+                  const unidade = lic.tipoLicencaUnidade ?? ''
+                  return (
                   <div key={i} className="flex flex-col gap-4">
 
                     {/* Tipo de Licença + Valor + remover */}
@@ -219,11 +300,54 @@ export function NewPlanDialog({ open, onClose, onSave, initialPlan, tiposLicenca
                       </button>
                     </div>
 
+                    {/* Excedente — toggle + campo condicional */}
+                    <div className="flex flex-col gap-3">
+                      <label className="flex items-center gap-2 cursor-pointer w-fit">
+                        <input
+                          type="checkbox"
+                          checked={isExcedenteOpen}
+                          onChange={() => toggleExcedente(i)}
+                          className="w-4 h-4 rounded border-[#e5e7eb] text-blue-600 accent-[#2563eb] cursor-pointer"
+                        />
+                        <span className="text-sm font-medium text-[#030712]">Definir excedente</span>
+                      </label>
+
+                      {isExcedenteOpen && (
+                        <div className="flex flex-col gap-2 pl-6">
+                          <div className="flex items-end gap-3">
+                            <div className="flex-1">
+                              <Input
+                                label={`Valor máximo do excedente${unidade ? ` (${unidade})` : ''}`}
+                                placeholder={semLimite ? 'Sem limite' : 'digite o valor máximo'}
+                                value={semLimite ? '' : (lic.excedente ?? '')}
+                                disabled={semLimite}
+                                onChange={e => handleLicensingChange(i, 'excedente', e.target.value)}
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => toggleExcedenteSemLimite(i)}
+                              className={`shrink-0 h-9 px-3 border rounded-md text-sm font-medium transition-colors mb-0.5 ${
+                                semLimite
+                                  ? 'border-[#2563eb] bg-blue-50 text-[#2563eb]'
+                                  : 'border-gray-200 bg-white text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]'
+                              }`}
+                            >
+                              {semLimite ? 'Sem limite (ativo)' : 'Sem limite'}
+                            </button>
+                          </div>
+                          <p className="text-xs text-[#6b7280]">
+                            Valor absoluto máximo permitido acima do nominal. Ao consumir além do nominal, o excedente é cobrado na próxima fatura.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
                     {i < licensings.length - 1 && (
                       <div className="border-t border-gray-100" />
                     )}
                   </div>
-                ))}
+                )})}
               </div>
             </>
           )}

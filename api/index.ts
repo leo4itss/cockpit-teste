@@ -3,7 +3,7 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { neon } from '@neondatabase/serverless'
 import { drizzle } from 'drizzle-orm/neon-http'
-import { eq, isNull, and, inArray, or } from 'drizzle-orm'
+import { eq, isNull, and, inArray, or, ne } from 'drizzle-orm'
 import * as schema from '../server/schema.js'
 import { getElegiveisParaSlot } from '../server/docnix-elegiveis.js'
 
@@ -85,7 +85,25 @@ app.post('/organizations', async (c) => {
   return c.json(org, 201)
 })
 app.put('/organizations/:id', async (c) => {
-  const [row] = await db.update(organizations).set(await c.req.json()).where(eq(organizations.id, c.req.param('id'))).returning()
+  const id = c.req.param('id')
+  const body = await c.req.json()
+
+  // ── Hierarquia de inativação: org só inativa se todas as contas já estiverem inativas ──
+  if (body.status === 'Inativo') {
+    const [existing] = await db.select().from(organizations).where(eq(organizations.id, id))
+    if (existing && existing.status !== 'Inativo') {
+      const activeAccounts = await db.select().from(accounts).where(
+        and(eq(accounts.orgId, id), isNull(accounts.deletedAt), ne(accounts.status, 'Inativo'))
+      )
+      if (activeAccounts.length > 0) {
+        return c.json({
+          error: `Não é possível inativar a organização: existem ${activeAccounts.length} conta(s) ativa(s) vinculada(s). Inative as contas primeiro.`,
+        }, 422)
+      }
+    }
+  }
+
+  const [row] = await db.update(organizations).set(body).where(eq(organizations.id, id)).returning()
   return row ? c.json(row) : c.json({ error: 'Not found' }, 404)
 })
 app.delete('/organizations/:id', async (c) => {
@@ -94,13 +112,20 @@ app.delete('/organizations/:id', async (c) => {
     db.select().from(accounts).where(eq(accounts.orgId, id)),
     db.select().from(contracts).where(eq(contracts.orgId, id)),
   ])
-  const activeAccounts = orgAccounts.filter((a: any) => a.status !== 'Excluído')
+  // Conta usa o modelo de quarentena (deletedAt), não `status` — ver CLAUDE.md.
+  const activeAccounts = orgAccounts.filter((a: any) => !a.deletedAt)
   // Qualquer contrato não inativado bloqueia a exclusão — inclui os estados de
   // provisionamento ('Provisionando', 'Falha no provisionamento'), que antes
   // escapavam da trava por não serem literalmente 'Ativo'.
   const activeContracts = orgContracts.filter((ct: any) => ct.status !== 'Inativo')
   if (activeAccounts.length > 0 || activeContracts.length > 0) {
-    return c.json({ error: 'dependencies', activeAccounts: activeAccounts.length, activeContracts: activeContracts.length }, 422)
+    return c.json({
+      error: 'dependencies',
+      activeAccounts: activeAccounts.length,
+      activeContracts: activeContracts.length,
+      accountNames: activeAccounts.map((a: any) => a.name),
+      contractNames: activeContracts.map((ct: any) => ct.contratante),
+    }, 422)
   }
   await db.delete(accounts).where(eq(accounts.orgId, id))
   await db.delete(contracts).where(eq(contracts.orgId, id))
@@ -134,14 +159,49 @@ app.post('/accounts', async (c) => {
   return c.json(row, 201)
 })
 app.put('/accounts/:id', async (c) => {
-  const [row] = await db.update(accounts).set(await c.req.json()).where(eq(accounts.id, c.req.param('id'))).returning()
+  const id = c.req.param('id')
+  const body = await c.req.json()
+
+  // ── Hierarquia de inativação: conta só inativa se todos os contratos vinculados já estiverem inativos ──
+  // (Organização → Conta → Contrato — cada nível bloqueia no de baixo. O vínculo conta↔solução
+  // existe apenas através do contrato, então a trava aqui é por contrato, não por solução.)
+  // Contratos NÃO são tocados por esta inativação — precisam ser inativados manualmente antes.
+  if (body.status === 'Inativo') {
+    const [existing] = await db.select().from(accounts).where(eq(accounts.id, id))
+    if (existing && existing.status !== 'Inativo') {
+      const activeContracts = await db.select().from(contracts).where(
+        and(eq(contracts.contratante, existing.name), ne(contracts.status, 'Inativo'))
+      )
+      if (activeContracts.length > 0) {
+        return c.json({
+          error: `Não é possível inativar a conta: existem ${activeContracts.length} contrato(s) ativo(s) vinculado(s). Inative os contratos primeiro.`,
+        }, 422)
+      }
+    }
+  }
+
+  const [row] = await db.update(accounts).set(body).where(eq(accounts.id, id)).returning()
   return row ? c.json(row) : c.json({ error: 'Not found' }, 404)
 })
 app.delete('/accounts/:id', async (c) => {
+  const id = c.req.param('id')
+
+  // ── Hierarquia: conta só entra em quarentena se não tiver contratos ativos vinculados ──
+  const [existing] = await db.select().from(accounts).where(eq(accounts.id, id))
+  if (!existing) return c.json({ error: 'Not found' }, 404)
+  const activeContracts = await db.select().from(contracts).where(
+    and(eq(contracts.contratante, existing.name), ne(contracts.status, 'Inativo'))
+  )
+  if (activeContracts.length > 0) {
+    return c.json({
+      error: `Não é possível excluir a conta: existem ${activeContracts.length} contrato(s) ativo(s) vinculado(s). Inative os contratos primeiro.`,
+    }, 422)
+  }
+
   const [row] = await db
     .update(accounts)
     .set({ deletedAt: new Date().toISOString() })
-    .where(eq(accounts.id, c.req.param('id')))
+    .where(eq(accounts.id, id))
     .returning()
   if (!row) return c.json({ error: 'Not found' }, 404)
   return c.json({ ok: true })
@@ -157,6 +217,7 @@ app.patch('/accounts/:id/restaurar', async (c) => {
 })
 
 // ── Solutions ─────────────────────────────────────────────────
+
 app.get('/solutions', async (c) => {
   const orgId = c.req.query('orgId')
   const rows = orgId
@@ -170,6 +231,14 @@ app.get('/solutions/:id', async (c) => {
 })
 app.post('/solutions', async (c) => {
   const body = await c.req.json()
+
+  // ── Máximo de um componente por solução ───────────────────
+  if ((body.componenteIds ?? []).length > 1) {
+    return c.json({
+      error: 'Uma solução pode ter no máximo um componente vinculado.',
+    }, 422)
+  }
+
   // Garante que todo plano criado já nasce com v1 registrada no histórico
   const now = new Date().toISOString()
   if (Array.isArray(body.plans)) {
@@ -190,11 +259,37 @@ app.put('/solutions/:id', async (c) => {
   const [existing] = await db.select().from(solutions).where(eq(solutions.id, id))
   if (!existing) return c.json({ error: 'Not found' }, 404)
 
+  // ── Hierarquia de inativação: solução só inativa se todos os contratos vinculados já estiverem inativos ──
+  // (Organização → Conta → Solução → Contrato — cada nível bloqueia no de baixo.)
+  if (body.status === 'Inativo' && existing.status !== 'Inativo') {
+    const orgContracts = await db.select().from(contracts).where(
+      and(eq(contracts.orgId, existing.orgId), ne(contracts.status, 'Inativo'))
+    )
+    const activeContracts = orgContracts.filter((ct: any) =>
+      Array.isArray(ct.objetos) && ct.objetos.some((o: any) => o.solucao === existing.name)
+    )
+    if (activeContracts.length > 0) {
+      return c.json({
+        error: `Não é possível inativar a solução: existem ${activeContracts.length} contrato(s) ativo(s) vinculado(s). Inative os contratos primeiro.`,
+      }, 422)
+    }
+  }
+
   // ── Componentes: ao menos 1 vinculado ────────────────────
   const incomingComponenteIds: string[] = body.componenteIds ?? []
   if (incomingComponenteIds.length === 0) {
     return c.json({
       error: 'A solução deve ter ao menos um componente vinculado.',
+    }, 422)
+  }
+
+  // ── Máximo de um componente por solução ───────────────────
+  // Soluções legadas com múltiplos componentes ficam isentas até serem
+  // editadas — só bloqueia se a quantidade estiver aumentando.
+  const existingComponenteIds: string[] = Array.isArray(existing.componenteIds) ? existing.componenteIds as string[] : []
+  if (incomingComponenteIds.length > 1 && incomingComponenteIds.length > existingComponenteIds.length) {
+    return c.json({
+      error: 'Uma solução pode ter no máximo um componente vinculado.',
     }, 422)
   }
 
@@ -285,6 +380,45 @@ app.delete('/solutions/:id', async (c) => {
 })
 
 // ── Contracts ─────────────────────────────────────────────────
+
+// Retorna os conflitos entre os componentes usados pelas soluções deste contrato
+// e os já usados por OUTROS contratos ATIVOS da MESMA conta (contratante) na
+// mesma organização. O vínculo conta↔solução existe apenas através do contrato
+// (Contract.objetos referencia a solução pelo nome) — por isso a resolução
+// solução → componentes é feita aqui, e não mais em Solution.accountId.
+async function findComponenteConflictsForContract(
+  orgId: string,
+  contratante: string,
+  objetos: Array<{ solucao: string }>,
+  excludeContractId?: string,
+) {
+  if (!contratante || objetos.length === 0) return []
+  const orgSolutions = await db.select().from(solutions).where(eq(solutions.orgId, orgId))
+  const componenteIdsPorSolucao = new Map<string, string[]>()
+  for (const sol of orgSolutions) {
+    componenteIdsPorSolucao.set(sol.name, Array.isArray(sol.componenteIds) ? sol.componenteIds as string[] : [])
+  }
+  const incomingComponenteIds = new Set(objetos.flatMap(o => componenteIdsPorSolucao.get(o.solucao) ?? []))
+  if (incomingComponenteIds.size === 0) return []
+
+  const orgContracts = await db.select().from(contracts).where(
+    and(eq(contracts.orgId, orgId), eq(contracts.contratante, contratante), ne(contracts.status, 'Inativo'))
+  )
+  const conflicts: { componenteId: string; solutionName: string; contractId: string }[] = []
+  for (const ct of orgContracts) {
+    if (ct.id === excludeContractId) continue
+    const ctObjetos: Array<{ solucao: string }> = Array.isArray(ct.objetos) ? ct.objetos as any[] : []
+    for (const obj of ctObjetos) {
+      for (const cid of componenteIdsPorSolucao.get(obj.solucao) ?? []) {
+        if (incomingComponenteIds.has(cid)) {
+          conflicts.push({ componenteId: cid, solutionName: obj.solucao, contractId: ct.id })
+        }
+      }
+    }
+  }
+  return conflicts
+}
+
 app.get('/contracts', async (c) => {
   const orgId = c.req.query('orgId')
   const rows = orgId
@@ -297,7 +431,18 @@ app.get('/contracts/:id', async (c) => {
   return row ? c.json(row) : c.json({ error: 'Not found' }, 404)
 })
 app.post('/contracts', async (c) => {
-  const [row] = await db.insert(contracts).values(await c.req.json()).returning()
+  const body = await c.req.json()
+
+  // ── Exclusividade de componente por conta ─────────────────
+  const conflicts = await findComponenteConflictsForContract(body.orgId, body.contratante, body.objetos ?? [])
+  if (conflicts.length > 0) {
+    const solNames = [...new Set(conflicts.map(cf => cf.solutionName))]
+    return c.json({
+      error: `Os componentes das soluções selecionadas já estão em uso por outro contrato ativo desta conta (${solNames.join(', ')}).`,
+    }, 422)
+  }
+
+  const [row] = await db.insert(contracts).values(body).returning()
   return c.json(row, 201)
 })
 app.put('/contracts/:id', async (c) => {
@@ -307,6 +452,19 @@ app.put('/contracts/:id', async (c) => {
   // Busca o contrato atual para snapshot antes de sobrescrever
   const [existing] = await db.select().from(contracts).where(eq(contracts.id, id))
   if (!existing) return c.json({ error: 'Not found' }, 404)
+
+  // ── Exclusividade de componente por conta ─────────────────
+  const effectiveContratante = ('contratante' in body) ? body.contratante : existing.contratante
+  const effectiveObjetos = ('objetos' in body) ? body.objetos : existing.objetos
+  const conflicts = await findComponenteConflictsForContract(
+    body.orgId ?? existing.orgId, effectiveContratante, effectiveObjetos ?? [], id
+  )
+  if (conflicts.length > 0) {
+    const solNames = [...new Set(conflicts.map(cf => cf.solutionName))]
+    return c.json({
+      error: `Os componentes das soluções selecionadas já estão em uso por outro contrato ativo desta conta (${solNames.join(', ')}).`,
+    }, 422)
+  }
 
   const [row] = await db.update(contracts).set(body).where(eq(contracts.id, id)).returning()
   return row ? c.json(row) : c.json({ error: 'Not found' }, 404)

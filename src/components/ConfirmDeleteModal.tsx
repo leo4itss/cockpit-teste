@@ -15,8 +15,9 @@ import { Button } from './ui/Button'
 import { AlertTriangle, CircleAlert, RotateCcw } from 'lucide-react'
 
 interface BlockedInfo {
-  activeAccounts: number
-  activeContracts: number
+  accounts?: string[]    // nomes das contas ativas que bloqueiam (ex: inativar org)
+  contracts?: string[]   // nomes/identificadores dos contratos ativos que bloqueiam (ex: inativar solução)
+  solutions?: string[]   // nomes das soluções ativas que bloqueiam (ex: inativar conta)
 }
 
 interface Props {
@@ -27,9 +28,11 @@ interface Props {
   onConfirm?: () => void  // não usado em 'blocked'
   blocked?: BlockedInfo   // usado em 'blocked'
   blockedTitle?: string   // título customizável para o variant 'blocked'
+  blockedDescription?: string  // corpo de texto explicando a regra específica (ex: por que está bloqueado)
+  actionLabel?: string    // verbo usado no texto do variant 'blocked' (ex: 'excluir', 'inativar') — padrão 'excluir'
 }
 
-export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, blocked, blockedTitle }: Props) {
+export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, blocked, blockedTitle, blockedDescription, actionLabel = 'excluir' }: Props) {
   const [typed, setTyped] = useState('')
 
   function handleClose() {
@@ -55,26 +58,63 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
         }
       >
         <div className="flex flex-col gap-4">
+          {blockedDescription && (
+            <p className="text-sm text-[#6b7280] leading-5">{blockedDescription}</p>
+          )}
           <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
             <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
             <p className="text-sm text-amber-800">
-              Resolva as dependências abaixo antes de excluir.
+              Resolva as dependências abaixo antes de {actionLabel}.
             </p>
           </div>
-          <ul className="flex flex-col gap-2 text-sm text-[#030712]">
-            {(blocked?.activeAccounts ?? 0) > 0 && (
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
-                <span><strong>{blocked!.activeAccounts}</strong> conta{blocked!.activeAccounts !== 1 ? 's' : ''} ativa{blocked!.activeAccounts !== 1 ? 's' : ''} vinculada{blocked!.activeAccounts !== 1 ? 's' : ''}</span>
-              </li>
-            )}
-            {(blocked?.activeContracts ?? 0) > 0 && (
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
-                <span><strong>{blocked!.activeContracts}</strong> contrato{blocked!.activeContracts !== 1 ? 's' : ''} ativo{blocked!.activeContracts !== 1 ? 's' : ''} vigente{blocked!.activeContracts !== 1 ? 's' : ''}</span>
-              </li>
-            )}
-          </ul>
+
+          {(blocked?.accounts?.length ?? 0) > 0 && (
+            <div className="flex flex-col gap-1.5">
+              <p className="text-sm font-medium text-[#030712]">
+                {blocked!.accounts!.length} conta{blocked!.accounts!.length !== 1 ? 's' : ''} ativa{blocked!.accounts!.length !== 1 ? 's' : ''} vinculada{blocked!.accounts!.length !== 1 ? 's' : ''}
+              </p>
+              <ul className="flex flex-col gap-1 pl-1">
+                {blocked!.accounts!.map((name, i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm text-[#6b7280]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+                    <span>{name}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {(blocked?.solutions?.length ?? 0) > 0 && (
+            <div className="flex flex-col gap-1.5">
+              <p className="text-sm font-medium text-[#030712]">
+                {blocked!.solutions!.length} solução{blocked!.solutions!.length !== 1 ? 'ões' : ''} ativa{blocked!.solutions!.length !== 1 ? 's' : ''} vinculada{blocked!.solutions!.length !== 1 ? 's' : ''}
+              </p>
+              <ul className="flex flex-col gap-1 pl-1">
+                {blocked!.solutions!.map((name, i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm text-[#6b7280]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+                    <span>{name}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {(blocked?.contracts?.length ?? 0) > 0 && (
+            <div className="flex flex-col gap-1.5">
+              <p className="text-sm font-medium text-[#030712]">
+                {blocked!.contracts!.length} contrato{blocked!.contracts!.length !== 1 ? 's' : ''} ativo{blocked!.contracts!.length !== 1 ? 's' : ''} vigente{blocked!.contracts!.length !== 1 ? 's' : ''}
+              </p>
+              <ul className="flex flex-col gap-1 pl-1">
+                {blocked!.contracts!.map((name, i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm text-[#6b7280]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+                    <span>{name}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </Modal>
     )
@@ -82,6 +122,7 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
 
   // --- SOLUTION ---
   if (variant === 'solution') {
+    const canConfirm = typed === name
     return (
       <Modal
         open={open}
@@ -91,7 +132,14 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
         footer={
           <>
             <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
-            <Button variant="destructive" onClick={handleConfirm}>Excluir</Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirm}
+              disabled={!canConfirm}
+              className={!canConfirm ? 'opacity-50 cursor-not-allowed' : ''}
+            >
+              Excluir
+            </Button>
           </>
         }
       >
@@ -103,6 +151,18 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
               Esta ação é <strong>irreversível</strong>. A solução e todos os seus planos serão removidos permanentemente.
             </p>
           </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-[#030712]">
+              Digite <strong>"{name}"</strong> para confirmar:
+            </label>
+            <input
+              type="text"
+              value={typed}
+              onChange={e => setTyped(e.target.value)}
+              placeholder={name}
+              className="w-full rounded-md border border-[#e5e7eb] px-3 py-2 text-sm text-[#030712] placeholder:text-[#9ca3af] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-red-500"
+            />
+          </div>
         </div>
       </Modal>
     )
@@ -110,6 +170,7 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
 
   // --- CONTRACT ---
   if (variant === 'contract') {
+    const canConfirm = typed === name
     return (
       <Modal
         open={open}
@@ -119,7 +180,14 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
         footer={
           <>
             <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
-            <Button variant="destructive" onClick={handleConfirm}>Excluir</Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirm}
+              disabled={!canConfirm}
+              className={!canConfirm ? 'opacity-50 cursor-not-allowed' : ''}
+            >
+              Excluir
+            </Button>
           </>
         }
       >
@@ -130,6 +198,18 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
             <p className="text-xs text-red-800">
               Esta ação é <strong>irreversível</strong>. O contrato e todos os seus objetos serão removidos permanentemente.
             </p>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-[#030712]">
+              Digite <strong>"{name}"</strong> para confirmar:
+            </label>
+            <input
+              type="text"
+              value={typed}
+              onChange={e => setTyped(e.target.value)}
+              placeholder={name}
+              className="w-full rounded-md border border-[#e5e7eb] px-3 py-2 text-sm text-[#030712] placeholder:text-[#9ca3af] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-red-500"
+            />
           </div>
         </div>
       </Modal>
@@ -143,6 +223,7 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
     const exclusaoFormatada = exclusaoPermanente.toLocaleDateString('pt-BR', {
       day: '2-digit', month: 'long', year: 'numeric',
     })
+    const canConfirm = typed === name
 
     return (
       <Modal
@@ -153,7 +234,14 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
         footer={
           <>
             <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
-            <Button variant="destructive" onClick={handleConfirm}>Excluir</Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirm}
+              disabled={!canConfirm}
+              className={!canConfirm ? 'opacity-50 cursor-not-allowed' : ''}
+            >
+              Excluir
+            </Button>
           </>
         }
       >
@@ -168,6 +256,18 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
               <br />
               <span className="font-semibold">Exclusão permanente prevista para: {exclusaoFormatada}</span>
             </p>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-[#030712]">
+              Digite <strong>"{name}"</strong> para confirmar:
+            </label>
+            <input
+              type="text"
+              value={typed}
+              onChange={e => setTyped(e.target.value)}
+              placeholder={name}
+              className="w-full rounded-md border border-[#e5e7eb] px-3 py-2 text-sm text-[#030712] placeholder:text-[#9ca3af] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-red-500"
+            />
           </div>
         </div>
       </Modal>
@@ -198,20 +298,12 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
       >
         <div className="flex flex-col gap-4 text-sm text-[#030712]">
           <p>
-            Ao inativar esta organização, os seguintes itens serão <strong>automaticamente inativados</strong>:
+            Tem certeza que deseja inativar a organização <strong>"{name}"</strong>?
           </p>
-          <div className="bg-yellow-50 border border-yellow-300 rounded-md p-4">
-            <ul className="flex flex-col gap-1 text-sm font-medium text-yellow-700 list-disc list-outside pl-5">
-              <li>Todas as contas vinculadas</li>
-              <li>Todos os contratos</li>
-              <li>Todas as soluções</li>
-            </ul>
-          </div>
-
           <div className="flex items-start gap-4 bg-blue-50 border border-blue-300 rounded-md p-4">
             <CircleAlert className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
             <p className="text-sm font-medium text-blue-700 leading-5">
-              Esta ação <strong>pode ser desfeita</strong>. Para reativar a organização e seus vínculos,
+              Esta ação <strong>pode ser desfeita</strong>. Para reativar a organização,
               acesse o menu de ações da organização e selecione <strong>"Reativar organização"</strong>.
             </p>
           </div>
@@ -283,12 +375,8 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
       >
         <div className="flex flex-col gap-4 text-sm text-[#030712]">
           <p>
-            Ao inativar a conta <strong>"{name}"</strong>, os seguintes itens serão <strong>automaticamente inativados</strong>:
+            Tem certeza que deseja inativar a conta <strong>"{name}"</strong>?
           </p>
-          <ul className="flex flex-col gap-1.5 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-xs list-disc list-outside pl-6">
-            <li>Todos os contratos vinculados a esta conta</li>
-            <li>Todas as soluções vinculadas a esta conta</li>
-          </ul>
           <div className="flex items-start gap-4 bg-blue-50 border border-blue-300 rounded-md p-4">
             <CircleAlert className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
             <p className="text-sm font-medium text-blue-700 leading-5">
@@ -325,15 +413,6 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
           <p>
             Tem certeza que deseja inativar a solução <strong>"{name}"</strong>?
           </p>
-          <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-            <div className="flex flex-col gap-1 text-xs text-amber-800">
-              <p>
-                Ao inativar esta solução, <strong>todos os contratos vinculados</strong> serão
-                automaticamente inativados.
-              </p>
-            </div>
-          </div>
           <div className="flex items-start gap-4 bg-blue-50 border border-blue-300 rounded-md p-4">
             <CircleAlert className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
             <p className="text-sm font-medium text-blue-700 leading-5">
@@ -348,6 +427,7 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
 
   // --- EXCLUIR-ORG ---
   if (variant === 'excluir-org') {
+    const canConfirm = typed === name
     return (
       <Modal
         open={open}
@@ -357,7 +437,14 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
         footer={
           <>
             <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
-            <Button variant="destructive" onClick={handleConfirm}>Excluir</Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirm}
+              disabled={!canConfirm}
+              className={!canConfirm ? 'opacity-50 cursor-not-allowed' : ''}
+            >
+              Excluir
+            </Button>
           </>
         }
       >
@@ -366,8 +453,22 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
           <div className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg">
             <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
             <p className="text-xs text-red-800">
-              Esta ação é <strong>irreversível</strong>. A organização e todos os seus dados serão removidos permanentemente.
+              Esta ação é <strong>irreversível</strong>. A organização e todos os seus dados (contas já
+              excluídas, contratos e soluções) serão removidos permanentemente do sistema.
             </p>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-[#030712]">
+              Digite <strong>"{name}"</strong> para confirmar:
+            </label>
+            <input
+              type="text"
+              value={typed}
+              onChange={e => setTyped(e.target.value)}
+              placeholder={name}
+              className="w-full rounded-md border border-[#e5e7eb] px-3 py-2 text-sm text-[#030712] placeholder:text-[#9ca3af] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-red-500"
+            />
           </div>
         </div>
       </Modal>
