@@ -57,14 +57,23 @@ function occupiedComponenteIds(solutions: Solution[], contratante: string, contr
   return occupied
 }
 
-/** Componentes das soluções já adicionadas ao contrato em edição, ainda não salvas. */
-function rascunhoComponenteIds(solutions: Solution[], objetos: ObjetoContrato[]): Set<string> {
-  const componenteIdsPorSolucao = componenteIdsPorSolucaoMap(solutions)
-  const ids = new Set<string>()
-  objetos.forEach(obj => {
-    (componenteIdsPorSolucao.get(obj.solucao) ?? []).forEach(cid => ids.add(cid))
-  })
-  return ids
+/**
+ * Nomes das soluções já adicionadas ao contrato em edição, ainda não salvas.
+ *
+ * Por NOME, e não por componente — ao contrário da checagem entre contratos.
+ * São regras diferentes: entre contratos o que não pode repetir é o componente
+ * provisionado na conta; dentro de um mesmo contrato o que não faz sentido é a
+ * mesma solução duas vezes, porque não há como dizer qual plano vale.
+ *
+ * Comparar por componente aqui bloquearia soluções DIFERENTES que dividem um
+ * componente — «PAS Flow» e «Assistente de Design» dividem `comp-1`, e o
+ * contrato da conta Apple Developer Tools tem as duas juntas. Seria impossível
+ * remontar pela interface um contrato que já existe, e o aviso mentiria
+ * dizendo que a solução já foi adicionada. O servidor sempre checou por nome
+ * (`findDuplicateSolutionNames`); esta é a metade que estava divergindo.
+ */
+function rascunhoSolucaoNames(objetos: ObjetoContrato[]): Set<string> {
+  return new Set(objetos.map(o => o.solucao))
 }
 
 function buildRows(solutions: Solution[]): Row[] {
