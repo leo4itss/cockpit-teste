@@ -442,6 +442,17 @@ app.delete('/solutions/:id', async (c) => {
 // mesma organização. O vínculo conta↔solução existe apenas através do contrato
 // (Contract.objetos referencia a solução pelo nome) — por isso a resolução
 // solução → componentes é feita aqui, e não mais em Solution.accountId.
+/** Nomes de solução que aparecem mais de uma vez na lista de objetos do próprio contrato. */
+function findDuplicateSolutionNames(objetos: Array<{ solucao: string }>): string[] {
+  const vistos = new Set<string>()
+  const duplicadas = new Set<string>()
+  for (const o of objetos) {
+    if (vistos.has(o.solucao)) duplicadas.add(o.solucao)
+    vistos.add(o.solucao)
+  }
+  return [...duplicadas]
+}
+
 async function findComponenteConflictsForContract(
   orgId: string,
   contratante: string,
@@ -489,6 +500,19 @@ app.get('/contracts/:id', async (c) => {
 app.post('/contracts', async (c) => {
   const body = await c.req.json()
 
+  // ── Mesma solução duas vezes no próprio contrato ───────────
+  // A checagem de exclusividade abaixo compara contra OUTROS contratos; ela
+  // nunca olha para dentro da própria lista. Sem isto, nada impede duas
+  // linhas de "PAS Flow" com planos diferentes no mesmo contrato — situação
+  // sem leitura sensata (qual plano vale?) que passou despercebida nos dados
+  // de demonstração até ser auditada.
+  const duplicadas = findDuplicateSolutionNames(body.objetos ?? [])
+  if (duplicadas.length > 0) {
+    return c.json({
+      error: `A mesma solução não pode aparecer duas vezes no mesmo contrato (${duplicadas.join(', ')}).`,
+    }, 422)
+  }
+
   // ── Exclusividade de componente por conta ─────────────────
   const conflicts = await findComponenteConflictsForContract(body.orgId, body.contratante, body.objetos ?? [])
   if (conflicts.length > 0) {
@@ -522,6 +546,14 @@ app.put('/contracts/:id', async (c) => {
   const vaiInativar = body.status === 'Inativo'
 
   if (mudaComposicao && !vaiInativar) {
+    const effectiveObjetosParaDuplicata = ('objetos' in body) ? body.objetos : existing.objetos
+    const duplicadas = findDuplicateSolutionNames(effectiveObjetosParaDuplicata ?? [])
+    if (duplicadas.length > 0) {
+      return c.json({
+        error: `A mesma solução não pode aparecer duas vezes no mesmo contrato (${duplicadas.join(', ')}).`,
+      }, 422)
+    }
+
     const effectiveContratante = ('contratante' in body) ? body.contratante : existing.contratante
     const effectiveObjetos = ('objetos' in body) ? body.objetos : existing.objetos
     const conflicts = await findComponenteConflictsForContract(
