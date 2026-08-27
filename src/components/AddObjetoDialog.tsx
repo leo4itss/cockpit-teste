@@ -132,13 +132,23 @@ function buildRows(solutions: Solution[]): Row[] {
   return rows
 }
 
-export function AddObjetoDialog({ open, onClose, solutions, contratante, contracts, onSave }: Props) {
+export function AddObjetoDialog({ open, onClose, solutions, contratante, contracts, objetosNoRascunho, onSave }: Props) {
   const rows = buildRows(solutions)
   const [selected, setSelected] = useState<Set<string>>(new Set())
 
   const occupied = occupiedComponenteIds(solutions, contratante, contracts)
+  const emRascunho = rascunhoComponenteIds(solutions, objetosNoRascunho)
   function isBlocked(row: Row) {
-    return row.componenteIds.some(cid => occupied.has(cid))
+    return row.componenteIds.some(cid => occupied.has(cid) || emRascunho.has(cid))
+  }
+  function motivoBloqueio(row: Row): string | undefined {
+    if (row.componenteIds.some(cid => emRascunho.has(cid))) {
+      return 'Esta solução já foi adicionada a este contrato.'
+    }
+    if (row.componenteIds.some(cid => occupied.has(cid))) {
+      return 'Um dos componentes desta solução já está em uso por outro contrato ativo desta conta.'
+    }
+    return undefined
   }
   const selectableRows = rows.filter(r => !isBlocked(r))
 
