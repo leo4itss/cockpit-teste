@@ -1,12 +1,13 @@
 # Provisionamento — adendo à revisão do PR #3
 
-**Origem:** revisão externa do PR, em duas rodadas (26 e 27/08/2026) ·
-**Branch:** `PAS-2409-provisionamento` · **Situação:** quatro achados corrigidos e verificados
+**Origem:** revisão externa do PR, em três rodadas (26 e 27/08/2026) ·
+**Branch:** `PAS-2409-provisionamento` · **Situação:** cinco achados corrigidos e verificados
 
-> **Resumo em uma linha.** Da revisão saíram **7 achados**: **4 eram defeitos reais e estão
-> corrigidos** (um deles bem mais grave do que a revisão supôs), **1 é falso positivo** — verifiquei
-> ao vivo —, e **2 são comportamento consciente** que só muda por decisão de produto. Cinco itens do
-> roteiro continuam sem validação independente.
+> **Resumo em uma linha.** Da revisão saíram **8 achados** ao todo: **5 eram defeitos reais e estão
+> corrigidos** (dois bem mais graves do que a revisão supôs, um deles achado pela própria revisora ao
+> se corrigir), **1 é falso positivo**, e **2 são comportamento consciente** que só muda por decisão de
+> produto. A revisora também corrigiu, por conta própria, dois achados dela mesma de rodadas
+> anteriores (ver seção 7). Cinco itens do roteiro continuam sem validação independente.
 
 ---
 
@@ -172,3 +173,64 @@ agora com recusa explícita quando o modelo não consegue distinguir contas de m
 - **Apagar a branch `PAS-240-discovery-solucao-contrato` e a tag `pre-merge-pas240`** — confirmado que
   a branch está 100% contida nesta (zero commits fora). Ação fica para **depois** do merge deste PR;
   apagar antes seria prematuro.
+
+---
+
+## 7. Terceira rodada — a revisora conferiu as correções e achou mais um
+
+Depois das correções da seção 1, a revisão voltou para verificar cada afirmação uma a uma — inclusive
+as duas em que ela discordava de mim. O rigor valeu: ela corrigiu a si mesma duas vezes, e achou um
+defeito real que eu não tinha visto.
+
+### Ela se corrigiu duas vezes, com verificação própria
+
+- **"Não houve re-seed"** — ela tinha inferido re-seed pela queda de 17 para 5 contratos. Foi conferir:
+  as contas Nexora Tecnologia, Vértice Digital e Mateus Gandi não existem nos dados de carga — um seed
+  as teria apagado, e as três seguem no ambiente. Confirmou que a limpeza foi contrato a contrato, como
+  eu tinha descrito, e retirou a inferência.
+- **"Arquiteto PAS tem Verificar saúde"** — ela testou de novo e confirmou: o botão está desabilitado,
+  com a explicação certa. O teste anterior dela tinha checado só a presença do botão, não o estado.
+  Retirou o achado.
+
+### O achado novo: dois elementos focáveis para uma única ação
+
+Tentando verificar o fix do tooltip, ela não conseguiu confirmar por foco de teclado — a aba dela nunca
+recebe foco real do sistema operacional, então `.focus()` programático muda `document.activeElement`
+sem disparar o evento que o React escuta. Em vez de reportar "não funciona", ela **identificou a causa
+como limitação do próprio ambiente de teste e descartou o resultado** — mesma disciplina que apliquei
+nos meus testes desta rodada.
+
+Sem depender de foco ao vivo, ela leu a estrutura da página e achou o problema de verdade: o
+`<div tabIndex="0">` que o Tooltip renderiza ficava **dentro de um `<button>`**, na listagem de contas
+da organização (`ProvisioningDots` é usado dentro de um botão que navega para o detalhe de
+provisionamento ao clicar). Consequência prática: duas paradas de Tab para uma única ação, e nenhuma
+forma de saber por qual delas um leitor de tela passaria.
+
+**Corrigido.** `Tooltip` ganhou `tabIndexed`/`focused`: com `tabIndexed={false}` o wrapper não declara
+`tabIndex` nem `onFocus`/`onBlur` próprios, e quem controla a exibição do balão passa a ser o `focused`
+vindo de fora. O `<button>` inline em `OrganizacaoDetailPage` virou um componente próprio
+(`ProvisioningDotsButton`) com seu próprio estado de foco, repassado para baixo. O outro consumidor do
+Tooltip (`ContractDetailSheet`, fora de botão) não muda.
+
+**Verificado no ambiente local:** zero elementos com `tabIndex` dentro do `<button>` (antes: um); foco
+no botão abre o balão e fecha ao perdê-lo; hover no elemento correto continua funcionando (testado com
+`mouseover`/`mouseout`, os eventos que o React realmente escuta — `mouseenter`/`mouseleave` nativos não
+borbulham, e foi aí que meu primeiro teste desta rodada deu falso negativo antes de eu corrigir o
+próprio teste).
+
+### Situação final dos achados dela
+
+| # | Achado | Situação |
+|---|---|---|
+| 1 | Solução duplicada bloqueava combinação válida | ✅ corrigido |
+| 2 | Data em formato técnico | ✅ corrigido |
+| 3 | Plano divergente (Pro × Basic) | ✅ corrigido |
+| 4 | Tooltip só no hover | ✅ corrigido |
+| 5 | Dois elementos focáveis dentro do botão | ✅ corrigido (achado na 3ª rodada) |
+| 6 | Arquiteto PAS com Verificar saúde | retirado por ela — falso positivo |
+| 7 | Ambiente re-semeado | retirado por ela — inferência errada |
+| 8 | "Concluído" + falha da Fase 2 / `Criado` em `Solution.status` | decisão de produto, não defeito |
+
+Não sobra nenhum defeito de código aberto vindo desta revisão. O que falta é só cobertura: os cinco
+fluxos de escrita (contrato nascer "Provisionando", reexecutar solução, os dois casos de renomear
+conta, a regra de solução duplicada) seguem sem validação por alguém fora deste ambiente — ver seção 5.
