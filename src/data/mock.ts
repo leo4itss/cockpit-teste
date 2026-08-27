@@ -1487,7 +1487,7 @@ export const provisioningSnapshots: Record<string, ProvisioningSnapshot> = {
     solucoes: [
       { solucaoNome: 'Assistente de Design', estado: 'criado',
         iniciadoEm: '2026-03-23T17:57:00.000Z', concluidoEm: '2026-03-23T17:58:20.000Z', duracaoMs: 80000,
-        detalhes: { plano: 'Pro', componentRef: 'comp-assistant' }, erro: null },
+        detalhes: { plano: 'Basic', componentRef: 'comp-assistant' }, erro: null },
       { solucaoNome: 'Base de Conhecimento PAS', estado: 'criado',
         iniciadoEm: '2026-03-23T17:58:20.000Z', concluidoEm: '2026-03-23T17:59:35.000Z', duracaoMs: 75000,
         detalhes: { plano: 'Enterprise', componentRef: 'comp-knowledge' }, erro: null },
