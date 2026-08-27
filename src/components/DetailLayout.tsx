@@ -7,13 +7,31 @@ export function DetailLayout() {
   const navigate = useNavigate()
   const [openApps, setOpenApps] = useState(false)
 
+  // Se esta aba foi aberta via link (ex: "Ver detalhes do provisionamento",
+  // que usa target="_blank") a partir de outra aba do próprio app, `window.opener`
+  // aponta pra ela. Nesse caso "Voltar" foca a aba de origem (preservando qualquer
+  // rascunho não salvo, como uma sheet aberta) e fecha esta, em vez de tentar
+  // navegar no histórico desta aba — que está vazio por ser recém-aberta.
+  function handleBack() {
+    if (window.opener && !window.opener.closed) {
+      try {
+        window.opener.focus()
+        window.close()
+        return
+      } catch {
+        // cross-origin ou bloqueado pelo navegador — cai no fallback abaixo
+      }
+    }
+    navigate(-1)
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-white">
       {/* Header — back à esquerda, ícones à direita */}
       <header className="h-16 border-b border-gray-200 bg-white flex items-center justify-between px-8 shrink-0">
         {/* Back button */}
         <button
-          onClick={() => navigate(-1)}
+          onClick={handleBack}
           className="w-10 h-10 flex items-center justify-center rounded-md hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors"
           title="Voltar"
         >

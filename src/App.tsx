@@ -16,6 +16,7 @@ import SchemaVisualizerPage from './pages/SchemaVisualizerPage'
 import CanvasPermissoesPage from './pages/CanvasPermissoesPage'
 import CanvasOrgPage from './pages/CanvasOrgPage'
 import { InstanciaPage } from './pages/InstanciaPage'
+import { ProvisionamentoPage } from './pages/ProvisionamentoPage'
 import { FigmaCaptureSession } from './components/FigmaCaptureSession'
 
 export default function App() {
@@ -42,6 +43,9 @@ export default function App() {
         <Route path="/instancia/:id" element={<InstanciaPage />} />
         <Route path="/organizacoes/:id" element={<DetailLayout />}>
           <Route index element={<OrganizacaoDetailPage />} />
+        </Route>
+        <Route path="/contas/:id/provisionamento" element={<DetailLayout />}>
+          <Route index element={<ProvisionamentoPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

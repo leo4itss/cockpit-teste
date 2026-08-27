@@ -1,4 +1,4 @@
-import type { Organization, Account, Solution, Contract, User, TipoLicenca, Componente, Grupo, Instancia, InstanciaMembro } from '../types'
+import type { Organization, Account, Solution, Contract, User, TipoLicenca, Componente, Grupo, Instancia, InstanciaMembro, ProvisioningSnapshot, HealthCheckResult, ProvisioningLogPage } from '../types'
 
 // ── Tipos de Licença ──────────────────────────────────────────
 // Dados iniciais — refletidos no seed do banco.
@@ -268,7 +268,7 @@ export const accounts: Account[] = [
     orgId: '1',
     name: 'Apple Retail Brasil',
     subdomain: 'apple-retail',
-    provisioningStatus: 'PENDING',
+    provisioningStatus: 'FAILED',
     arquitetoPAS: 'Marcelo Gomes',
     isDefault: false,
     status: 'Criado',
@@ -279,7 +279,7 @@ export const accounts: Account[] = [
     orgId: '2',
     name: 'Santacruz',
     subdomain: 'santacruzltda',
-    provisioningStatus: 'PENDING',
+    provisioningStatus: 'IN_PROGRESS',
     arquitetoPAS: 'Marcelo Gomes',
     isDefault: true,
     status: 'Criado',
@@ -599,6 +599,18 @@ export const solutions: Solution[] = [
 ]
 
 export const contracts: Contract[] = [
+  // ── Conjunto curado ─────────────────────────────────────────────────
+  // Um contrato por cenário que precisa ser demonstrável, e nada além disso.
+  // A base já teve 23 contratos acumulados de sessões de teste, com a mesma
+  // solução repetida dentro do próprio contrato e a mesma solução ativa em
+  // vários contratos da mesma conta — as duas coisas que a regra de
+  // exclusividade existe para impedir. Ao acrescentar cenário aqui, confira:
+  //   1. nenhuma solução aparece duas vezes no mesmo contrato;
+  //   2. por conta, cada solução está em no máximo UM contrato não-inativo;
+  //   3. `contratante` casa exatamente com `accounts.name` da MESMA org;
+  //   4. contrato não-inativo só em conta com Fase 1 COMPLETED.
+
+  // Cenário: contrato inativado — só aparece com "Exibir contratos inativados".
   {
     id: 'c1',
     orgId: '1',
@@ -606,7 +618,6 @@ export const contracts: Contract[] = [
     objetos: [
       {
         solucao: 'Assistente de Design',
-        orgContratada: 'Apple',
         plano: 'Pro',
         licenciamento: 'Usuário nominal: 5–50 usuários',
         qtdContratada: 50,
@@ -615,17 +626,155 @@ export const contracts: Contract[] = [
     dataInicio: '01/01/2026',
     dataTermino: '31/12/2026',
     renovacao: 'Anual',
+    status: 'Inativo',
+  },
+
+  // Cenário: contrato ativo com várias soluções, todas provisionadas.
+  // Par das entradas 'criado' em `provisioningSnapshots.a1.solucoes`.
+  // É também o contrato que faz a conta Apple não poder ser inativada e que
+  // bloqueia estas 3 soluções num novo contrato da mesma conta.
+  {
+    id: '6e20fc54-0baa-4f09-82ac-1c62809714ef',
+    orgId: '1',
+    contratante: 'Apple',
+    objetos: [
+      {
+        solucao: 'Assistente de Design',
+        plano: 'Basic',
+        planoVersao: 1,
+        licenciamento: 'Usuário nominal: 1–10 usuários',
+        valoresLicenca: [
+          { tipoLicencaNome: 'Usuário nominal', tipoLicencaUnidade: 'usuários', valor: '1' },
+        ],
+      },
+      {
+        solucao: 'Assistente Jurídico',
+        plano: 'Professional',
+        planoVersao: 2,
+        licenciamento: 'Quantidade de assistentes: 15 unidades · Usuário nominal: 1000 usuários · Quantidade de tokens/mensagens: 10000 tokens',
+        valoresLicenca: [
+          { tipoLicencaNome: 'Quantidade de assistentes', tipoLicencaUnidade: 'unidades', valor: '15' },
+          { tipoLicencaNome: 'Usuário nominal', tipoLicencaUnidade: 'usuários', valor: '1000' },
+          { tipoLicencaNome: 'Quantidade de tokens/mensagens', tipoLicencaUnidade: 'tokens', valor: '10000' },
+        ],
+      },
+      {
+        solucao: 'Base de Conhecimento PAS',
+        plano: 'Enterprise',
+        planoVersao: 1,
+        licenciamento: 'Usuário nominal: 10–500 usuários · Tamanho de banco de dados: 50–1000 GB',
+        valoresLicenca: [
+          { tipoLicencaNome: 'Usuário nominal', tipoLicencaUnidade: 'usuários', valor: '10' },
+          { tipoLicencaNome: 'Tamanho de banco de dados', tipoLicencaUnidade: 'GB', valor: '50' },
+        ],
+      },
+    ],
+    dataInicio: '2026-08-06',
+    dataTermino: '2026-08-15',
+    renovacao: 'Automática',
     status: 'Ativo',
   },
+
+  // ── Cenário de erro da Fase 2 ────────────────────────────────────────
+  // Par do registro em `provisioningSnapshots.a1.solucoes` com estado 'erro'.
+  // Existe para que a falha do provisionamento por contrato seja demonstrável
+  // ao abrir a tela, sem depender do gatilho por console. Reexecutar a solução
+  // leva este contrato de volta a 'Provisionando' e depois a 'Ativo'.
+  {
+    id: 'ctr-apple-flow-falha',
+    orgId: '1',
+    contratante: 'Apple',
+    objetos: [
+      {
+        solucao: 'PAS Flow',
+        plano: 'Starter',
+        licenciamento: 'Usuário nominal: 1–10 usuários',
+      },
+    ],
+    dataInicio: '24/03/2026',
+    dataTermino: '23/03/2027',
+    renovacao: 'Anual',
+    status: 'Falha no provisionamento',
+  },
+
+  // Cenário: exclusividade é por CONTA, não por organização. Estas duas contas
+  // da org Apple contratam PAS Flow ao mesmo tempo que a conta Apple — o que é
+  // válido, e é o que separa a regra certa da leitura errada dela.
+  {
+    id: 'ddd0ceab-e12f-4b00-b8fe-86cc7cb5b404',
+    orgId: '1',
+    contratante: 'Apple Design Studio',
+    objetos: [
+      {
+        solucao: 'PAS Flow',
+        plano: 'Starter',
+        planoVersao: 1,
+        licenciamento: 'Usuário nominal: 1–10 usuários',
+        valoresLicenca: [
+          { tipoLicencaNome: 'Usuário nominal', tipoLicencaUnidade: 'usuários', valor: '1' },
+        ],
+      },
+      {
+        solucao: 'Base de Conhecimento PAS',
+        plano: 'Starter',
+        planoVersao: 1,
+        licenciamento: 'Usuário nominal: 1–5 usuários',
+        valoresLicenca: [
+          { tipoLicencaNome: 'Usuário nominal', tipoLicencaUnidade: 'usuários', valor: '1' },
+        ],
+      },
+    ],
+    dataInicio: '2026-08-19',
+    dataTermino: '2027-08-19',
+    renovacao: 'Anual',
+    status: 'Ativo',
+  },
+
+  // Cenário: contrato usando uma versão de plano criada por edição
+  // ("Pro Plano Teste") — cobre o versionamento de planos de `Solution.plans`.
+  {
+    id: '233e00d3-b0fd-4e6e-9486-7ce3d32fa3fe',
+    orgId: '1',
+    contratante: 'Apple Developer Tools',
+    objetos: [
+      {
+        solucao: 'PAS Flow',
+        plano: 'Starter',
+        planoVersao: 1,
+        licenciamento: 'Usuário nominal: 1–10 usuários',
+        valoresLicenca: [
+          { tipoLicencaNome: 'Usuário nominal', tipoLicencaUnidade: 'usuários', valor: '1' },
+        ],
+      },
+      {
+        solucao: 'Assistente de Design',
+        plano: 'Pro Plano Teste',
+        planoVersao: 1,
+        licenciamento: 'Usuário concorrente: 5–50 sessões · Quantidade de assistentes: 1–10 unidades · Tamanho de banco de dados: 10 GB',
+        valoresLicenca: [
+          { tipoLicencaNome: 'Usuário concorrente', tipoLicencaUnidade: 'sessões', valor: '5' },
+          { tipoLicencaNome: 'Quantidade de assistentes', tipoLicencaUnidade: 'unidades', valor: '1' },
+          { tipoLicencaNome: 'Tamanho de banco de dados', tipoLicencaUnidade: 'GB', valor: '10' },
+        ],
+      },
+    ],
+    dataInicio: '2026-08-14',
+    dataTermino: '2027-08-14',
+    renovacao: 'Automática',
+    status: 'Ativo',
+  },
+
   // ── Atlas ↔ Comgas — fallback local para cenário Docnix ──────────────
+  // `contratante` precisa ser exatamente 'Comgas': é o nome da conta
+  // `acc-comgas`. Ficou como 'Comgas S.A.' por um tempo, e o contrato não
+  // casava com conta nenhuma — o join conta↔contrato é por texto puro.
   {
     id: 'ctr-atlas-comgas',
     orgId: 'org-docnix',
-    contratante: 'Comgas S.A.',
+    contratante: 'Comgas',
     objetos: [
       {
         solucao: 'Atlas',
-        orgContratada: 'Docnix',
         plano: 'Atlas Enterprise',
         licenciamento: '50 Usuários nominais',
         qtdContratada: 50,
@@ -1301,4 +1450,259 @@ export const accountEntitlements: Record<string, string[]> = {
   'acc-comgas': ['assistant.use', 'knowledge.use', 'maxdoc.use', 'docaction.use'],
   'a1':         ['assistant.use', 'knowledge.use', 'analytics.use'],
   'a2':         ['assistant.use', 'knowledge.use', 'analytics.use', 'maxdoc.use', 'docaction.use'],
+}
+
+// ── Provisionamento de tenant — fallback mock (não existe em produção) ──
+// Contrato com o pas-cockpit-worker. accountId → snapshot.
+// 'a1-dev' e 'acc-comgas' propositalmente SEM entrada, para exercitar o
+// estado "vazio" da tela (conta ainda sem registro de provisionamento).
+export const provisioningSnapshots: Record<string, ProvisioningSnapshot> = {
+  a1: {
+    tenant: {
+      accountId: 'a1', accountName: 'Apple',
+      slug: 'appletecgo', dominio: 'https://appletecgo.hml.pas.app.br',
+      ambiente: 'hml', orgId: '1', orgNome: 'Apple', criadoEm: '23/03/2026',
+    },
+    status: 'COMPLETED',
+    iniciadoEm: '2026-03-23T17:50:02.000Z',
+    finalizadoEm: '2026-03-23T17:56:47.000Z',
+    workerVersion: 'provisioner@2.7.1',
+    correlationId: 'prv_01HXA7QK3M9APPLE00001',
+    atualizadoEm: '2026-03-23T17:56:47.000Z',
+    steps: [
+      { id: 'database', estado: 'criado', iniciadoEm: '2026-03-23T17:50:02.000Z', concluidoEm: '2026-03-23T17:50:41.000Z', duracaoMs: 39000,
+        detalhes: { host: 'pg-shared-01.hml.internal', database: 'tenant_appletecgo', usuario: 'tenant_appletecgo_app' }, erro: null },
+      { id: 'keycloak', estado: 'criado', iniciadoEm: '2026-03-23T17:50:41.000Z', concluidoEm: '2026-03-23T17:51:12.000Z', duracaoMs: 31000,
+        detalhes: { realm: 'appletecgo', clientId: 'pas-web', issuer: 'https://auth.hml.pas.app.br/realms/appletecgo' }, erro: null },
+      { id: 'dns', estado: 'criado', iniciadoEm: '2026-03-23T17:51:12.000Z', concluidoEm: '2026-03-23T17:52:03.000Z', duracaoMs: 51000,
+        detalhes: { zona: 'pas.app.br', registro: 'appletecgo.hml', tipo: 'CNAME', alvo: 'ingress-hml.pas.app.br' }, erro: null },
+      { id: 'ingress', estado: 'criado', iniciadoEm: '2026-03-23T17:52:03.000Z', concluidoEm: '2026-03-23T17:54:30.000Z', duracaoMs: 147000,
+        detalhes: { host: 'appletecgo.hml.pas.app.br', certificado: 'letsencrypt-prod', ingressClass: 'nginx' }, erro: null },
+      { id: 'env-vars', estado: 'criado', iniciadoEm: '2026-03-23T17:54:30.000Z', concluidoEm: '2026-03-23T17:56:47.000Z', duracaoMs: 137000,
+        detalhes: { projeto: 'appletecgo', ambiente: 'hml', segredosInjetados: '14' }, erro: null },
+    ],
+    // Fase 2 (solutionPublicationByContract) — contrato ativo desta conta cobre
+    // estas 2 soluções (ver `contracts` acima, contratante: 'Apple'). Ambas já
+    // provisionadas — bate com o cenário Fase 1 COMPLETED.
+    solucoes: [
+      { solucaoNome: 'Assistente de Design', estado: 'criado',
+        iniciadoEm: '2026-03-23T17:57:00.000Z', concluidoEm: '2026-03-23T17:58:20.000Z', duracaoMs: 80000,
+        detalhes: { plano: 'Basic', componentRef: 'comp-assistant' }, erro: null },
+      { solucaoNome: 'Base de Conhecimento PAS', estado: 'criado',
+        iniciadoEm: '2026-03-23T17:58:20.000Z', concluidoEm: '2026-03-23T17:59:35.000Z', duracaoMs: 75000,
+        detalhes: { plano: 'Enterprise', componentRef: 'comp-knowledge' }, erro: null },
+      // Cenário de erro da Fase 2 — visível ao abrir a tela, sem console.
+      // Vinculado a `ctr-apple-flow-falha` em `contracts`, que por isso nasce
+      // com status 'Falha no provisionamento'. `podeReexecutar: true` é o que
+      // faz o botão "Tentar novamente" aparecer nesta linha.
+      { solucaoNome: 'PAS Flow', estado: 'erro', contratoId: 'ctr-apple-flow-falha',
+        iniciadoEm: '2026-03-24T09:12:00.000Z', concluidoEm: '2026-03-24T09:14:38.000Z', duracaoMs: 158000,
+        detalhes: { plano: 'Starter', componentRef: 'comp-flow' },
+        erro: {
+          codigo: 'SOLUTION_SCHEMA_MIGRATION_FAILED',
+          mensagem: 'Falha ao criar as estruturas de dados da solução «PAS Flow» no ambiente do cliente.',
+          detalhe: 'migration 2026.03.11-flow-init: relation "flow_step" already exists\ndatabase=tenant_appletecgo schema=flow',
+          ocorridoEm: '2026-03-24T09:14:38.000Z',
+          tentativas: 3,
+          podeReexecutar: true,
+        },
+      },
+    ],
+  },
+  a2: {
+    tenant: {
+      accountId: 'a2', accountName: 'Santacruz',
+      slug: 'santacruzltda', dominio: 'https://santacruzltda.hml.pas.app.br',
+      ambiente: 'hml', orgId: '2', orgNome: 'Santacruz', criadoEm: '10/01/2026',
+    },
+    status: 'IN_PROGRESS',
+    iniciadoEm: '2026-07-28T09:12:00.000Z',
+    finalizadoEm: null,
+    workerVersion: 'provisioner@2.7.1',
+    correlationId: 'prv_01HXA7QK3M9SANTACRUZ01',
+    atualizadoEm: '2026-07-28T09:13:40.000Z',
+    steps: [
+      { id: 'database', estado: 'criado', iniciadoEm: '2026-07-28T09:12:00.000Z', concluidoEm: '2026-07-28T09:12:38.000Z', duracaoMs: 38000,
+        detalhes: { host: 'pg-shared-01.hml.internal', database: 'tenant_santacruzltda', usuario: 'tenant_santacruzltda_app' }, erro: null },
+      { id: 'keycloak', estado: 'em-andamento', iniciadoEm: '2026-07-28T09:12:38.000Z', concluidoEm: null, duracaoMs: null,
+        detalhes: { realm: 'santacruzltda' }, erro: null },
+      { id: 'dns', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
+      { id: 'ingress', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
+      { id: 'env-vars', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
+    ],
+    // Fase 2 bloqueada — Fase 1 ainda IN_PROGRESS.
+    solucoes: [],
+  },
+  a3: {
+    tenant: {
+      accountId: 'a3', accountName: 'Margatastiltda',
+      slug: 'margatastiltda', dominio: 'https://margatastiltda.hml.pas.app.br',
+      ambiente: 'hml', orgId: '3', orgNome: 'Margatastiltda', criadoEm: '05/02/2026',
+    },
+    status: 'PENDING',
+    iniciadoEm: null,
+    finalizadoEm: null,
+    workerVersion: null,
+    correlationId: null,
+    atualizadoEm: '2026-02-05T00:00:00.000Z',
+    steps: [
+      { id: 'database', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
+      { id: 'keycloak', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
+      { id: 'dns', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
+      { id: 'ingress', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
+      { id: 'env-vars', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
+    ],
+    // Fase 2 bloqueada — Fase 1 ainda nem começou.
+    solucoes: [],
+  },
+  'a1-retail': {
+    tenant: {
+      accountId: 'a1-retail', accountName: 'Apple Retail Brasil',
+      slug: 'apple-retail', dominio: 'https://apple-retail.hml.pas.app.br',
+      ambiente: 'hml', orgId: '1', orgNome: 'Apple', criadoEm: '01/03/2026',
+    },
+    status: 'FAILED',
+    iniciadoEm: '2026-03-01T14:22:03.118Z',
+    finalizadoEm: '2026-03-01T14:24:47.902Z',
+    workerVersion: 'provisioner@2.7.1',
+    correlationId: 'prv_01HXA7QK3M9RETAIL0001',
+    atualizadoEm: '2026-03-01T14:24:47.902Z',
+    steps: [
+      {
+        id: 'database', estado: 'criado',
+        iniciadoEm: '2026-03-01T14:22:03.118Z', concluidoEm: '2026-03-01T14:22:41.556Z', duracaoMs: 38438,
+        detalhes: {
+          host: 'pg-shared-01.hml.internal', database: 'tenant_apple_retail',
+          schemaVersion: '2026.02.14-migrations', usuario: 'tenant_apple_retail_app',
+        },
+        erro: null,
+      },
+      {
+        id: 'keycloak', estado: 'criado',
+        iniciadoEm: '2026-03-01T14:22:41.560Z', concluidoEm: '2026-03-01T14:23:12.004Z', duracaoMs: 30444,
+        detalhes: {
+          realm: 'apple-retail', clientId: 'pas-web',
+          issuer: 'https://auth.hml.pas.app.br/realms/apple-retail',
+        },
+        erro: null,
+      },
+      {
+        id: 'dns', estado: 'erro',
+        iniciadoEm: '2026-03-01T14:23:12.010Z', concluidoEm: '2026-03-01T14:24:47.902Z', duracaoMs: 95892,
+        detalhes: {
+          zona: 'pas.app.br', registro: 'apple-retail.hml',
+          tipo: 'CNAME', alvo: 'ingress-hml.pas.app.br',
+        },
+        erro: {
+          codigo: 'DNS_RECORD_CONFLICT',
+          mensagem: 'Já existe um registro DNS para apple-retail.hml.pas.app.br apontando para outro destino.',
+          detalhe: 'Cloudflare API 400 — code 81053: An A, AAAA, or CNAME record with that host already exists.\nzone_id=7b4f2c9e1a8d4f0b93c2e5a61d0f8b34',
+          ocorridoEm: '2026-03-01T14:24:47.880Z',
+          tentativas: 3,
+          podeReexecutar: true,
+        },
+      },
+      { id: 'ingress', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
+      { id: 'env-vars', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
+    ],
+    // Fase 2 bloqueada — Fase 1 falhou na etapa DNS.
+    solucoes: [],
+  },
+  // Conta criada manualmente via NewAccountSheet durante teste do fluxo —
+  // id real do Neon, não um id de fixture (a1/a2/a3). Cenário: em andamento.
+  'ec745c8b-3440-4bc3-b990-b698dce8c480': {
+    tenant: {
+      accountId: 'ec745c8b-3440-4bc3-b990-b698dce8c480', accountName: 'Nexora Tecnologia',
+      slug: 'nexora', dominio: 'https://nexora.hml.pas.app.br',
+      ambiente: 'hml', orgId: '1', orgNome: 'Apple', criadoEm: '28/07/2026',
+    },
+    status: 'IN_PROGRESS',
+    iniciadoEm: '2026-07-28T11:40:00.000Z',
+    finalizadoEm: null,
+    workerVersion: 'provisioner@2.7.1',
+    correlationId: 'prv_01HXA7QK3M9NEXORA00001',
+    atualizadoEm: '2026-07-28T11:41:52.000Z',
+    steps: [
+      { id: 'database', estado: 'criado', iniciadoEm: '2026-07-28T11:40:00.000Z', concluidoEm: '2026-07-28T11:40:35.000Z', duracaoMs: 35000,
+        detalhes: { host: 'pg-shared-01.hml.internal', database: 'tenant_nexora', usuario: 'tenant_nexora_app' }, erro: null },
+      { id: 'keycloak', estado: 'criado', iniciadoEm: '2026-07-28T11:40:35.000Z', concluidoEm: '2026-07-28T11:41:10.000Z', duracaoMs: 35000,
+        detalhes: { realm: 'nexora', clientId: 'pas-web', issuer: 'https://auth.hml.pas.app.br/realms/nexora' }, erro: null },
+      { id: 'dns', estado: 'em-andamento', iniciadoEm: '2026-07-28T11:41:10.000Z', concluidoEm: null, duracaoMs: null,
+        detalhes: { zona: 'pas.app.br', registro: 'nexora.hml', tipo: 'CNAME', alvo: 'ingress-hml.pas.app.br' }, erro: null },
+      { id: 'ingress', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
+      { id: 'env-vars', estado: 'pendente', iniciadoEm: null, concluidoEm: null, duracaoMs: null, erro: null },
+    ],
+    // Fase 2 bloqueada — Fase 1 ainda IN_PROGRESS. Também consistente com
+    // "Nenhum contrato ativo encontrado" já visto ao vivo para esta conta.
+    solucoes: [],
+  },
+}
+
+export const provisioningHealth: Record<string, HealthCheckResult> = {
+  a1: {
+    accountId: 'a1', executadoEm: '2026-07-28T10:00:00.000Z', duracaoMs: 820, estadoGeral: 'ok',
+    itens: [
+      { id: 'database', estado: 'ok', latenciaMs: 12, mensagem: 'Conexão estabelecida, query de verificação respondeu.' },
+      { id: 'keycloak', estado: 'ok', latenciaMs: 34, mensagem: 'Realm ativo, endpoint de discovery respondeu.' },
+      { id: 'dns', estado: 'ok', latenciaMs: 41, mensagem: 'Registro CNAME resolve para o ingress esperado.' },
+      { id: 'ingress', estado: 'ok', latenciaMs: 58, mensagem: 'Certificado válido, TLS handshake bem-sucedido.' },
+      { id: 'env-vars', estado: 'ok', latenciaMs: 9, mensagem: 'Segredos acessíveis pelo runtime do tenant.' },
+    ],
+  },
+  a2: {
+    accountId: 'a2', executadoEm: '2026-07-28T10:00:00.000Z', duracaoMs: 410, estadoGeral: 'degradado',
+    itens: [
+      { id: 'database', estado: 'ok', latenciaMs: 15, mensagem: 'Conexão estabelecida.' },
+      { id: 'keycloak', estado: 'degradado', latenciaMs: 890, mensagem: 'Realm ainda em criação — respondendo com latência alta.' },
+      { id: 'dns', estado: 'nao-verificado', latenciaMs: null, mensagem: 'Etapa ainda não iniciada.' },
+      { id: 'ingress', estado: 'nao-verificado', latenciaMs: null, mensagem: 'Etapa ainda não iniciada.' },
+      { id: 'env-vars', estado: 'nao-verificado', latenciaMs: null, mensagem: 'Etapa ainda não iniciada.' },
+    ],
+  },
+  'a1-retail': {
+    accountId: 'a1-retail', executadoEm: '2026-03-01T14:25:10.000Z', duracaoMs: 640, estadoGeral: 'falha',
+    itens: [
+      { id: 'database', estado: 'ok', latenciaMs: 18, mensagem: 'Conexão estabelecida.' },
+      { id: 'keycloak', estado: 'ok', latenciaMs: 29, mensagem: 'Realm ativo.' },
+      { id: 'dns', estado: 'falha', latenciaMs: null, mensagem: 'NXDOMAIN — o host não resolve.' },
+      { id: 'ingress', estado: 'nao-verificado', latenciaMs: null, mensagem: 'Etapa nunca foi criada — não é possível verificar.' },
+      { id: 'env-vars', estado: 'nao-verificado', latenciaMs: null, mensagem: 'Etapa nunca foi criada — não é possível verificar.' },
+    ],
+  },
+  // Nexora — conta real do Neon (ver provisioningSnapshots acima), Fase 1
+  // IN_PROGRESS com DNS em andamento. Cenário de referência para "Degradado".
+  'ec745c8b-3440-4bc3-b990-b698dce8c480': {
+    accountId: 'ec745c8b-3440-4bc3-b990-b698dce8c480', executadoEm: '2026-07-28T11:42:30.000Z', duracaoMs: 710, estadoGeral: 'degradado',
+    itens: [
+      { id: 'database', estado: 'ok', latenciaMs: 14, mensagem: 'Conexão estabelecida, query de verificação respondeu.' },
+      { id: 'keycloak', estado: 'ok', latenciaMs: 31, mensagem: 'Realm ativo, endpoint de discovery respondeu.' },
+      { id: 'dns', estado: 'degradado', latenciaMs: 860, mensagem: 'Registro CNAME em propagação — respondendo com latência alta.' },
+      { id: 'ingress', estado: 'nao-verificado', latenciaMs: null, mensagem: 'Etapa ainda não iniciada.' },
+      { id: 'env-vars', estado: 'nao-verificado', latenciaMs: null, mensagem: 'Etapa ainda não iniciada.' },
+    ],
+  },
+}
+
+export const provisioningLogs: Record<string, ProvisioningLogPage> = {
+  'a1-retail': {
+    accountId: 'a1-retail',
+    temMais: false,
+    proximoCursor: null,
+    entradas: [
+      { id: 'log-01', timestamp: '2026-03-01T14:22:03.118Z', nivel: 'info', stepId: null, mensagem: 'Job de provisionamento iniciado.', contexto: { correlationId: 'prv_01HXA7QK3M9RETAIL0001' } },
+      { id: 'log-02', timestamp: '2026-03-01T14:22:03.200Z', nivel: 'info', stepId: 'database', mensagem: 'Iniciando criação da database do tenant.' },
+      { id: 'log-03', timestamp: '2026-03-01T14:22:20.500Z', nivel: 'debug', stepId: 'database', mensagem: 'Aplicando migration 2026.02.14-migrations.' },
+      { id: 'log-04', timestamp: '2026-03-01T14:22:41.556Z', nivel: 'info', stepId: 'database', mensagem: 'Database tenant_apple_retail criada com sucesso.' },
+      { id: 'log-05', timestamp: '2026-03-01T14:22:41.560Z', nivel: 'info', stepId: 'keycloak', mensagem: 'Iniciando criação do realm no Keycloak.' },
+      { id: 'log-06', timestamp: '2026-03-01T14:23:01.200Z', nivel: 'debug', stepId: 'keycloak', mensagem: 'Client OIDC pas-web registrado.' },
+      { id: 'log-07', timestamp: '2026-03-01T14:23:12.004Z', nivel: 'info', stepId: 'keycloak', mensagem: 'Realm apple-retail pronto.' },
+      { id: 'log-08', timestamp: '2026-03-01T14:23:12.010Z', nivel: 'info', stepId: 'dns', mensagem: 'Solicitando criação de registro CNAME no Cloudflare.' },
+      { id: 'log-09', timestamp: '2026-03-01T14:23:42.300Z', nivel: 'warn', stepId: 'dns', mensagem: 'Tentativa 1 falhou — reagendando retry.' },
+      { id: 'log-10', timestamp: '2026-03-01T14:24:10.100Z', nivel: 'warn', stepId: 'dns', mensagem: 'Tentativa 2 falhou — reagendando retry.' },
+      { id: 'log-11', timestamp: '2026-03-01T14:24:47.880Z', nivel: 'error', stepId: 'dns', mensagem: 'Tentativa 3 falhou — registro já existe (DNS_RECORD_CONFLICT).', contexto: { code: 81053, zone_id: '7b4f2c9e1a8d4f0b93c2e5a61d0f8b34' } },
+      { id: 'log-12', timestamp: '2026-03-01T14:24:47.900Z', nivel: 'error', stepId: 'dns', mensagem: 'Etapa DNS marcada como falha após 3 tentativas.' },
+      { id: 'log-13', timestamp: '2026-03-01T14:24:47.901Z', nivel: 'info', stepId: null, mensagem: 'Execução pausada — etapas seguintes aguardam intervenção manual.' },
+      { id: 'log-14', timestamp: '2026-03-01T14:24:47.902Z', nivel: 'error', stepId: null, mensagem: 'Job de provisionamento finalizado com falha.', contexto: { correlationId: 'prv_01HXA7QK3M9RETAIL0001' } },
+    ],
+  },
 }

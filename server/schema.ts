@@ -90,6 +90,7 @@ export const accounts = pgTable('accounts', {
 export const solutions = pgTable('solutions', {
   id: text('id').primaryKey(),
   orgId: text('org_id').notNull().references(() => organizations.id),
+  accountId: text('account_id').references(() => accounts.id), // nullable — soluções legadas ficam sem conta (isentas da regra de exclusividade)
   name: text('name').notNull(),
   plans: jsonb('plans').notNull().default([]),
   componenteIds: jsonb('componente_ids').notNull().default([]), // string[] — ids de componentes usados

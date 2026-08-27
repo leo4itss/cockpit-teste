@@ -39,14 +39,20 @@ export function useToast() {
 export function ToastContainer({
   toasts,
   onDismiss,
+  position = 'top-right',
 }: {
   toasts: ToastItem[]
   onDismiss: (id: string) => void
+  position?: 'top-right' | 'bottom-right'
 }) {
   if (toasts.length === 0) return null
 
+  const positionClasses = position === 'top-right'
+    ? 'top-20 right-6 flex-col-reverse items-end'
+    : 'bottom-6 right-6 flex-col'
+
   return (
-    <div className="fixed bottom-6 right-6 z-[200] flex flex-col gap-2">
+    <div className={`fixed z-[200] flex gap-2 ${positionClasses}`}>
       {toasts.map(t => {
         // Suporta '\n' para separar título e subtítulo
         const parts = t.message.split('\n')

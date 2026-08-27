@@ -1,3 +1,5 @@
+export * from './provisioning'
+
 export interface Contact {
   name: string
   role: string
@@ -100,6 +102,8 @@ export interface Licensing {
   valorMinimo?: string           // quantidade mínima (opcional)
   valorMaximo?: string           // quantidade máxima (opcional)
   valor?: string                 // valor livre por licença
+  excedente?: string             // valor absoluto máximo permitido acima do nominal (excedente)
+  excedenteSemLimite?: boolean   // se true, ignora `excedente` e considera excedente ilimitado
   definirPreco: boolean
   precoAnual: string
   descontoMensal: string
@@ -123,7 +127,9 @@ export interface Plan {
 export interface ValorLicencaContrato {
   tipoLicencaNome: string
   tipoLicencaUnidade?: string
-  valor: string   // valor contratado (ex: "15", "500")
+  valor: string                  // valor contratado (ex: "15", "500")
+  excedente?: string             // valor absoluto máximo de excedente contratado (independente do plano)
+  excedenteSemLimite?: boolean   // se true, ignora `excedente` e considera excedente ilimitado
 }
 
 // ── Entrada de histórico do contrato ─────────────────────────
@@ -139,7 +145,6 @@ export interface ContractHistoricoEntry {
 // combinação de solução + plano + licenciamento + organização contratada.
 export interface ObjetoContrato {
   solucao: string
-  orgContratada: string
   plano: string
   licenciamento: string
   qtdContratada?: number  // deprecated — preservado apenas para dados históricos
@@ -150,6 +155,7 @@ export interface ObjetoContrato {
 export interface Solution {
   id: string
   orgId: string
+  accountId?: string  // conta à qual a solução pertence; ausente/vazio = solução legada (isenta da exclusividade por conta)
   name: string
   plans: Plan[]
   componenteIds?: string[]  // IDs dos componentes utilizados por esta solução
@@ -166,6 +172,26 @@ export interface Solution {
   marketplaceStatus?: string
 }
 
+/**
+ * Ciclo de vida do contrato.
+ *
+ * 'Provisionando' e 'Falha no provisionamento' refletem a execução assíncrona
+ * da Fase 2 (workflow `solutionPublicationByContract`), que leva minutos e pode
+ * falhar. Antes do handoff de 19/08/2026 o contrato nascia direto como 'Ativo',
+ * o que era factualmente incorreto: **'Ativo' só pode aparecer quando todas as
+ * soluções do contrato terminarem de provisionar**. Derivado por
+ * `deriveContractStatus` em src/services/provisioning.ts.
+ *
+ * 'Pendente' é anterior a este modelo (default da coluna no banco) e permanece
+ * para não invalidar registros existentes.
+ */
+export type ContractStatus =
+  | 'Ativo'
+  | 'Inativo'
+  | 'Pendente'
+  | 'Provisionando'
+  | 'Falha no provisionamento'
+
 export interface Contract {
   id: string
   orgId: string
@@ -174,7 +200,7 @@ export interface Contract {
   dataInicio: string
   dataTermino: string
   renovacao: string
-  status: 'Ativo' | 'Inativo' | 'Pendente'
+  status: ContractStatus
   historico?: ContractHistoricoEntry[]  // log de ajustes de licença
 }
 

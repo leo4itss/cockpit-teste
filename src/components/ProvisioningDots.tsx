@@ -1,102 +1,84 @@
-import { useState, useRef, useLayoutEffect, Fragment } from 'react'
-import { createPortal } from 'react-dom'
+import { Fragment } from 'react'
 import { Check, X } from 'lucide-react'
+import { Tooltip } from './ui/Tooltip'
+import { PROVISIONING_STEPS, deriveStepsFromStatus, PROVISIONING_STATUS_BADGE } from '@/services/provisioning'
+import { formatarDataHora } from '@/lib/datas'
+import type { ProvisioningOverallStatus, ProvisioningStep, ProvisioningStepDef } from '@/types'
 
 interface Props {
-  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED'
+  /** Status consolidado. Continua sendo a única prop obrigatória. */
+  status: ProvisioningOverallStatus
+  /** Estados reais por passo. Quando ausente, derivados de `status`. */
+  steps?: ProvisioningStep[]
+  /** Catálogo de passos exibido. Default: os 5 passos do worker de provisionamento. */
+  catalog?: readonly ProvisioningStepDef[]
+  iniciadoEm?: string | null
+  finalizadoEm?: string | null
+  /** Título do tooltip. Default: 'Status do provisionamento'. */
+  tooltipTitulo?: string
+  /**
+   * Repassado ao `Tooltip` interno. `false` quando este componente já mora
+   * dentro de um elemento focável (ex.: um `<button>`) — evita nele mesmo
+   * virar uma segunda parada de Tab. Ver `Tooltip`.
+   */
+  tabIndexed?: boolean
+  /** Usado com `tabIndexed={false}`: mostra o balão quando o pai está focado. */
+  focused?: boolean
 }
 
-const STEPS = ['Iniciando', 'Banco de dados', 'Cloudflare', 'Recursos', 'Finalizando', 'Concluído']
-
-export function ProvisioningDots({ status }: Props) {
-  const [showTooltip, setShowTooltip] = useState(false)
-  const [tooltipPos, setTooltipPos] = useState<{ top: number; left: number } | null>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  const completedSteps =
-    status === 'PENDING'      ? 0
-    : status === 'IN_PROGRESS'  ? 3
-    : status === 'COMPLETED'    ? 6
-    : 0 // FAILED
-
-  const isFailed = status === 'FAILED'
-
-  const statusLabel = {
-    PENDING:     'Pendente',
-    IN_PROGRESS: 'Em progresso',
-    COMPLETED:   'Concluído',
-    FAILED:      'Falhou',
-  }[status]
-
-  const etapa = status === 'COMPLETED'
-    ? 'Concluído'
-    : status === 'FAILED'
-    ? 'Falhou'
-    : STEPS[completedSteps] ?? ''
-
-  useLayoutEffect(() => {
-    if (showTooltip && containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect()
-      setTooltipPos({
-        top:  rect.top  + window.scrollY,
-        left: rect.left + window.scrollX + rect.width / 2,
-      })
-    }
-  }, [showTooltip])
-
-  const tooltipContent = showTooltip && tooltipPos && createPortal(
-    <div
-      className="fixed bg-[#1f2937] rounded-md px-3 py-1.5 text-xs text-[#f9fafb] w-52 z-[9999] shadow-lg border border-gray-700 whitespace-normal"
-      style={{
-        top:       `${tooltipPos.top}px`,
-        left:      `${tooltipPos.left}px`,
-        transform: 'translate(-50%, -100%) translateY(-8px)',
-        pointerEvents: 'none' as const,
-      }}
-    >
-      <p className="font-semibold mb-1">Status do provisionamento</p>
-      <p>• Status: <span className="font-medium">{statusLabel}</span></p>
-      <p>• Etapa: <span className="font-medium">{etapa}</span></p>
-      <p>• Início: <span className="font-medium">23/03/2026, 17:56:47</span></p>
-      <p>• Fim: <span className="font-medium">23/03/2026, 17:57:57</span></p>
-    </div>,
-    document.body
-  )
+export function ProvisioningDots({
+  status,
+  steps,
+  catalog = PROVISIONING_STEPS,
+  iniciadoEm = null,
+  finalizadoEm = null,
+  tooltipTitulo = 'Status do provisionamento',
+  tabIndexed = true,
+  focused = false,
+}: Props) {
+  const resolvedSteps = steps ?? deriveStepsFromStatus(status)
+  const errorIndex = resolvedSteps.findIndex(s => s.estado === 'erro')
+  const currentEtapa =
+    status === 'COMPLETED' ? 'Concluído'
+    : status === 'FAILED' ? (catalog.find(d => d.id === resolvedSteps[errorIndex]?.id)?.nome ?? 'Falha')
+    : (catalog.find(d => d.id === resolvedSteps.find(s => s.estado === 'em-andamento' || s.estado === 'pendente')?.id)?.nome ?? '—')
 
   return (
-    <>
-      <div
-        ref={containerRef}
-        className="inline-flex items-center"
-        onMouseEnter={() => setShowTooltip(true)}
-        onMouseLeave={() => setShowTooltip(false)}
-      >
-        {STEPS.map((_, i) => {
-          const done    = i < completedSteps
-          const dotColor = done
-            ? isFailed ? 'bg-red-500' : 'bg-[#16a34a]'
-            : 'bg-gray-200'
-          // linha após o dot: verde se ambos os extremos estão completos
-          const lineColor = (i < completedSteps - 1 && !isFailed) ? 'bg-[#16a34a]' : 'bg-gray-200'
+    <Tooltip
+      tabIndexed={tabIndexed}
+      focused={focused}
+      content={
+        <>
+          <p className="font-semibold mb-1">{tooltipTitulo}</p>
+          <p>• Status: <span className="font-medium">{PROVISIONING_STATUS_BADGE[status].label}</span></p>
+          <p>• Etapa: <span className="font-medium">{currentEtapa}</span></p>
+          <p>• Início: <span className="font-medium">{formatarDataHora(iniciadoEm)}</span></p>
+          <p>• Fim: <span className="font-medium">{formatarDataHora(finalizadoEm)}</span></p>
+        </>
+      }
+    >
+      {catalog.map((def, i) => {
+        const step = resolvedSteps.find(s => s.id === def.id)
+        const estado = step?.estado ?? 'pendente'
+        const done = estado === 'criado'
+        const failed = estado === 'erro'
 
-          return (
-            <Fragment key={i}>
-              {/* dot */}
-              <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${dotColor}`}>
-                {done && isFailed  && <X     className="w-2.5 h-2.5 text-white" strokeWidth={2.5} />}
-                {done && !isFailed && <Check className="w-2.5 h-2.5 text-white" strokeWidth={2.5} />}
-              </div>
+        const dotColor = done ? 'bg-[#16a34a]' : failed ? 'bg-red-500' : 'bg-gray-200'
+        const nextEstado = catalog[i + 1] ? resolvedSteps.find(s => s.id === catalog[i + 1].id)?.estado : undefined
+        const lineColor = done && nextEstado === 'criado' ? 'bg-[#16a34a]' : 'bg-gray-200'
 
-              {/* separador (exceto após o último dot) */}
-              {i < STEPS.length - 1 && (
-                <div className={`w-[9px] h-px shrink-0 ${lineColor}`} />
-              )}
-            </Fragment>
-          )
-        })}
-      </div>
-
-      {tooltipContent}
-    </>
+        return (
+          <Fragment key={def.id}>
+            <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${dotColor}`}>
+              {done && <Check className="w-2.5 h-2.5 text-white" strokeWidth={2.5} />}
+              {failed && <X className="w-2.5 h-2.5 text-white" strokeWidth={2.5} />}
+            </div>
+            {i < catalog.length - 1 && (
+              <div className={`w-[9px] h-px shrink-0 ${lineColor}`} />
+            )}
+          </Fragment>
+        )
+      })}
+    </Tooltip>
   )
 }

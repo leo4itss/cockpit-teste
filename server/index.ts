@@ -28,7 +28,7 @@ import {
   instanciaPerfilSlotNomeacoes,
   faseAtribuicoesPermitidas,
 } from './schema'
-import { eq, and, or, inArray, isNull } from 'drizzle-orm'
+import { eq, and, or, inArray, isNull, ne } from 'drizzle-orm'
 import { getElegiveisParaSlot } from './docnix-elegiveis'
 
 const app = new Hono()
@@ -83,8 +83,26 @@ app.post('/api/organizations', async (c) => {
 })
 
 app.put('/api/organizations/:id', async (c) => {
+  const id = c.req.param('id')
   const body = await c.req.json()
-  const [row] = await db.update(organizations).set(body).where(eq(organizations.id, c.req.param('id'))).returning()
+
+  // ── Hierarquia de inativação: org só inativa se todas as contas já estiverem inativas ──
+  if (body.status === 'Inativo') {
+    const [existing] = await db.select().from(organizations).where(eq(organizations.id, id))
+    if (existing && existing.status !== 'Inativo') {
+      const { isNull, and, ne } = await import('drizzle-orm')
+      const activeAccounts = await db.select().from(accounts).where(
+        and(eq(accounts.orgId, id), isNull(accounts.deletedAt), ne(accounts.status, 'Inativo'))
+      )
+      if (activeAccounts.length > 0) {
+        return c.json({
+          error: `Não é possível inativar a organização: existem ${activeAccounts.length} conta(s) ativa(s) vinculada(s). Inative as contas primeiro.`,
+        }, 422)
+      }
+    }
+  }
+
+  const [row] = await db.update(organizations).set(body).where(eq(organizations.id, id)).returning()
   if (!row) return c.json({ error: 'Not found' }, 404)
   return c.json(row)
 })
@@ -92,19 +110,27 @@ app.put('/api/organizations/:id', async (c) => {
 app.delete('/api/organizations/:id', async (c) => {
   const id = c.req.param('id')
 
-  // Verificar dependências bloqueantes
+  // Verificar dependências bloqueantes — exclusão permanente só é permitida quando
+  // todas as contas já passaram pela quarentena (deletedAt preenchido) e todos os
+  // contratos estão inativos.
   const [orgAccounts, orgContracts] = await Promise.all([
     db.select().from(accounts).where(eq(accounts.orgId, id)),
     db.select().from(contracts).where(eq(contracts.orgId, id)),
   ])
-  const activeAccounts = orgAccounts.filter((a: any) => a.status !== 'Excluído')
-  const activeContracts = orgContracts.filter((ct: any) => ct.status === 'Ativo')
+  // Conta usa o modelo de quarentena (deletedAt), não `status` — ver CLAUDE.md.
+  const activeAccounts = orgAccounts.filter((a: any) => !a.deletedAt)
+  // Qualquer contrato não inativado bloqueia a exclusão — inclui os estados de
+  // provisionamento ('Provisionando', 'Falha no provisionamento'), que antes
+  // escapavam da trava por não serem literalmente 'Ativo'.
+  const activeContracts = orgContracts.filter((ct: any) => ct.status !== 'Inativo')
 
   if (activeAccounts.length > 0 || activeContracts.length > 0) {
     return c.json({
       error: 'dependencies',
       activeAccounts: activeAccounts.length,
       activeContracts: activeContracts.length,
+      accountNames: activeAccounts.map((a: any) => a.name),
+      contractNames: activeContracts.map((ct: any) => ct.contratante),
     }, 422)
   }
 
@@ -152,18 +178,106 @@ app.post('/api/accounts', async (c) => {
 })
 
 app.put('/api/accounts/:id', async (c) => {
+  const id = c.req.param('id')
   const body = await c.req.json()
-  const [row] = await db.update(accounts).set(body).where(eq(accounts.id, c.req.param('id'))).returning()
+
+  // Uma única leitura da conta serve às três regras abaixo (inativação, renome
+  // ambíguo e propagação). O driver HTTP do Neon cobra uma ida à rede por
+  // consulta, então reler a mesma linha três vezes é desperdício puro.
+  const [atual] = await db.select().from(accounts).where(eq(accounts.id, id))
+  if (!atual) return c.json({ error: 'Not found' }, 404)
+
+  // ── Hierarquia de inativação: conta só inativa se todos os contratos vinculados já estiverem inativos ──
+  // (Organização → Conta → Contrato — cada nível bloqueia no de baixo. O vínculo conta↔solução
+  // existe apenas através do contrato, então a trava aqui é por contrato, não por solução.)
+  // Contratos NÃO são tocados por esta inativação — precisam ser inativados manualmente antes.
+  if (body.status === 'Inativo' && atual.status !== 'Inativo') {
+    const activeContracts = await db.select().from(contracts).where(
+      // Escopo por organização: nome de conta não é único no banco, então sem
+      // este filtro contas homônimas de orgs diferentes casariam entre si.
+      and(
+        eq(contracts.orgId, atual.orgId),
+        eq(contracts.contratante, atual.name),
+        ne(contracts.status, 'Inativo'),
+      )
+    )
+    if (activeContracts.length > 0) {
+      return c.json({
+        error: `Não é possível inativar a conta: existem ${activeContracts.length} contrato(s) ativo(s) vinculado(s). Inative os contratos primeiro.`,
+      }, 422)
+    }
+  }
+
+  const renomeou = Boolean(body.name && body.name !== atual.name)
+
+  // ── Renomear com conta homônima na org é ambíguo ─────────────────────
+  // A propagação abaixo identifica os contratos por (orgId, nome antigo) —
+  // sem `contracts.accountId` não existe forma de saber de qual das contas
+  // homônimas cada contrato é. Renomear uma delas reescreveria os contratos
+  // da outra. O modelo não consegue expressar essa distinção, então recusamos
+  // em vez de corromper em silêncio.
+  if (renomeou) {
+    const irmas = await db.select().from(accounts).where(eq(accounts.orgId, atual.orgId))
+    const conflitoAntigo = irmas.some(a => a.id !== id && a.name === atual.name)
+    const conflitoNovo = irmas.some(a => a.id !== id && a.name === body.name)
+    if (conflitoAntigo || conflitoNovo) {
+      return c.json({
+        error: conflitoAntigo
+          ? `Não é possível renomear: existe outra conta chamada "${atual.name}" nesta organização, e os contratos são vinculados por nome. Renomeie a outra conta primeiro.`
+          : `Não é possível renomear para "${body.name}": já existe outra conta com esse nome nesta organização, e os contratos são vinculados por nome.`,
+      }, 422)
+    }
+  }
+
+  const [row] = await db.update(accounts).set(body).where(eq(accounts.id, id)).returning()
   if (!row) return c.json({ error: 'Not found' }, 404)
+
+  // ── Renomear a conta precisa arrastar os contratos junto ──────────────
+  // O vínculo conta↔contrato é por texto (`contracts.contratante` = `accounts.name`),
+  // sem chave estrangeira. Sem esta propagação, renomear uma conta órfã seus
+  // contratos silenciosamente — e o pior não é a tela ficar errada, é que as
+  // travas que dependem deste join passam a NÃO ENCONTRAR NADA e liberam o que
+  // deveriam bloquear: a inativação da conta com contrato ativo, e a
+  // exclusividade de componente por conta.
+  //
+  // Paliativo consciente. O certo é `contracts.accountId` como FK — ver risco
+  // registrado no handoff. Enquanto a FK não existe, isto impede o pior.
+  if (renomeou) {
+    // Sem transação nativa no driver HTTP do Neon: se esta etapa falhar, a conta
+    // fica renomeada e os contratos para trás. Por isso o erro é reportado em vez
+    // de engolido — um 500 aqui é preferível a uma inconsistência silenciosa.
+    await db.update(contracts)
+      .set({ contratante: row.name })
+      .where(and(eq(contracts.orgId, atual.orgId), eq(contracts.contratante, atual.name)))
+  }
+
   return c.json(row)
 })
 
 app.delete('/api/accounts/:id', async (c) => {
+  const id = c.req.param('id')
+
+  // ── Hierarquia: conta só entra em quarentena se não tiver contratos ativos vinculados ──
+  const [existing] = await db.select().from(accounts).where(eq(accounts.id, id))
+  if (!existing) return c.json({ error: 'Not found' }, 404)
+  const activeContracts = await db.select().from(contracts).where(
+    and(
+      eq(contracts.orgId, existing.orgId),
+      eq(contracts.contratante, existing.name),
+      ne(contracts.status, 'Inativo'),
+    )
+  )
+  if (activeContracts.length > 0) {
+    return c.json({
+      error: `Não é possível excluir a conta: existem ${activeContracts.length} contrato(s) ativo(s) vinculado(s). Inative os contratos primeiro.`,
+    }, 422)
+  }
+
   // Soft delete: marca deletedAt, não remove fisicamente
   const [row] = await db
     .update(accounts)
     .set({ deletedAt: new Date().toISOString() })
-    .where(eq(accounts.id, c.req.param('id')))
+    .where(eq(accounts.id, id))
     .returning()
   if (!row) return c.json({ error: 'Not found' }, 404)
   return c.json({ ok: true })
@@ -198,6 +312,14 @@ app.get('/api/solutions/:id', async (c) => {
 
 app.post('/api/solutions', async (c) => {
   const body = await c.req.json()
+
+  // ── Máximo de um componente por solução ───────────────────
+  if ((body.componenteIds ?? []).length > 1) {
+    return c.json({
+      error: 'Uma solução pode ter no máximo um componente vinculado.',
+    }, 422)
+  }
+
   // Garante que todo plano criado já nasce com v1 registrada no histórico
   const now = new Date().toISOString()
   if (Array.isArray(body.plans)) {
@@ -220,11 +342,38 @@ app.put('/api/solutions/:id', async (c) => {
   const [existing] = await db.select().from(solutions).where(eq(solutions.id, id))
   if (!existing) return c.json({ error: 'Not found' }, 404)
 
+  // ── Hierarquia de inativação: solução só inativa se todos os contratos vinculados já estiverem inativos ──
+  // (Organização → Conta → Solução → Contrato — cada nível bloqueia no de baixo.)
+  if (body.status === 'Inativo' && existing.status !== 'Inativo') {
+    const { ne, and } = await import('drizzle-orm')
+    const orgContracts = await db.select().from(contracts).where(
+      and(eq(contracts.orgId, existing.orgId), ne(contracts.status, 'Inativo'))
+    )
+    const activeContracts = orgContracts.filter((ct: any) =>
+      Array.isArray(ct.objetos) && ct.objetos.some((o: any) => o.solucao === existing.name)
+    )
+    if (activeContracts.length > 0) {
+      return c.json({
+        error: `Não é possível inativar a solução: existem ${activeContracts.length} contrato(s) ativo(s) vinculado(s). Inative os contratos primeiro.`,
+      }, 422)
+    }
+  }
+
   // ── Componentes: ao menos 1 vinculado ────────────────────
   const incomingComponenteIds: string[] = body.componenteIds ?? []
   if (incomingComponenteIds.length === 0) {
     return c.json({
       error: 'A solução deve ter ao menos um componente vinculado.',
+    }, 422)
+  }
+
+  // ── Máximo de um componente por solução ───────────────────
+  // Soluções legadas com múltiplos componentes ficam isentas até serem
+  // editadas — só bloqueia se a quantidade estiver aumentando.
+  const existingComponenteIds: string[] = Array.isArray(existing.componenteIds) ? existing.componenteIds as string[] : []
+  if (incomingComponenteIds.length > 1 && incomingComponenteIds.length > existingComponenteIds.length) {
+    return c.json({
+      error: 'Uma solução pode ter no máximo um componente vinculado.',
     }, 422)
   }
 
@@ -328,6 +477,55 @@ app.delete('/api/solutions/:id', async (c) => {
 
 // ── Contracts ─────────────────────────────────────────────────
 
+// Retorna os conflitos entre os componentes usados pelas soluções deste contrato
+// e os já usados por OUTROS contratos ATIVOS da MESMA conta (contratante) na
+// mesma organização. O vínculo conta↔solução existe apenas através do contrato
+// (Contract.objetos referencia a solução pelo nome) — por isso a resolução
+// solução → componentes é feita aqui, e não mais em Solution.accountId.
+/** Nomes de solução que aparecem mais de uma vez na lista de objetos do próprio contrato. */
+function findDuplicateSolutionNames(objetos: Array<{ solucao: string }>): string[] {
+  const vistos = new Set<string>()
+  const duplicadas = new Set<string>()
+  for (const o of objetos) {
+    if (vistos.has(o.solucao)) duplicadas.add(o.solucao)
+    vistos.add(o.solucao)
+  }
+  return [...duplicadas]
+}
+
+async function findComponenteConflictsForContract(
+  orgId: string,
+  contratante: string,
+  objetos: Array<{ solucao: string }>,
+  excludeContractId?: string,
+) {
+  if (!contratante || objetos.length === 0) return []
+  const orgSolutions = await db.select().from(solutions).where(eq(solutions.orgId, orgId))
+  const componenteIdsPorSolucao = new Map<string, string[]>()
+  for (const sol of orgSolutions) {
+    componenteIdsPorSolucao.set(sol.name, Array.isArray(sol.componenteIds) ? sol.componenteIds as string[] : [])
+  }
+  const incomingComponenteIds = new Set(objetos.flatMap(o => componenteIdsPorSolucao.get(o.solucao) ?? []))
+  if (incomingComponenteIds.size === 0) return []
+
+  const orgContracts = await db.select().from(contracts).where(
+    and(eq(contracts.orgId, orgId), eq(contracts.contratante, contratante), ne(contracts.status, 'Inativo'))
+  )
+  const conflicts: { componenteId: string; solutionName: string; contractId: string }[] = []
+  for (const ct of orgContracts) {
+    if (ct.id === excludeContractId) continue
+    const ctObjetos: Array<{ solucao: string }> = Array.isArray(ct.objetos) ? ct.objetos as any[] : []
+    for (const obj of ctObjetos) {
+      for (const cid of componenteIdsPorSolucao.get(obj.solucao) ?? []) {
+        if (incomingComponenteIds.has(cid)) {
+          conflicts.push({ componenteId: cid, solutionName: obj.solucao, contractId: ct.id })
+        }
+      }
+    }
+  }
+  return conflicts
+}
+
 app.get('/api/contracts', async (c) => {
   const orgId = c.req.query('orgId')
   const rows = orgId
@@ -344,6 +542,29 @@ app.get('/api/contracts/:id', async (c) => {
 
 app.post('/api/contracts', async (c) => {
   const body = await c.req.json()
+
+  // ── Mesma solução duas vezes no próprio contrato ───────────
+  // A checagem de exclusividade abaixo compara contra OUTROS contratos; ela
+  // nunca olha para dentro da própria lista. Sem isto, nada impede duas
+  // linhas de "PAS Flow" com planos diferentes no mesmo contrato — situação
+  // sem leitura sensata (qual plano vale?) que passou despercebida nos dados
+  // de demonstração até ser auditada.
+  const duplicadas = findDuplicateSolutionNames(body.objetos ?? [])
+  if (duplicadas.length > 0) {
+    return c.json({
+      error: `A mesma solução não pode aparecer duas vezes no mesmo contrato (${duplicadas.join(', ')}).`,
+    }, 422)
+  }
+
+  // ── Exclusividade de componente por conta ─────────────────
+  const conflicts = await findComponenteConflictsForContract(body.orgId, body.contratante, body.objetos ?? [])
+  if (conflicts.length > 0) {
+    const solNames = [...new Set(conflicts.map(cf => cf.solutionName))]
+    return c.json({
+      error: `Os componentes das soluções selecionadas já estão em uso por outro contrato ativo desta conta (${solNames.join(', ')}).`,
+    }, 422)
+  }
+
   const [row] = await db.insert(contracts).values(body).returning()
   return c.json(row, 201)
 })
@@ -354,6 +575,40 @@ app.put('/api/contracts/:id', async (c) => {
 
   const [existing] = await db.select().from(contracts).where(eq(contracts.id, id))
   if (!existing) return c.json({ error: 'Not found' }, 404)
+
+  // ── Exclusividade de componente por conta ─────────────────
+  // Só valida quando a composição do contrato realmente muda. Rodar em TODA
+  // atualização congelava permanentemente qualquer contrato que já violasse a
+  // regra: um update de status (ex.: a Fase 2 concluindo, ou o operador
+  // reexecutando uma solução) era rejeitado por um conflito que ele não criou
+  // — e inativar, a única saída do conflito, era bloqueado PELO conflito.
+  //
+  // Inativar também nunca valida: tirar um contrato de circulação só reduz
+  // ocupação de componente, nunca cria conflito.
+  const mudaComposicao = 'objetos' in body || 'contratante' in body
+  const vaiInativar = body.status === 'Inativo'
+
+  if (mudaComposicao && !vaiInativar) {
+    const effectiveObjetosParaDuplicata = ('objetos' in body) ? body.objetos : existing.objetos
+    const duplicadas = findDuplicateSolutionNames(effectiveObjetosParaDuplicata ?? [])
+    if (duplicadas.length > 0) {
+      return c.json({
+        error: `A mesma solução não pode aparecer duas vezes no mesmo contrato (${duplicadas.join(', ')}).`,
+      }, 422)
+    }
+
+    const effectiveContratante = ('contratante' in body) ? body.contratante : existing.contratante
+    const effectiveObjetos = ('objetos' in body) ? body.objetos : existing.objetos
+    const conflicts = await findComponenteConflictsForContract(
+      body.orgId ?? existing.orgId, effectiveContratante, effectiveObjetos ?? [], id
+    )
+    if (conflicts.length > 0) {
+      const solNames = [...new Set(conflicts.map(cf => cf.solutionName))]
+      return c.json({
+        error: `Os componentes das soluções selecionadas já estão em uso por outro contrato ativo desta conta (${solNames.join(', ')}).`,
+      }, 422)
+    }
+  }
 
   const [row] = await db.update(contracts).set(body).where(eq(contracts.id, id)).returning()
   if (!row) return c.json({ error: 'Not found' }, 404)

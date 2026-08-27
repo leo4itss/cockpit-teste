@@ -98,11 +98,12 @@ export function NewSolutionSheet({
   const [planDialogOpen, setPlanDialogOpen] = useState(false)
   const [componenteSelecaoOpen, setComponenteSelecaoOpen] = useState(false)
 
-  const useInline = componentes.length <= THRESHOLD_INLINE
-
   function set(field: string, value: string | boolean) {
     setForm(f => ({ ...f, [field]: value }))
   }
+
+  const availableComponentes = componentes
+  const useInline = componentes.length <= THRESHOLD_INLINE
 
   // Tipos disponíveis para planos = union dos componentes selecionados (ou todos se nenhum)
   const tiposDisponiveis: TipoLicenca[] = selectedComponenteIds.length === 0
@@ -240,15 +241,16 @@ export function NewSolutionSheet({
         <div className="flex flex-col gap-4">
           <SectionTitle>Componentes</SectionTitle>
           <p className="text-sm text-[#6b7280] -mt-2">
-            Selecione os módulos que compõem esta solução. Os tipos de licença disponíveis para os planos serão derivados dos componentes selecionados.
+            Selecione o componente que compõe esta solução. Os tipos de licença disponíveis para os planos serão derivados do componente selecionado.
           </p>
 
           {useInline ? (
-            /* ≤ 5 componentes: seletor inline — multi-select */
+            /* ≤ 5 componentes: seletor inline — seleção única */
             <ComponenteSelector
-              componentes={componentes}
+              componentes={availableComponentes}
               value={selectedComponenteIds}
               onChange={setSelectedComponenteIds}
+              single
             />
           ) : (
             /* > 5 componentes: botão que abre sheet de seleção */
@@ -259,7 +261,7 @@ export function NewSolutionSheet({
                 className="inline-flex items-center gap-1.5 h-9 px-4 border border-[#e5e7eb] rounded-md text-sm font-medium text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-colors w-fit"
               >
                 <Plus className="w-4 h-4" />
-                Selecionar componentes
+                Selecionar componente
                 {selectedComponenteIds.length > 0 && (
                   <span className="ml-1 bg-blue-100 text-blue-700 text-xs font-semibold px-1.5 py-0.5 rounded-full">
                     {selectedComponenteIds.length}
@@ -383,9 +385,10 @@ export function NewSolutionSheet({
       <ComponenteSelecaoSheet
         open={componenteSelecaoOpen}
         onClose={() => setComponenteSelecaoOpen(false)}
-        componentes={componentes}
+        componentes={availableComponentes}
         value={selectedComponenteIds}
         onChange={setSelectedComponenteIds}
+        single
       />
 
       <ToastContainer toasts={toasts} onDismiss={dismiss} />

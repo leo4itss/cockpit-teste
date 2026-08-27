@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Dialog } from './ui/Dialog'
 import { Button } from './ui/Button'
 import { Badge } from './ui/Badge'
-import type { Solution, ObjetoContrato, ValorLicencaContrato } from '@/types'
+import type { Solution, Contract, ObjetoContrato, ValorLicencaContrato } from '@/types'
 
 // Alias mantido para compatibilidade com importadores existentes
 export type { ObjetoContrato as ObjetoSelecionado }
@@ -10,7 +10,7 @@ export type { ObjetoContrato as ObjetoSelecionado }
 interface Row {
   id: string
   solucao: string
-  orgContratada: string
+  componenteIds: string[]
   plano: string
   planoVersao: number
   licenciamento: string
@@ -22,11 +22,61 @@ interface Props {
   open: boolean
   onClose: () => void
   solutions: Solution[]
-  orgName: string
+  /** Conta contratante deste contrato — usada para checar exclusividade de componente por conta */
+  contratante: string
+  /** Outros contratos existentes (o próprio contrato, se em edição, deve vir excluído pelo chamador) */
+  contracts: Contract[]
+  /**
+   * Objetos já adicionados ao contrato em edição nesta mesma sessão (ainda não
+   * salvos). Sem isso, nada impede escolher a mesma solução duas vezes dentro
+   * do próprio contrato — `contracts` só enxerga o que já está persistido em
+   * OUTROS contratos, nunca os itens que este diálogo mesmo alimentou.
+   */
+  objetosNoRascunho: ObjetoContrato[]
   onSave: (objetos: ObjetoContrato[]) => void
 }
 
-function buildRows(solutions: Solution[], orgName: string): Row[] {
+function componenteIdsPorSolucaoMap(solutions: Solution[]): Map<string, string[]> {
+  const map = new Map<string, string[]>()
+  solutions.forEach(s => map.set(s.name, s.componenteIds ?? []))
+  return map
+}
+
+/** Componentes já em uso por outros contratos ATIVOS da mesma conta (contratante). */
+function occupiedComponenteIds(solutions: Solution[], contratante: string, contracts: Contract[]): Set<string> {
+  const componenteIdsPorSolucao = componenteIdsPorSolucaoMap(solutions)
+
+  const occupied = new Set<string>()
+  contracts
+    .filter(ct => ct.contratante === contratante && ct.status !== 'Inativo')
+    .forEach(ct => {
+      ct.objetos.forEach(obj => {
+        (componenteIdsPorSolucao.get(obj.solucao) ?? []).forEach(cid => occupied.add(cid))
+      })
+    })
+  return occupied
+}
+
+/**
+ * Nomes das soluções já adicionadas ao contrato em edição, ainda não salvas.
+ *
+ * Por NOME, e não por componente — ao contrário da checagem entre contratos.
+ * São regras diferentes: entre contratos o que não pode repetir é o componente
+ * provisionado na conta; dentro de um mesmo contrato o que não faz sentido é a
+ * mesma solução duas vezes, porque não há como dizer qual plano vale.
+ *
+ * Comparar por componente aqui bloquearia soluções DIFERENTES que dividem um
+ * componente — «PAS Flow» e «Assistente de Design» dividem `comp-1`, e o
+ * contrato da conta Apple Developer Tools tem as duas juntas. Seria impossível
+ * remontar pela interface um contrato que já existe, e o aviso mentiria
+ * dizendo que a solução já foi adicionada. O servidor sempre checou por nome
+ * (`findDuplicateSolutionNames`); esta é a metade que estava divergindo.
+ */
+function rascunhoSolucaoNames(objetos: ObjetoContrato[]): Set<string> {
+  return new Set(objetos.map(o => o.solucao))
+}
+
+function buildRows(solutions: Solution[]): Row[] {
   const rows: Row[] = []
   solutions.forEach(sol => {
     // Apenas planos ativos (versão vigente) estão disponíveis para novos contratos
@@ -37,7 +87,7 @@ function buildRows(solutions: Solution[], orgName: string): Row[] {
       rows.push({
         id: sol.id,
         solucao: sol.name,
-        orgContratada: orgName,
+        componenteIds: sol.componenteIds ?? [],
         plano: '—',
         planoVersao: 1,
         licenciamento: '—',
@@ -48,7 +98,7 @@ function buildRows(solutions: Solution[], orgName: string): Row[] {
     }
 
     activePlans.forEach(plan => {
-      // Monta label de licenciamento a partir do novo formato (tipoLicencaNome + range)
+      // Monta label de licenciamento a partir do novo formato (tipoLicencaNome + range + excedente)
       const licenciamento = plan.licensings.length > 0
         ? plan.licensings.map(l => {
             const unidade = l.tipoLicencaUnidade ?? ''
@@ -61,14 +111,19 @@ function buildRows(solutions: Solution[], orgName: string): Row[] {
             else if (min) range = `${min} ${unidade}`.trim()
             else if (max) range = `Até ${max} ${unidade}`.trim()
             else if (val) range = `${val} ${unidade}`.trim()
-            return range ? `${nome}: ${range}` : nome
+            const excedenteLabel = l.excedenteSemLimite
+              ? ' (excedente: sem limite)'
+              : l.excedente?.trim()
+                ? ` (excedente até ${l.excedente.trim()} ${unidade})`.replace(/ \)/, ')')
+                : ''
+            return (range ? `${nome}: ${range}` : nome) + excedenteLabel
           }).join(' · ') || '—'
         : '—'
 
       rows.push({
         id: `${sol.id}-${plan.name}`,
         solucao: sol.name,
-        orgContratada: orgName,
+        componenteIds: sol.componenteIds ?? [],
         plano: plan.name,
         planoVersao: plan.versao ?? 1,
         licenciamento,
@@ -77,6 +132,8 @@ function buildRows(solutions: Solution[], orgName: string): Row[] {
           tipoLicencaNome: l.tipoLicencaNome || l.tipoLicencaId,
           tipoLicencaUnidade: l.tipoLicencaUnidade,
           valor: l.valorMinimo?.trim() || l.valor?.trim() || '',
+          excedente: l.excedente,
+          excedenteSemLimite: l.excedenteSemLimite,
         })),
       })
     })
@@ -84,19 +141,36 @@ function buildRows(solutions: Solution[], orgName: string): Row[] {
   return rows
 }
 
-export function AddObjetoDialog({ open, onClose, solutions, orgName, onSave }: Props) {
-  const rows = buildRows(solutions, orgName)
+export function AddObjetoDialog({ open, onClose, solutions, contratante, contracts, objetosNoRascunho, onSave }: Props) {
+  const rows = buildRows(solutions)
   const [selected, setSelected] = useState<Set<string>>(new Set())
 
+  const occupied = occupiedComponenteIds(solutions, contratante, contracts)
+  const emRascunho = rascunhoSolucaoNames(objetosNoRascunho)
+  function isBlocked(row: Row) {
+    return emRascunho.has(row.solucao) || row.componenteIds.some(cid => occupied.has(cid))
+  }
+  function motivoBloqueio(row: Row): string | undefined {
+    if (emRascunho.has(row.solucao)) {
+      return 'Esta solução já foi adicionada a este contrato.'
+    }
+    if (row.componenteIds.some(cid => occupied.has(cid))) {
+      return 'Um dos componentes desta solução já está em uso por outro contrato ativo desta conta.'
+    }
+    return undefined
+  }
+  const selectableRows = rows.filter(r => !isBlocked(r))
+
   function toggleAll() {
-    if (selected.size === rows.length) setSelected(new Set())
-    else setSelected(new Set(rows.map(r => r.id)))
+    if (selected.size === selectableRows.length) setSelected(new Set())
+    else setSelected(new Set(selectableRows.map(r => r.id)))
   }
 
-  function toggle(id: string) {
+  function toggle(row: Row) {
+    if (isBlocked(row)) return
     setSelected(prev => {
       const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
+      next.has(row.id) ? next.delete(row.id) : next.add(row.id)
       return next
     })
   }
@@ -106,7 +180,6 @@ export function AddObjetoDialog({ open, onClose, solutions, orgName, onSave }: P
       .filter(r => selected.has(r.id))
       .map(r => ({
         solucao: r.solucao,
-        orgContratada: r.orgContratada,
         plano: r.plano,
         licenciamento: r.licenciamento,
         planoVersao: r.planoVersao,
@@ -122,8 +195,8 @@ export function AddObjetoDialog({ open, onClose, solutions, orgName, onSave }: P
     onClose()
   }
 
-  const allChecked = rows.length > 0 && selected.size === rows.length
-  const someChecked = selected.size > 0 && selected.size < rows.length
+  const allChecked = selectableRows.length > 0 && selected.size === selectableRows.length
+  const someChecked = selected.size > 0 && selected.size < selectableRows.length
 
   return (
     <Dialog
@@ -156,7 +229,7 @@ export function AddObjetoDialog({ open, onClose, solutions, orgName, onSave }: P
                     onChange={toggleAll}
                   />
                 </th>
-                {['Solução', 'Organização contratada', 'Plano', 'Licença', 'Status'].map(col => (
+                {['Solução', 'Plano', 'Licença', 'Status'].map(col => (
                   <th
                     key={col}
                     className="px-2 py-2.5 text-left text-sm font-medium text-[#030712] opacity-40 whitespace-nowrap"
@@ -169,18 +242,23 @@ export function AddObjetoDialog({ open, onClose, solutions, orgName, onSave }: P
             <tbody>
               {rows.map(row => {
                 const checked = selected.has(row.id)
+                const blocked = isBlocked(row)
                 return (
                   <tr
                     key={row.id}
-                    className="border-b border-[#e5e7eb] last:border-0 hover:bg-gray-50 cursor-pointer"
-                    onClick={() => toggle(row.id)}
+                    title={motivoBloqueio(row)}
+                    className={`border-b border-[#e5e7eb] last:border-0 transition-colors ${
+                      blocked ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50 cursor-pointer'
+                    }`}
+                    onClick={() => toggle(row)}
                   >
                     <td className="px-3 py-3">
                       <input
                         type="checkbox"
-                        className="rounded border-[#e5e7eb] text-blue-600 shadow-sm cursor-pointer"
+                        className="rounded border-[#e5e7eb] text-blue-600 shadow-sm cursor-pointer disabled:cursor-not-allowed"
                         checked={checked}
-                        onChange={() => toggle(row.id)}
+                        disabled={blocked}
+                        onChange={() => toggle(row)}
                         onClick={e => e.stopPropagation()}
                       />
                     </td>
@@ -191,9 +269,13 @@ export function AddObjetoDialog({ open, onClose, solutions, orgName, onSave }: P
                           {row.solucao.charAt(0)}
                         </div>
                         <span className="text-sm text-[#030712] truncate max-w-[140px]">{row.solucao}</span>
+                        {blocked && (
+                          <span className="text-[11px] font-medium text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                            {emRascunho.has(row.solucao) ? 'Já neste contrato' : 'Em uso nesta conta'}
+                          </span>
+                        )}
                       </div>
                     </td>
-                    <td className="px-2 py-3 text-sm text-[#030712] whitespace-nowrap">{row.orgContratada}</td>
                     <td className="px-2 py-3 text-sm text-[#030712] whitespace-nowrap">
                       <span className="flex items-center gap-1.5">
                         {row.plano}

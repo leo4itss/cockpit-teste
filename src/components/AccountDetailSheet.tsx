@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Copy, MessageCircle, Mail, ExternalLink, Bot, Database, Layers, FileText, Zap, Loader2, CheckCircle2, XCircle } from 'lucide-react'
 import { Sheet } from './ui/Sheet'
 import { Button } from './ui/Button'
@@ -6,6 +7,7 @@ import { Badge } from './ui/Badge'
 import { useToast, ToastContainer } from './ui/Toast'
 import { cn } from '@/lib/utils'
 import { api } from '@/api/client'
+import { buildTenantDomain } from '@/services/provisioning'
 import { accountEntitlements as mockEntitlements } from '@/data/mock'
 import type { Account, Organization } from '@/types'
 
@@ -115,6 +117,7 @@ function StatusBadge({ status }: { status: Account['status'] }) {
 /* ── main component ─────────────────────────────────────────── */
 
 export function AccountDetailSheet({ open, onClose, account, org, onEdit }: Props) {
+  const navigate = useNavigate()
   const { toasts, toast, dismiss } = useToast()
   const [tab, setTab] = useState<DetailTab>('detalhes')
 
@@ -167,10 +170,8 @@ export function AccountDetailSheet({ open, onClose, account, org, onEdit }: Prop
 
   if (!account || !org) return null
 
-  const hasSubdomain = !!account.subdomain?.trim()
-  const accessUrl = hasSubdomain
-    ? `http://${account.subdomain}.hml.pas.app.br`
-    : ''
+  const accessUrl = buildTenantDomain(account.subdomain) ?? ''
+  const hasSubdomain = !!accessUrl
 
   const enderecoPartes = [
     account.endereco || org.address,
@@ -185,9 +186,14 @@ export function AccountDetailSheet({ open, onClose, account, org, onEdit }: Prop
       onClose={onClose}
       title="Detalhes da Conta"
       width="w-[640px]"
-      headerAction={onEdit ? (
-        <Button variant="outline" size="sm" onClick={onEdit}>Editar</Button>
-      ) : undefined}
+      headerAction={
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => navigate(`/contas/${account.id}/provisionamento`)}>
+            Ver provisionamento
+          </Button>
+          {onEdit && <Button variant="outline" size="sm" onClick={onEdit}>Editar</Button>}
+        </div>
+      }
     >
       {/* ── Tabs ── */}
       <div className="flex border-b border-[#e5e7eb] -mx-6 px-6 mb-6">
