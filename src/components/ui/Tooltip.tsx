@@ -29,6 +29,7 @@ export function Tooltip({ content, children, width = 'w-52' }: Props) {
 
   const portalContent = show && pos && createPortal(
     <div
+      role="tooltip"
       className={`fixed bg-[#1f2937] rounded-md px-3 py-1.5 text-xs text-[#f9fafb] ${width} z-[9999] shadow-lg border border-gray-700 whitespace-normal`}
       style={{
         top: `${pos.top}px`,
@@ -44,11 +45,17 @@ export function Tooltip({ content, children, width = 'w-52' }: Props) {
 
   return (
     <>
+      {/* tabIndex + onFocus/onBlur: só onMouseEnter deixava o conteúdo
+          inacessível a quem navega por teclado, leitor de tela ou toque —
+          a única forma de ver o conteúdo era passar o mouse por cima. */}
       <div
         ref={containerRef}
         className="inline-flex items-center"
+        tabIndex={0}
         onMouseEnter={() => setShow(true)}
         onMouseLeave={() => setShow(false)}
+        onFocus={() => setShow(true)}
+        onBlur={() => setShow(false)}
       >
         {children}
       </div>
