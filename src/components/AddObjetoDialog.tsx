@@ -26,13 +26,25 @@ interface Props {
   contratante: string
   /** Outros contratos existentes (o próprio contrato, se em edição, deve vir excluído pelo chamador) */
   contracts: Contract[]
+  /**
+   * Objetos já adicionados ao contrato em edição nesta mesma sessão (ainda não
+   * salvos). Sem isso, nada impede escolher a mesma solução duas vezes dentro
+   * do próprio contrato — `contracts` só enxerga o que já está persistido em
+   * OUTROS contratos, nunca os itens que este diálogo mesmo alimentou.
+   */
+  objetosNoRascunho: ObjetoContrato[]
   onSave: (objetos: ObjetoContrato[]) => void
+}
+
+function componenteIdsPorSolucaoMap(solutions: Solution[]): Map<string, string[]> {
+  const map = new Map<string, string[]>()
+  solutions.forEach(s => map.set(s.name, s.componenteIds ?? []))
+  return map
 }
 
 /** Componentes já em uso por outros contratos ATIVOS da mesma conta (contratante). */
 function occupiedComponenteIds(solutions: Solution[], contratante: string, contracts: Contract[]): Set<string> {
-  const componenteIdsPorSolucao = new Map<string, string[]>()
-  solutions.forEach(s => componenteIdsPorSolucao.set(s.name, s.componenteIds ?? []))
+  const componenteIdsPorSolucao = componenteIdsPorSolucaoMap(solutions)
 
   const occupied = new Set<string>()
   contracts
@@ -43,6 +55,16 @@ function occupiedComponenteIds(solutions: Solution[], contratante: string, contr
       })
     })
   return occupied
+}
+
+/** Componentes das soluções já adicionadas ao contrato em edição, ainda não salvas. */
+function rascunhoComponenteIds(solutions: Solution[], objetos: ObjetoContrato[]): Set<string> {
+  const componenteIdsPorSolucao = componenteIdsPorSolucaoMap(solutions)
+  const ids = new Set<string>()
+  objetos.forEach(obj => {
+    (componenteIdsPorSolucao.get(obj.solucao) ?? []).forEach(cid => ids.add(cid))
+  })
+  return ids
 }
 
 function buildRows(solutions: Solution[]): Row[] {
