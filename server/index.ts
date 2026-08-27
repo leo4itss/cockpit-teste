@@ -189,7 +189,13 @@ app.put('/api/accounts/:id', async (c) => {
     const [existing] = await db.select().from(accounts).where(eq(accounts.id, id))
     if (existing && existing.status !== 'Inativo') {
       const activeContracts = await db.select().from(contracts).where(
-        and(eq(contracts.contratante, existing.name), ne(contracts.status, 'Inativo'))
+        // Escopo por organização: nome de conta não é único no banco, então sem
+        // este filtro contas homônimas de orgs diferentes casariam entre si.
+        and(
+          eq(contracts.orgId, existing.orgId),
+          eq(contracts.contratante, existing.name),
+          ne(contracts.status, 'Inativo'),
+        )
       )
       if (activeContracts.length > 0) {
         return c.json({
@@ -199,8 +205,31 @@ app.put('/api/accounts/:id', async (c) => {
     }
   }
 
+  // ── Renomear a conta precisa arrastar os contratos junto ──────────────
+  // O vínculo conta↔contrato é por texto (`contracts.contratante` = `accounts.name`),
+  // sem chave estrangeira. Sem esta propagação, renomear uma conta órfã seus
+  // contratos silenciosamente — e o pior não é a tela ficar errada, é que as
+  // travas que dependem deste join passam a NÃO ENCONTRAR NADA e liberam o que
+  // deveriam bloquear: a inativação da conta com contrato ativo, e a
+  // exclusividade de componente por conta.
+  //
+  // Paliativo consciente. O certo é `contracts.accountId` como FK — ver risco
+  // registrado no handoff. Enquanto a FK não existe, isto impede o pior.
+  const [anterior] = await db.select().from(accounts).where(eq(accounts.id, id))
+  const renomeou = Boolean(anterior && body.name && body.name !== anterior.name)
+
   const [row] = await db.update(accounts).set(body).where(eq(accounts.id, id)).returning()
   if (!row) return c.json({ error: 'Not found' }, 404)
+
+  if (renomeou) {
+    // Sem transação nativa no driver HTTP do Neon: se esta etapa falhar, a conta
+    // fica renomeada e os contratos para trás. Por isso o erro é reportado em vez
+    // de engolido — um 500 aqui é preferível a uma inconsistência silenciosa.
+    await db.update(contracts)
+      .set({ contratante: row.name })
+      .where(and(eq(contracts.orgId, anterior.orgId), eq(contracts.contratante, anterior.name)))
+  }
+
   return c.json(row)
 })
 
@@ -211,7 +240,11 @@ app.delete('/api/accounts/:id', async (c) => {
   const [existing] = await db.select().from(accounts).where(eq(accounts.id, id))
   if (!existing) return c.json({ error: 'Not found' }, 404)
   const activeContracts = await db.select().from(contracts).where(
-    and(eq(contracts.contratante, existing.name), ne(contracts.status, 'Inativo'))
+    and(
+      eq(contracts.orgId, existing.orgId),
+      eq(contracts.contratante, existing.name),
+      ne(contracts.status, 'Inativo'),
+    )
   )
   if (activeContracts.length > 0) {
     return c.json({

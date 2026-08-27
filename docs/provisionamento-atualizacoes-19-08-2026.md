@@ -164,8 +164,20 @@ o novo status do contrato. Quando o worker real entrar, **quem deve escrever iss
 alinhamento com o backend.
 
 **L-4 · O vínculo entre conta e contrato é por nome.** Não há chave estrangeira: o sistema compara o campo
-"Contratante" do contrato com o nome da conta, texto com texto. Já era assim; esta entrega aumentou a dependência
-disso. Renomear uma conta quebra o vínculo. **Corrigir é tarefa à parte.**
+"Contratante" do contrato com o nome da conta, texto com texto.
+
+Investigando isso, descobrimos que **não era risco teórico — era bug alcançável**. O nome da conta é editável na
+tela e o rename não propagava para os contratos, então renomear uma conta ativa órfãos seus contratos no instante
+seguinte. E o pior não era a tela ficar errada: as travas que dependem desse vínculo passavam a **não encontrar
+nada e liberar o que deveriam bloquear** — inativar conta com contrato ativo, e contratar o mesmo componente duas
+vezes na mesma conta. Falha em aberto, sem nenhum erro visível.
+
+**Corrigido:** renomear uma conta agora arrasta os contratos junto, e os guards passaram a filtrar por
+organização (nome de conta não é único no banco, então contas homônimas de orgs diferentes casavam entre si).
+Reproduzido e verificado: antes, conta renomeada era inativada com 2 contratos ativos; agora é bloqueada com 422.
+
+**A chave estrangeira continua sendo o certo** e segue como tarefa à parte — o que existe hoje é um paliativo
+consciente que impede o pior enquanto `contracts.accountId` não existe.
 
 **L-5 · Simulação temporária.** Enquanto o worker não expõe status por contrato, o provisionamento é simulado no
 navegador com tempo comprimido para caber numa sessão de validação. É código descartável e está marcado como tal.

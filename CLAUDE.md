@@ -125,6 +125,7 @@ In production, `engine.ts` functions would be replaced by OpenFGA SDK calls; the
 - **`ProvisioningErrorBlock`** is the single error-detail block, shared by the Phase 1 step, the Phase 2 solution and the contract detail. Never inline a fourth copy.
 - **There is no runbook link.** `docUrl` was removed from `ProvisioningStepError` — the error→procedure mapping never existed, so the link pointed nowhere.
 - `mergeSolucoes()` gives the session simulation precedence over fixtures for the same solution+contract. Without it, retrying a fixture-based failure changes nothing on screen.
+- **The account↔contract join is by name, and renaming must cascade.** `contracts.contratante` matches `accounts.name` with no FK. `PUT /accounts/:id` therefore rewrites every matching contract when the name changes — without it, renaming an account orphans its contracts and the guards that rely on the join stop finding anything, silently allowing what they exist to block (inactivating an account with live contracts; contracting the same component twice). Account names are not unique, so every such query must also scope by `orgId`. A real `contracts.accountId` FK is still the correct fix.
 - Contract filters must use `status !== 'Inativo'`, never `status === 'Ativo'` — the latter silently drops contracts that are provisioning. This bit the org-deletion guard in `server/index.ts` and `api/index.ts`.
 
 ### Provisioning vocabulary and dates
