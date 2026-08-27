@@ -419,6 +419,7 @@ export function NewContractSheet({ open, onClose, orgId, orgName, accounts, solu
         solutions={solutions}
         contratante={contratante}
         contracts={contracts}
+        objetosNoRascunho={objetos}
         onSave={handleObjetosSave}
       />
 
