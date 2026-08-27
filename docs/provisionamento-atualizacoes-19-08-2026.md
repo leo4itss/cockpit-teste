@@ -1,7 +1,7 @@
 # Provisionamento — atualizações do handoff de 19/08/2026
 
 **Reunião:** handoff "Tela de Provisionamento" · **Branch:** `PAS-2409-provisionamento` ·
-**Status:** implementado e verificado em preview local · **Textos:** pendentes de validação com River e Neide
+**Status:** implementado e verificado em preview local · **Textos:** validados com River e Neide
 
 > **Para que serve este arquivo.** Consolida o que mudou nesta rodada para que a documentação de handoff no
 > Figma (página *📆 30.07.2026 - Detalhes de Provisionamento*) seja atualizada. Cada seção indica o texto final
