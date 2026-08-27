@@ -228,10 +228,22 @@ export function OrganizacaoDetailPage() {
 
       // Persiste o estado terminal — sem isso o contrato voltaria a
       // "Provisionando" no próximo carregamento vindo da API.
+      //
+      // Só o campo `status`. Mandar o contrato inteiro colocaria `objetos` e
+      // `contratante` no corpo, e é exatamente isso que faz o backend rodar a
+      // validação de exclusividade de componentes — que reprova o contrato
+      // contra as próprias soluções dele e devolve 422. Além disso o objeto
+      // vem do estado carregado no mount e sobrescreveria qualquer edição
+      // feita nesse meio-tempo.
       for (const m of mudaram) {
-        const alvo = contracts.find(c => c.id === m.id)
-        if (!alvo) continue
-        api.updateContract(m.id, { ...alvo, status: m.status }).catch(() => {})
+        api.updateContract(m.id, { status: m.status }).catch(() => {
+          // Desfaz o otimismo: a tela não pode afirmar um status que o banco
+          // não tem. O ciclo seguinte do polling tenta de novo.
+          const desfaz = (c: Contract): Contract =>
+            c.id === m.id ? { ...c, status: m.statusAnterior } : c
+          setContracts(prev => prev.map(desfaz))
+          setSelectedContract(prev => (prev ? desfaz(prev) : prev))
+        })
       }
     },
   })

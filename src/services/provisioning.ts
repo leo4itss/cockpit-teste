@@ -315,11 +315,6 @@ export function deriveContractStatus(
   return 'Provisionando'
 }
 
-/** Estados em que a Fase 2 do contrato ainda está rodando — usado para parar o polling. */
-export function isContractStatusTerminal(status: ContractStatus): boolean {
-  return status !== 'Provisionando'
-}
-
 // ── Join contratos/soluções (frágil por design — ver nota) ────
 
 /**
