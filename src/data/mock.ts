@@ -599,6 +599,18 @@ export const solutions: Solution[] = [
 ]
 
 export const contracts: Contract[] = [
+  // ── Conjunto curado ─────────────────────────────────────────────────
+  // Um contrato por cenário que precisa ser demonstrável, e nada além disso.
+  // A base já teve 23 contratos acumulados de sessões de teste, com a mesma
+  // solução repetida dentro do próprio contrato e a mesma solução ativa em
+  // vários contratos da mesma conta — as duas coisas que a regra de
+  // exclusividade existe para impedir. Ao acrescentar cenário aqui, confira:
+  //   1. nenhuma solução aparece duas vezes no mesmo contrato;
+  //   2. por conta, cada solução está em no máximo UM contrato não-inativo;
+  //   3. `contratante` casa exatamente com `accounts.name` da MESMA org;
+  //   4. contrato não-inativo só em conta com Fase 1 COMPLETED.
+
+  // Cenário: contrato inativado — só aparece com "Exibir contratos inativados".
   {
     id: 'c1',
     orgId: '1',
@@ -614,8 +626,55 @@ export const contracts: Contract[] = [
     dataInicio: '01/01/2026',
     dataTermino: '31/12/2026',
     renovacao: 'Anual',
+    status: 'Inativo',
+  },
+
+  // Cenário: contrato ativo com várias soluções, todas provisionadas.
+  // Par das entradas 'criado' em `provisioningSnapshots.a1.solucoes`.
+  // É também o contrato que faz a conta Apple não poder ser inativada e que
+  // bloqueia estas 3 soluções num novo contrato da mesma conta.
+  {
+    id: '6e20fc54-0baa-4f09-82ac-1c62809714ef',
+    orgId: '1',
+    contratante: 'Apple',
+    objetos: [
+      {
+        solucao: 'Assistente de Design',
+        plano: 'Basic',
+        planoVersao: 1,
+        licenciamento: 'Usuário nominal: 1–10 usuários',
+        valoresLicenca: [
+          { tipoLicencaNome: 'Usuário nominal', tipoLicencaUnidade: 'usuários', valor: '1' },
+        ],
+      },
+      {
+        solucao: 'Assistente Jurídico',
+        plano: 'Professional',
+        planoVersao: 2,
+        licenciamento: 'Quantidade de assistentes: 15 unidades · Usuário nominal: 1000 usuários · Quantidade de tokens/mensagens: 10000 tokens',
+        valoresLicenca: [
+          { tipoLicencaNome: 'Quantidade de assistentes', tipoLicencaUnidade: 'unidades', valor: '15' },
+          { tipoLicencaNome: 'Usuário nominal', tipoLicencaUnidade: 'usuários', valor: '1000' },
+          { tipoLicencaNome: 'Quantidade de tokens/mensagens', tipoLicencaUnidade: 'tokens', valor: '10000' },
+        ],
+      },
+      {
+        solucao: 'Base de Conhecimento PAS',
+        plano: 'Enterprise',
+        planoVersao: 1,
+        licenciamento: 'Usuário nominal: 10–500 usuários · Tamanho de banco de dados: 50–1000 GB',
+        valoresLicenca: [
+          { tipoLicencaNome: 'Usuário nominal', tipoLicencaUnidade: 'usuários', valor: '10' },
+          { tipoLicencaNome: 'Tamanho de banco de dados', tipoLicencaUnidade: 'GB', valor: '50' },
+        ],
+      },
+    ],
+    dataInicio: '2026-08-06',
+    dataTermino: '2026-08-15',
+    renovacao: 'Automática',
     status: 'Ativo',
   },
+
   // ── Cenário de erro da Fase 2 ────────────────────────────────────────
   // Par do registro em `provisioningSnapshots.a1.solucoes` com estado 'erro'.
   // Existe para que a falha do provisionamento por contrato seja demonstrável
@@ -637,11 +696,82 @@ export const contracts: Contract[] = [
     renovacao: 'Anual',
     status: 'Falha no provisionamento',
   },
+
+  // Cenário: exclusividade é por CONTA, não por organização. Estas duas contas
+  // da org Apple contratam PAS Flow ao mesmo tempo que a conta Apple — o que é
+  // válido, e é o que separa a regra certa da leitura errada dela.
+  {
+    id: 'ddd0ceab-e12f-4b00-b8fe-86cc7cb5b404',
+    orgId: '1',
+    contratante: 'Apple Design Studio',
+    objetos: [
+      {
+        solucao: 'PAS Flow',
+        plano: 'Starter',
+        planoVersao: 1,
+        licenciamento: 'Usuário nominal: 1–10 usuários',
+        valoresLicenca: [
+          { tipoLicencaNome: 'Usuário nominal', tipoLicencaUnidade: 'usuários', valor: '1' },
+        ],
+      },
+      {
+        solucao: 'Base de Conhecimento PAS',
+        plano: 'Starter',
+        planoVersao: 1,
+        licenciamento: 'Usuário nominal: 1–5 usuários',
+        valoresLicenca: [
+          { tipoLicencaNome: 'Usuário nominal', tipoLicencaUnidade: 'usuários', valor: '1' },
+        ],
+      },
+    ],
+    dataInicio: '2026-08-19',
+    dataTermino: '2027-08-19',
+    renovacao: 'Anual',
+    status: 'Ativo',
+  },
+
+  // Cenário: contrato usando uma versão de plano criada por edição
+  // ("Pro Plano Teste") — cobre o versionamento de planos de `Solution.plans`.
+  {
+    id: '233e00d3-b0fd-4e6e-9486-7ce3d32fa3fe',
+    orgId: '1',
+    contratante: 'Apple Developer Tools',
+    objetos: [
+      {
+        solucao: 'PAS Flow',
+        plano: 'Starter',
+        planoVersao: 1,
+        licenciamento: 'Usuário nominal: 1–10 usuários',
+        valoresLicenca: [
+          { tipoLicencaNome: 'Usuário nominal', tipoLicencaUnidade: 'usuários', valor: '1' },
+        ],
+      },
+      {
+        solucao: 'Assistente de Design',
+        plano: 'Pro Plano Teste',
+        planoVersao: 1,
+        licenciamento: 'Usuário concorrente: 5–50 sessões · Quantidade de assistentes: 1–10 unidades · Tamanho de banco de dados: 10 GB',
+        valoresLicenca: [
+          { tipoLicencaNome: 'Usuário concorrente', tipoLicencaUnidade: 'sessões', valor: '5' },
+          { tipoLicencaNome: 'Quantidade de assistentes', tipoLicencaUnidade: 'unidades', valor: '1' },
+          { tipoLicencaNome: 'Tamanho de banco de dados', tipoLicencaUnidade: 'GB', valor: '10' },
+        ],
+      },
+    ],
+    dataInicio: '2026-08-14',
+    dataTermino: '2027-08-14',
+    renovacao: 'Automática',
+    status: 'Ativo',
+  },
+
   // ── Atlas ↔ Comgas — fallback local para cenário Docnix ──────────────
+  // `contratante` precisa ser exatamente 'Comgas': é o nome da conta
+  // `acc-comgas`. Ficou como 'Comgas S.A.' por um tempo, e o contrato não
+  // casava com conta nenhuma — o join conta↔contrato é por texto puro.
   {
     id: 'ctr-atlas-comgas',
     orgId: 'org-docnix',
-    contratante: 'Comgas S.A.',
+    contratante: 'Comgas',
     objetos: [
       {
         solucao: 'Atlas',
