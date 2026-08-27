@@ -90,13 +90,14 @@ export function ProvisionamentoPage() {
     if (account && canView) loadProvisioning()
   }, [account, canView, loadProvisioning])
 
-  // Polling só enquanto há trabalho em execução — Fase 1 não concluída ou
-  // alguma solução da Fase 2 ainda provisionando. Ao atingir estado terminal
-  // o hook para sozinho, sem requisições indefinidas.
+  // Polling só enquanto há trabalho REALMENTE em execução. 'PENDING' fica de
+  // fora de propósito: é o estado de uma conta cujo provisionamento ainda não
+  // começou, e ele não progride sozinho — incluí-lo mantinha a tela consultando
+  // para sempre um estado que nunca muda. Só 'IN_PROGRESS' (Fase 1 rodando) e
+  // soluções de Fase 2 em curso justificam continuar perguntando.
   const emExecucao =
     fetchState.fase === 'ok' &&
-    (fetchState.dados.status === 'PENDING' ||
-      fetchState.dados.status === 'IN_PROGRESS' ||
+    (fetchState.dados.status === 'IN_PROGRESS' ||
       fetchState.dados.solucoes.some(s => s.estado === 'pendente' || s.estado === 'em-andamento'))
 
   useProvisioningPolling({
@@ -269,9 +270,15 @@ function ProvisioningContent({
       const novo = deriveContractStatus(solucoes, alvo.status)
       if (novo === alvo.status) continue
 
-      const atualizado: Contract = { ...alvo, status: novo }
-      setContracts(prev => prev.map(c => (c.id === contratoId ? atualizado : c)))
-      api.updateContract(contratoId, atualizado).catch(() => {})
+      // Só o campo `status`: o backend aceita body parcial, e mandar o contrato
+      // inteiro a partir deste estado (carregado uma vez no mount) sobrescreveria
+      // com dados velhos qualquer edição feita nesse meio-tempo.
+      setContracts(prev => prev.map(c => (c.id === contratoId ? { ...c, status: novo } : c)))
+      api.updateContract(contratoId, { status: novo }).catch(() => {
+        // A gravação falhou: desfaz o estado otimista para a tela não afirmar
+        // um status que o banco não tem. O polling tenta de novo no próximo ciclo.
+        setContracts(prev => prev.map(c => (c.id === contratoId ? { ...c, status: alvo.status } : c)))
+      })
     }
   }, [snapshot.solucoes, contracts])
 
@@ -292,9 +299,15 @@ function ProvisioningContent({
 
       const alvo = contracts.find(c => c.id === contratoId)
       if (alvo && alvo.status !== 'Provisionando') {
-        const atualizado: Contract = { ...alvo, status: 'Provisionando' }
-        setContracts(prev => prev.map(c => (c.id === contratoId ? atualizado : c)))
-        api.updateContract(contratoId, atualizado).catch(() => {})
+        const anterior = alvo.status
+        setContracts(prev => prev.map(c => (c.id === contratoId ? { ...c, status: 'Provisionando' } : c)))
+        // Body parcial e falha visível: engolir o erro fazia a tela afirmar
+        // sucesso enquanto o banco não mudava, e o usuário só descobria ao
+        // recarregar.
+        api.updateContract(contratoId, { status: 'Provisionando' }).catch(() => {
+          setContracts(prev => prev.map(c => (c.id === contratoId ? { ...c, status: anterior } : c)))
+          onToast('A reexecução começou, mas não foi possível atualizar o status do contrato.\nRecarregue a tela para conferir.', 'warning')
+        })
       }
 
       onToast(`Reexecução solicitada para «${solucaoNome}».\nAcompanhe o status nesta tela.`, 'success')
