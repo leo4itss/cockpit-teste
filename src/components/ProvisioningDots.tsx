@@ -16,6 +16,14 @@ interface Props {
   finalizadoEm?: string | null
   /** Título do tooltip. Default: 'Status do provisionamento'. */
   tooltipTitulo?: string
+  /**
+   * Repassado ao `Tooltip` interno. `false` quando este componente já mora
+   * dentro de um elemento focável (ex.: um `<button>`) — evita nele mesmo
+   * virar uma segunda parada de Tab. Ver `Tooltip`.
+   */
+  tabIndexed?: boolean
+  /** Usado com `tabIndexed={false}`: mostra o balão quando o pai está focado. */
+  focused?: boolean
 }
 
 export function ProvisioningDots({
@@ -25,6 +33,8 @@ export function ProvisioningDots({
   iniciadoEm = null,
   finalizadoEm = null,
   tooltipTitulo = 'Status do provisionamento',
+  tabIndexed = true,
+  focused = false,
 }: Props) {
   const resolvedSteps = steps ?? deriveStepsFromStatus(status)
   const errorIndex = resolvedSteps.findIndex(s => s.estado === 'erro')
@@ -35,6 +45,8 @@ export function ProvisioningDots({
 
   return (
     <Tooltip
+      tabIndexed={tabIndexed}
+      focused={focused}
       content={
         <>
           <p className="font-semibold mb-1">{tooltipTitulo}</p>

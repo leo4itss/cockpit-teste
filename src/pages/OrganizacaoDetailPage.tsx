@@ -36,7 +36,7 @@ import {
   contracts as mockContracts,
   tiposLicenca as mockTiposLicenca,
 } from '@/data/mock'
-import type { Account, Solution, Contract, Organization, Contact, TipoLicenca, User } from '@/types'
+import type { Account, Solution, Contract, Organization, Contact, TipoLicenca, User, ProvisioningOverallStatus } from '@/types'
 
 type Tab = 'conta' | 'solucoes' | 'contrato' | 'marketplace' | 'usuarios'
 
@@ -871,14 +871,10 @@ export function OrganizacaoDetailPage() {
                                 {isInativo ? (
                                   <span className="text-xs text-[#9ca3af]">—</span>
                                 ) : (
-                                  <button
-                                    type="button"
-                                    title="Ver detalhes do provisionamento"
+                                  <ProvisioningDotsButton
+                                    status={a.provisioningStatus}
                                     onClick={e => { e.stopPropagation(); navigate(`/contas/${a.id}/provisionamento`) }}
-                                    className="inline-flex items-center rounded p-1 -m-1 hover:bg-gray-100 transition-colors"
-                                  >
-                                    <ProvisioningDots status={a.provisioningStatus} />
-                                  </button>
+                                  />
                                 )}
                               </td>
                               <td className={`px-2 py-2 h-[52px] text-sm ${isInativo ? 'text-[#9ca3af]' : 'text-[#030712]'}`}>{a.subdomain}</td>
@@ -1471,6 +1467,38 @@ export function OrganizacaoDetailPage() {
 }
 
 /* ── helpers ───────────────────────────────────────────── */
+
+/**
+ * Botão que abre o detalhe de provisionamento, com as bolinhas dentro.
+ *
+ * Extraído para poder ter seu próprio `useState` do foco — sem isso, o
+ * `<button>` teria um `<div tabIndex="0">` (o wrapper do Tooltip de
+ * `ProvisioningDots`) dentro dele: elemento focável dentro de elemento
+ * focável, virando uma segunda parada de Tab para uma única ação, achado
+ * na revisão externa. `tabIndexed={false}` tira o foco próprio das bolinhas;
+ * quem passa a controlar a exibição do balão é o foco real do botão.
+ */
+function ProvisioningDotsButton({
+  status,
+  onClick,
+}: {
+  status: ProvisioningOverallStatus
+  onClick: (e: React.MouseEvent) => void
+}) {
+  const [focused, setFocused] = useState(false)
+  return (
+    <button
+      type="button"
+      title="Ver detalhes do provisionamento"
+      onClick={onClick}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
+      className="inline-flex items-center rounded p-1 -m-1 hover:bg-gray-100 transition-colors"
+    >
+      <ProvisioningDots status={status} tabIndexed={false} focused={focused} />
+    </button>
+  )
+}
 
 function FieldGroup({ title, children }: { title: string; children: React.ReactNode }) {
   return (

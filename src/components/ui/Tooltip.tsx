@@ -6,14 +6,27 @@ interface Props {
   children: ReactNode
   /** Largura do balão em classes Tailwind (ex: 'w-52'). */
   width?: string
+  /**
+   * `false` quando o próprio elemento pai já é o alvo de foco real — por
+   * exemplo, este Tooltip envolvido por um `<button>`. Nesse caso o wrapper
+   * não recebe `tabIndex` próprio: um segundo elemento focável dentro do
+   * mesmo controle criaria duas paradas de Tab para uma única ação, e
+   * ambíguo saber por qual delas um leitor de tela deveria passar. Controle
+   * a exibição de fora repassando `focused` a partir do onFocus/onBlur do
+   * elemento pai. Default `true` preserva o comportamento standalone.
+   */
+  tabIndexed?: boolean
+  /** Usado com `tabIndexed={false}`: mostra o balão quando o pai está focado. */
+  focused?: boolean
 }
 
 /**
  * Tooltip em portal, posicionado acima do elemento filho e centralizado.
  * Extraído de ProvisioningDots — mesmo comportamento visual.
  */
-export function Tooltip({ content, children, width = 'w-52' }: Props) {
-  const [show, setShow] = useState(false)
+export function Tooltip({ content, children, width = 'w-52', tabIndexed = true, focused = false }: Props) {
+  const [hovered, setHovered] = useState(false)
+  const show = hovered || focused
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -47,15 +60,14 @@ export function Tooltip({ content, children, width = 'w-52' }: Props) {
     <>
       {/* tabIndex + onFocus/onBlur: só onMouseEnter deixava o conteúdo
           inacessível a quem navega por teclado, leitor de tela ou toque —
-          a única forma de ver o conteúdo era passar o mouse por cima. */}
+          a única forma de ver o conteúdo era passar o mouse por cima.
+          Omitidos quando `tabIndexed=false` — ver comentário do prop. */}
       <div
         ref={containerRef}
         className="inline-flex items-center"
-        tabIndex={0}
-        onMouseEnter={() => setShow(true)}
-        onMouseLeave={() => setShow(false)}
-        onFocus={() => setShow(true)}
-        onBlur={() => setShow(false)}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        {...(tabIndexed ? { tabIndex: 0, onFocus: () => setHovered(true), onBlur: () => setHovered(false) } : {})}
       >
         {children}
       </div>
