@@ -146,12 +146,12 @@ export function AddObjetoDialog({ open, onClose, solutions, contratante, contrac
   const [selected, setSelected] = useState<Set<string>>(new Set())
 
   const occupied = occupiedComponenteIds(solutions, contratante, contracts)
-  const emRascunho = rascunhoComponenteIds(solutions, objetosNoRascunho)
+  const emRascunho = rascunhoSolucaoNames(objetosNoRascunho)
   function isBlocked(row: Row) {
-    return row.componenteIds.some(cid => occupied.has(cid) || emRascunho.has(cid))
+    return emRascunho.has(row.solucao) || row.componenteIds.some(cid => occupied.has(cid))
   }
   function motivoBloqueio(row: Row): string | undefined {
-    if (row.componenteIds.some(cid => emRascunho.has(cid))) {
+    if (emRascunho.has(row.solucao)) {
       return 'Esta solução já foi adicionada a este contrato.'
     }
     if (row.componenteIds.some(cid => occupied.has(cid))) {
