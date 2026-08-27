@@ -271,7 +271,7 @@ export function AddObjetoDialog({ open, onClose, solutions, contratante, contrac
                         <span className="text-sm text-[#030712] truncate max-w-[140px]">{row.solucao}</span>
                         {blocked && (
                           <span className="text-[11px] font-medium text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                            Em uso nesta conta
+                            {emRascunho.has(row.solucao) ? 'Já neste contrato' : 'Em uso nesta conta'}
                           </span>
                         )}
                       </div>
