@@ -26,8 +26,8 @@ A reunião levantou três problemas. Os três foram resolvidos:
 **Princípio aplicado:** cada etapa descreve **o recurso que é criado**, nunca **a capacidade que o cliente ganha**.
 Nenhuma etapa isolada pode implicar que o cliente já consegue entrar, acessar ou usar a plataforma.
 
-**A ordem das etapas não mudou.** A revisão de ordem (a autenticação pode ocorrer mais ao final, não no início)
-continua sendo tarefa separada, pendente de confirmação técnica do River.
+**A ordem das etapas está definida e não muda.** A hipótese levantada na reunião — de que a autenticação
+ocorreria mais ao final — foi descartada: a ordem atual é a correta.
 
 | Etapa | Descrição | Se ela falhar |
 |---|---|---|
@@ -142,8 +142,8 @@ atualização. WebSocket foi avaliado e descartado: a comunicação é unidireci
 |---|---|---|
 | ~~V-1~~ | ~~Os textos das 5 etapas e da nota geral (seção 1)~~ — **validados com River e Neide.** Os textos da seção 1 são os definitivos. | ✅ resolvido |
 | V-2 | O rótulo **"Provisionando"** — foi o termo adotado; se produto preferir outro, é troca de uma palavra | PO |
-| V-3 | O intervalo de **5 segundos** do lado do Cockpit — o número veio do mecanismo que o worker usa para consultar o Temporal, mas nada garante que seja o intervalo certo para a interface | River |
-| V-4 | Duas ações do mesmo bloco têm permissões diferentes: **reprovisionar** só Platform Admin; **verificar saúde** também Org Admin e Account Admin. Se é intencional, vale documentar explicitamente — os botões ficam lado a lado e é fácil supor que têm a mesma regra | River, PO |
+| V-3 | **Mantido em 5 segundos.** Hoje não custa nada (simulado no navegador, sem rede) e o polling para sozinho ao concluir — no máximo ~60 requisições por provisionamento. Reenquadrado: a pergunta real não é de UX, é de capacidade — *o endpoint do worker aguenta uma requisição a cada 5s por tela aberta?* Decidir na integração, não agora. | Back-end, na integração |
+| ~~V-4~~ | ~~Permissões diferentes no mesmo bloco de ações~~ — **confirmado como intencional.** Reprovisionar é destrutivo e fica restrito a Platform Admin; verificar saúde é só leitura e libera também Org Admin e Account Admin. | ✅ resolvido |
 
 ---
 
@@ -183,7 +183,6 @@ Não implementado, conforme combinado na reunião:
 - **Reprovisionar contrato** — existe apenas reprovisionamento de **conta** (Fase 1), restrito a Platform Admin.
   Reprovisionamento em nível de contrato não foi decidido e conflita com as regras de edição/inativação de
   contrato. Nada durante a implementação exigiu essa ação.
-- **Reordenação das etapas da Fase 1** — tarefa separada, pendente de definição técnica do River.
 - **Persistência de logs** — os logs vivem no Temporal e expiram; pré-requisito de outra tarefa.
 - **Informação de billing/custo** na tela de revisão — necessidade validada, mas sem escopo nem dado definido.
 - **Correção do datepicker** divergente do design system — tarefa separada.
