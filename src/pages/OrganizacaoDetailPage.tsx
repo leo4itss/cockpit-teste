@@ -1113,9 +1113,12 @@ export function OrganizacaoDetailPage() {
                           </td>
                           {/* Plano */}
                           <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.objetos[0]?.plano ?? '—'}</td>
-                          {/* Datas */}
-                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.dataInicio}</td>
-                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{c.dataTermino}</td>
+                          {/* Datas — sempre por formatarData: o banco guarda os dois
+                              formatos (ISO em contrato criado pela tela, dd/mm/aaaa
+                              nos fixtures), e imprimir cru fazia a mesma coluna
+                              mostrar "2026-08-14" e "24/03/2026" lado a lado. */}
+                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{formatarData(c.dataInicio)}</td>
+                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712]">{formatarData(c.dataTermino)}</td>
                           {/* Renovação */}
                           <td className="px-2 py-2 h-[52px] text-sm text-[#030712] text-center">{c.renovacao}</td>
                           {/* Status */}
