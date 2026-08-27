@@ -141,7 +141,7 @@ atualização. WebSocket foi avaliado e descartado: a comunicação é unidireci
 | # | Item | Com quem |
 |---|---|---|
 | ~~V-1~~ | ~~Os textos das 5 etapas e da nota geral (seção 1)~~ — **validados com River e Neide.** Os textos da seção 1 são os definitivos. | ✅ resolvido |
-| V-2 | O rótulo **"Provisionando"** — foi o termo adotado; se produto preferir outro, é troca de uma palavra | PO |
+| ~~V-2~~ | ~~O rótulo "Provisionando"~~ — **mantido.** Decisão de 27/08: fica o termo já implementado em todo o código, docs e telas; trocar depois continua sendo troca de uma palavra, sem risco. | ✅ resolvido |
 | V-3 | **Mantido em 5 segundos.** Hoje não custa nada (simulado no navegador, sem rede) e o polling para sozinho ao concluir — no máximo ~60 requisições por provisionamento. Reenquadrado: a pergunta real não é de UX, é de capacidade — *o endpoint do worker aguenta uma requisição a cada 5s por tela aberta?* Decidir na integração, não agora. | Back-end, na integração |
 | ~~V-4~~ | ~~Permissões diferentes no mesmo bloco de ações~~ — **confirmado como intencional.** Reprovisionar é destrutivo e fica restrito a Platform Admin; verificar saúde é só leitura e libera também Org Admin e Account Admin. | ✅ resolvido |
 

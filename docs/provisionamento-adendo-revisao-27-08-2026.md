@@ -159,3 +159,16 @@ são ações soltas numa linha, onde sumir é a opção natural. É diferença e
 
 A chave estrangeira `contracts.accountId` continua sendo o certo. O que entrou é paliativo consciente,
 agora com recusa explícita quando o modelo não consegue distinguir contas de mesmo nome.
+
+---
+
+## 6. Pendências de processo — fechadas em 27/08
+
+- **"Avisar quem trabalhou na PAS-240"** — não havia quem avisar. Os únicos autores dos commits
+  exclusivos daquela branch são as duas identidades git do próprio autor deste PR; não existe PR
+  separado para ela. Item encerrado sem ação.
+- **Rótulo "Provisionando" (ponto V-2 do handoff de 19/08)** — decidido: **mantém**. Marcado como
+  resolvido em `docs/provisionamento-atualizacoes-19-08-2026.md`.
+- **Apagar a branch `PAS-240-discovery-solucao-contrato` e a tag `pre-merge-pas240`** — confirmado que
+  a branch está 100% contida nesta (zero commits fora). Ação fica para **depois** do merge deste PR;
+  apagar antes seria prematuro.
