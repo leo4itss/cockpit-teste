@@ -237,7 +237,7 @@ export function AddObjetoDialog({ open, onClose, solutions, contratante, contrac
                 return (
                   <tr
                     key={row.id}
-                    title={blocked ? 'Um dos componentes desta solução já está em uso por outro contrato ativo desta conta.' : undefined}
+                    title={motivoBloqueio(row)}
                     className={`border-b border-[#e5e7eb] last:border-0 transition-colors ${
                       blocked ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50 cursor-pointer'
                     }`}
