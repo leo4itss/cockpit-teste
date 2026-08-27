@@ -1,12 +1,12 @@
 # Provisionamento — adendo à revisão do PR #3
 
 **Origem:** revisão externa do PR, em duas rodadas (26 e 27/08/2026) ·
-**Branch:** `PAS-2409-provisionamento` · **Situação:** três achados corrigidos e verificados
+**Branch:** `PAS-2409-provisionamento` · **Situação:** quatro achados corrigidos e verificados
 
-> **Resumo em uma linha.** Da revisão saíram **7 achados**: **3 eram defeitos reais e estão
+> **Resumo em uma linha.** Da revisão saíram **7 achados**: **4 eram defeitos reais e estão
 > corrigidos** (um deles bem mais grave do que a revisão supôs), **1 é falso positivo** — verifiquei
-> ao vivo —, **1 estava certo pelo motivo errado**, e **2 são comportamento consciente** que só muda
-> por decisão de produto. Cinco itens do roteiro continuam sem validação independente.
+> ao vivo —, e **2 são comportamento consciente** que só muda por decisão de produto. Cinco itens do
+> roteiro continuam sem validação independente.
 
 ---
 
@@ -57,6 +57,20 @@ O registro da conta `a1` trazia "Assistente de Design" com plano **Pro**, enquan
 mantido na curadoria traz **Basic** — *Pro* é o plano do contrato **inativado**. O comentário da
 curadoria afirma que os dois são par, então ou o comentário ou o dado estava errado. Alinhei o dado.
 
+### A coluna "Provisionamento" só por bolinha colorida — certo pelo motivo errado
+
+A revisão diz que "não há texto em lugar nenhum da célula". Há — num *tooltip* com Status, Etapa,
+Início e Fim. Só que o componente de tooltip respondia **apenas ao passar do mouse**: não tinha
+`onFocus`, `tabIndex` nem `role`.
+
+O defeito era real e mais específico do que o relatado: **a informação existia, mas só chegava no
+hover** — inacessível a teclado, leitor de tela e toque. Achei o risco de mexer nele exagerado depois
+de conferir: é usado num único lugar (`ProvisioningDots`), então corrigi.
+
+**Verificado:** os elementos ganharam `tabIndex={0}`, `onFocus`/`onBlur`, e o balão ganhou
+`role="tooltip"`. Confirmado por evento de foco sintético (equivalente ao que a tecla Tab dispara de
+verdade) que o balão abre ao ganhar foco e fecha ao perdê-lo, igual ao mouse.
+
 ---
 
 ## 2. Falso positivo — verificado ao vivo
@@ -68,28 +82,16 @@ painel diz *"Você não tem permissão para executar o health check deste tenant
 Platform Admin, Org Admin e Account Admin — o arquiteto não está em nenhum. A documentação de
 permissões **não** está sendo contrariada.
 
-O que a revisão captou de verdade é uma **inconsistência de padrão**, e essa é legítima: três ações
-(`Tentar novamente`, `Reprovisionar`, `Visualizar logs`) **somem** para quem não pode, e uma
-(`Verificar saúde`) **aparece desabilitada com explicação**. Foi isso que fez presença ser lida como
-permissão. Vale unificar — mas é decisão de design, não defeito.
+O que a revisão captou de verdade é que três ações (`Tentar novamente`, `Reprovisionar`,
+`Visualizar logs`) **somem** para quem não pode, e uma (`Verificar saúde`) **aparece desabilitada com
+explicação** — foi essa diferença de comportamento que fez presença ser lida como permissão. Não é
+inconsistência a corrigir, como registro na seção 5: `Verificar saúde` mora num painel fixo da tela,
+não numa linha de lista, e esconder o painel tiraria informação que vale ver mesmo sem poder disparar
+checagem nova.
 
 ---
 
-## 3. Certo, pelo motivo errado
-
-### A coluna "Provisionamento" só por bolinha colorida
-
-A revisão diz que "não há texto em lugar nenhum da célula". Há — num *tooltip* com Status, Etapa,
-Início e Fim. Só que o componente de tooltip responde **apenas ao passar do mouse**: não tem `onFocus`,
-`tabIndex` nem `role`.
-
-O defeito é real e mais específico do que o relatado: **a informação existe, mas só no hover** —
-inacessível a teclado, leitor de tela e toque. Não corrigi porque o tooltip é componente compartilhado,
-usado em telas fora deste PR. A correção é pequena e está proposta.
-
----
-
-## 4. Comportamento consciente — muda por decisão, não por correção
+## 3. Comportamento consciente — muda por decisão, não por correção
 
 ### "Concluído" em verde com uma solução em falha logo abaixo
 
@@ -110,7 +112,7 @@ de palavra com o estado das etapas é infeliz e vale renomear um dos dois, mas �
 
 ---
 
-## 5. Correção factual sobre o ambiente
+## 4. Correção factual sobre o ambiente
 
 A revisão afirma que *"o ambiente foi re-semeado"*. **Não foi.** O comando de seed **não** foi
 executado — ele apaga todas as tabelas, inclusive usuários, grupos, permissões e organizações. A
@@ -124,7 +126,7 @@ a organização Apple ter saído de 17 contratos para 5 no meio do trabalho.
 
 ---
 
-## 6. O que continua aberto
+## 5. O que continua aberto
 
 ### Sem validação independente — cinco itens
 
@@ -143,10 +145,15 @@ escrita no preview compartilhado repete exatamente o problema do item 5 acima.
 
 ### Decisões de produto
 
-- unificar o padrão de ação sem permissão: **sumir** ou **desabilitar com explicação**;
-- acessibilidade do tooltip das bolinhas (`onFocus` + `tabIndex` + `role`);
 - se o topo da tela deve sinalizar falha da Fase 2 ou continuar falando só da Fase 1;
 - renomear `Criado` em `Solution.status` ou o `criado` das etapas, para acabar com a colisão.
+
+**Revi um item que eu mesmo tinha proposto como decisão de produto e retirei da lista:** unificar o
+padrão de "sumir" vs. "desabilitar com explicação" entre `Verificar saúde` e as outras três ações. Não
+é inconsistência a decidir — `Verificar saúde` mora num painel fixo da tela ("Saúde do tenant"), não
+numa linha de lista; esconder o botão deixaria o painel vazio sem nunca poder ser preenchido, e esconder
+o painel inteiro tiraria informação que vale ver mesmo sem poder disparar checagem nova. As outras três
+são ações soltas numa linha, onde sumir é a opção natural. É diferença estrutural, não inconsistência.
 
 ### Dívida técnica já registrada
 
