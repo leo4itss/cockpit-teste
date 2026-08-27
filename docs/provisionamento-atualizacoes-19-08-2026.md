@@ -140,7 +140,7 @@ atualização. WebSocket foi avaliado e descartado: a comunicação é unidireci
 
 | # | Item | Com quem |
 |---|---|---|
-| V-1 | Os textos das 5 etapas e da nota geral (seção 1) — foram escritos aplicando o princípio acordado, mas o River ficou de enviar as descrições tecnicamente corretas | River, Neide |
+| ~~V-1~~ | ~~Os textos das 5 etapas e da nota geral (seção 1)~~ — **validados com River e Neide.** Os textos da seção 1 são os definitivos. | ✅ resolvido |
 | V-2 | O rótulo **"Provisionando"** — foi o termo adotado; se produto preferir outro, é troca de uma palavra | PO |
 | V-3 | O intervalo de **5 segundos** do lado do Cockpit — o número veio do mecanismo que o worker usa para consultar o Temporal, mas nada garante que seja o intervalo certo para a interface | River |
 | V-4 | Duas ações do mesmo bloco têm permissões diferentes: **reprovisionar** só Platform Admin; **verificar saúde** também Org Admin e Account Admin. Se é intencional, vale documentar explicitamente — os botões ficam lado a lado e é fácil supor que têm a mesma regra | River, PO |
