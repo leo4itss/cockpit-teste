@@ -1555,16 +1555,47 @@ app.get('/instancias/:id/permissoes-efetivas', async (c) => {
     todosGrupos.map((g: any) => [g.id, g.nome])
   )
 
-  const fontes: { atribuicaoId: string; fonte: string; entidadeId: string; displayName?: string; viaChain?: string[] }[] = [
+  // Escopo do grupo — o mesmo nome pode existir na organização (herdado por
+  // todas as contas) e na conta (exclusivo dela). Sem isto, auditar "de onde
+  // veio esta permissão?" para de responder assim que houver dois homônimos.
+  const escopoPorGrupoId: Record<string, { escopo: 'org' | 'conta'; escopoId: string | null }> =
+    Object.fromEntries(todosGrupos.map((g: any) => [
+      g.id,
+      g.orgId ? { escopo: 'org' as const, escopoId: g.orgId }
+              : { escopo: 'conta' as const, escopoId: g.accountId ?? null },
+    ]))
+
+  const orgIdsGrupos = [...new Set(todosGrupos.filter((g: any) => g.orgId).map((g: any) => g.orgId))]
+  const accIdsGrupos = [...new Set(todosGrupos.filter((g: any) => !g.orgId && g.accountId).map((g: any) => g.accountId))]
+  const [orgsDosGrupos, contasDosGrupos] = await Promise.all([
+    orgIdsGrupos.length > 0
+      ? db.select().from(organizations).where(inArray(organizations.id, orgIdsGrupos as string[]))
+      : Promise.resolve([] as any[]),
+    accIdsGrupos.length > 0
+      ? db.select().from(accounts).where(inArray(accounts.id, accIdsGrupos as string[]))
+      : Promise.resolve([] as any[]),
+  ])
+  const nomeEscopo: Record<string, string> = {
+    ...Object.fromEntries(orgsDosGrupos.map((o: any) => [o.id, o.name])),
+    ...Object.fromEntries(contasDosGrupos.map((a: any) => [a.id, a.name])),
+  }
+
+  const fontes: {
+    atribuicaoId: string; fonte: string; entidadeId: string; displayName?: string
+    viaChain?: string[]; escopo?: 'org' | 'conta'; escopoNome?: string
+  }[] = [
     ...directPerms.map((p: any) => ({ atribuicaoId: p.acao, fonte: 'direto', entidadeId: userId })),
     ...groupPerms.map((p: any) => {
       const caminho = caminhoPorGrupoId[p.entidadeId]
+      const esc = escopoPorGrupoId[p.entidadeId]
       return {
         atribuicaoId: p.acao,
         fonte: 'grupo',
         entidadeId: p.entidadeId,
         displayName: grupoNomeMap[p.entidadeId],
         viaChain: caminho && caminho.length > 1 ? caminho : undefined,
+        escopo: esc?.escopo,
+        escopoNome: esc?.escopoId ? nomeEscopo[esc.escopoId] : undefined,
       }
     }),
   ]

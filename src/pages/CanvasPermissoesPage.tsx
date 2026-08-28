@@ -44,6 +44,7 @@ import { Modal } from '@/components/ui/Modal'
 // import { cn } from '@/lib/utils'
 import { VisualizerThemeContext, useNodeTheme, type VisualizerTheme } from '@/lib/visualizerTheme'
 import { useVisualizerTheme } from '@/hooks/useVisualizerTheme'
+import type { Account } from '@/types'
 
 // ── Tipos ──────────────────────────────────────────────────────
 
@@ -849,7 +850,16 @@ function DetailPanel({ selected, graphData, accountId, theme, onClose, onRefresh
 
 // ── Página principal ──────────────────────────────────────────
 
-export default function CanvasPermissoesPage() {
+interface CanvasPermissoesPageProps {
+  /**
+   * Contas no escopo, quando montado como aba da organização. O contexto vem
+   * de onde a pessoa está, em vez de um seletor persistido em sessionStorage.
+   * Ausente = modo antigo, autônomo (a página descobre as contas pelo papel).
+   */
+  contas?: Account[]
+}
+
+export default function CanvasPermissoesPage({ contas }: CanvasPermissoesPageProps = {}) {
   const isPlatformAdmin   = useIsPlatformAdmin()
   const isOrgAdmin        = useIsOrgAdmin()
   const isAccountAdmin    = useIsAccountAdmin()
@@ -858,13 +868,20 @@ export default function CanvasPermissoesPage() {
   const isAccountAdminOnly = isAccountAdmin && !isPlatformAdmin && !isOrgAdmin
   const { theme, mode, toggle } = useVisualizerTheme()
 
-  // accountId persiste em sessionStorage — sobrevive à navegação entre abas
-  const [accountId, setAccountId] = useSessionState<string | null>('canvas-accountId', null)
+  const escopoPorProps = Array.isArray(contas)
+
+  // Sem props, o contexto ainda vem de sessionStorage (rota autônoma).
+  // Com props, é estado local: quem manda é a rota da organização.
+  const [accountIdLocal, setAccountIdLocal] = useState<string | null>(contas?.[0]?.id ?? null)
+  const [accountIdSessao, setAccountIdSessao] = useSessionState<string | null>('canvas-accountId', null)
+  const accountId    = escopoPorProps ? accountIdLocal : accountIdSessao
+  const setAccountId = escopoPorProps ? setAccountIdLocal : setAccountIdSessao
+
   // Impede carregamento do grafo com accountId stale antes da validação da conta
-  const [accountValidated, setAccountValidated] = useState(false)
+  const [accountValidated, setAccountValidated] = useState(escopoPorProps)
 
   const [showOnboarding, setShowOnboarding] = useState(false)
-  const [allAccounts, setAllAccounts] = useState<any[]>([])
+  const [allAccounts, setAllAccounts] = useState<any[]>(contas ?? [])
   const [graphData,   setGraphData]   = useState<GraphData | null>(null)
   const [loading,     setLoading]     = useState(false)
   const [refreshKey,  setRefreshKey]  = useState(0)
@@ -881,6 +898,15 @@ export default function CanvasPermissoesPage() {
   // - Org Admin: só contas da sua org
   // - Platform Admin: todas
   useEffect(() => {
+    // Escopo veio por props (aba da organização): as contas já estão dadas.
+    if (escopoPorProps) {
+      setAllAccounts(contas!)
+      if (!contas!.some(a => a.id === accountIdLocal)) {
+        setAccountIdLocal(contas![0]?.id ?? null)
+      }
+      setAccountValidated(true)
+      return
+    }
     if (isAccountAdminOnly && defaultAccId) {
       api.getAccount(defaultAccId).then(acc => {
         setAllAccounts([acc])
@@ -907,7 +933,8 @@ export default function CanvasPermissoesPage() {
       if (!accountId || !isValid) setAccountId(defaultAccId ?? fallback[0]?.id ?? null)
       setAccountValidated(true)
     })
-  }, [])
+    // Reage à troca de contas quando montado como aba (ex.: mudar de org).
+  }, [escopoPorProps, contas?.map(c => c.id).join(',')])   // eslint-disable-line react-hooks/exhaustive-deps
 
   // Carrega dados da conta — aguarda validação do accountId para evitar carregar conta stale
   useEffect(() => {

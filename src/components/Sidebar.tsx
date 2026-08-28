@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Building2, Users, PanelLeft, Puzzle, Network, GitFork, Globe2 } from 'lucide-react'
+import { Building2, PanelLeft, Puzzle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useIsPlatformAdmin, useIsOrgAdmin, useIsPasArchitect, useIsAccountAdmin } from '@/authz'
 
@@ -87,12 +87,8 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
   // Account Admin puro: só tem papel de account_admin, nenhum outro
   const isAccountAdminOnly = isAccountAdmin && !isPlatformAdmin && !isOrgAdmin && !isPasArchitect
 
-  // PAS Architect puro: só tem esse papel (sem platform_admin, org_admin, account_admin)
-  const isPasArchitectOnly = isPasArchitect && !isPlatformAdmin && !isOrgAdmin && !isAccountAdmin
-
   // Itens visíveis para cada grupo
   const showOrganizacoes = !isAccountAdminOnly   // todos exceto Account Admin puro
-  const showAcessos      = !isPasArchitectOnly   // PAS Architect puro não vê Acessos
   const showComponentes  = isPlatformAdmin || isPasArchitect  // só quem gerencia componentes
 
   return (
@@ -148,15 +144,9 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
             </>
           )}
 
-          {/* ── Acessos ── */}
-          {showAcessos && (
-            <>
-              <SectionLabel label="Acessos" collapsed={collapsed} />
-              <div className="flex flex-col gap-1">
-                <NavItem to="/acessos" icon={Users} label="Acessos" collapsed={collapsed} />
-              </div>
-            </>
-          )}
+          {/* Acessos e Visualização saíram da sidebar: viraram abas dentro da
+              organização (Figma). Entra-se por Organizações, e tudo o que se
+              faz numa organização acontece lá dentro. */}
 
           {/* ── Componentes ── */}
           {showComponentes && (
@@ -164,28 +154,6 @@ export function Sidebar({ collapsed, onCollapse }: SidebarProps) {
               <SectionLabel label="Componentes" collapsed={collapsed} />
               <div className="flex flex-col gap-1">
                 <NavItem to="/componentes" icon={Puzzle} label="Componentes" collapsed={collapsed} />
-              </div>
-            </>
-          )}
-
-          {/* ── Visualização ── */}
-          {(isPlatformAdmin || isOrgAdmin || isAccountAdmin) && (
-            <>
-              <SectionLabel label="Visualização" collapsed={collapsed} />
-              <div className="flex flex-col gap-1">
-                {isPlatformAdmin && (
-                  <>
-                    <NavItem to="/canvas-org" icon={Globe2}  label="Canvas Org" collapsed={collapsed} />
-                    <NavItem to="/canvas"     icon={GitFork} label="Canvas"     collapsed={collapsed} />
-                    <NavItem to="/schema"     icon={Network} label="Schema"     collapsed={collapsed} />
-                  </>
-                )}
-                {isOrgAdmin && !isPlatformAdmin && (
-                  <NavItem to="/canvas" icon={GitFork} label="Canvas" collapsed={collapsed} />
-                )}
-                {isAccountAdminOnly && (
-                  <NavItem to="/canvas" icon={GitFork} label="Canvas" collapsed={collapsed} />
-                )}
               </div>
             </>
           )}
