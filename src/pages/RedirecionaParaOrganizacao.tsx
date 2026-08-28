@@ -13,7 +13,7 @@
 import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { api } from '@/api/client'
-import { accounts as mockAccounts } from '@/data/mock'
+import { accounts as mockAccounts, organizations as mockOrgs } from '@/data/mock'
 import {
   useIsPlatformAdmin,
   useIsOrgAdmin,
@@ -48,7 +48,24 @@ export function RedirecionaParaOrganizacao({ aba }: { aba: string }) {
       return
     }
 
-    // Platform admin (e qualquer outro): escolhe a organização primeiro.
+    // Platform admin: Componentes, Schema e Canvas Org não são escopados por
+    // org — manda para a primeira org com a aba certa, em vez de largar na
+    // lista sem pista de onde a tela foi parar. As demais abas (usuários,
+    // canvas de conta) precisam de uma org escolhida: aí sim, lista primeiro.
+    if (isPlatformAdmin) {
+      const abasPlataforma = ['componentes', 'schema', 'canvas-org']
+      if (abasPlataforma.includes(aba)) {
+        api.getOrganizations()
+          .then((orgs: any[]) => {
+            const primeira = orgs.find(o => o.status !== 'Inativo')
+            setDestino(primeira ? `/organizacoes/${primeira.id}?aba=${aba}` : '/organizacoes')
+          })
+          .catch(() => setDestino(`/organizacoes/${mockOrgs[0]?.id}?aba=${aba}`))
+        return
+      }
+    }
+
+    // Escolhe a organização primeiro.
     setDestino('/organizacoes')
   }, [isPlatformAdmin, isOrgAdmin, adminOrgId, adminAccountId, aba])
 

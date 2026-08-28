@@ -5,7 +5,6 @@ import { OrganizacoesPage } from './pages/OrganizacoesPage'
 import { OrganizacaoDetailPage } from './pages/OrganizacaoDetailPage'
 import { RedirecionaParaOrganizacao } from './pages/RedirecionaParaOrganizacao'
 import { HomePage } from './pages/HomePage'
-import { ComponentesPage } from './pages/ComponentesPage'
 import { ComponentesProvider } from './context/ComponentesContext'
 import { UsersProvider } from './context/UsersContext'
 import { AuthProvider } from './context/AuthContext'
@@ -28,16 +27,16 @@ export default function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Navigate to="/home" replace />} />
           <Route path="organizacoes" element={<OrganizacoesPage />} />
-          <Route path="componentes"  element={<ComponentesPage />} />
           <Route path="grupos"       element={<GruposPage />} />
           <Route path="usuarios"     element={<UsuariosPage />} />
           <Route path="contas"       element={<ContasPage />} />
           {/* Absorvidas pelas abas da organização (Figma). Continuam como
               rota para não quebrar link salvo — mas só redirecionam. */}
-          <Route path="acessos"    element={<RedirecionaParaOrganizacao aba="usuarios" />} />
-          <Route path="canvas"     element={<RedirecionaParaOrganizacao aba="canvas" />} />
-          <Route path="canvas-org" element={<RedirecionaParaOrganizacao aba="canvas-org" />} />
-          <Route path="schema"     element={<RedirecionaParaOrganizacao aba="schema" />} />
+          <Route path="acessos"     element={<RedirecionaParaOrganizacao aba="usuarios" />} />
+          <Route path="componentes" element={<RedirecionaParaOrganizacao aba="componentes" />} />
+          <Route path="canvas"      element={<RedirecionaParaOrganizacao aba="canvas" />} />
+          <Route path="canvas-org"  element={<RedirecionaParaOrganizacao aba="canvas-org" />} />
+          <Route path="schema"      element={<RedirecionaParaOrganizacao aba="schema" />} />
         </Route>
         <Route path="/instancia/:id" element={<InstanciaPage />} />
         <Route path="/organizacoes/:id" element={<DetailLayout />}>

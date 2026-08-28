@@ -24,6 +24,7 @@ import { PainelAcessos } from '@/components/acessos/PainelAcessos'
 import CanvasPermissoesPage from '@/pages/CanvasPermissoesPage'
 import CanvasOrgPage from '@/pages/CanvasOrgPage'
 import SchemaVisualizerPage from '@/pages/SchemaVisualizerPage'
+import { ComponentesPage } from '@/pages/ComponentesPage'
 import { useComponentes } from '@/context/ComponentesContext'
 import { useProvisioningPolling } from '@/hooks/useProvisioningPolling'
 import { formatarData } from '@/lib/datas'
@@ -38,14 +39,16 @@ import {
   solutions as mockSolutions,
   contracts as mockContracts,
   tiposLicenca as mockTiposLicenca,
+  users as mockUsers,
 } from '@/data/mock'
 import type { Account, Solution, Contract, Organization, Contact, TipoLicenca, User, ProvisioningOverallStatus } from '@/types'
 
 type Tab =
   | 'conta' | 'solucoes' | 'contrato' | 'marketplace'
-  // Abas absorvidas de /acessos e das rotas de visualização, conforme o Figma:
-  // tudo o que se faz numa organização passa a viver dentro dela.
-  | 'usuarios' | 'grupos' | 'objetos' | 'canvas' | 'canvas-org' | 'schema'
+  // Abas absorvidas de /acessos, /componentes e das rotas de visualização,
+  // conforme o Figma: tudo o que se faz numa organização passa a viver dentro
+  // dela, e a sidebar de navegação deixa de existir.
+  | 'usuarios' | 'grupos' | 'objetos' | 'componentes' | 'canvas' | 'canvas-org' | 'schema'
 
 // Título e descrição de cada aba num lugar só — antes eram duas cadeias de
 // ternários que caíam em "Marketplace" para qualquer aba não prevista, e foi
@@ -57,6 +60,7 @@ const TITULO_ABA: Partial<Record<Tab, string>> = {
   usuarios:     'Usuários',
   grupos:       'Grupos',
   objetos:      'Objetos',
+  componentes:  'Componentes',
   canvas:       'Canvas',
   'canvas-org': 'Canvas Org',
   schema:       'Schema',
@@ -69,6 +73,7 @@ const DESCRICAO_ABA: Partial<Record<Tab, string>> = {
   usuarios:     'Todos os usuários da organização, independente da conta a que pertencem.',
   grupos:       'Grupos desta organização e das suas contas. Grupos de organização são herdados por todas as contas.',
   objetos:      'Objetos configurados nas contas desta organização, e quem tem acesso a cada um.',
+  componentes:  'Módulos e serviços que compõem as Soluções PAS. Cada componente define as permissões granulares que podem ser atribuídas a usuários e grupos.',
   canvas:       'Mapa de permissões de uma conta — pessoas, grupos e objetos, e os vínculos entre eles.',
   'canvas-org': 'Mapa da organização: contas, e o que existe dentro de cada uma.',
   schema:       'Modelo de dados da plataforma e as relações entre as tabelas.',
@@ -87,8 +92,12 @@ export function OrganizacaoDetailPage() {
   // A aba vive na URL — a tela fica linkável e sobrevive ao recarregar.
   // Mesmo padrão que a antiga /acessos já usava com `?aba=`.
   const [searchParams, setSearchParams] = useSearchParams()
-  const tab = (searchParams.get('aba') as Tab | null) ?? 'conta'
+  const abaPedida = (searchParams.get('aba') as Tab | null) ?? 'conta'
   const setTab = (t: Tab) => setSearchParams({ aba: t }, { replace: true })
+  // Abas só do platform admin — digitar ?aba=componentes na URL como outro
+  // papel cai em Conta, não no conteúdo restrito.
+  const abasSoPlatform: Tab[] = ['componentes', 'canvas-org', 'schema']
+  const tab: Tab = (!isPlatformAdmin && abasSoPlatform.includes(abaPedida)) ? 'conta' : abaPedida
   const [org, setOrg] = useState<Organization | null>(null)
   const [accounts, setAccounts] = useState<Account[]>([])
   const [solutions, setSolutions] = useState<Solution[]>([])
@@ -140,7 +149,8 @@ export function OrganizacaoDetailPage() {
         setUserCount(users.length)
         setLoadingMetrics(false)
       })
-      .catch(() => setLoadingMetrics(false))
+      // Sem backend, o mock responde — mesmo padrão do resto da página.
+      .catch(() => { setUserCount(mockUsers.length); setLoadingMetrics(false) })
   }, [])
 
   // Create sheets
@@ -598,8 +608,8 @@ export function OrganizacaoDetailPage() {
     setEditingSolution(null)
   }
 
-  // Ordem do Figma (Visão - Mateus). Canvas Org e Schema são exclusivas do
-  // platform admin — as duas aparecem em uma única tela do desenho, a dele.
+  // Ordem do Figma (Visão - Mateus). Componentes, Canvas Org e Schema são
+  // exclusivas do platform admin: Componentes fica antes de Canvas Org.
   const tabs: { key: Tab; label: string }[] = [
     { key: 'conta',      label: 'Conta' },
     { key: 'solucoes',   label: 'Soluções e planos' },
@@ -607,7 +617,10 @@ export function OrganizacaoDetailPage() {
     { key: 'usuarios',   label: 'Usuários' },
     { key: 'grupos',     label: 'Grupos' },
     { key: 'objetos',    label: 'Objetos' },
-    ...(isPlatformAdmin ? [{ key: 'canvas-org' as Tab, label: 'Canvas Org' }] : []),
+    ...(isPlatformAdmin ? [
+      { key: 'componentes' as Tab, label: 'Componentes' },
+      { key: 'canvas-org'  as Tab, label: 'Canvas Org' },
+    ] : []),
     { key: 'canvas',     label: 'Canvas' },
     ...(isPlatformAdmin ? [{ key: 'schema' as Tab, label: 'Schema' }] : []),
   ]
@@ -955,6 +968,16 @@ export function OrganizacaoDetailPage() {
                 aba={tab === 'objetos' ? 'instancias' : tab}
                 mostrarFiltroConta={contasNoEscopo.length > 1}
               />
+            </div>
+          )}
+
+          {/* ── Componentes ──────────────────────────────────────
+              Catálogo da plataforma — não é escopado por org, igual ao Schema.
+              `embutido` esconde o cabeçalho próprio da página; o título vem
+              das abas. */}
+          {tab === 'componentes' && (
+            <div className="-mx-8">
+              <ComponentesPage embutido />
             </div>
           )}
 
