@@ -974,7 +974,6 @@ export function OrganizacaoDetailPage() {
                 org={org}
                 contas={contasNoEscopo}
                 aba={tab === 'objetos' ? 'instancias' : tab === 'grupos' ? 'grupos' : 'usuarios'}
-                mostrarFiltroConta={contasNoEscopo.length > 1}
                 titulo={TITULO_ABA[tab] ?? ''}
                 descricao={DESCRICAO_ABA[tab] ?? ''}
                 acoesExtras={

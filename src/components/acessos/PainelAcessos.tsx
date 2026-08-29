@@ -1,5 +1,4 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { Search, Plus, Ellipsis, FilePen, UserX, UserCheck, Eye, Trash2, ChevronDown, HelpCircle, ShieldCheck, Globe, Lock, AlertTriangle, SlidersHorizontal, GitBranch, Info, Users, Columns3, UserPlus } from 'lucide-react'
 import { useLocalState } from '@/hooks/useLocalState'
 import { Button } from '@/components/ui/Button'
@@ -92,8 +91,6 @@ export interface PainelAcessosProps {
    */
   contas: Account[]
   aba: Aba
-  /** Filtro de conta só aparece quando há mais de uma — cardinalidade, não papel. */
-  mostrarFiltroConta?: boolean
   /**
    * Título e descrição da aba. O painel monta o cabeçalho inteiro — título,
    * descrição e ações na mesma linha, como no Figma. Antes o cabeçalho era do
@@ -118,37 +115,17 @@ export interface PainelAcessosProps {
  * O título e a descrição de cada aba são do componente pai — aqui começa na
  * barra de ações.
  */
-export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = false, titulo, descricao, acoesExtras }: PainelAcessosProps) {
+export function PainelAcessos({ orgId, org, contas, aba, titulo, descricao, acoesExtras }: PainelAcessosProps) {
   const isPlatformAdmin = useIsPlatformAdmin()
 
   const abaAtiva: Aba = aba
 
-  const allAccounts = contas
-  const effectiveOrgId = orgId
+  // ── Escopo ──────────────────────────────────────────────────
+  // O platform admin enxerga TODAS as organizações e reduz por filtro; os
+  // demais ficam nas contas que o pai entrega (a organização da rota, ou a
+  // própria conta). Por isso a base de contas depende do papel.
+  const [filtroOrganizacao, setFiltroOrganizacao] = useState('')
 
-  // Filtro de conta: '' = todas as contas do escopo. Substitui o sentinela
-  // '__all__' que existia quando isto era um <select> de entrada.
-  const [filtroConta, setFiltroConta] = useState('')
-
-  // `accountId` é a conta ativa quando há exatamente uma no escopo (ou uma
-  // filtrada); `isAllAccounts` liga a visão consolidada, com coluna de conta.
-  //
-  // `accountId` vazio significa "todas as contas do escopo" — era o sentinela
-  // '__all__' quando isto era um <select> de entrada. Toda guarda de
-  // carregamento pergunta por `contas.length`, nunca por `accountId`: com o
-  // sentinela removido, `!accountId` deixou de significar "sem escopo".
-  const contaUnica = contas.length === 1 ? contas[0].id : ''
-  const accountId = filtroConta || contaUnica
-  const isAllAccounts = !accountId
-
-  const accountNome = contas.find(c => c.id === accountId)?.name ?? null
-
-  // ── Filtro de organizações (só platform admin) ──────────────
-  // O painel vive dentro de UMA organização, e o painel esquerdo descreve essa
-  // organização — uma lista misturando várias contradiria isso. Então este
-  // select TROCA de organização: escolher outra navega para ela, mantendo a
-  // aba. É a leitura que preserva "você está num lugar".
-  const navigate = useNavigate()
   const [todasOrgs, setTodasOrgs] = useState<Organization[]>([])
   useEffect(() => {
     if (!isPlatformAdmin) return
@@ -189,15 +166,62 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
     return (
       <div className="relative">
         <select
-          value={orgId}
-          onChange={e => navigate(`/organizacoes/${e.target.value}?aba=${aba === 'instancias' ? 'objetos' : aba}`)}
+          value={filtroOrganizacao}
+          onChange={e => { setFiltroOrganizacao(e.target.value); setFiltroConta('') }}
           className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
         >
+          <option value="">Todas as organizações</option>
           {todasOrgs.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
         </select>
         <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
       </div>
     )
+  }
+
+  // Contas efetivamente no escopo, depois do filtro de organização.
+  // Para o platform admin a base é a plataforma inteira; para os demais, o que
+  // o pai entregou.
+  const contasBase = isPlatformAdmin && todasContas.length > 0 ? todasContas : contas
+  const allAccounts = filtroOrganizacao
+    ? contasBase.filter(c => c.orgId === filtroOrganizacao)
+    : contasBase
+
+  // `allAccounts` é derivado: array novo a cada render. Efeitos NÃO podem
+  // depender dele por referência — isso rende "Maximum update depth exceeded",
+  // porque cada setState do próprio painel gera um array novo e redispara o
+  // efeito. Os efeitos dependem desta chave, que só muda quando o conjunto
+  // de contas realmente muda.
+  const chaveEscopo = allAccounts.map(a => a.id).join(',')
+
+  // Cardinalidade sobre o escopo REAL do painel, não sobre o que o pai passou:
+  // com "todas as organizações" o platform admin tem muitas contas, mesmo que
+  // a organização da rota tenha uma só.
+  const exibeFiltroConta = allAccounts.length > 1
+
+  // orgId para consultas que precisam de UMA organização (grupos de escopo org,
+  // criação). Com "todas", cai na organização da rota.
+  const effectiveOrgId = filtroOrganizacao || orgId
+
+  // Filtro de conta: '' = todas as contas do escopo.
+  const [filtroConta, setFiltroConta] = useState('')
+
+  // `accountId` é a conta ativa quando há exatamente uma no escopo (ou uma
+  // filtrada); vazio significa "todas as contas do escopo" — era o sentinela
+  // '__all__' quando isto era um <select> de entrada. Toda guarda de
+  // carregamento pergunta por `allAccounts.length`, nunca por `accountId`.
+  const contaUnica = allAccounts.length === 1 ? allAccounts[0].id : ''
+  const accountId = filtroConta || contaUnica
+  const isAllAccounts = !accountId
+
+  const accountNome = allAccounts.find(c => c.id === accountId)?.name ?? null
+
+  // Com mais de uma organização em jogo, a coluna de organização deixa de ser
+  // opcional: sem ela a lista global não diz de onde cada pessoa é.
+  const orgsNoEscopo = new Set(allAccounts.map(c => c.orgId))
+  const mostrarColunaOrg = orgsNoEscopo.size > 1
+  const nomeOrgDaConta = (accId: string) => {
+    const c = allAccounts.find(a => a.id === accId)
+    return todasOrgs.find(o => o.id === c?.orgId)?.name ?? org?.name ?? '—'
   }
 
   // ── Usuários ────────────────────────────────────────────────
@@ -234,7 +258,7 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
   // Carrega o mapa usuário→grupos (1 chamada por conta; no modo "Todas as contas",
   // uma por conta em paralelo, com merge)
   useEffect(() => {
-    if (contas.length === 0) return
+    if (allAccounts.length === 0) return
     const accountIds = isAllAccounts ? allAccounts.map(a => a.id) : [accountId]
     if (accountIds.length === 0) return
     let cancelled = false
@@ -254,7 +278,7 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
       setUserGruposMap(map)
     })
     return () => { cancelled = true }
-  }, [accountId, allAccounts, isAllAccounts, contas.length])
+  }, [accountId, chaveEscopo, isAllAccounts])   // eslint-disable-line react-hooks/exhaustive-deps
 
   // Filtros/conta/itens por página mudaram → volta para a primeira página e limpa
   // a seleção (uma seleção feita sob um filtro não deve vazar para outro contexto)
@@ -264,27 +288,30 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
   }, [searchUsers, filtroGrupo, filtroObjeto, filtroPapel, filtroStatus, accountId, pageSize])
 
   useEffect(() => {
-    if (contas.length === 0) return
+    if (allAccounts.length === 0) return
     setLoadingUsers(true)
     if (isAllAccounts) {
       Promise.all(
         allAccounts.map(acc =>
           api.getAccountMembros(acc.id)
-            .then((data: User[]) => data.map(u => ({ u, accName: acc.name })))
+            .then((data: User[]) => data.map(u => ({ u, accId: acc.id })))
             // Sem backend, o mock responde — o mesmo fallback que o caminho de
             // conta única já tinha, e sem o qual a visão agregada nasce vazia.
             .catch(() => (accountMembrosIds[acc.id] ?? [])
               .map(id => mockUsers.find(u => u.id === id))
               .filter((u): u is User => Boolean(u))
-              .map(u => ({ u, accName: acc.name })))
+              .map(u => ({ u, accId: acc.id })))
         )
       ).then(results => {
         const seenIds = new Set<string>()
         const merged: User[] = []
+        // userId → accountId. Guardar o ID e não o nome: numa lista que
+        // atravessa organizações, o nome da conta não identifica sozinho —
+        // nomes de conta não são únicos entre organizações.
         const map: Record<string, string> = {}
-        results.flat().forEach(({ u, accName }) => {
+        results.flat().forEach(({ u, accId }) => {
           if (!seenIds.has(u.id)) { seenIds.add(u.id); merged.push(u) }
-          if (!map[u.id]) map[u.id] = accName
+          if (!map[u.id]) map[u.id] = accId
         })
         setUsers(merged)
         setUserAccountMap(map)
@@ -301,7 +328,7 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
         setUserAccountMap({})
         setLoadingUsers(false)
       })
-  }, [accountId, allAccounts])
+  }, [accountId, chaveEscopo])   // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleCriarSuccess(user: User) {
     setUsers(prev => prev.find(u => u.id === user.id) ? prev : [...prev, user])
@@ -412,7 +439,7 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
   const [selectedInstancia, setSelectedInstancia]     = useState<Instancia | null>(null)
 
   useEffect(() => {
-    if (contas.length === 0) return
+    if (allAccounts.length === 0) return
     setLoadingInstancias(true)
     if (isAllAccounts) {
       Promise.all(
@@ -438,7 +465,7 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
         setInstAccountMap({})
         setLoadingInstancias(false)
       })
-  }, [accountId, allAccounts])
+  }, [accountId, chaveEscopo])   // eslint-disable-line react-hooks/exhaustive-deps
 
   // Membros (diretos + via grupo) de cada objeto — carregado 1x por lista de instâncias,
   // usado para computar quais objetos cada usuário enxerga (filtro "Objetos" na aba Usuários).
@@ -634,7 +661,7 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
         setGrupos(fallback)
         setLoadingGrupos(false)
       })
-  }, [accountId, effectiveOrgId, allAccounts])
+  }, [accountId, effectiveOrgId, chaveEscopo])   // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Filtros da aba Grupos ───────────────────────────────────
   const [filtroGrupoId,     setFiltroGrupoId]     = useState('')
@@ -736,7 +763,7 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
 
       {/* ── Aba Usuários ── */}
       {abaAtiva === 'usuarios' && (() => {
-        const colSpanUsuarios = 2 + colunasVisiveis.length + (isAllAccounts ? 1 : 0) + 1
+        const colSpanUsuarios = 2 + colunasVisiveis.length + (isAllAccounts ? 1 : 0) + (mostrarColunaOrg ? 1 : 0) + 1
         return (
         <div className="px-8 pt-6 pb-8 space-y-4">
 
@@ -746,7 +773,7 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
             {/* Conta como FILTRO, não como portão: a lista já nasce cheia com
                 todas as contas do escopo, e isto reduz. Só aparece quando há
                 mais de uma — cardinalidade, não papel. */}
-            {mostrarFiltroConta && (
+            {exibeFiltroConta && (
               <div className="relative">
                 <select
                   value={filtroConta}
@@ -882,6 +909,9 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[200px]">Nome</th>
                   {colVisivel('usuario') && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[150px]">Usuário</th>}
                   {colVisivel('email') && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[200px]">E-mail</th>}
+                  {/* Com várias organizações na lista, dizer só a conta não
+                      basta — o nome de conta não é único entre organizações. */}
+                  {mostrarColunaOrg && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[140px]">Organização</th>}
                   {isAllAccounts && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[140px]">Conta</th>}
                   {colVisivel('grupos') && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[180px]">Grupo</th>}
                   {colVisivel('papel') && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[150px]">Papel</th>}
@@ -919,7 +949,16 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
                       </td>
                       {colVisivel('usuario') && <td className="px-4 py-3 text-sm text-[#030712]">{user.usuario}</td>}
                       {colVisivel('email') && <td className="px-4 py-3 text-sm text-[#030712]">{user.email}</td>}
-                      {isAllAccounts && <td className="px-4 py-3 text-sm text-[#6b7280]">{userAccountMap[user.id] ?? '—'}</td>}
+                      {mostrarColunaOrg && (
+                        <td className="px-4 py-3 text-sm text-[#6b7280]">
+                          {nomeOrgDaConta(userAccountMap[user.id] ?? '')}
+                        </td>
+                      )}
+                      {isAllAccounts && (
+                        <td className="px-4 py-3 text-sm text-[#6b7280]">
+                          {allAccounts.find(a => a.id === userAccountMap[user.id])?.name ?? '—'}
+                        </td>
+                      )}
                       {colVisivel('grupos') && (
                         <td className="px-4 py-3">
                           {(() => {
@@ -1061,7 +1100,7 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
               Status, mais o seletor de colunas, como no Figma. */}
           <div className="flex items-center gap-2 flex-wrap mb-4">
             <FiltroOrganizacoes />
-            {mostrarFiltroConta && (
+            {exibeFiltroConta && (
               <div className="relative">
                 <select
                   value={filtroConta}
