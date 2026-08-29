@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Search, Plus, Ellipsis, FilePen, UserX, UserCheck, Eye, Trash2, ChevronDown, HelpCircle, ShieldCheck, Globe, Lock, AlertTriangle, SlidersHorizontal, GitBranch, Info, Users, Columns3, UserPlus } from 'lucide-react'
 import { useLocalState } from '@/hooks/useLocalState'
 import { Button } from '@/components/ui/Button'
@@ -8,7 +9,7 @@ import { UsuarioDetailAccountSheet } from '@/components/usuarios/UsuarioDetailAc
 import { EditUserSheet } from '@/components/EditUserSheet'
 import { CriarUsuarioSheet } from '@/components/usuarios/CriarUsuarioSheet'
 import { api } from '@/api/client'
-import { grupos as mockGrupos, users as mockUsers, accountMembrosIds, instancias as mockInstancias, instanciaMembros as mockInstanciaMembros } from '@/data/mock'
+import { grupos as mockGrupos, users as mockUsers, accountMembrosIds, instancias as mockInstancias, organizations as mockOrgs } from '@/data/mock'
 import { useIsPlatformAdmin } from '@/authz/hooks'
 import { cn } from '@/lib/utils'
 import type { User, Grupo, Account, Organization } from '@/types'
@@ -61,6 +62,18 @@ type UserColumnId = typeof USER_COLUMNS[number]['id']
 
 // Padrão pós-GAP da reunião de 06/07: "Grupo" substitui "Papel" (que fica opcional)
 const DEFAULT_USER_COLUMNS: UserColumnId[] = ['usuario', 'email', 'grupos', 'status', 'ultimoAcesso']
+
+// ── Colunas configuráveis da aba Grupos ───────────────────────
+// "Grupo" e "Ações" são fixas — sem o nome não há linha, e sem as ações não há
+// como operar. O resto o usuário liga e desliga.
+const GRUPO_COLUMNS = [
+  { id: 'membros', label: 'Membros' },
+  { id: 'escopo',  label: 'Escopo'  },
+  { id: 'conta',   label: 'Conta'   },
+  { id: 'status',  label: 'Status'  },
+] as const
+type GrupoColumnId = typeof GRUPO_COLUMNS[number]['id']
+const DEFAULT_GRUPO_COLUMNS: GrupoColumnId[] = ['membros', 'escopo', 'conta', 'status']
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100] as const
 const DEFAULT_PAGE_SIZE = 50
@@ -119,6 +132,36 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
   const isAllAccounts = !accountId
 
   const accountNome = contas.find(c => c.id === accountId)?.name ?? null
+
+  // ── Filtro de organizações (só platform admin) ──────────────
+  // O painel vive dentro de UMA organização, e o painel esquerdo descreve essa
+  // organização — uma lista misturando várias contradiria isso. Então este
+  // select TROCA de organização: escolher outra navega para ela, mantendo a
+  // aba. É a leitura que preserva "você está num lugar".
+  const navigate = useNavigate()
+  const [todasOrgs, setTodasOrgs] = useState<Organization[]>([])
+  useEffect(() => {
+    if (!isPlatformAdmin) return
+    api.getOrganizations()
+      .then((os: Organization[]) => setTodasOrgs(os.filter(o => o.status !== 'Inativo')))
+      .catch(() => setTodasOrgs(mockOrgs.filter(o => o.status !== 'Inativo')))
+  }, [isPlatformAdmin])
+
+  function FiltroOrganizacoes() {
+    if (!isPlatformAdmin || todasOrgs.length === 0) return null
+    return (
+      <div className="relative">
+        <select
+          value={orgId}
+          onChange={e => navigate(`/organizacoes/${e.target.value}?aba=${aba === 'instancias' ? 'objetos' : aba}`)}
+          className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
+        >
+          {todasOrgs.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
+        </select>
+        <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+      </div>
+    )
+  }
 
   // ── Usuários ────────────────────────────────────────────────
   const [users, setUsers]                   = useState<User[]>([])
@@ -557,55 +600,30 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
   }, [accountId, effectiveOrgId, allAccounts])
 
   // ── Filtros da aba Grupos ───────────────────────────────────
-  // O Figma reusa a barra de Usuários aqui. Dois dos cinco selects não se
-  // aplicam a grupo e foram trocados pelo equivalente:
-  //   "Todos os grupos"  → Escopo (Organização/Conta), que é a dimensão que
-  //                        importa num grupo e já é coluna da tabela
-  //   "Todos os papéis"  → papéis DE GRUPO (Viewer/User/Admin), não os de
-  //                        membro de conta (Membro/Admin da conta)
+  const [filtroGrupoId,     setFiltroGrupoId]     = useState('')
   const [filtroGrupoEscopo, setFiltroGrupoEscopo] = useState('')
-  const [filtroGrupoPapel,  setFiltroGrupoPapel]  = useState('')
-  const [filtroGrupoObjeto, setFiltroGrupoObjeto] = useState('')
-
-  // grupoId → ids dos objetos que ele alcança. Alimenta o filtro "Objetos":
-  // "quais grupos dão acesso a este objeto?" é a pergunta que a tabela de
-  // grupos não responde sozinha.
-  const [objetosPorGrupo, setObjetosPorGrupo] = useState<Record<string, string[]>>({})
-  useEffect(() => {
-    if (grupos.length === 0) { setObjetosPorGrupo({}); return }
-    let cancelado = false
-    Promise.all(
-      grupos.map(g =>
-        api.getGrupoInstancias(g.id)
-          .then(vs => [g.id, vs.map(v => v.instanciaId)] as const)
-          // Sem backend, o mock de instancia_membros responde.
-          .catch(() => [
-            g.id,
-            mockInstanciaMembros
-              .filter(m => m.entidadeTipo === 'group' && m.entidadeId === g.id)
-              .map(m => m.instanciaId),
-          ] as const)
-      )
-    ).then(pares => { if (!cancelado) setObjetosPorGrupo(Object.fromEntries(pares)) })
-    return () => { cancelado = true }
-  }, [grupos])
-
-  const papeisDeGrupo = [...new Set(grupos.map(g => g.papel).filter(Boolean))] as string[]
+  const [colunasGrupos, setColunasGrupos] = useLocalState<GrupoColumnId[]>('acessos-grupos-colunas', DEFAULT_GRUPO_COLUMNS)
+  const colGrupoVisivel = (id: GrupoColumnId) => colunasGrupos.includes(id)
+  // Grupo + Ações são fixas; "conta" só conta quando há mais de uma no escopo.
+  const colSpanGrupos = 2
+    + (colGrupoVisivel('membros') ? 1 : 0)
+    + (colGrupoVisivel('escopo')  ? 1 : 0)
+    + (colGrupoVisivel('conta') && isAllAccounts ? 1 : 0)
+    + (colGrupoVisivel('status')  ? 1 : 0)
 
   const filteredGrupos = useMemo(() => {
     const q = searchGrupos.toLowerCase()
     return grupos.filter(g => {
       if (q && !(g.nome.toLowerCase().includes(q) || (g.descricao ?? '').toLowerCase().includes(q))) return false
+      if (filtroGrupoId && g.id !== filtroGrupoId) return false
       // Grupo de organização vale para todas as contas — filtrar por conta não
       // deve escondê-lo, senão o filtro passa a mentir sobre o que a conta usa.
       if (filtroConta && g.escopo === 'conta' && g.accountId !== filtroConta) return false
       if (filtroGrupoEscopo && g.escopo !== filtroGrupoEscopo) return false
-      if (filtroGrupoPapel && (g.papel ?? '') !== filtroGrupoPapel) return false
-      if (filtroGrupoObjeto && !(objetosPorGrupo[g.id] ?? []).includes(filtroGrupoObjeto)) return false
       if (filtroStatus && g.status !== filtroStatus) return false
       return true
     })
-  }, [grupos, searchGrupos, filtroConta, filtroGrupoEscopo, filtroGrupoPapel, filtroGrupoObjeto, filtroStatus, objetosPorGrupo])
+  }, [grupos, searchGrupos, filtroGrupoId, filtroConta, filtroGrupoEscopo, filtroStatus])
 
   function handleViewGrupo(grupo: Grupo) {
     setSelectedGrupo(grupo)
@@ -676,6 +694,7 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
 
           {/* Filtros + colunas configuráveis */}
           <div className="flex items-center gap-2 flex-wrap">
+            <FiltroOrganizacoes />
             {/* Conta como FILTRO, não como portão: a lista já nasce cheia com
                 todas as contas do escopo, e isto reduz. Só aparece quando há
                 mais de uma — cardinalidade, não papel. */}
@@ -987,27 +1006,15 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
       {/* ── Aba Grupos ── */}
       {abaAtiva === 'grupos' && (
         <div className="px-8 pt-6 pb-8">
-          {/* Badges de contexto — dizem O QUE está na lista antes de você ler a
-              tabela. No Figma o chip de contas tem chevron, o que duplicaria o
-              filtro logo abaixo; aqui ele é reflexo do filtro, e o controle
-              fica num lugar só. */}
-          <div className="flex items-center gap-2 mb-3 text-[11px]">
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full font-semibold bg-violet-50 text-violet-600 border border-violet-200">
-              Escopo: {filtroGrupoEscopo === 'org' ? 'Organização' : filtroGrupoEscopo === 'conta' ? 'Contas' : 'Organização e contas'}
-            </span>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-medium bg-gray-50 text-gray-600 border border-gray-200">
-              Contas: <strong className="font-semibold">{filtroConta ? (contas.find(c => c.id === filtroConta)?.name ?? '—') : 'Todas as contas'}</strong>
-            </span>
-          </div>
-
           <p className="text-sm text-[#6b7280] mb-4">
             Grupos com escopo <strong>Organização</strong> são criados pelo Org Admin e herdados por todas as contas — você pode atribuir Ações a eles, mas não editá-los aqui.
             Grupos com escopo <strong>Conta</strong> são exclusivos desta conta e gerenciados pelo Account Admin.
           </p>
 
-          {/* Barra de filtros — mesma do Figma, com os dois selects que não se
-              aplicam a grupo trocados por Escopo e papéis de grupo. */}
+          {/* Barra de filtros — Organizações · Contas · Grupos · Escopos ·
+              Status, mais o seletor de colunas, como no Figma. */}
           <div className="flex items-center gap-2 flex-wrap mb-4">
+            <FiltroOrganizacoes />
             {mostrarFiltroConta && (
               <div className="relative">
                 <select
@@ -1023,6 +1030,17 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
             )}
             <div className="relative">
               <select
+                value={filtroGrupoId}
+                onChange={e => setFiltroGrupoId(e.target.value)}
+                className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
+              >
+                <option value="">Todos os grupos</option>
+                {grupos.map(g => <option key={g.id} value={g.id}>{g.nome}</option>)}
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+            </div>
+            <div className="relative">
+              <select
                 value={filtroGrupoEscopo}
                 onChange={e => setFiltroGrupoEscopo(e.target.value)}
                 className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
@@ -1030,28 +1048,6 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
                 <option value="">Todos os escopos</option>
                 <option value="org">Organização</option>
                 <option value="conta">Conta</option>
-              </select>
-              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
-            </div>
-            <div className="relative">
-              <select
-                value={filtroGrupoObjeto}
-                onChange={e => setFiltroGrupoObjeto(e.target.value)}
-                className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
-              >
-                <option value="">Todos os objetos</option>
-                {instancias.filter(i => i.status === 'Ativo').map(i => <option key={i.id} value={i.id}>{i.nome}</option>)}
-              </select>
-              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
-            </div>
-            <div className="relative">
-              <select
-                value={filtroGrupoPapel}
-                onChange={e => setFiltroGrupoPapel(e.target.value)}
-                className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
-              >
-                <option value="">Todos os papéis</option>
-                {papeisDeGrupo.map(p => <option key={p} value={p}>{p}</option>)}
               </select>
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
             </div>
@@ -1067,22 +1063,50 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
               </select>
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
             </div>
+
+            <div className="ml-auto">
+              <Popover
+                content={
+                  <div className="flex flex-col gap-0.5 min-w-[180px] p-1">
+                    <p className="px-2 py-1.5 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Colunas visíveis</p>
+                    {GRUPO_COLUMNS.map(col => (
+                      <label key={col.id} className="flex items-center gap-2.5 px-2 py-1.5 text-sm text-[#030712] hover:bg-gray-100 rounded-md cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={colunasGrupos.includes(col.id)}
+                          onChange={() => setColunasGrupos(prev =>
+                            prev.includes(col.id) ? prev.filter(c => c !== col.id) : [...prev, col.id]
+                          )}
+                          className="w-4 h-4 rounded border-gray-300 accent-blue-600"
+                        />
+                        {col.label}
+                      </label>
+                    ))}
+                  </div>
+                }
+              >
+                <button className="flex items-center gap-1.5 px-3 py-2 text-sm text-[#030712] bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:border-gray-300 transition-colors">
+                  <Columns3 className="w-4 h-4" />
+                  <span>Colunas</span>
+                </button>
+              </Popover>
+            </div>
           </div>
           <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200">
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[240px]">Grupo</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[100px]">Membros</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[130px]">Escopo</th>
-                  {isAllAccounts && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[140px]">Conta</th>}
-                  <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 w-[100px]">Status</th>
+                  {colGrupoVisivel('membros') && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[100px]">Membros</th>}
+                  {colGrupoVisivel('escopo')  && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[130px]">Escopo</th>}
+                  {colGrupoVisivel('conta') && isAllAccounts && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[140px]">Conta</th>}
+                  {colGrupoVisivel('status')  && <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 w-[100px]">Status</th>}
                   <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 w-[80px]">Ações</th>
                 </tr>
               </thead>
               <tbody>
                 {loadingGrupos ? (
-                  <tr><td colSpan={isAllAccounts ? 6 : 5} className="px-4 py-8 text-center text-sm text-gray-500">Carregando...</td></tr>
+                  <tr><td colSpan={colSpanGrupos} className="px-4 py-8 text-center text-sm text-gray-500">Carregando...</td></tr>
                 ) : filteredGrupos.length > 0 ? (
                   filteredGrupos.map(grupo => (
                     <tr
@@ -1096,18 +1120,20 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
                           <p className="text-xs text-[#6b7280] mt-0.5 max-w-xs truncate">{grupo.descricao}</p>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-sm text-[#030712]">{grupo.qtdMembros ?? 0}</td>
-                      <td className="px-4 py-3"><EscopoBadge escopo={grupo.escopo} /></td>
-                      {isAllAccounts && (
+                      {colGrupoVisivel('membros') && <td className="px-4 py-3 text-sm text-[#030712]">{grupo.qtdMembros ?? 0}</td>}
+                      {colGrupoVisivel('escopo')  && <td className="px-4 py-3"><EscopoBadge escopo={grupo.escopo} /></td>}
+                      {colGrupoVisivel('conta') && isAllAccounts && (
                         <td className="px-4 py-3 text-sm text-[#6b7280]">
                           {grupo.escopo === 'org' ? <span className="italic text-xs">Org (todas)</span> : (allAccounts.find(a => a.id === grupo.accountId)?.name ?? '—')}
                         </td>
                       )}
-                      <td className="px-4 py-3 text-center">
-                        {grupo.status === 'Ativo'
-                          ? <Badge variant="success">Ativo</Badge>
-                          : <Badge variant="secondary">Inativo</Badge>}
-                      </td>
+                      {colGrupoVisivel('status') && (
+                        <td className="px-4 py-3 text-center">
+                          {grupo.status === 'Ativo'
+                            ? <Badge variant="success">Ativo</Badge>
+                            : <Badge variant="secondary">Inativo</Badge>}
+                        </td>
+                      )}
                       <td className="px-4 py-3 text-center" onClick={e => e.stopPropagation()}>
                         <div className="invisible group-hover:visible">
                           <Popover
@@ -1134,7 +1160,7 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={isAllAccounts ? 6 : 5} className="px-4 py-12 text-center">
+                    <td colSpan={colSpanGrupos} className="px-4 py-12 text-center">
                       <p className="text-sm font-medium text-[#030712]">Nenhum grupo encontrado</p>
                       <p className="text-xs text-[#6b7280] mt-1">Crie um grupo para organizar os usuários desta conta.</p>
                     </td>
