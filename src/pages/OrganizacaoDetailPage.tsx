@@ -71,7 +71,9 @@ const DESCRICAO_ABA: Partial<Record<Tab, string>> = {
   solucoes:     'Visualize e edite as soluções contratadas por esta organização, seus planos e os componentes que as compõem.',
   contrato:     'Acompanhe os contratos ativos e histórico de contratações desta organização, com detalhes de vigência e objetos contratados.',
   usuarios:     'Todos os usuários da organização, independente da conta a que pertencem.',
-  grupos:       'Grupos desta organização e das suas contas. Grupos de organização são herdados por todas as contas.',
+  // A regra de escopo é a descrição da aba, não um aviso solto acima da
+  // tabela: é o que a pessoa precisa saber antes de ler qualquer linha.
+  grupos:       'Grupos com escopo Organização são criados pelo Org Admin e herdados por todas as contas — você pode atribuir Ações a eles, mas não editá-los aqui. Grupos com escopo Conta são exclusivos desta conta e gerenciados pelo Account Admin.',
   objetos:      'Objetos configurados nas contas desta organização, e quem tem acesso a cada um.',
   componentes:  'Módulos e serviços que compõem as Soluções PAS. Cada componente define as permissões granulares que podem ser atribuídas a usuários e grupos.',
   canvas:       'Mapa de permissões de uma conta — pessoas, grupos e objetos, e os vínculos entre eles.',
