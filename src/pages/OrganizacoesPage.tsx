@@ -44,6 +44,16 @@ export function OrganizacoesPage() {
     return <Navigate to="/acessos" replace />
   }
 
+  // Quem administra UMA organização entra direto nela. Esta lista existe para
+  // quem gerencia várias — para o org admin ela mostrava uma linha só, que é
+  // cerimônia sem informação: foi a primeira queixa do time sobre o cockpit.
+  //
+  // A regra é sobre quantas organizações a pessoa alcança, não sobre o papel:
+  // no dia em que um org admin puder ter duas, a lista volta a aparecer sozinha.
+  if (!isPlatformAdmin && isOrgAdmin && adminOrgId) {
+    return <Navigate to={`/organizacoes/${adminOrgId}`} replace />
+  }
+
   const filtered = orgs
     .filter(o => isPlatformAdmin || !isOrgAdmin || !adminOrgId || o.id === adminOrgId)
     .filter(o => showInativas || o.status !== 'Inativo')
