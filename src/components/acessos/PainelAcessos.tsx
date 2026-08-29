@@ -9,7 +9,7 @@ import { UsuarioDetailAccountSheet } from '@/components/usuarios/UsuarioDetailAc
 import { EditUserSheet } from '@/components/EditUserSheet'
 import { CriarUsuarioSheet } from '@/components/usuarios/CriarUsuarioSheet'
 import { api } from '@/api/client'
-import { grupos as mockGrupos, users as mockUsers, accountMembrosIds, instancias as mockInstancias, organizations as mockOrgs } from '@/data/mock'
+import { grupos as mockGrupos, users as mockUsers, accountMembrosIds, instancias as mockInstancias, organizations as mockOrgs, accounts as mockAccounts } from '@/data/mock'
 import { useIsPlatformAdmin } from '@/authz/hooks'
 import { cn } from '@/lib/utils'
 import type { User, Grupo, Account, Organization } from '@/types'
@@ -146,6 +146,22 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
       .then((os: Organization[]) => setTodasOrgs(os.filter(o => o.status !== 'Inativo')))
       .catch(() => setTodasOrgs(mockOrgs.filter(o => o.status !== 'Inativo')))
   }, [isPlatformAdmin])
+
+  // Contas de TODAS as organizações — o sheet de criar grupo permite escolher
+  // a organização de destino, então precisa das contas dela também, não só das
+  // contas do escopo em que o painel está montado.
+  const [todasContas, setTodasContas] = useState<Account[]>([])
+  useEffect(() => {
+    if (!isPlatformAdmin) { setTodasContas([]); return }
+    api.getAccounts()
+      .then((cs: Account[]) => setTodasContas(cs.filter(c => !c.deletedAt)))
+      .catch(() => setTodasContas(mockAccounts.filter(c => !c.deletedAt)))
+  }, [isPlatformAdmin])
+
+  // Onde o grupo pode nascer. O platform admin cria em qualquer organização —
+  // grupos podem ser criados entre organizações; os demais, só na sua.
+  const orgsParaCriarGrupo = isPlatformAdmin ? todasOrgs : (org ? [org] : [])
+  const contasParaCriarGrupo = isPlatformAdmin && todasContas.length > 0 ? todasContas : contas
 
   function FiltroOrganizacoes() {
     if (!isPlatformAdmin || todasOrgs.length === 0) return null
@@ -1281,8 +1297,8 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
         open={showCriarGrupoOrgSheet}
         onClose={() => setShowCriarGrupoOrgSheet(false)}
         orgId={effectiveOrgId}
-        orgs={org ? [org] : []}
-        contas={allAccounts}
+        orgs={orgsParaCriarGrupo}
+        contas={contasParaCriarGrupo}
         grupos={grupos}
         isPlatformAdmin={isPlatformAdmin}
         onSuccess={grupo => setGrupos(prev => [...prev, grupo])}
