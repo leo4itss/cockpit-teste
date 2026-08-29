@@ -8,7 +8,7 @@ import { UsuarioDetailAccountSheet } from '@/components/usuarios/UsuarioDetailAc
 import { EditUserSheet } from '@/components/EditUserSheet'
 import { CriarUsuarioSheet } from '@/components/usuarios/CriarUsuarioSheet'
 import { api } from '@/api/client'
-import { grupos as mockGrupos, users as mockUsers, accountMembrosIds, instancias as mockInstancias } from '@/data/mock'
+import { grupos as mockGrupos, users as mockUsers, accountMembrosIds, instancias as mockInstancias, instanciaMembros as mockInstanciaMembros } from '@/data/mock'
 import { useIsPlatformAdmin } from '@/authz/hooks'
 import { cn } from '@/lib/utils'
 import type { User, Grupo, Account, Organization } from '@/types'
@@ -556,13 +556,56 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
       })
   }, [accountId, effectiveOrgId, allAccounts])
 
+  // ── Filtros da aba Grupos ───────────────────────────────────
+  // O Figma reusa a barra de Usuários aqui. Dois dos cinco selects não se
+  // aplicam a grupo e foram trocados pelo equivalente:
+  //   "Todos os grupos"  → Escopo (Organização/Conta), que é a dimensão que
+  //                        importa num grupo e já é coluna da tabela
+  //   "Todos os papéis"  → papéis DE GRUPO (Viewer/User/Admin), não os de
+  //                        membro de conta (Membro/Admin da conta)
+  const [filtroGrupoEscopo, setFiltroGrupoEscopo] = useState('')
+  const [filtroGrupoPapel,  setFiltroGrupoPapel]  = useState('')
+  const [filtroGrupoObjeto, setFiltroGrupoObjeto] = useState('')
+
+  // grupoId → ids dos objetos que ele alcança. Alimenta o filtro "Objetos":
+  // "quais grupos dão acesso a este objeto?" é a pergunta que a tabela de
+  // grupos não responde sozinha.
+  const [objetosPorGrupo, setObjetosPorGrupo] = useState<Record<string, string[]>>({})
+  useEffect(() => {
+    if (grupos.length === 0) { setObjetosPorGrupo({}); return }
+    let cancelado = false
+    Promise.all(
+      grupos.map(g =>
+        api.getGrupoInstancias(g.id)
+          .then(vs => [g.id, vs.map(v => v.instanciaId)] as const)
+          // Sem backend, o mock de instancia_membros responde.
+          .catch(() => [
+            g.id,
+            mockInstanciaMembros
+              .filter(m => m.entidadeTipo === 'group' && m.entidadeId === g.id)
+              .map(m => m.instanciaId),
+          ] as const)
+      )
+    ).then(pares => { if (!cancelado) setObjetosPorGrupo(Object.fromEntries(pares)) })
+    return () => { cancelado = true }
+  }, [grupos])
+
+  const papeisDeGrupo = [...new Set(grupos.map(g => g.papel).filter(Boolean))] as string[]
+
   const filteredGrupos = useMemo(() => {
     const q = searchGrupos.toLowerCase()
-    return grupos.filter(g =>
-      g.nome.toLowerCase().includes(q) ||
-      (g.descricao ?? '').toLowerCase().includes(q)
-    )
-  }, [grupos, searchGrupos])
+    return grupos.filter(g => {
+      if (q && !(g.nome.toLowerCase().includes(q) || (g.descricao ?? '').toLowerCase().includes(q))) return false
+      // Grupo de organização vale para todas as contas — filtrar por conta não
+      // deve escondê-lo, senão o filtro passa a mentir sobre o que a conta usa.
+      if (filtroConta && g.escopo === 'conta' && g.accountId !== filtroConta) return false
+      if (filtroGrupoEscopo && g.escopo !== filtroGrupoEscopo) return false
+      if (filtroGrupoPapel && (g.papel ?? '') !== filtroGrupoPapel) return false
+      if (filtroGrupoObjeto && !(objetosPorGrupo[g.id] ?? []).includes(filtroGrupoObjeto)) return false
+      if (filtroStatus && g.status !== filtroStatus) return false
+      return true
+    })
+  }, [grupos, searchGrupos, filtroConta, filtroGrupoEscopo, filtroGrupoPapel, filtroGrupoObjeto, filtroStatus, objetosPorGrupo])
 
   function handleViewGrupo(grupo: Grupo) {
     setSelectedGrupo(grupo)
@@ -944,10 +987,87 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
       {/* ── Aba Grupos ── */}
       {abaAtiva === 'grupos' && (
         <div className="px-8 pt-6 pb-8">
+          {/* Badges de contexto — dizem O QUE está na lista antes de você ler a
+              tabela. No Figma o chip de contas tem chevron, o que duplicaria o
+              filtro logo abaixo; aqui ele é reflexo do filtro, e o controle
+              fica num lugar só. */}
+          <div className="flex items-center gap-2 mb-3 text-[11px]">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full font-semibold bg-violet-50 text-violet-600 border border-violet-200">
+              Escopo: {filtroGrupoEscopo === 'org' ? 'Organização' : filtroGrupoEscopo === 'conta' ? 'Contas' : 'Organização e contas'}
+            </span>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-medium bg-gray-50 text-gray-600 border border-gray-200">
+              Contas: <strong className="font-semibold">{filtroConta ? (contas.find(c => c.id === filtroConta)?.name ?? '—') : 'Todas as contas'}</strong>
+            </span>
+          </div>
+
           <p className="text-sm text-[#6b7280] mb-4">
             Grupos com escopo <strong>Organização</strong> são criados pelo Org Admin e herdados por todas as contas — você pode atribuir Ações a eles, mas não editá-los aqui.
             Grupos com escopo <strong>Conta</strong> são exclusivos desta conta e gerenciados pelo Account Admin.
           </p>
+
+          {/* Barra de filtros — mesma do Figma, com os dois selects que não se
+              aplicam a grupo trocados por Escopo e papéis de grupo. */}
+          <div className="flex items-center gap-2 flex-wrap mb-4">
+            {mostrarFiltroConta && (
+              <div className="relative">
+                <select
+                  value={filtroConta}
+                  onChange={e => setFiltroConta(e.target.value)}
+                  className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
+                >
+                  <option value="">Todas as contas</option>
+                  {contas.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+              </div>
+            )}
+            <div className="relative">
+              <select
+                value={filtroGrupoEscopo}
+                onChange={e => setFiltroGrupoEscopo(e.target.value)}
+                className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
+              >
+                <option value="">Todos os escopos</option>
+                <option value="org">Organização</option>
+                <option value="conta">Conta</option>
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+            </div>
+            <div className="relative">
+              <select
+                value={filtroGrupoObjeto}
+                onChange={e => setFiltroGrupoObjeto(e.target.value)}
+                className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
+              >
+                <option value="">Todos os objetos</option>
+                {instancias.filter(i => i.status === 'Ativo').map(i => <option key={i.id} value={i.id}>{i.nome}</option>)}
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+            </div>
+            <div className="relative">
+              <select
+                value={filtroGrupoPapel}
+                onChange={e => setFiltroGrupoPapel(e.target.value)}
+                className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
+              >
+                <option value="">Todos os papéis</option>
+                {papeisDeGrupo.map(p => <option key={p} value={p}>{p}</option>)}
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+            </div>
+            <div className="relative">
+              <select
+                value={filtroStatus}
+                onChange={e => setFiltroStatus(e.target.value)}
+                className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
+              >
+                <option value="">Todos os status</option>
+                <option value="Ativo">Ativo</option>
+                <option value="Inativo">Inativo</option>
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+            </div>
+          </div>
           <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
             <table className="w-full">
               <thead>
