@@ -99,6 +99,8 @@ export function OrganizacaoDetailPage() {
   // Abas só do platform admin — digitar ?aba=componentes na URL como outro
   // papel cai em Conta, não no conteúdo restrito.
   const abasSoPlatform: Tab[] = ['componentes', 'canvas-org', 'schema']
+  // Abas cujo conteúdo é o PainelAcessos — elas montam o próprio cabeçalho.
+  const abasDoPainel: Tab[] = ['usuarios', 'grupos', 'objetos']
   const tab: Tab = (!isPlatformAdmin && abasSoPlatform.includes(abaPedida)) ? 'conta' : abaPedida
   const [org, setOrg] = useState<Organization | null>(null)
   const [accounts, setAccounts] = useState<Account[]>([])
@@ -763,7 +765,10 @@ export function OrganizacaoDetailPage() {
             </nav>
           </div>
 
-          {/* Page header */}
+          {/* Page header — as abas de Acessos montam o próprio cabeçalho, com
+              título, descrição e ações na mesma linha. Renderizar os dois
+              duplicava o botão "Criar usuário" em linhas diferentes. */}
+          {!abasDoPainel.includes(tab) && (
           <div className="flex items-center justify-between px-6 py-6">
             <div className="flex flex-col gap-2 max-w-[720px]">
               <h2 className="text-[30px] font-bold leading-9 text-[#030712] tracking-normal">
@@ -853,6 +858,7 @@ export function OrganizacaoDetailPage() {
               </div>
             </div>
           </div>
+          )}
         </div>
 
         {/* Tab content */}
@@ -961,14 +967,26 @@ export function OrganizacaoDetailPage() {
               escopo — a ponto de /acessos precisar se descrever como
               "Diferente de Usuários (visão org)". Agora é uma só, e o escopo
               vem de onde você está. */}
-          {(tab === 'usuarios' || tab === 'grupos' || tab === 'objetos') && (
-            <div className="-mx-8">
+          {abasDoPainel.includes(tab) && (
+            <div className="-mx-8 -mt-8">
               <PainelAcessos
                 orgId={id!}
                 org={org}
                 contas={contasNoEscopo}
-                aba={tab === 'objetos' ? 'instancias' : tab}
+                aba={tab === 'objetos' ? 'instancias' : tab === 'grupos' ? 'grupos' : 'usuarios'}
                 mostrarFiltroConta={contasNoEscopo.length > 1}
+                titulo={TITULO_ABA[tab] ?? ''}
+                descricao={DESCRICAO_ABA[tab] ?? ''}
+                acoesExtras={
+                  // Criar Org Admin é do nível da organização, não do painel —
+                  // por isso vem daqui e não de dentro dele.
+                  isPlatformAdmin && tab === 'usuarios' ? (
+                    <Button variant="outline" onClick={() => setShowCriarOrgAdmin(true)}>
+                      <UserPlus className="w-4 h-4 mr-1.5" />
+                      Criar Org Admin
+                    </Button>
+                  ) : null
+                }
               />
             </div>
           )}

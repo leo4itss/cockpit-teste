@@ -94,6 +94,16 @@ export interface PainelAcessosProps {
   aba: Aba
   /** Filtro de conta só aparece quando há mais de uma — cardinalidade, não papel. */
   mostrarFiltroConta?: boolean
+  /**
+   * Título e descrição da aba. O painel monta o cabeçalho inteiro — título,
+   * descrição e ações na mesma linha, como no Figma. Antes o cabeçalho era do
+   * componente pai e as ações do painel caíam numa segunda linha, o que
+   * duplicava o botão "Criar usuário".
+   */
+  titulo: string
+  descricao: string
+  /** Ações do pai que entram antes das do painel (ex.: Criar Org Admin). */
+  acoesExtras?: React.ReactNode
 }
 
 /**
@@ -108,7 +118,7 @@ export interface PainelAcessosProps {
  * O título e a descrição de cada aba são do componente pai — aqui começa na
  * barra de ações.
  */
-export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = false }: PainelAcessosProps) {
+export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = false, titulo, descricao, acoesExtras }: PainelAcessosProps) {
   const isPlatformAdmin = useIsPlatformAdmin()
 
   const abaAtiva: Aba = aba
@@ -675,8 +685,14 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
 
   return (
     <div>
-      {/* Barra de ações — o título e a descrição da aba são do componente pai. */}
-      <div className="flex items-center justify-end gap-2 px-8 pt-4">
+      {/* Cabeçalho da aba — título, descrição e ações na mesma linha. */}
+      <div className="flex items-start justify-between gap-6 px-8 pt-6 pb-2">
+        <div className="flex flex-col gap-2 max-w-[720px]">
+          <h2 className="text-[30px] font-bold leading-9 text-[#030712] tracking-normal">{titulo}</h2>
+          <p className="text-base text-[#6b7280] leading-6">{descricao}</p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+        {acoesExtras}
         <button
           onClick={() => setShowOnboarding(true)}
           title="Sobre esta aba"
@@ -698,7 +714,11 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
             <button onClick={() => handleSearchChange('')} className="text-gray-400 hover:text-gray-600 leading-none">×</button>
           )}
         </div>
-        {abaAtiva === 'usuarios' && !isAllAccounts ? (
+        {/* Sem a guarda `!isAllAccounts` que existia aqui: ela escondia o botão
+            de quem administra VÁRIAS contas — justamente o org admin, que é
+            quem mais cria usuário. O sheet aceita accountId opcional; sem uma
+            conta escolhida, cria a pessoa e o vínculo se faz depois. */}
+        {abaAtiva === 'usuarios' ? (
           <Button onClick={() => setShowCriarSheet(true)}>
             <Plus className="w-4 h-4 mr-1.5" />Criar usuário
           </Button>
@@ -711,6 +731,7 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
             <Plus className="w-4 h-4 mr-1.5" />Criar grupo
           </Button>
         ) : null}
+        </div>
       </div>
 
       {/* ── Aba Usuários ── */}
