@@ -158,6 +158,17 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
       .catch(() => setTodasContas(mockAccounts.filter(c => !c.deletedAt)))
   }, [isPlatformAdmin])
 
+  // Grupos de todas as organizações — o sheet oferece "grupo pai" filtrando
+  // pela organização/conta escolhida ali dentro. Com só os grupos do escopo
+  // atual, escolher outra organização mostrava os pais da organização errada.
+  const [todosGrupos, setTodosGrupos] = useState<Grupo[]>([])
+  useEffect(() => {
+    if (!isPlatformAdmin) { setTodosGrupos([]); return }
+    api.getGrupos()
+      .then((gs: Grupo[]) => setTodosGrupos(gs))
+      .catch(() => setTodosGrupos(mockGrupos))
+  }, [isPlatformAdmin])
+
   // Onde o grupo pode nascer. O platform admin cria em qualquer organização —
   // grupos podem ser criados entre organizações; os demais, só na sua.
   const orgsParaCriarGrupo = isPlatformAdmin ? todasOrgs : (org ? [org] : [])
@@ -1299,7 +1310,7 @@ export function PainelAcessos({ orgId, org, contas, aba, mostrarFiltroConta = fa
         orgId={effectiveOrgId}
         orgs={orgsParaCriarGrupo}
         contas={contasParaCriarGrupo}
-        grupos={grupos}
+        grupos={isPlatformAdmin && todosGrupos.length > 0 ? todosGrupos : grupos}
         isPlatformAdmin={isPlatformAdmin}
         onSuccess={grupo => setGrupos(prev => [...prev, grupo])}
       />
