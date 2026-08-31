@@ -686,12 +686,16 @@ export function OrganizacaoDetailPage() {
                 <p className="text-base font-medium text-[#030712] leading-6 truncate">{org.name}</p>
               </div>
             </div>
-            <button
-              onClick={() => setSheetEditOrg(true)}
-              className="text-sm font-medium text-[#030712] bg-white border border-[#e5e7eb] rounded-md px-4 py-2 h-9 shrink-0 ml-4 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:bg-gray-50 transition-colors"
-            >
-              Editar
-            </button>
+            {/* Editar a organização é do org/platform admin. Account admin
+                vê os dados, não os edita. */}
+            {(isPlatformAdmin || isOrgAdmin) && (
+              <button
+                onClick={() => setSheetEditOrg(true)}
+                className="text-sm font-medium text-[#030712] bg-white border border-[#e5e7eb] rounded-md px-4 py-2 h-9 shrink-0 ml-4 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:bg-gray-50 transition-colors"
+              >
+                Editar
+              </button>
+            )}
           </div>
         </div>
 
@@ -897,11 +901,16 @@ export function OrganizacaoDetailPage() {
             <>
               {/* Cards de métricas */}
               <div className="flex divide-x divide-gray-200 bg-white border border-gray-200 rounded-2xl overflow-hidden mb-6">
-                {[
-                  { label: 'Total de usuários',        value: userCount,         loading: loadingMetrics },
-                  { label: 'Contas ativas',             value: activeAccountCount, loading: false         },
-                  { label: 'Administradores da org',   value: orgAdminCount,     loading: false         },
-                ].map(m => (
+                {(ehSomenteAccountAdmin
+                  ? [
+                      { label: 'Contas que você administra', value: contasNoEscopo.length, loading: false },
+                    ]
+                  : [
+                      { label: 'Total de usuários',        value: userCount,          loading: loadingMetrics },
+                      { label: 'Contas ativas',            value: activeAccountCount, loading: false          },
+                      { label: 'Administradores da org',   value: orgAdminCount,      loading: false          },
+                    ]
+                ).map(m => (
                   <div key={m.label} className="flex-1 px-6 py-4 min-w-0">
                     <p className="text-2xl font-bold text-[#030712] leading-8">
                       {m.loading
@@ -914,7 +923,11 @@ export function OrganizacaoDetailPage() {
               </div>
 
               {(() => {
-                const visibleAccounts = accounts.filter(a => showInativosAccount || a.status !== 'Inativo')
+                // contasNoEscopo já vem escopada: uma conta só para o account
+                // admin puro, todas para org e platform admin.
+                const visibleAccounts = ehSomenteAccountAdmin
+                  ? contasNoEscopo
+                  : accounts.filter(a => showInativosAccount || a.status !== 'Inativo')
                 return visibleAccounts.length === 0 ? (
                   <EmptyState message="Nenhuma conta criada" description="Crie uma conta para provisionar o sistema." />
                 ) : (
