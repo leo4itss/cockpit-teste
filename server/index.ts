@@ -922,6 +922,8 @@ app.get('/api/grupos', async (c) => {
 
     const filtered = rows.filter((g: any) => {
       if (g.status === 'Inativo') return false
+      // Grupo global (sem orgId e sem accountId) aparece em qualquer escopo.
+      if (!g.orgId && !g.accountId) return true
       if (orgId && accountId) return g.orgId === orgId || g.accountId === accountId
       if (orgId) {
         // Inclui grupos escopo=org E grupos escopo=conta de contas pertencentes à org
@@ -975,7 +977,8 @@ app.get('/api/grupos/:id', async (c) => {
 app.post('/api/grupos', async (c) => {
   const body = await c.req.json()
 
-  // Validação: grupo org-scoped exige orgId; grupo conta-scoped exige accountId
+  // Validação: org-scoped exige orgId; conta-scoped exige accountId.
+  // escopo='global' não exige nada — orgId e accountId ficam null.
   const escopo = body.escopo ?? 'org'
   if (escopo === 'org'   && !body.orgId)     return c.json({ error: 'orgId é obrigatório para grupos de escopo org' }, 400)
   if (escopo === 'conta' && !body.accountId) return c.json({ error: 'accountId é obrigatório para grupos de escopo conta' }, 400)
@@ -2103,11 +2106,12 @@ app.get('/api/instancias/:id/permissoes-efetivas', async (c) => {
   // Escopo do grupo — o mesmo nome pode existir na organização (herdado por
   // todas as contas) e na conta (exclusivo dela). Sem isto, auditar "de onde
   // veio esta permissão?" para de responder assim que houver dois homônimos.
-  const escopoPorGrupoId: Record<string, { escopo: 'org' | 'conta'; escopoId: string | null }> =
+  const escopoPorGrupoId: Record<string, { escopo: 'global' | 'org' | 'conta'; escopoId: string | null }> =
     Object.fromEntries(todosGrupos.map((g: any) => [
       g.id,
-      g.orgId ? { escopo: 'org' as const, escopoId: g.orgId }
-              : { escopo: 'conta' as const, escopoId: g.accountId ?? null },
+      g.orgId       ? { escopo: 'org' as const,    escopoId: g.orgId }
+      : g.accountId ? { escopo: 'conta' as const,  escopoId: g.accountId }
+      :               { escopo: 'global' as const, escopoId: null },
     ]))
 
   // Nome da org/conta dona de cada grupo, para o badge dizer de onde herdou.

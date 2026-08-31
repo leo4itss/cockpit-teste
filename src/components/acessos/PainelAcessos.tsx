@@ -16,6 +16,7 @@ import type { User, Grupo, Account, Organization } from '@/types'
 import { CriarGrupoSheet } from '@/components/grupos/CriarGrupoSheet'
 import { CriarGrupoOrgSheet } from '@/components/grupos/CriarGrupoOrgSheet'
 import { GrupoDetailSheet } from '@/components/grupos/GrupoDetailSheet'
+import { EscopoBadge } from '@/components/grupos/EscopoBadge'
 import { AtribuirGrupoEmMassaSheet } from '@/components/usuarios/AtribuirGrupoEmMassaSheet'
 import { InstanciaDetailSheet } from '@/components/instancias/InstanciaDetailSheet'
 import { PermissoesEfetivasSheet } from '@/components/permissoes/PermissoesEfetivasSheet'
@@ -38,12 +39,6 @@ function Initials({ nome }: { nome: string }) {
 }
 
 // ── Badge de escopo ───────────────────────────────────────────
-
-function EscopoBadge({ escopo }: { escopo: 'org' | 'conta' }) {
-  return escopo === 'org'
-    ? <Badge variant="info">Organização</Badge>
-    : <Badge variant="default" className="bg-violet-50 text-violet-700 border border-violet-200">Conta</Badge>
-}
 
 // ── Colunas configuráveis da aba Usuários ─────────────────────
 // "Nome" é fixa; as demais o usuário escolhe (estilo File Explorer).
@@ -654,9 +649,11 @@ export function PainelAcessos({ orgId, org, contas, aba, titulo, descricao, acoe
         // conta, que são a maioria.
         const idsContas = new Set(allAccounts.map(a => a.id))
         const fallback = mockGrupos.filter(g =>
-          effectiveAccId
-            ? g.accountId === effectiveAccId
-            : (g.orgId === orgIdForGrupos) || (g.accountId ? idsContas.has(g.accountId) : false)
+          // Grupo global aparece em qualquer escopo — toda conta de toda org.
+          g.escopo === 'global'
+          || (effectiveAccId
+              ? g.accountId === effectiveAccId
+              : (g.orgId === orgIdForGrupos) || (g.accountId ? idsContas.has(g.accountId) : false))
         )
         setGrupos(fallback)
         setLoadingGrupos(false)
@@ -682,6 +679,8 @@ export function PainelAcessos({ orgId, org, contas, aba, titulo, descricao, acoe
       if (filtroGrupoId && g.id !== filtroGrupoId) return false
       // Grupo de organização vale para todas as contas — filtrar por conta não
       // deve escondê-lo, senão o filtro passa a mentir sobre o que a conta usa.
+      // Grupo global e grupo de org valem para todas as contas — o filtro
+      // de conta só restringe os de escopo 'conta'.
       if (filtroConta && g.escopo === 'conta' && g.accountId !== filtroConta) return false
       if (filtroGrupoEscopo && g.escopo !== filtroGrupoEscopo) return false
       if (filtroStatus && g.status !== filtroStatus) return false
@@ -1131,6 +1130,7 @@ export function PainelAcessos({ orgId, org, contas, aba, titulo, descricao, acoe
                 className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
               >
                 <option value="">Todos os escopos</option>
+                <option value="global">Global</option>
                 <option value="org">Organização</option>
                 <option value="conta">Conta</option>
               </select>

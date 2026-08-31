@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Plus, Search, Ellipsis, Eye, Trash2, Building2, Building } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
-import { Badge } from '@/components/ui/Badge'
+import { EscopoBadge } from '@/components/grupos/EscopoBadge'
 import { Popover } from '@/components/ui/Popover'
 import { CriarGrupoOrgSheet } from '@/components/grupos/CriarGrupoOrgSheet'
 import { GrupoDetailSheet } from '@/components/grupos/GrupoDetailSheet'
@@ -11,12 +11,6 @@ import { grupos as mockGrupos, accounts as mockAccounts, organizations as mockOr
 import type { Account, Grupo } from '@/types'
 
 // ── Badge de escopo ───────────────────────────────────────────
-
-function EscopoBadge({ escopo }: { escopo: 'org' | 'conta' }) {
-  return escopo === 'org'
-    ? <Badge variant="info">Organização</Badge>
-    : <Badge variant="default" className="bg-violet-50 text-violet-700 border border-violet-200">Conta</Badge>
-}
 
 const PAPEL_LABELS: Record<string, string> = {
   'Viewer': 'Visualizador',

@@ -777,6 +777,8 @@ app.get('/grupos', async (c) => {
   ])
   const filtered = rows.filter((g: any) => {
     if (g.status === 'Inativo') return false
+    // Grupo global (sem orgId e sem accountId) aparece em qualquer escopo.
+    if (!g.orgId && !g.accountId) return true
     if (orgId && accountId) return g.orgId === orgId || g.accountId === accountId
     if (orgId) {
       const orgAccountIds = allAccounts.filter((a: any) => a.orgId === orgId).map((a: any) => a.id)
@@ -808,6 +810,7 @@ app.post('/grupos', async (c) => {
   const body  = await c.req.json()
   const escopo = body.escopo ?? 'org'
   if (escopo === 'org'   && !body.orgId)     return c.json({ error: 'orgId obrigatório' }, 400)
+  // escopo='global': orgId e accountId ficam null, sem validação
   if (escopo === 'conta' && !body.accountId) return c.json({ error: 'accountId obrigatório' }, 400)
   const [row] = await db.insert(grupos).values({
     id:        body.id ?? crypto.randomUUID(),
@@ -1558,11 +1561,12 @@ app.get('/instancias/:id/permissoes-efetivas', async (c) => {
   // Escopo do grupo — o mesmo nome pode existir na organização (herdado por
   // todas as contas) e na conta (exclusivo dela). Sem isto, auditar "de onde
   // veio esta permissão?" para de responder assim que houver dois homônimos.
-  const escopoPorGrupoId: Record<string, { escopo: 'org' | 'conta'; escopoId: string | null }> =
+  const escopoPorGrupoId: Record<string, { escopo: 'global' | 'org' | 'conta'; escopoId: string | null }> =
     Object.fromEntries(todosGrupos.map((g: any) => [
       g.id,
-      g.orgId ? { escopo: 'org' as const, escopoId: g.orgId }
-              : { escopo: 'conta' as const, escopoId: g.accountId ?? null },
+      g.orgId       ? { escopo: 'org' as const,    escopoId: g.orgId }
+      : g.accountId ? { escopo: 'conta' as const,  escopoId: g.accountId }
+      :               { escopo: 'global' as const, escopoId: null },
     ]))
 
   const orgIdsGrupos = [...new Set(todosGrupos.filter((g: any) => g.orgId).map((g: any) => g.orgId))]

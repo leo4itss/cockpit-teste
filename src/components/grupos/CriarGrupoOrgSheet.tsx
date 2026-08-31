@@ -68,7 +68,7 @@ function FieldLabel({ children, required, hint }: {
 export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, grupos = [], isPlatformAdmin, onSuccess }: Props) {
   const [nome, setNome]                         = useState('')
   const [descricao, setDescricao]               = useState('')
-  const [escopo, setEscopo]                     = useState<'org' | 'conta'>('org')
+  const [escopo, setEscopo]                     = useState<'global' | 'org' | 'conta'>('org')
   const [orgSelecionada, setOrgSelecionada]     = useState('')   // só usado quando isPlatformAdmin + escopo='org'
   const [contaSelecionada, setContaSelecionada] = useState('')
   const [parentId, setParentId]                 = useState<string | null>(null)
@@ -81,6 +81,9 @@ export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, grupos 
   // Grupos disponíveis como pai — filtrados pelo escopo atual
   const gruposDisponiveis = useMemo(() => {
     const orgIdEfetivo = isPlatformAdmin ? orgSelecionada : orgId
+    if (escopo === 'global') {
+      return grupos.filter(g => g.escopo === 'global' && g.status === 'Ativo')
+    }
     if (escopo === 'org') {
       return grupos.filter(g => g.escopo === 'org' && g.orgId === orgIdEfetivo && g.status === 'Ativo')
     }
@@ -131,8 +134,11 @@ export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, grupos 
   const orgIdEfetivo = isPlatformAdmin ? orgSelecionada : orgId
 
   const canSave =
-    nome.trim().length > 0 &&
-    (escopo === 'conta' ? contaSelecionada !== '' : orgIdEfetivo !== '')
+    nome.trim().length > 0 && (
+      escopo === 'global' ? true
+      : escopo === 'conta' ? contaSelecionada !== ''
+      : orgIdEfetivo !== ''
+    )
 
   async function handleSave() {
     if (!canSave) return
@@ -149,6 +155,7 @@ export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, grupos 
       escopo,
       orgId:     escopo === 'org'   ? orgIdEfetivo     : undefined,
       accountId: escopo === 'conta' ? contaSelecionada : undefined,
+      // escopo='global' => os dois vazios
       parentId:  parentId ?? undefined,
       status:    'Ativo',
       createdAt: now,
@@ -233,6 +240,25 @@ export function CriarGrupoOrgSheet({ open, onClose, orgId, orgs, contas, grupos 
           <div className="flex flex-col gap-2">
             <FieldLabel required>Escopo</FieldLabel>
             <div className="grid grid-cols-2 gap-2">
+              {/* Global — só o Platform Admin. Ocupa a linha inteira acima das
+                  outras duas: é o escopo mais amplo, e deixá-lo em pé de
+                  igualdade num grid de 3 esconderia que ele é o de fora. */}
+              {isPlatformAdmin && (
+                <button
+                  type="button"
+                  onClick={() => setEscopo('global')}
+                  disabled={saving}
+                  className={cn(
+                    'col-span-2 flex flex-col items-start px-4 py-3 rounded-lg border text-left transition-colors',
+                    escopo === 'global'
+                      ? 'border-emerald-500 bg-emerald-50 ring-1 ring-emerald-500'
+                      : 'border-gray-200 bg-white hover:bg-gray-50'
+                  )}
+                >
+                  <span className="text-sm font-medium text-[#030712]">Global</span>
+                  <span className="text-xs text-[#6b7280] mt-0.5">Disponível em toda conta de toda organização</span>
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => setEscopo('org')}

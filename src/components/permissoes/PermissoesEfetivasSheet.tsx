@@ -19,7 +19,7 @@ interface EfetivaFonte {
   /** Cadeia de herança do grupo direto até o grupo que detém a permissão (ex: ['Farmacêuticos Sênior', 'Farmacêuticos']) */
   viaChain?: string[]
   /** Escopo do grupo: 'org' é herdado por todas as contas; 'conta' é exclusivo dela. */
-  escopo?: 'org' | 'conta'
+  escopo?: 'global' | 'org' | 'conta'
   /** Nome da organização ou conta dona do grupo. */
   escopoNome?: string
 }
@@ -49,7 +49,7 @@ interface PermissoesEfetivasSheetProps {
 
 function FonteBadge({ fonte, entidadeId, displayName, viaChain, escopo, escopoNome }: {
   fonte: string; entidadeId: string; displayName?: string; viaChain?: string[]
-  escopo?: 'org' | 'conta'; escopoNome?: string
+  escopo?: 'global' | 'org' | 'conta'; escopoNome?: string
 }) {
   if (fonte === 'direto') {
     return (
@@ -63,28 +63,34 @@ function FonteBadge({ fonte, entidadeId, displayName, viaChain, escopo, escopoNo
     // Grupo de organização é herdado por todas as contas; grupo de conta é
     // exclusivo dela. Como o mesmo nome pode existir nos dois escopos, dizer
     // "Via Grupo · Suporte" sem o escopo não responde de onde a permissão veio.
-    const daOrg = escopo === 'org'
+    const daOrg    = escopo === 'org'
+    const daGlobal = escopo === 'global'
 
     const explicacao = [
       temCadeia ? `Herdado via ${viaChain!.join(' → ')}` : null,
-      daOrg
-        ? `Grupo da organização${escopoNome ? ` ${escopoNome}` : ''} — herdado por todas as contas`
+      daGlobal ? 'Grupo global — vale em toda conta de toda organização'
+        : daOrg ? `Grupo da organização${escopoNome ? ` ${escopoNome}` : ''} — herdado por todas as contas`
         : escopoNome ? `Grupo exclusivo da conta ${escopoNome}` : null,
     ].filter(Boolean).join(' · ')
+
+    const rotulo = daGlobal ? 'Grupo global' : daOrg ? 'Grupo da org' : 'Via Grupo'
+    const cor = daGlobal
+      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+      : daOrg
+        ? 'bg-violet-50 text-violet-700 border-violet-200'
+        : 'bg-green-50 text-green-700 border-green-200'
 
     return (
       <span
         className={cn(
           'inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium border',
-          daOrg
-            ? 'bg-violet-50 text-violet-700 border-violet-200'
-            : 'bg-green-50 text-green-700 border-green-200',
-          (temCadeia || escopoNome) && 'cursor-help',
+          cor,
+          (temCadeia || escopoNome || daGlobal) && 'cursor-help',
           temCadeia && 'border-dashed'
         )}
         title={explicacao || undefined}
       >
-        {daOrg ? 'Grupo da org' : 'Via Grupo'} · {displayName ?? entidadeId}
+        {rotulo} · {displayName ?? entidadeId}
       </span>
     )
   }

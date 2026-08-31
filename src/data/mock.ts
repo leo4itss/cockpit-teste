@@ -1092,6 +1092,18 @@ export const users: User[] = [
 // Usado como fallback quando a API está indisponível (Neon cold start).
 export const grupos: Grupo[] = [
   {
+    // Grupo global — criado pelo Platform Admin, disponível em toda conta de
+    // toda organização. orgId e accountId vazios.
+    id:         'grp-global-suporte',
+    nome:       'Suporte PAS',
+    descricao:  'Time de suporte da plataforma. Acesso de leitura aos objetos de qualquer conta para diagnóstico.',
+    escopo:     'global',
+    papel:      'Viewer',
+    status:     'Ativo',
+    createdAt:  '01/01/2026',
+    qtdMembros: 2,
+  },
+  {
     id:         'grp-comgas-aq',
     nome:       'Analistas de Qualidade',
     descricao:  'Equipe responsável pela análise e controle de qualidade. Acesso ao assistente de IA e à base de conhecimento.',

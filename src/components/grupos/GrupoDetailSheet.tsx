@@ -19,11 +19,13 @@ import {
   NestedSheetFooter,
 } from '@/components/ui/nested-sheet'
 import { Badge } from '@/components/ui/Badge'
+import { EscopoBadge } from './EscopoBadge'
 import { Button } from '@/components/ui/Button'
 import { api } from '@/api/client'
 import type { GrupoInstanciaVinculo } from '@/api/client'
 import { cn } from '@/lib/utils'
 import { getPapelInfo } from '@/authz/mock'
+import { useIsPlatformAdmin } from '@/authz/hooks'
 import type { User, Grupo } from '@/types'
 import {
   users as mockUsers,
@@ -54,12 +56,6 @@ function Avatar({ nome }: { nome: string }) {
       {ini}
     </div>
   )
-}
-
-function EscopoBadge({ escopo }: { escopo: 'org' | 'conta' }) {
-  return escopo === 'org'
-    ? <Badge variant="info">Organização</Badge>
-    : <Badge variant="default" className="bg-violet-50 text-violet-700 border border-violet-200">Conta</Badge>
 }
 
 function PapelBadge({ papel }: { papel: string }) {
@@ -263,6 +259,10 @@ function AddMembroSection({ allUsers, membros, onAdd, onAddBulk, disabled }: Add
 // ── Componente principal ──────────────────────────────────────
 
 export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome, contextoLabel }: Props) {
+  const isPlatformAdmin = useIsPlatformAdmin()
+  // Grupo global só o Platform Admin gerencia; grupo de organização, só o
+  // Org Admin (aqui simplificado: quem não é platform admin não mexe em global).
+  const somenteLeitura = grupo?.escopo === 'global' && !isPlatformAdmin
   const [membros, setMembros]           = useState<User[]>([])
   const [loadingMembros, setLoadingMembros] = useState(false)
   // userId → papel de conta ('member' | 'account_admin'), vindo de user_account_memberships.
@@ -478,18 +478,22 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
               <span className="ml-1.5 text-xs font-normal text-[#6b7280]">({membros.length})</span>
             )}
           </p>
-          <button
-            onClick={() => setShowAdd(v => !v)}
-            className={cn(
-              'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors',
-              showAdd
-                ? 'bg-gray-100 text-[#030712]'
-                : 'border border-gray-200 bg-white text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]'
-            )}
-          >
-            <UserPlus className="w-3.5 h-3.5" />
-            {showAdd ? 'Fechar busca' : 'Adicionar membro'}
-          </button>
+          {somenteLeitura ? (
+            <span className="text-xs text-[#6b7280]">Gerenciado pelo Platform Admin</span>
+          ) : (
+            <button
+              onClick={() => setShowAdd(v => !v)}
+              className={cn(
+                'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors',
+                showAdd
+                  ? 'bg-gray-100 text-[#030712]'
+                  : 'border border-gray-200 bg-white text-[#030712] hover:bg-gray-50 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]'
+              )}
+            >
+              <UserPlus className="w-3.5 h-3.5" />
+              {showAdd ? 'Fechar busca' : 'Adicionar membro'}
+            </button>
+          )}
         </div>
 
         {showAdd && (
@@ -538,7 +542,7 @@ export function GrupoDetailSheet({ open, onClose, grupo, accountId, accountNome,
                           : <Badge variant="default">Membro</Badge>}
                       </td>
                       <td className="pr-6 pl-3 py-3 text-right">
-                        <div className="invisible group-hover:visible">
+                        <div className={cn('invisible', !somenteLeitura && 'group-hover:visible')}>
                           <button
                             onClick={() => handleRemove(user)}
                             disabled={isRemoving || isAdding}
