@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams, Navigate } from 'react-router-dom'
 import { Copy, Phone, Mail, RotateCcw, UserPlus } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { useToast, ToastContainer } from '@/components/ui/Toast'
@@ -19,7 +19,7 @@ import { ContractDetailSheet } from '@/components/ContractDetailSheet'
 import { EditContractSheet } from '@/components/EditContractSheet'
 import { CriarUsuarioSheet } from '@/components/usuarios/CriarUsuarioSheet'
 import { api } from '@/api/client'
-import { useAuthz, useIsPlatformAdmin, useIsOrgAdmin, useIsPasArchitect, useAdminAccountId } from '@/authz/hooks'
+import { useAuthz, useIsPlatformAdmin, useIsOrgAdmin, useIsPasArchitect, useAdminAccountId, useAdminOrgId } from '@/authz/hooks'
 import { PainelAcessos } from '@/components/acessos/PainelAcessos'
 import CanvasPermissoesPage from '@/pages/CanvasPermissoesPage'
 import CanvasOrgPage from '@/pages/CanvasOrgPage'
@@ -90,6 +90,24 @@ export function OrganizacaoDetailPage() {
   const isOrgAdmin = useIsOrgAdmin()
   const isPasArchitect = useIsPasArchitect()
   const adminAccountId = useAdminAccountId()
+  const adminOrgId = useAdminOrgId()
+
+  // ── Guarda de organização ───────────────────────────────────
+  // Cada papel só enxerga a SUA organização. Sem isto, trocar de persona
+  // estando numa organização qualquer (ou colar o link de outra) mostrava os
+  // dados dela para quem não deveria — as abas mudavam, o conteúdo não.
+  //   platform admin → qualquer organização
+  //   org admin      → a organização que administra
+  //   account admin  → a organização da conta que administra
+  //   sem papel      → fora do cockpit
+  const orgDoAccountAdmin = adminAccountId
+    ? mockAccounts.find(a => a.id === adminAccountId)?.orgId
+    : undefined
+  const orgPermitida = isPlatformAdmin
+    ? null                                   // null = sem restrição
+    : (adminOrgId ?? orgDoAccountAdmin ?? null)
+  const precisaRedirecionar =
+    !isPlatformAdmin && orgPermitida != null && orgPermitida !== id
 
   // A aba vive na URL — a tela fica linkável e sobrevive ao recarregar.
   // Mesmo padrão que a antiga /acessos já usava com `?aba=`.
@@ -279,6 +297,16 @@ export function OrganizacaoDetailPage() {
       }
     },
   })
+
+  // Redireciona ANTES de qualquer render de conteúdo — mantém a aba pedida.
+  if (precisaRedirecionar) {
+    return <Navigate to={`/organizacoes/${orgPermitida}?aba=${abaPedida}`} replace />
+  }
+  // Nem org admin nem account admin nem platform admin: o cockpit não é para
+  // este papel.
+  if (!isPlatformAdmin && orgPermitida == null && !isPasArchitect) {
+    return <Navigate to="/home" replace />
+  }
 
   if (loading) return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3 p-6">
