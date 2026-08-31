@@ -1,9 +1,6 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
 import { Search, Plus, Ellipsis, FilePen, UserX, UserCheck, Eye, Trash2, ChevronDown, HelpCircle, ShieldCheck, Globe, Lock, AlertTriangle, SlidersHorizontal, GitBranch, Info, Users, Columns3, UserPlus } from 'lucide-react'
-import { useSessionState } from '@/hooks/useSessionState'
 import { useLocalState } from '@/hooks/useLocalState'
-import { useAdminOrgId } from '@/authz/hooks'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Popover } from '@/components/ui/Popover'
@@ -11,14 +8,15 @@ import { UsuarioDetailAccountSheet } from '@/components/usuarios/UsuarioDetailAc
 import { EditUserSheet } from '@/components/EditUserSheet'
 import { CriarUsuarioSheet } from '@/components/usuarios/CriarUsuarioSheet'
 import { api } from '@/api/client'
-import { grupos as mockGrupos, users as mockUsers, accountMembrosIds, instancias as mockInstancias } from '@/data/mock'
-import { useAdminAccountId, useIsPlatformAdmin, useIsOrgAdmin, useIsAccountAdmin } from '@/authz/hooks'
+import { grupos as mockGrupos, users as mockUsers, accountMembrosIds, instancias as mockInstancias, organizations as mockOrgs, accounts as mockAccounts } from '@/data/mock'
+import { useIsPlatformAdmin } from '@/authz/hooks'
 import { cn } from '@/lib/utils'
-import type { User, Grupo } from '@/types'
+import type { User, Grupo, Account, Organization } from '@/types'
 
 import { CriarGrupoSheet } from '@/components/grupos/CriarGrupoSheet'
 import { CriarGrupoOrgSheet } from '@/components/grupos/CriarGrupoOrgSheet'
 import { GrupoDetailSheet } from '@/components/grupos/GrupoDetailSheet'
+import { EscopoBadge } from '@/components/grupos/EscopoBadge'
 import { AtribuirGrupoEmMassaSheet } from '@/components/usuarios/AtribuirGrupoEmMassaSheet'
 import { InstanciaDetailSheet } from '@/components/instancias/InstanciaDetailSheet'
 import { PermissoesEfetivasSheet } from '@/components/permissoes/PermissoesEfetivasSheet'
@@ -42,12 +40,6 @@ function Initials({ nome }: { nome: string }) {
 
 // ── Badge de escopo ───────────────────────────────────────────
 
-function EscopoBadge({ escopo }: { escopo: 'org' | 'conta' }) {
-  return escopo === 'org'
-    ? <Badge variant="info">Organização</Badge>
-    : <Badge variant="default" className="bg-violet-50 text-violet-700 border border-violet-200">Conta</Badge>
-}
-
 // ── Colunas configuráveis da aba Usuários ─────────────────────
 // "Nome" é fixa; as demais o usuário escolhe (estilo File Explorer).
 // A preferência persiste em localStorage.
@@ -65,89 +57,166 @@ type UserColumnId = typeof USER_COLUMNS[number]['id']
 // Padrão pós-GAP da reunião de 06/07: "Grupo" substitui "Papel" (que fica opcional)
 const DEFAULT_USER_COLUMNS: UserColumnId[] = ['usuario', 'email', 'grupos', 'status', 'ultimoAcesso']
 
+// ── Colunas configuráveis da aba Grupos ───────────────────────
+// "Grupo" e "Ações" são fixas — sem o nome não há linha, e sem as ações não há
+// como operar. O resto o usuário liga e desliga.
+const GRUPO_COLUMNS = [
+  { id: 'membros', label: 'Membros' },
+  { id: 'escopo',  label: 'Escopo'  },
+  { id: 'conta',   label: 'Conta'   },
+  { id: 'status',  label: 'Status'  },
+] as const
+type GrupoColumnId = typeof GRUPO_COLUMNS[number]['id']
+const DEFAULT_GRUPO_COLUMNS: GrupoColumnId[] = ['membros', 'escopo', 'conta', 'status']
+
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100] as const
 const DEFAULT_PAGE_SIZE = 50
 
 // ─────────────────────────────────────────────────────────────
 
-export function AcessosPage() {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const abaParam = searchParams.get('aba') as Aba | null
-  const abaAtiva: Aba = abaParam === 'grupos' ? 'grupos' : abaParam === 'instancias' ? 'instancias' : 'usuarios'
+export interface PainelAcessosProps {
+  /** Organização em que o painel está montado — vem da rota, não de um seletor. */
+  orgId: string
+  /** A organização em si — o sheet de criar grupo precisa dela para o escopo. */
+  org?: Organization | null
+  /**
+   * Contas no escopo. Todas as contas ativas da org para platform/org admin;
+   * só a própria para account admin. Uma conta → escopo de conta; várias →
+   * escopo de organização, com a conta virando coluna e filtro.
+   */
+  contas: Account[]
+  aba: Aba
+  /**
+   * Título e descrição da aba. O painel monta o cabeçalho inteiro — título,
+   * descrição e ações na mesma linha, como no Figma. Antes o cabeçalho era do
+   * componente pai e as ações do painel caíam numa segunda linha, o que
+   * duplicava o botão "Criar usuário".
+   */
+  titulo: string
+  descricao: string
+  /** Ações do pai que entram antes das do painel (ex.: Criar Org Admin). */
+  acoesExtras?: React.ReactNode
+}
 
-  const rawAccountId    = useAdminAccountId()          // accountId fixo do Account Admin (null para outros)
+/**
+ * Painel de Acessos — Usuários, Grupos e Objetos.
+ *
+ * Era a página `/acessos`, que escolhia organização e conta em dois <select>
+ * persistidos em sessionStorage. No desenho do Figma isso deixa de existir: o
+ * painel é o conteúdo das abas da organização, e o contexto vem de onde você
+ * está. A conta deixa de ser um portão (escolha antes de ver qualquer coisa) e
+ * vira coluna e filtro sobre uma lista que já nasce cheia.
+ *
+ * O título e a descrição de cada aba são do componente pai — aqui começa na
+ * barra de ações.
+ */
+export function PainelAcessos({ orgId, org, contas, aba, titulo, descricao, acoesExtras }: PainelAcessosProps) {
   const isPlatformAdmin = useIsPlatformAdmin()
-  const isOrgAdmin      = useIsOrgAdmin()
-  const isAccountAdmin  = useIsAccountAdmin()
-  const adminOrgId      = useAdminOrgId()              // orgId do Org Admin (para filtrar contas)
 
-  // Account Admin puro: não é nem Org Admin nem Platform Admin
-  const isAccountAdminOnly = isAccountAdmin && !isOrgAdmin && !isPlatformAdmin
+  const abaAtiva: Aba = aba
 
-  const ALL_ACCOUNTS = '__all__'
+  // ── Escopo ──────────────────────────────────────────────────
+  // O platform admin enxerga TODAS as organizações e reduz por filtro; os
+  // demais ficam nas contas que o pai entrega (a organização da rota, ou a
+  // própria conta). Por isso a base de contas depende do papel.
+  const [filtroOrganizacao, setFiltroOrganizacao] = useState('')
 
-  // Seletor persistido em sessionStorage
-  const [selectedOrgId,     setSelectedOrgId]     = useSessionState<string>('acessos-orgId', '')
-  const [selectedAccountId, setSelectedAccountId] = useSessionState<string>('acessos-accountId', '')
-
-  const [allOrgs,     setAllOrgs]     = useState<any[]>([])
-  const [allAccounts, setAllAccounts] = useState<any[]>([])
-
-  // Platform Admin: carrega todas as orgs e auto-seleciona a primeira
+  const [todasOrgs, setTodasOrgs] = useState<Organization[]>([])
   useEffect(() => {
     if (!isPlatformAdmin) return
     api.getOrganizations()
-      .then((orgs: any[]) => {
-        const active = orgs.filter(o => o.status !== 'Inativo')
-        setAllOrgs(active)
-        if (!selectedOrgId && active.length > 0) setSelectedOrgId(active[0].id)
-      })
-      .catch(() => {})
+      .then((os: Organization[]) => setTodasOrgs(os.filter(o => o.status !== 'Inativo')))
+      .catch(() => setTodasOrgs(mockOrgs.filter(o => o.status !== 'Inativo')))
   }, [isPlatformAdmin])
 
-  // Carrega contas:
-  //   Platform Admin → filtra pela org selecionada (quando há uma)
-  //   Org Admin      → sempre filtra pela sua org
+  // Contas de TODAS as organizações — o sheet de criar grupo permite escolher
+  // a organização de destino, então precisa das contas dela também, não só das
+  // contas do escopo em que o painel está montado.
+  const [todasContas, setTodasContas] = useState<Account[]>([])
   useEffect(() => {
-    if (isAccountAdminOnly) return
-    const orgFilter = isPlatformAdmin
-      ? (selectedOrgId || undefined)
-      : (isOrgAdmin && adminOrgId ? adminOrgId : undefined)
-    if (isPlatformAdmin && !selectedOrgId) { setAllAccounts([]); return }
-    api.getAccounts(orgFilter)
-      .then((accs: any[]) => {
-        const active = accs.filter(a => !a.deletedAt)
-        setAllAccounts(active)
-        // se a conta selecionada não pertence mais à org escolhida, auto-seleciona a primeira
-        if (!selectedAccountId || !active.find(a => a.id === selectedAccountId)) {
-          setSelectedAccountId(active.length > 0 ? active[0].id : '')
-        }
-      })
-      .catch(() => {})
-  }, [isAccountAdminOnly, isPlatformAdmin, isOrgAdmin, adminOrgId, selectedOrgId])
+    if (!isPlatformAdmin) { setTodasContas([]); return }
+    api.getAccounts()
+      .then((cs: Account[]) => setTodasContas(cs.filter(c => !c.deletedAt)))
+      .catch(() => setTodasContas(mockAccounts.filter(c => !c.deletedAt)))
+  }, [isPlatformAdmin])
 
-  // accountId efetivo
-  const accountId = isAccountAdminOnly ? (rawAccountId ?? '') : selectedAccountId
-  const isAllAccounts = accountId === ALL_ACCOUNTS
-
-  // orgId efetivo — derivado do papel do usuário logado
-  const effectiveOrgId = isPlatformAdmin
-    ? selectedOrgId
-    : isOrgAdmin
-      ? (adminOrgId ?? '')
-      : ''   // Account Admin: orgId vem da conta (ver busca de grupos abaixo)
-
-  // Nome da conta — para o header (Account Admin puro)
-  const [accountNome, setAccountNome] = useState<string | null>(null)
+  // Grupos de todas as organizações — o sheet oferece "grupo pai" filtrando
+  // pela organização/conta escolhida ali dentro. Com só os grupos do escopo
+  // atual, escolher outra organização mostrava os pais da organização errada.
+  const [todosGrupos, setTodosGrupos] = useState<Grupo[]>([])
   useEffect(() => {
-    if (!isAccountAdminOnly || !accountId) return
-    api.getAccount(accountId)
-      .then((acc: any) => setAccountNome(acc?.name ?? null))
-      .catch(() => setAccountNome(null))
-  }, [isAccountAdminOnly, accountId])
+    if (!isPlatformAdmin) { setTodosGrupos([]); return }
+    api.getGrupos()
+      .then((gs: Grupo[]) => setTodosGrupos(gs))
+      .catch(() => setTodosGrupos(mockGrupos))
+  }, [isPlatformAdmin])
 
-  function setAba(aba: Aba) {
-    setSearchParams({ aba }, { replace: true })
+  // Onde o grupo pode nascer. O platform admin cria em qualquer organização —
+  // grupos podem ser criados entre organizações; os demais, só na sua.
+  const orgsParaCriarGrupo = isPlatformAdmin ? todasOrgs : (org ? [org] : [])
+  const contasParaCriarGrupo = isPlatformAdmin && todasContas.length > 0 ? todasContas : contas
+
+  function FiltroOrganizacoes() {
+    if (!isPlatformAdmin || todasOrgs.length === 0) return null
+    return (
+      <div className="relative">
+        <select
+          value={filtroOrganizacao}
+          onChange={e => { setFiltroOrganizacao(e.target.value); setFiltroConta('') }}
+          className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
+        >
+          <option value="">Todas as organizações</option>
+          {todasOrgs.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
+        </select>
+        <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+      </div>
+    )
+  }
+
+  // Contas efetivamente no escopo, depois do filtro de organização.
+  // Para o platform admin a base é a plataforma inteira; para os demais, o que
+  // o pai entregou.
+  const contasBase = isPlatformAdmin && todasContas.length > 0 ? todasContas : contas
+  const allAccounts = filtroOrganizacao
+    ? contasBase.filter(c => c.orgId === filtroOrganizacao)
+    : contasBase
+
+  // `allAccounts` é derivado: array novo a cada render. Efeitos NÃO podem
+  // depender dele por referência — isso rende "Maximum update depth exceeded",
+  // porque cada setState do próprio painel gera um array novo e redispara o
+  // efeito. Os efeitos dependem desta chave, que só muda quando o conjunto
+  // de contas realmente muda.
+  const chaveEscopo = allAccounts.map(a => a.id).join(',')
+
+  // Cardinalidade sobre o escopo REAL do painel, não sobre o que o pai passou:
+  // com "todas as organizações" o platform admin tem muitas contas, mesmo que
+  // a organização da rota tenha uma só.
+  const exibeFiltroConta = allAccounts.length > 1
+
+  // orgId para consultas que precisam de UMA organização (grupos de escopo org,
+  // criação). Com "todas", cai na organização da rota.
+  const effectiveOrgId = filtroOrganizacao || orgId
+
+  // Filtro de conta: '' = todas as contas do escopo.
+  const [filtroConta, setFiltroConta] = useState('')
+
+  // `accountId` é a conta ativa quando há exatamente uma no escopo (ou uma
+  // filtrada); vazio significa "todas as contas do escopo" — era o sentinela
+  // '__all__' quando isto era um <select> de entrada. Toda guarda de
+  // carregamento pergunta por `allAccounts.length`, nunca por `accountId`.
+  const contaUnica = allAccounts.length === 1 ? allAccounts[0].id : ''
+  const accountId = filtroConta || contaUnica
+  const isAllAccounts = !accountId
+
+  const accountNome = allAccounts.find(c => c.id === accountId)?.name ?? null
+
+  // Com mais de uma organização em jogo, a coluna de organização deixa de ser
+  // opcional: sem ela a lista global não diz de onde cada pessoa é.
+  const orgsNoEscopo = new Set(allAccounts.map(c => c.orgId))
+  const mostrarColunaOrg = orgsNoEscopo.size > 1
+  const nomeOrgDaConta = (accId: string) => {
+    const c = allAccounts.find(a => a.id === accId)
+    return todasOrgs.find(o => o.id === c?.orgId)?.name ?? org?.name ?? '—'
   }
 
   // ── Usuários ────────────────────────────────────────────────
@@ -184,7 +253,7 @@ export function AcessosPage() {
   // Carrega o mapa usuário→grupos (1 chamada por conta; no modo "Todas as contas",
   // uma por conta em paralelo, com merge)
   useEffect(() => {
-    if (!accountId) return
+    if (allAccounts.length === 0) return
     const accountIds = isAllAccounts ? allAccounts.map(a => a.id) : [accountId]
     if (accountIds.length === 0) return
     let cancelled = false
@@ -204,7 +273,7 @@ export function AcessosPage() {
       setUserGruposMap(map)
     })
     return () => { cancelled = true }
-  }, [accountId, allAccounts, isAllAccounts])
+  }, [accountId, chaveEscopo, isAllAccounts])   // eslint-disable-line react-hooks/exhaustive-deps
 
   // Filtros/conta/itens por página mudaram → volta para a primeira página e limpa
   // a seleção (uma seleção feita sob um filtro não deve vazar para outro contexto)
@@ -214,22 +283,30 @@ export function AcessosPage() {
   }, [searchUsers, filtroGrupo, filtroObjeto, filtroPapel, filtroStatus, accountId, pageSize])
 
   useEffect(() => {
-    if (!accountId) return
+    if (allAccounts.length === 0) return
     setLoadingUsers(true)
     if (isAllAccounts) {
       Promise.all(
         allAccounts.map(acc =>
           api.getAccountMembros(acc.id)
-            .then((data: User[]) => data.map(u => ({ u, accName: acc.name })))
-            .catch(() => [] as { u: User; accName: string }[])
+            .then((data: User[]) => data.map(u => ({ u, accId: acc.id })))
+            // Sem backend, o mock responde — o mesmo fallback que o caminho de
+            // conta única já tinha, e sem o qual a visão agregada nasce vazia.
+            .catch(() => (accountMembrosIds[acc.id] ?? [])
+              .map(id => mockUsers.find(u => u.id === id))
+              .filter((u): u is User => Boolean(u))
+              .map(u => ({ u, accId: acc.id })))
         )
       ).then(results => {
         const seenIds = new Set<string>()
         const merged: User[] = []
+        // userId → accountId. Guardar o ID e não o nome: numa lista que
+        // atravessa organizações, o nome da conta não identifica sozinho —
+        // nomes de conta não são únicos entre organizações.
         const map: Record<string, string> = {}
-        results.flat().forEach(({ u, accName }) => {
+        results.flat().forEach(({ u, accId }) => {
           if (!seenIds.has(u.id)) { seenIds.add(u.id); merged.push(u) }
-          if (!map[u.id]) map[u.id] = accName
+          if (!map[u.id]) map[u.id] = accId
         })
         setUsers(merged)
         setUserAccountMap(map)
@@ -246,7 +323,7 @@ export function AcessosPage() {
         setUserAccountMap({})
         setLoadingUsers(false)
       })
-  }, [accountId, allAccounts])
+  }, [accountId, chaveEscopo])   // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleCriarSuccess(user: User) {
     setUsers(prev => prev.find(u => u.id === user.id) ? prev : [...prev, user])
@@ -357,7 +434,7 @@ export function AcessosPage() {
   const [selectedInstancia, setSelectedInstancia]     = useState<Instancia | null>(null)
 
   useEffect(() => {
-    if (!accountId) return
+    if (allAccounts.length === 0) return
     setLoadingInstancias(true)
     if (isAllAccounts) {
       Promise.all(
@@ -383,7 +460,7 @@ export function AcessosPage() {
         setInstAccountMap({})
         setLoadingInstancias(false)
       })
-  }, [accountId, allAccounts])
+  }, [accountId, chaveEscopo])   // eslint-disable-line react-hooks/exhaustive-deps
 
   // Membros (diretos + via grupo) de cada objeto — carregado 1x por lista de instâncias,
   // usado para computar quais objetos cada usuário enxerga (filtro "Objetos" na aba Usuários).
@@ -567,22 +644,49 @@ export function AcessosPage() {
     api.getGrupos({ orgId: orgIdForGrupos, accountId: effectiveAccId })
       .then(data => { setGrupos(data); setLoadingGrupos(false) })
       .catch(() => {
+        // Na visão agregada entram os grupos da organização E os de todas as
+        // contas do escopo — filtrar só por `orgId` perderia os de escopo
+        // conta, que são a maioria.
+        const idsContas = new Set(allAccounts.map(a => a.id))
         const fallback = mockGrupos.filter(g =>
-          (effectiveAccId && g.accountId === effectiveAccId) ||
-          (orgIdForGrupos && g.orgId === orgIdForGrupos)
+          // Grupo global aparece em qualquer escopo — toda conta de toda org.
+          g.escopo === 'global'
+          || (effectiveAccId
+              ? g.accountId === effectiveAccId
+              : (g.orgId === orgIdForGrupos) || (g.accountId ? idsContas.has(g.accountId) : false))
         )
         setGrupos(fallback)
         setLoadingGrupos(false)
       })
-  }, [accountId, effectiveOrgId, allAccounts])
+  }, [accountId, effectiveOrgId, chaveEscopo])   // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Filtros da aba Grupos ───────────────────────────────────
+  const [filtroGrupoId,     setFiltroGrupoId]     = useState('')
+  const [filtroGrupoEscopo, setFiltroGrupoEscopo] = useState('')
+  const [colunasGrupos, setColunasGrupos] = useLocalState<GrupoColumnId[]>('acessos-grupos-colunas', DEFAULT_GRUPO_COLUMNS)
+  const colGrupoVisivel = (id: GrupoColumnId) => colunasGrupos.includes(id)
+  // Grupo + Ações são fixas; "conta" só conta quando há mais de uma no escopo.
+  const colSpanGrupos = 2
+    + (colGrupoVisivel('membros') ? 1 : 0)
+    + (colGrupoVisivel('escopo')  ? 1 : 0)
+    + (colGrupoVisivel('conta') && isAllAccounts ? 1 : 0)
+    + (colGrupoVisivel('status')  ? 1 : 0)
 
   const filteredGrupos = useMemo(() => {
     const q = searchGrupos.toLowerCase()
-    return grupos.filter(g =>
-      g.nome.toLowerCase().includes(q) ||
-      (g.descricao ?? '').toLowerCase().includes(q)
-    )
-  }, [grupos, searchGrupos])
+    return grupos.filter(g => {
+      if (q && !(g.nome.toLowerCase().includes(q) || (g.descricao ?? '').toLowerCase().includes(q))) return false
+      if (filtroGrupoId && g.id !== filtroGrupoId) return false
+      // Grupo de organização vale para todas as contas — filtrar por conta não
+      // deve escondê-lo, senão o filtro passa a mentir sobre o que a conta usa.
+      // Grupo global e grupo de org valem para todas as contas — o filtro
+      // de conta só restringe os de escopo 'conta'.
+      if (filtroConta && g.escopo === 'conta' && g.accountId !== filtroConta) return false
+      if (filtroGrupoEscopo && g.escopo !== filtroGrupoEscopo) return false
+      if (filtroStatus && g.status !== filtroStatus) return false
+      return true
+    })
+  }, [grupos, searchGrupos, filtroGrupoId, filtroConta, filtroGrupoEscopo, filtroStatus])
 
   function handleViewGrupo(grupo: Grupo) {
     setSelectedGrupo(grupo)
@@ -607,133 +711,80 @@ export function AcessosPage() {
 
   return (
     <div>
-      {/* Header */}
-      <div className="flex items-start justify-between px-8 py-4 gap-6">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-violet-50 text-violet-600 border border-violet-200">
-              {isAllAccounts ? 'Escopo: Organização' : 'Escopo: Conta'}
-            </span>
-            {isAccountAdmin && !isPlatformAdmin && !isOrgAdmin && (
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-orange-50 text-orange-600 border border-orange-200">Account Admin</span>
-            )}
-            {/* Seletor de org (Platform Admin) + conta (Org Admin / Platform Admin) */}
-            {!isAccountAdminOnly ? (
-              <>
-                {isPlatformAdmin && allOrgs.length > 0 && (
-                  <div className="relative">
-                    <select
-                      value={selectedOrgId}
-                      onChange={e => { setSelectedOrgId(e.target.value); setSelectedAccountId('') }}
-                      className="appearance-none pl-2 pr-6 py-0.5 text-[11px] font-medium border border-gray-200 rounded-full bg-gray-50 text-gray-700 outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
-                    >
-                      {allOrgs.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
-                    </select>
-                    <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
-                  </div>
-                )}
-                {allAccounts.length > 0 && (
-                  <div className="relative">
-                    <select
-                      value={accountId}
-                      onChange={e => setSelectedAccountId(e.target.value)}
-                      className="appearance-none pl-2 pr-6 py-0.5 text-[11px] font-medium border border-gray-200 rounded-full bg-gray-50 text-gray-700 outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
-                    >
-                      {isPlatformAdmin && (
-                        <option value={ALL_ACCOUNTS}>Todas as contas</option>
-                      )}
-                      {allAccounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-                    </select>
-                    <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
-                  </div>
-                )}
-              </>
-            ) : accountNome ? (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-50 text-gray-600 border border-gray-200">
-                Conta: <strong className="font-semibold">{accountNome}</strong>
-              </span>
-            ) : null}
-          </div>
-          <h1 className="text-2xl font-bold leading-8 text-[#030712]">Acessos</h1>
-          <p className="text-sm text-[#6b7280] mt-1 max-w-[1080px]">
-            {isAllAccounts
-              ? <>Visão consolidada de todas as contas da organização. Diferente de <strong className="font-medium text-[#374151]">Usuários</strong> (visão org), aqui você vê membros, grupos e objetos por conta.</>
-              : <>Gerencie quem acessa <strong className="font-medium text-[#374151]">esta conta</strong> e com quais Ações. Diferente de <strong className="font-medium text-[#374151]">Usuários</strong> (visão da organização), aqui você vê apenas os membros e grupos desta conta específica.</>
-            }
-          </p>
+      {/* Cabeçalho da aba — título, descrição e ações na mesma linha. */}
+      <div className="flex items-start justify-between gap-6 px-8 pt-6 pb-2">
+        <div className="flex flex-col gap-2 max-w-[720px]">
+          <h2 className="text-[30px] font-bold leading-9 text-[#030712] tracking-normal">{titulo}</h2>
+          <p className="text-base text-[#6b7280] leading-6">{descricao}</p>
         </div>
-        <div className="flex items-center gap-2 shrink-0 mt-1">
-          <button
-            onClick={() => setShowOnboarding(true)}
-            title="Sobre esta aba"
-            className="flex items-center gap-1.5 px-3 py-2 text-sm text-[#6b7280] bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:text-[#030712] hover:border-gray-300 transition-colors"
-          >
-            <HelpCircle className="w-4 h-4" />
-            <span>Sobre</span>
-          </button>
-          <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
-            <Search className="w-4 h-4 text-gray-400 opacity-50" />
-            <input
-              type="text"
-              placeholder="Buscar"
-              className="w-28 bg-transparent text-sm outline-none text-[#030712] placeholder:text-[#6b7280]"
-              value={searchQuery}
-              onChange={e => handleSearchChange(e.target.value)}
-            />
-            {searchQuery && (
-              <button onClick={() => handleSearchChange('')} className="text-gray-400 hover:text-gray-600 leading-none">×</button>
-            )}
-          </div>
-          {abaAtiva === 'usuarios' && !isAllAccounts ? (
-            <div className="flex items-center gap-2">
-              <Button onClick={() => setShowCriarSheet(true)}>
-                <Plus className="w-4 h-4 mr-1.5" />Criar usuário
-              </Button>
-            </div>
-          ) : abaAtiva === 'grupos' && !isPlatformAdmin ? (
-            <Button onClick={() => setShowCriarGrupoSheet(true)}>
-              <Plus className="w-4 h-4 mr-1.5" />Criar grupo
-            </Button>
-          ) : abaAtiva === 'grupos' && isPlatformAdmin ? (
-            <Button onClick={() => setShowCriarGrupoOrgSheet(true)}>
-              <Plus className="w-4 h-4 mr-1.5" />Criar grupo
-            </Button>
-          ) : null}
+        <div className="flex items-center gap-2 shrink-0">
+        {acoesExtras}
+        <button
+          onClick={() => setShowOnboarding(true)}
+          title="Sobre esta aba"
+          className="flex items-center gap-1.5 px-3 py-2 text-sm text-[#6b7280] bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:text-[#030712] hover:border-gray-300 transition-colors"
+        >
+          <HelpCircle className="w-4 h-4" />
+          <span>Sobre</span>
+        </button>
+        <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
+          <Search className="w-4 h-4 text-gray-400 opacity-50" />
+          <input
+            type="text"
+            placeholder="Buscar"
+            className="w-28 bg-transparent text-sm outline-none text-[#030712] placeholder:text-[#6b7280]"
+            value={searchQuery}
+            onChange={e => handleSearchChange(e.target.value)}
+          />
+          {searchQuery && (
+            <button onClick={() => handleSearchChange('')} className="text-gray-400 hover:text-gray-600 leading-none">×</button>
+          )}
         </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="px-8 border-b border-gray-200">
-        <div className="flex">
-          {([
-            { id: 'usuarios',   label: 'Usuários' },
-            { id: 'grupos',     label: 'Grupos' },
-            { id: 'instancias', label: 'Objetos' },
-          ] as const).map(({ id, label }) => (
-            <button
-              key={id}
-              onClick={() => setAba(id)}
-              className={cn(
-                'px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors',
-                abaAtiva === id
-                  ? 'border-[#030712] text-[#030712]'
-                  : 'border-transparent text-[#6b7280] hover:text-[#030712] hover:border-gray-300'
-              )}
-            >
-              {label}
-            </button>
-          ))}
+        {/* Sem a guarda `!isAllAccounts` que existia aqui: ela escondia o botão
+            de quem administra VÁRIAS contas — justamente o org admin, que é
+            quem mais cria usuário. O sheet aceita accountId opcional; sem uma
+            conta escolhida, cria a pessoa e o vínculo se faz depois. */}
+        {abaAtiva === 'usuarios' ? (
+          <Button onClick={() => setShowCriarSheet(true)}>
+            <Plus className="w-4 h-4 mr-1.5" />Criar usuário
+          </Button>
+        ) : abaAtiva === 'grupos' && !isPlatformAdmin ? (
+          <Button onClick={() => setShowCriarGrupoSheet(true)}>
+            <Plus className="w-4 h-4 mr-1.5" />Criar grupo
+          </Button>
+        ) : abaAtiva === 'grupos' && isPlatformAdmin ? (
+          <Button onClick={() => setShowCriarGrupoOrgSheet(true)}>
+            <Plus className="w-4 h-4 mr-1.5" />Criar grupo
+          </Button>
+        ) : null}
         </div>
       </div>
 
       {/* ── Aba Usuários ── */}
       {abaAtiva === 'usuarios' && (() => {
-        const colSpanUsuarios = 2 + colunasVisiveis.length + (isAllAccounts ? 1 : 0) + 1
+        const colSpanUsuarios = 2 + colunasVisiveis.length + (isAllAccounts ? 1 : 0) + (mostrarColunaOrg ? 1 : 0) + 1
         return (
         <div className="px-8 pt-6 pb-8 space-y-4">
 
           {/* Filtros + colunas configuráveis */}
           <div className="flex items-center gap-2 flex-wrap">
+            <FiltroOrganizacoes />
+            {/* Conta como FILTRO, não como portão: a lista já nasce cheia com
+                todas as contas do escopo, e isto reduz. Só aparece quando há
+                mais de uma — cardinalidade, não papel. */}
+            {exibeFiltroConta && (
+              <div className="relative">
+                <select
+                  value={filtroConta}
+                  onChange={e => setFiltroConta(e.target.value)}
+                  className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
+                >
+                  <option value="">Todas as contas</option>
+                  {contas.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+              </div>
+            )}
             <div className="relative">
               <select
                 value={filtroGrupo}
@@ -857,6 +908,9 @@ export function AcessosPage() {
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[200px]">Nome</th>
                   {colVisivel('usuario') && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[150px]">Usuário</th>}
                   {colVisivel('email') && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[200px]">E-mail</th>}
+                  {/* Com várias organizações na lista, dizer só a conta não
+                      basta — o nome de conta não é único entre organizações. */}
+                  {mostrarColunaOrg && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[140px]">Organização</th>}
                   {isAllAccounts && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[140px]">Conta</th>}
                   {colVisivel('grupos') && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[180px]">Grupo</th>}
                   {colVisivel('papel') && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[150px]">Papel</th>}
@@ -894,7 +948,16 @@ export function AcessosPage() {
                       </td>
                       {colVisivel('usuario') && <td className="px-4 py-3 text-sm text-[#030712]">{user.usuario}</td>}
                       {colVisivel('email') && <td className="px-4 py-3 text-sm text-[#030712]">{user.email}</td>}
-                      {isAllAccounts && <td className="px-4 py-3 text-sm text-[#6b7280]">{userAccountMap[user.id] ?? '—'}</td>}
+                      {mostrarColunaOrg && (
+                        <td className="px-4 py-3 text-sm text-[#6b7280]">
+                          {nomeOrgDaConta(userAccountMap[user.id] ?? '')}
+                        </td>
+                      )}
+                      {isAllAccounts && (
+                        <td className="px-4 py-3 text-sm text-[#6b7280]">
+                          {allAccounts.find(a => a.id === userAccountMap[user.id])?.name ?? '—'}
+                        </td>
+                      )}
                       {colVisivel('grupos') && (
                         <td className="px-4 py-3">
                           {(() => {
@@ -1029,25 +1092,106 @@ export function AcessosPage() {
       {/* ── Aba Grupos ── */}
       {abaAtiva === 'grupos' && (
         <div className="px-8 pt-6 pb-8">
-          <p className="text-sm text-[#6b7280] mb-4">
-            Grupos com escopo <strong>Organização</strong> são criados pelo Org Admin e herdados por todas as contas — você pode atribuir Ações a eles, mas não editá-los aqui.
-            Grupos com escopo <strong>Conta</strong> são exclusivos desta conta e gerenciados pelo Account Admin.
-          </p>
+          {/* A regra de escopo saiu daqui e virou a descrição da aba, no
+              cabeçalho — deixou de ser um aviso solto acima da tabela. */}
+
+          {/* Barra de filtros — Organizações · Contas · Grupos · Escopos ·
+              Status, mais o seletor de colunas, como no Figma. */}
+          <div className="flex items-center gap-2 flex-wrap mb-4">
+            <FiltroOrganizacoes />
+            {exibeFiltroConta && (
+              <div className="relative">
+                <select
+                  value={filtroConta}
+                  onChange={e => setFiltroConta(e.target.value)}
+                  className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
+                >
+                  <option value="">Todas as contas</option>
+                  {contas.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+              </div>
+            )}
+            <div className="relative">
+              <select
+                value={filtroGrupoId}
+                onChange={e => setFiltroGrupoId(e.target.value)}
+                className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
+              >
+                <option value="">Todos os grupos</option>
+                {grupos.map(g => <option key={g.id} value={g.id}>{g.nome}</option>)}
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+            </div>
+            <div className="relative">
+              <select
+                value={filtroGrupoEscopo}
+                onChange={e => setFiltroGrupoEscopo(e.target.value)}
+                className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
+              >
+                <option value="">Todos os escopos</option>
+                <option value="global">Global</option>
+                <option value="org">Organização</option>
+                <option value="conta">Conta</option>
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+            </div>
+            <div className="relative">
+              <select
+                value={filtroStatus}
+                onChange={e => setFiltroStatus(e.target.value)}
+                className="appearance-none pl-3 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-[#030712]"
+              >
+                <option value="">Todos os status</option>
+                <option value="Ativo">Ativo</option>
+                <option value="Inativo">Inativo</option>
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+            </div>
+
+            <div className="ml-auto">
+              <Popover
+                content={
+                  <div className="flex flex-col gap-0.5 min-w-[180px] p-1">
+                    <p className="px-2 py-1.5 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Colunas visíveis</p>
+                    {GRUPO_COLUMNS.map(col => (
+                      <label key={col.id} className="flex items-center gap-2.5 px-2 py-1.5 text-sm text-[#030712] hover:bg-gray-100 rounded-md cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={colunasGrupos.includes(col.id)}
+                          onChange={() => setColunasGrupos(prev =>
+                            prev.includes(col.id) ? prev.filter(c => c !== col.id) : [...prev, col.id]
+                          )}
+                          className="w-4 h-4 rounded border-gray-300 accent-blue-600"
+                        />
+                        {col.label}
+                      </label>
+                    ))}
+                  </div>
+                }
+              >
+                <button className="flex items-center gap-1.5 px-3 py-2 text-sm text-[#030712] bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:border-gray-300 transition-colors">
+                  <Columns3 className="w-4 h-4" />
+                  <span>Colunas</span>
+                </button>
+              </Popover>
+            </div>
+          </div>
           <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200">
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[240px]">Grupo</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[100px]">Membros</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[130px]">Escopo</th>
-                  {isAllAccounts && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[140px]">Conta</th>}
-                  <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 w-[100px]">Status</th>
+                  {colGrupoVisivel('membros') && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[100px]">Membros</th>}
+                  {colGrupoVisivel('escopo')  && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 w-[130px]">Escopo</th>}
+                  {colGrupoVisivel('conta') && isAllAccounts && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 opacity-40 min-w-[140px]">Conta</th>}
+                  {colGrupoVisivel('status')  && <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 w-[100px]">Status</th>}
                   <th className="px-4 py-3 text-center text-sm font-medium text-gray-600 opacity-40 w-[80px]">Ações</th>
                 </tr>
               </thead>
               <tbody>
                 {loadingGrupos ? (
-                  <tr><td colSpan={isAllAccounts ? 6 : 5} className="px-4 py-8 text-center text-sm text-gray-500">Carregando...</td></tr>
+                  <tr><td colSpan={colSpanGrupos} className="px-4 py-8 text-center text-sm text-gray-500">Carregando...</td></tr>
                 ) : filteredGrupos.length > 0 ? (
                   filteredGrupos.map(grupo => (
                     <tr
@@ -1061,18 +1205,20 @@ export function AcessosPage() {
                           <p className="text-xs text-[#6b7280] mt-0.5 max-w-xs truncate">{grupo.descricao}</p>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-sm text-[#030712]">{grupo.qtdMembros ?? 0}</td>
-                      <td className="px-4 py-3"><EscopoBadge escopo={grupo.escopo} /></td>
-                      {isAllAccounts && (
+                      {colGrupoVisivel('membros') && <td className="px-4 py-3 text-sm text-[#030712]">{grupo.qtdMembros ?? 0}</td>}
+                      {colGrupoVisivel('escopo')  && <td className="px-4 py-3"><EscopoBadge escopo={grupo.escopo} /></td>}
+                      {colGrupoVisivel('conta') && isAllAccounts && (
                         <td className="px-4 py-3 text-sm text-[#6b7280]">
                           {grupo.escopo === 'org' ? <span className="italic text-xs">Org (todas)</span> : (allAccounts.find(a => a.id === grupo.accountId)?.name ?? '—')}
                         </td>
                       )}
-                      <td className="px-4 py-3 text-center">
-                        {grupo.status === 'Ativo'
-                          ? <Badge variant="success">Ativo</Badge>
-                          : <Badge variant="secondary">Inativo</Badge>}
-                      </td>
+                      {colGrupoVisivel('status') && (
+                        <td className="px-4 py-3 text-center">
+                          {grupo.status === 'Ativo'
+                            ? <Badge variant="success">Ativo</Badge>
+                            : <Badge variant="secondary">Inativo</Badge>}
+                        </td>
+                      )}
                       <td className="px-4 py-3 text-center" onClick={e => e.stopPropagation()}>
                         <div className="invisible group-hover:visible">
                           <Popover
@@ -1099,7 +1245,7 @@ export function AcessosPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={isAllAccounts ? 6 : 5} className="px-4 py-12 text-center">
+                    <td colSpan={colSpanGrupos} className="px-4 py-12 text-center">
                       <p className="text-sm font-medium text-[#030712]">Nenhum grupo encontrado</p>
                       <p className="text-xs text-[#6b7280] mt-1">Crie um grupo para organizar os usuários desta conta.</p>
                     </td>
@@ -1222,9 +1368,9 @@ export function AcessosPage() {
         open={showCriarGrupoOrgSheet}
         onClose={() => setShowCriarGrupoOrgSheet(false)}
         orgId={effectiveOrgId}
-        orgs={allOrgs}
-        contas={allAccounts}
-        grupos={grupos}
+        orgs={orgsParaCriarGrupo}
+        contas={contasParaCriarGrupo}
+        grupos={isPlatformAdmin && todosGrupos.length > 0 ? todosGrupos : grupos}
         isPlatformAdmin={isPlatformAdmin}
         onSuccess={grupo => setGrupos(prev => [...prev, grupo])}
       />

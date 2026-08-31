@@ -777,6 +777,8 @@ app.get('/grupos', async (c) => {
   ])
   const filtered = rows.filter((g: any) => {
     if (g.status === 'Inativo') return false
+    // Grupo global (sem orgId e sem accountId) aparece em qualquer escopo.
+    if (!g.orgId && !g.accountId) return true
     if (orgId && accountId) return g.orgId === orgId || g.accountId === accountId
     if (orgId) {
       const orgAccountIds = allAccounts.filter((a: any) => a.orgId === orgId).map((a: any) => a.id)
@@ -808,6 +810,7 @@ app.post('/grupos', async (c) => {
   const body  = await c.req.json()
   const escopo = body.escopo ?? 'org'
   if (escopo === 'org'   && !body.orgId)     return c.json({ error: 'orgId obrigatório' }, 400)
+  // escopo='global': orgId e accountId ficam null, sem validação
   if (escopo === 'conta' && !body.accountId) return c.json({ error: 'accountId obrigatório' }, 400)
   const [row] = await db.insert(grupos).values({
     id:        body.id ?? crypto.randomUUID(),
@@ -1555,16 +1558,48 @@ app.get('/instancias/:id/permissoes-efetivas', async (c) => {
     todosGrupos.map((g: any) => [g.id, g.nome])
   )
 
-  const fontes: { atribuicaoId: string; fonte: string; entidadeId: string; displayName?: string; viaChain?: string[] }[] = [
+  // Escopo do grupo — o mesmo nome pode existir na organização (herdado por
+  // todas as contas) e na conta (exclusivo dela). Sem isto, auditar "de onde
+  // veio esta permissão?" para de responder assim que houver dois homônimos.
+  const escopoPorGrupoId: Record<string, { escopo: 'global' | 'org' | 'conta'; escopoId: string | null }> =
+    Object.fromEntries(todosGrupos.map((g: any) => [
+      g.id,
+      g.orgId       ? { escopo: 'org' as const,    escopoId: g.orgId }
+      : g.accountId ? { escopo: 'conta' as const,  escopoId: g.accountId }
+      :               { escopo: 'global' as const, escopoId: null },
+    ]))
+
+  const orgIdsGrupos = [...new Set(todosGrupos.filter((g: any) => g.orgId).map((g: any) => g.orgId))]
+  const accIdsGrupos = [...new Set(todosGrupos.filter((g: any) => !g.orgId && g.accountId).map((g: any) => g.accountId))]
+  const [orgsDosGrupos, contasDosGrupos] = await Promise.all([
+    orgIdsGrupos.length > 0
+      ? db.select().from(organizations).where(inArray(organizations.id, orgIdsGrupos as string[]))
+      : Promise.resolve([] as any[]),
+    accIdsGrupos.length > 0
+      ? db.select().from(accounts).where(inArray(accounts.id, accIdsGrupos as string[]))
+      : Promise.resolve([] as any[]),
+  ])
+  const nomeEscopo: Record<string, string> = {
+    ...Object.fromEntries(orgsDosGrupos.map((o: any) => [o.id, o.name])),
+    ...Object.fromEntries(contasDosGrupos.map((a: any) => [a.id, a.name])),
+  }
+
+  const fontes: {
+    atribuicaoId: string; fonte: string; entidadeId: string; displayName?: string
+    viaChain?: string[]; escopo?: 'org' | 'conta'; escopoNome?: string
+  }[] = [
     ...directPerms.map((p: any) => ({ atribuicaoId: p.acao, fonte: 'direto', entidadeId: userId })),
     ...groupPerms.map((p: any) => {
       const caminho = caminhoPorGrupoId[p.entidadeId]
+      const esc = escopoPorGrupoId[p.entidadeId]
       return {
         atribuicaoId: p.acao,
         fonte: 'grupo',
         entidadeId: p.entidadeId,
         displayName: grupoNomeMap[p.entidadeId],
         viaChain: caminho && caminho.length > 1 ? caminho : undefined,
+        escopo: esc?.escopo,
+        escopoNome: esc?.escopoId ? nomeEscopo[esc.escopoId] : undefined,
       }
     }),
   ]

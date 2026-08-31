@@ -44,6 +44,16 @@ export function OrganizacoesPage() {
     return <Navigate to="/acessos" replace />
   }
 
+  // Quem administra UMA organização entra direto nela. Esta lista existe para
+  // quem gerencia várias — para o org admin ela mostrava uma linha só, que é
+  // cerimônia sem informação: foi a primeira queixa do time sobre o cockpit.
+  //
+  // A regra é sobre quantas organizações a pessoa alcança, não sobre o papel:
+  // no dia em que um org admin puder ter duas, a lista volta a aparecer sozinha.
+  if (!isPlatformAdmin && isOrgAdmin && adminOrgId) {
+    return <Navigate to={`/organizacoes/${adminOrgId}`} replace />
+  }
+
   const filtered = orgs
     .filter(o => isPlatformAdmin || !isOrgAdmin || !adminOrgId || o.id === adminOrgId)
     .filter(o => showInativas || o.status !== 'Inativo')
@@ -96,19 +106,6 @@ export function OrganizacoesPage() {
       {/* Page header */}
       <div className="flex items-start justify-between px-8 py-4 gap-6">
         <div className="min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            {isPlatformAdmin ? (
-              <>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-500 border border-gray-200">Escopo: Plataforma</span>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-600 border border-purple-200">Platform Admin</span>
-              </>
-            ) : (
-              <>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-500 border border-gray-200">Escopo: Organização</span>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-600 border border-blue-200">Org Admin</span>
-              </>
-            )}
-          </div>
           <h1 className="text-2xl font-bold leading-8 text-[#030712]">Organizações</h1>
           <p className="text-sm text-[#6b7280] mt-1 max-w-[1080px]">
             {isPlatformAdmin

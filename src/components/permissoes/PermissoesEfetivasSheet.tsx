@@ -18,6 +18,10 @@ interface EfetivaFonte {
   displayName?: string
   /** Cadeia de herança do grupo direto até o grupo que detém a permissão (ex: ['Farmacêuticos Sênior', 'Farmacêuticos']) */
   viaChain?: string[]
+  /** Escopo do grupo: 'org' é herdado por todas as contas; 'conta' é exclusivo dela. */
+  escopo?: 'global' | 'org' | 'conta'
+  /** Nome da organização ou conta dona do grupo. */
+  escopoNome?: string
 }
 
 interface InstanciaOpcao {
@@ -43,7 +47,10 @@ interface PermissoesEfetivasSheetProps {
 
 // ── Badges de origem ──────────────────────────────────────────
 
-function FonteBadge({ fonte, entidadeId, displayName, viaChain }: { fonte: string; entidadeId: string; displayName?: string; viaChain?: string[] }) {
+function FonteBadge({ fonte, entidadeId, displayName, viaChain, escopo, escopoNome }: {
+  fonte: string; entidadeId: string; displayName?: string; viaChain?: string[]
+  escopo?: 'global' | 'org' | 'conta'; escopoNome?: string
+}) {
   if (fonte === 'direto') {
     return (
       <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
@@ -53,15 +60,37 @@ function FonteBadge({ fonte, entidadeId, displayName, viaChain }: { fonte: strin
   }
   if (fonte === 'grupo') {
     const temCadeia = viaChain && viaChain.length > 1
+    // Grupo de organização é herdado por todas as contas; grupo de conta é
+    // exclusivo dela. Como o mesmo nome pode existir nos dois escopos, dizer
+    // "Via Grupo · Suporte" sem o escopo não responde de onde a permissão veio.
+    const daOrg    = escopo === 'org'
+    const daGlobal = escopo === 'global'
+
+    const explicacao = [
+      temCadeia ? `Herdado via ${viaChain!.join(' → ')}` : null,
+      daGlobal ? 'Grupo global — vale em toda conta de toda organização'
+        : daOrg ? `Grupo da organização${escopoNome ? ` ${escopoNome}` : ''} — herdado por todas as contas`
+        : escopoNome ? `Grupo exclusivo da conta ${escopoNome}` : null,
+    ].filter(Boolean).join(' · ')
+
+    const rotulo = daGlobal ? 'Grupo global' : daOrg ? 'Grupo da org' : 'Via Grupo'
+    const cor = daGlobal
+      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+      : daOrg
+        ? 'bg-violet-50 text-violet-700 border-violet-200'
+        : 'bg-green-50 text-green-700 border-green-200'
+
     return (
       <span
         className={cn(
-          'inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200',
-          temCadeia && 'cursor-help border-dashed'
+          'inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium border',
+          cor,
+          (temCadeia || escopoNome || daGlobal) && 'cursor-help',
+          temCadeia && 'border-dashed'
         )}
-        title={temCadeia ? `Herdado via ${viaChain!.join(' → ')}` : undefined}
+        title={explicacao || undefined}
       >
-        Via Grupo · {displayName ?? entidadeId}
+        {rotulo} · {displayName ?? entidadeId}
       </span>
     )
   }
@@ -244,7 +273,7 @@ export function PermissoesEfetivasSheet({
                         ) : (
                           <div className="flex flex-wrap gap-1.5">
                             {fontesDoAtrib.map((f, idx) => (
-                              <FonteBadge key={idx} fonte={f.fonte} entidadeId={f.entidadeId} displayName={f.displayName} viaChain={f.viaChain} />
+                              <FonteBadge key={idx} fonte={f.fonte} entidadeId={f.entidadeId} displayName={f.displayName} viaChain={f.viaChain} escopo={f.escopo} escopoNome={f.escopoNome} />
                             ))}
                           </div>
                         )}

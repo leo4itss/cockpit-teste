@@ -763,19 +763,22 @@ function OrgCanvas({
 
 // ── Página principal ──────────────────────────────────────────
 
-function CanvasOrgInner() {
+function CanvasOrgInner({ orgIdFixo }: { orgIdFixo?: string }) {
   useIsPlatformAdmin()
   useIsOrgAdmin()
   const { theme, mode, toggle } = useVisualizerTheme()
 
-  // orgId e expandedId persistem no sessionStorage para sobreviver à navegação entre abas
-  const [orgId,      setOrgIdRaw]      = useSessionState<string | null>('canvas-org-orgId', null)
+  // Montado como aba, a org é a da rota. Autônomo, persiste em sessionStorage
+  // para sobreviver à navegação entre telas.
+  const [orgIdSessao, setOrgIdRaw]     = useSessionState<string | null>('canvas-org-orgId', null)
   const [expandedId, setExpandedId]    = useSessionState<string | null>('canvas-org-expandedId', null)
+  const orgId = orgIdFixo ?? orgIdSessao
 
   const setOrgId = useCallback((id: string) => {
+    if (orgIdFixo) { setExpandedId(null); return }   // aba: a org não muda por aqui
     setOrgIdRaw(id)
     setExpandedId(null)
-  }, [setOrgIdRaw, setExpandedId])
+  }, [orgIdFixo, setOrgIdRaw, setExpandedId])
 
   const [allOrgs,    setAllOrgs]   = useState<any[]>([])
   const [accounts,   setAccounts]  = useState<any[]>([])
@@ -1119,10 +1122,19 @@ function CanvasOrgInner() {
   )
 }
 
-export default function CanvasOrgPage() {
+interface CanvasOrgPageProps {
+  /**
+   * Organização fixa, quando montado como aba dentro dela. Sem isso a página
+   * escolhe a org por um seletor persistido em sessionStorage — comportamento
+   * da rota autônoma, que o Figma substitui.
+   */
+  orgIdFixo?: string
+}
+
+export default function CanvasOrgPage({ orgIdFixo }: CanvasOrgPageProps = {}) {
   return (
     <ReactFlowProvider>
-      <CanvasOrgInner />
+      <CanvasOrgInner orgIdFixo={orgIdFixo} />
     </ReactFlowProvider>
   )
 }

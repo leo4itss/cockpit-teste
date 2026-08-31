@@ -228,21 +228,25 @@ export interface User {
 // ── Grupos e Permissões ───────────────────────────────────────
 
 /**
- * Grupo de usuários com escopo org-level ou conta-level.
+ * Grupo de usuários com escopo global, org-level ou conta-level.
  *
- * escopo='org'   → disponível para todas as contas da organização.
- *                  orgId preenchido, accountId null.
- * escopo='conta' → restrito a uma conta específica.
- *                  accountId preenchido, orgId null.
- *                  Account Admin pode criar e gerenciar.
+ * escopo='global' → toda conta de TODA organização. orgId e accountId vazios.
+ *                   Só o Platform Admin cria e gerencia.
+ * escopo='org'    → disponível para todas as contas da organização.
+ *                   orgId preenchido, accountId null.
+ * escopo='conta'  → restrito a uma conta específica.
+ *                   accountId preenchido, orgId null.
+ *                   Account Admin pode criar e gerenciar.
  */
 export interface Grupo {
   id: string
   nome: string
   descricao?: string
-  escopo: 'org' | 'conta'
+  // 'global' → toda conta de toda organização (só platform admin cria)
+  escopo: 'global' | 'org' | 'conta'
   orgId?: string       // preenchido quando escopo='org'
   accountId?: string   // preenchido quando escopo='conta'
+  // escopo='global' deixa orgId e accountId vazios
   /**
    * Papel padrão do grupo — abstração sobre as tuplas FGA de permissão.
    * 'Viewer' → leitura/consulta

@@ -12,15 +12,24 @@ import { useIsPlatformAdmin, useIsPasArchitect } from '@/authz/hooks'
 import { api } from '@/api/client'
 import type { Componente } from '@/types'
 
-export function ComponentesPage() {
+interface ComponentesPageProps {
+  /**
+   * Montado como aba da organização (Figma): o título e a descrição vêm do
+   * componente pai, então este esconde o seu próprio cabeçalho de página e
+   * mantém só os controles (buscar, exibir inativados, adicionar).
+   */
+  embutido?: boolean
+}
+
+export function ComponentesPage({ embutido = false }: ComponentesPageProps = {}) {
   const { componentes, loading, error, addComponente, updateComponente, deleteComponente, reativarComponente } = useComponentes()
   const { toasts, toast, dismiss } = useToast()
   const isPlatformAdmin = useIsPlatformAdmin()
   const isPasArchitect  = useIsPasArchitect()
   const canCreate = isPlatformAdmin || isPasArchitect
 
-  // Redirecionar perfis sem acesso a componentes
-  if (!isPlatformAdmin && !isPasArchitect) {
+  // Guarda só quando é a rota autônoma — como aba, o pai já decidiu o acesso.
+  if (!embutido && !isPlatformAdmin && !isPasArchitect) {
     return <Navigate to="/home" replace />
   }
   const [search, setSearch] = useState('')
@@ -180,18 +189,20 @@ export function ComponentesPage() {
     <div className="flex flex-col h-full">
       {/* Page header */}
       <div className="bg-white shrink-0">
-        <div className="flex items-start justify-between px-8 py-4 gap-6">
-          {/* Título + descrição */}
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-500 border border-gray-200">Escopo: Plataforma</span>
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-600 border border-purple-200">Platform Admin</span>
+        <div className={`flex items-start ${embutido ? 'justify-end' : 'justify-between'} px-8 py-4 gap-6`}>
+          {/* Título + descrição — só na rota autônoma; como aba, o pai já os dá. */}
+          {!embutido && (
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-500 border border-gray-200">Escopo: Plataforma</span>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-600 border border-purple-200">Platform Admin</span>
+              </div>
+              <h1 className="text-2xl font-bold leading-8 text-[#030712]">Componentes</h1>
+              <p className="text-sm text-[#6b7280] mt-1 max-w-[1080px]">
+                Módulos e serviços que compõem as Soluções PAS. Cada componente define quais permissões granulares (<code className="text-xs bg-gray-100 px-1 rounded">can_use_assistant</code>, <code className="text-xs bg-gray-100 px-1 rounded">pode_ler</code>…) podem ser atribuídas a usuários e grupos via <strong className="font-medium text-[#374151]">Acessos</strong>.
+              </p>
             </div>
-            <h1 className="text-2xl font-bold leading-8 text-[#030712]">Componentes</h1>
-            <p className="text-sm text-[#6b7280] mt-1 max-w-[1080px]">
-              Módulos e serviços que compõem as Soluções PAS. Cada componente define quais permissões granulares (<code className="text-xs bg-gray-100 px-1 rounded">can_use_assistant</code>, <code className="text-xs bg-gray-100 px-1 rounded">pode_ler</code>…) podem ser atribuídas a usuários e grupos via <strong className="font-medium text-[#374151]">Acessos</strong>.
-            </p>
-          </div>
+          )}
           {/* Controles */}
           <div className="flex items-center gap-2 shrink-0 mt-1">
             <label className={`flex items-center gap-2 ${hasInativos ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'}`}>

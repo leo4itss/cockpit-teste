@@ -1,15 +1,10 @@
-import { Search, LayoutGrid, PanelLeft } from 'lucide-react'
+import { Search, LayoutGrid } from 'lucide-react'
 import { useState } from 'react'
 import { SettingsMenu } from './ui/SettingsMenu'
 import { ProfileModal } from './ui/ProfileModal'
 import { AppsMenu } from './ui/AppsMenu'
 
-interface TopBarProps {
-  collapsed: boolean
-  onExpand: () => void
-}
-
-export function TopBar({ collapsed, onExpand }: TopBarProps) {
+export function TopBar() {
   const [query, setQuery] = useState('')
   const [openApps, setOpenApps] = useState(false)
   const [openSettings, setOpenSettings] = useState(false)
@@ -17,17 +12,6 @@ export function TopBar({ collapsed, onExpand }: TopBarProps) {
 
   return (
     <header className="h-16 border-b border-gray-200 bg-white flex items-center px-8 gap-3 shrink-0">
-      {/* Expand button — aparece somente quando a sidebar está colapsada */}
-      {collapsed && (
-        <button
-          onClick={onExpand}
-          className="p-1.5 rounded-md hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors shrink-0"
-          title="Expandir sidebar"
-        >
-          <PanelLeft className="w-4 h-4" />
-        </button>
-      )}
-
       {/* Search */}
       <div className="flex items-center gap-2 border border-gray-200 rounded-md px-3 py-2 bg-white shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] w-[228px] shrink-0">
         <input

@@ -3,18 +3,14 @@ import { Layout } from './components/Layout'
 import { DetailLayout } from './components/DetailLayout'
 import { OrganizacoesPage } from './pages/OrganizacoesPage'
 import { OrganizacaoDetailPage } from './pages/OrganizacaoDetailPage'
-import { AcessosPage } from './pages/AcessosPage'
+import { RedirecionaParaOrganizacao } from './pages/RedirecionaParaOrganizacao'
 import { HomePage } from './pages/HomePage'
-import { ComponentesPage } from './pages/ComponentesPage'
 import { ComponentesProvider } from './context/ComponentesContext'
 import { UsersProvider } from './context/UsersContext'
 import { AuthProvider } from './context/AuthContext'
 import { GruposPage } from './pages/GruposPage'
 import { UsuariosPage } from './pages/UsuariosPage'
 import { ContasPage } from './pages/ContasPage'
-import SchemaVisualizerPage from './pages/SchemaVisualizerPage'
-import CanvasPermissoesPage from './pages/CanvasPermissoesPage'
-import CanvasOrgPage from './pages/CanvasOrgPage'
 import { InstanciaPage } from './pages/InstanciaPage'
 import { ProvisionamentoPage } from './pages/ProvisionamentoPage'
 import { FigmaCaptureSession } from './components/FigmaCaptureSession'
@@ -31,14 +27,16 @@ export default function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Navigate to="/home" replace />} />
           <Route path="organizacoes" element={<OrganizacoesPage />} />
-          <Route path="acessos"      element={<AcessosPage />} />
-          <Route path="componentes"  element={<ComponentesPage />} />
           <Route path="grupos"       element={<GruposPage />} />
           <Route path="usuarios"     element={<UsuariosPage />} />
           <Route path="contas"       element={<ContasPage />} />
-          <Route path="schema"       element={<SchemaVisualizerPage />} />
-          <Route path="canvas"       element={<CanvasPermissoesPage />} />
-          <Route path="canvas-org"   element={<CanvasOrgPage />} />
+          {/* Absorvidas pelas abas da organização (Figma). Continuam como
+              rota para não quebrar link salvo — mas só redirecionam. */}
+          <Route path="acessos"     element={<RedirecionaParaOrganizacao aba="usuarios" />} />
+          <Route path="componentes" element={<RedirecionaParaOrganizacao aba="componentes" />} />
+          <Route path="canvas"      element={<RedirecionaParaOrganizacao aba="canvas" />} />
+          <Route path="canvas-org"  element={<RedirecionaParaOrganizacao aba="canvas-org" />} />
+          <Route path="schema"      element={<RedirecionaParaOrganizacao aba="schema" />} />
         </Route>
         <Route path="/instancia/:id" element={<InstanciaPage />} />
         <Route path="/organizacoes/:id" element={<DetailLayout />}>

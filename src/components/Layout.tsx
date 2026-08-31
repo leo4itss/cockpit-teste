@@ -1,20 +1,19 @@
 import { Outlet } from 'react-router-dom'
-import { useState } from 'react'
-import { Sidebar } from './Sidebar'
 import { TopBar } from './TopBar'
 
+/**
+ * Shell das telas de lista (Organizações). Sem sidebar de navegação — no
+ * desenho do Figma ela não existe: entra-se por Organizações, e tudo o que se
+ * faz numa organização acontece nas abas dela. O TopBar traz a busca global e
+ * o menu de apps.
+ */
 export function Layout() {
-  const [collapsed, setCollapsed] = useState(false)
-
   return (
-    <div className="flex h-screen bg-white overflow-hidden">
-      <Sidebar collapsed={collapsed} onCollapse={setCollapsed} />
-      <div className="flex flex-col flex-1 min-w-0 min-h-0">
-        <TopBar collapsed={collapsed} onExpand={() => setCollapsed(false)} />
-        <main className="flex-1 overflow-auto min-h-0 flex flex-col">
-          <Outlet />
-        </main>
-      </div>
+    <div className="flex flex-col h-screen bg-white overflow-hidden">
+      <TopBar />
+      <main className="flex-1 overflow-auto min-h-0 flex flex-col">
+        <Outlet />
+      </main>
     </div>
   )
 }

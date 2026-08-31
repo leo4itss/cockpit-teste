@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams, Navigate } from 'react-router-dom'
 import { Copy, Phone, Mail, RotateCcw, UserPlus } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { useToast, ToastContainer } from '@/components/ui/Toast'
@@ -18,9 +18,13 @@ import { EditSolutionSheet } from '@/components/EditSolutionSheet'
 import { ContractDetailSheet } from '@/components/ContractDetailSheet'
 import { EditContractSheet } from '@/components/EditContractSheet'
 import { CriarUsuarioSheet } from '@/components/usuarios/CriarUsuarioSheet'
-import { UsuarioDetailOrgSheet, type ContaVinculada } from '@/components/usuarios/UsuarioDetailOrgSheet'
 import { api } from '@/api/client'
-import { useAuthz, useIsPlatformAdmin, useIsOrgAdmin, useIsPasArchitect } from '@/authz/hooks'
+import { useAuthz, useIsPlatformAdmin, useIsOrgAdmin, useIsPasArchitect, useAdminAccountId, useAdminOrgId } from '@/authz/hooks'
+import { PainelAcessos } from '@/components/acessos/PainelAcessos'
+import CanvasPermissoesPage from '@/pages/CanvasPermissoesPage'
+import CanvasOrgPage from '@/pages/CanvasOrgPage'
+import SchemaVisualizerPage from '@/pages/SchemaVisualizerPage'
+import { ComponentesPage } from '@/pages/ComponentesPage'
 import { useComponentes } from '@/context/ComponentesContext'
 import { useProvisioningPolling } from '@/hooks/useProvisioningPolling'
 import { formatarData } from '@/lib/datas'
@@ -35,10 +39,47 @@ import {
   solutions as mockSolutions,
   contracts as mockContracts,
   tiposLicenca as mockTiposLicenca,
+  users as mockUsers,
 } from '@/data/mock'
 import type { Account, Solution, Contract, Organization, Contact, TipoLicenca, User, ProvisioningOverallStatus } from '@/types'
 
-type Tab = 'conta' | 'solucoes' | 'contrato' | 'marketplace' | 'usuarios'
+type Tab =
+  | 'conta' | 'solucoes' | 'contrato' | 'marketplace'
+  // Abas absorvidas de /acessos, /componentes e das rotas de visualização,
+  // conforme o Figma: tudo o que se faz numa organização passa a viver dentro
+  // dela, e a sidebar de navegação deixa de existir.
+  | 'usuarios' | 'grupos' | 'objetos' | 'componentes' | 'canvas' | 'canvas-org' | 'schema'
+
+// Título e descrição de cada aba num lugar só — antes eram duas cadeias de
+// ternários que caíam em "Marketplace" para qualquer aba não prevista, e foi
+// exatamente o que aconteceu ao acrescentar as novas.
+const TITULO_ABA: Partial<Record<Tab, string>> = {
+  conta:        'Conta',
+  solucoes:     'Soluções e planos',
+  contrato:     'Contratos',
+  usuarios:     'Usuários',
+  grupos:       'Grupos',
+  objetos:      'Objetos',
+  componentes:  'Componentes',
+  canvas:       'Canvas',
+  'canvas-org': 'Canvas Org',
+  schema:       'Schema',
+}
+
+const DESCRICAO_ABA: Partial<Record<Tab, string>> = {
+  conta:        'Gerencie as contas vinculadas a esta organização, incluindo usuários, acessos e configurações de cada conta.',
+  solucoes:     'Visualize e edite as soluções contratadas por esta organização, seus planos e os componentes que as compõem.',
+  contrato:     'Acompanhe os contratos ativos e histórico de contratações desta organização, com detalhes de vigência e objetos contratados.',
+  usuarios:     'Todos os usuários da organização, independente da conta a que pertencem.',
+  // A regra de escopo é a descrição da aba, não um aviso solto acima da
+  // tabela: é o que a pessoa precisa saber antes de ler qualquer linha.
+  grupos:       'Grupos com escopo Organização são criados pelo Org Admin e herdados por todas as contas — você pode atribuir Ações a eles, mas não editá-los aqui. Grupos com escopo Conta são exclusivos desta conta e gerenciados pelo Account Admin.',
+  objetos:      'Objetos configurados nas contas desta organização, e quem tem acesso a cada um.',
+  componentes:  'Módulos e serviços que compõem as Soluções PAS. Cada componente define as permissões granulares que podem ser atribuídas a usuários e grupos.',
+  canvas:       'Mapa de permissões de uma conta — pessoas, grupos e objetos, e os vínculos entre eles.',
+  'canvas-org': 'Mapa da organização: contas, e o que existe dentro de cada uma.',
+  schema:       'Modelo de dados da plataforma e as relações entre as tabelas.',
+}
 
 export function OrganizacaoDetailPage() {
   const { id } = useParams()
@@ -48,7 +89,37 @@ export function OrganizacaoDetailPage() {
   const isPlatformAdmin = useIsPlatformAdmin()
   const isOrgAdmin = useIsOrgAdmin()
   const isPasArchitect = useIsPasArchitect()
-  const [tab, setTab] = useState<Tab>('conta')
+  const adminAccountId = useAdminAccountId()
+  const adminOrgId = useAdminOrgId()
+
+  // ── Guarda de organização ───────────────────────────────────
+  // Cada papel só enxerga a SUA organização. Sem isto, trocar de persona
+  // estando numa organização qualquer (ou colar o link de outra) mostrava os
+  // dados dela para quem não deveria — as abas mudavam, o conteúdo não.
+  //   platform admin → qualquer organização
+  //   org admin      → a organização que administra
+  //   account admin  → a organização da conta que administra
+  //   sem papel      → fora do cockpit
+  const orgDoAccountAdmin = adminAccountId
+    ? mockAccounts.find(a => a.id === adminAccountId)?.orgId
+    : undefined
+  const orgPermitida = isPlatformAdmin
+    ? null                                   // null = sem restrição
+    : (adminOrgId ?? orgDoAccountAdmin ?? null)
+  const precisaRedirecionar =
+    !isPlatformAdmin && orgPermitida != null && orgPermitida !== id
+
+  // A aba vive na URL — a tela fica linkável e sobrevive ao recarregar.
+  // Mesmo padrão que a antiga /acessos já usava com `?aba=`.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const abaPedida = (searchParams.get('aba') as Tab | null) ?? 'conta'
+  const setTab = (t: Tab) => setSearchParams({ aba: t }, { replace: true })
+  // Abas só do platform admin — digitar ?aba=componentes na URL como outro
+  // papel cai em Conta, não no conteúdo restrito.
+  const abasSoPlatform: Tab[] = ['componentes', 'canvas-org', 'schema']
+  // Abas cujo conteúdo é o PainelAcessos — elas montam o próprio cabeçalho.
+  const abasDoPainel: Tab[] = ['usuarios', 'grupos', 'objetos']
+  const tab: Tab = (!isPlatformAdmin && abasSoPlatform.includes(abaPedida)) ? 'conta' : abaPedida
   const [org, setOrg] = useState<Organization | null>(null)
   const [accounts, setAccounts] = useState<Account[]>([])
   const [solutions, setSolutions] = useState<Solution[]>([])
@@ -89,42 +160,20 @@ export function OrganizacaoDetailPage() {
     })
   }, [id])
 
-  // Métricas + lista de usuários da org
+  // Métricas do cabeçalho. A lista de usuários saiu daqui: a aba Usuários é
+  // agora o PainelAcessos, que carrega os seus próprios dados por conta.
   const [userCount, setUserCount]           = useState(0)
-  const [orgUsers, setOrgUsers]             = useState<User[]>([])
   const [loadingMetrics, setLoadingMetrics] = useState(true)
   const [showCriarUsuario, setShowCriarUsuario] = useState(false)
-  const [selectedOrgUser, setSelectedOrgUser] = useState<User | null>(null)
-  const [showOrgUserDetail, setShowOrgUserDetail] = useState(false)
-  const [userAccountsMap, setUserAccountsMap] = useState<Record<string, ContaVinculada[]>>({})
   useEffect(() => {
     api.getUsers()
       .then((users: User[]) => {
         setUserCount(users.length)
-        setOrgUsers(users)
         setLoadingMetrics(false)
       })
-      .catch(() => setLoadingMetrics(false))
+      // Sem backend, o mock responde — mesmo padrão do resto da página.
+      .catch(() => { setUserCount(mockUsers.length); setLoadingMetrics(false) })
   }, [])
-
-  // Carrega membros por conta para montar userAccountsMap (necessário para UsuarioDetailOrgSheet)
-  useEffect(() => {
-    if (accounts.length === 0) return
-    Promise.all(
-      accounts.map(acc =>
-        api.getAccountMembros(acc.id)
-          .then((mems: any[]) => mems.map(m => ({ userId: m.id as string, account: acc, papel: m.papel as 'member' | 'account_admin' })))
-          .catch(() => [] as { userId: string; account: Account; papel: 'member' | 'account_admin' }[])
-      )
-    ).then(results => {
-      const map: Record<string, ContaVinculada[]> = {}
-      results.flat().forEach(({ userId, account, papel }) => {
-        if (!map[userId]) map[userId] = []
-        map[userId].push({ account, papel })
-      })
-      setUserAccountsMap(map)
-    })
-  }, [accounts])
 
   // Create sheets
   const [sheetAccount, setSheetAccount] = useState(false)
@@ -248,6 +297,16 @@ export function OrganizacaoDetailPage() {
       }
     },
   })
+
+  // Redireciona ANTES de qualquer render de conteúdo — mantém a aba pedida.
+  if (precisaRedirecionar) {
+    return <Navigate to={`/organizacoes/${orgPermitida}?aba=${abaPedida}`} replace />
+  }
+  // Nem org admin nem account admin nem platform admin: o cockpit não é para
+  // este papel.
+  if (!isPlatformAdmin && orgPermitida == null && !isPasArchitect) {
+    return <Navigate to="/home" replace />
+  }
 
   if (loading) return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3 p-6">
@@ -581,12 +640,35 @@ export function OrganizacaoDetailPage() {
     setEditingSolution(null)
   }
 
+  // Ordem do Figma (Visão - Mateus). Componentes, Canvas Org e Schema são
+  // exclusivas do platform admin: Componentes fica antes de Canvas Org.
   const tabs: { key: Tab; label: string }[] = [
-    { key: 'conta',     label: 'Conta' },
-    { key: 'usuarios',  label: 'Usuários' },
-    { key: 'solucoes',  label: 'Soluções e planos' },
-    { key: 'contrato',  label: 'Contrato' },
+    { key: 'conta',      label: 'Conta' },
+    { key: 'solucoes',   label: 'Soluções e planos' },
+    { key: 'contrato',   label: 'Contratos' },
+    { key: 'usuarios',   label: 'Usuários' },
+    { key: 'grupos',     label: 'Grupos' },
+    { key: 'objetos',    label: 'Objetos' },
+    ...(isPlatformAdmin ? [
+      { key: 'componentes' as Tab, label: 'Componentes' },
+      { key: 'canvas-org'  as Tab, label: 'Canvas Org' },
+    ] : []),
+    { key: 'canvas',     label: 'Canvas' },
+    ...(isPlatformAdmin ? [{ key: 'schema' as Tab, label: 'Schema' }] : []),
   ]
+
+  // Contas no escopo do painel de acessos: todas as ativas da org para
+  // platform e org admin; só a própria para o account admin.
+  //
+  // A condição é "account admin E MAIS NADA": papéis se acumulam — a Ana é
+  // org admin da Apple e também account admin de uma das contas dela. Olhar só
+  // para `adminAccountId` a prenderia numa conta, escondendo as outras três
+  // que ela administra.
+  const ehSomenteAccountAdmin = Boolean(adminAccountId) && !isPlatformAdmin && !isOrgAdmin
+  const contasAtivas = accounts.filter(a => !a.deletedAt && a.status !== 'Inativo')
+  const contasNoEscopo = ehSomenteAccountAdmin
+    ? contasAtivas.filter(a => a.id === adminAccountId)
+    : contasAtivas
 
   return (
     <div className="flex h-[calc(100vh-64px)]">
@@ -604,12 +686,16 @@ export function OrganizacaoDetailPage() {
                 <p className="text-base font-medium text-[#030712] leading-6 truncate">{org.name}</p>
               </div>
             </div>
-            <button
-              onClick={() => setSheetEditOrg(true)}
-              className="text-sm font-medium text-[#030712] bg-white border border-[#e5e7eb] rounded-md px-4 py-2 h-9 shrink-0 ml-4 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:bg-gray-50 transition-colors"
-            >
-              Editar
-            </button>
+            {/* Editar a organização é do org/platform admin. Account admin
+                vê os dados, não os edita. */}
+            {(isPlatformAdmin || isOrgAdmin) && (
+              <button
+                onClick={() => setSheetEditOrg(true)}
+                className="text-sm font-medium text-[#030712] bg-white border border-[#e5e7eb] rounded-md px-4 py-2 h-9 shrink-0 ml-4 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:bg-gray-50 transition-colors"
+              >
+                Editar
+              </button>
+            )}
           </div>
         </div>
 
@@ -711,22 +797,17 @@ export function OrganizacaoDetailPage() {
             </nav>
           </div>
 
-          {/* Page header */}
+          {/* Page header — as abas de Acessos montam o próprio cabeçalho, com
+              título, descrição e ações na mesma linha. Renderizar os dois
+              duplicava o botão "Criar usuário" em linhas diferentes. */}
+          {!abasDoPainel.includes(tab) && (
           <div className="flex items-center justify-between px-6 py-6">
             <div className="flex flex-col gap-2 max-w-[720px]">
               <h2 className="text-[30px] font-bold leading-9 text-[#030712] tracking-normal">
-                {tab === 'conta'     ? 'Conta'
-                  : tab === 'usuarios'  ? 'Usuários'
-                  : tab === 'solucoes'  ? 'Soluções e planos'
-                  : tab === 'contrato'  ? 'Contrato'
-                  : 'Marketplace'}
+                {TITULO_ABA[tab] ?? 'Marketplace'}
               </h2>
               <p className="text-base text-[#6b7280] leading-6">
-                {tab === 'conta'     ? 'Gerencie as contas vinculadas a esta organização, incluindo usuários, acessos e configurações de cada conta.'
-                  : tab === 'usuarios'  ? 'Todos os usuários da organização, independente da conta a que pertencem.'
-                  : tab === 'solucoes'  ? 'Visualize e edite as soluções contratadas por esta organização, seus planos e os componentes que as compõem.'
-                  : tab === 'contrato'  ? 'Acompanhe os contratos ativos e histórico de contratações desta organização, com detalhes de vigência e objetos contratados.'
-                  : 'Esta funcionalidade estará disponível em breve.'}
+                {DESCRICAO_ABA[tab] ?? 'Esta funcionalidade estará disponível em breve.'}
               </p>
             </div>
             <div className="flex items-center gap-3 shrink-0">
@@ -809,6 +890,7 @@ export function OrganizacaoDetailPage() {
               </div>
             </div>
           </div>
+          )}
         </div>
 
         {/* Tab content */}
@@ -819,11 +901,16 @@ export function OrganizacaoDetailPage() {
             <>
               {/* Cards de métricas */}
               <div className="flex divide-x divide-gray-200 bg-white border border-gray-200 rounded-2xl overflow-hidden mb-6">
-                {[
-                  { label: 'Total de usuários',        value: userCount,         loading: loadingMetrics },
-                  { label: 'Contas ativas',             value: activeAccountCount, loading: false         },
-                  { label: 'Administradores da org',   value: orgAdminCount,     loading: false         },
-                ].map(m => (
+                {(ehSomenteAccountAdmin
+                  ? [
+                      { label: 'Contas que você administra', value: contasNoEscopo.length, loading: false },
+                    ]
+                  : [
+                      { label: 'Total de usuários',        value: userCount,          loading: loadingMetrics },
+                      { label: 'Contas ativas',            value: activeAccountCount, loading: false          },
+                      { label: 'Administradores da org',   value: orgAdminCount,      loading: false          },
+                    ]
+                ).map(m => (
                   <div key={m.label} className="flex-1 px-6 py-4 min-w-0">
                     <p className="text-2xl font-bold text-[#030712] leading-8">
                       {m.loading
@@ -836,7 +923,11 @@ export function OrganizacaoDetailPage() {
               </div>
 
               {(() => {
-                const visibleAccounts = accounts.filter(a => showInativosAccount || a.status !== 'Inativo')
+                // contasNoEscopo já vem escopada: uma conta só para o account
+                // admin puro, todas para org e platform admin.
+                const visibleAccounts = ehSomenteAccountAdmin
+                  ? contasNoEscopo
+                  : accounts.filter(a => showInativosAccount || a.status !== 'Inativo')
                 return visibleAccounts.length === 0 ? (
                   <EmptyState message="Nenhuma conta criada" description="Crie uma conta para provisionar o sistema." />
                 ) : (
@@ -911,59 +1002,62 @@ export function OrganizacaoDetailPage() {
           )}
 
           {/* USUÁRIOS TAB */}
-          {tab === 'usuarios' && (
-            <>
-              {loadingMetrics ? (
-                <div className="flex items-center justify-center py-16">
-                  <div className="w-6 h-6 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
-                </div>
-              ) : orgUsers.length === 0 ? (
-                <EmptyState message="Nenhum usuário encontrado" description="Convide usuários para que apareçam aqui." />
-              ) : (
-                <div className="border border-[#e5e7eb] rounded-2xl p-4 overflow-hidden">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-[#e5e7eb]">
-                        <th className="text-left px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10">Nome</th>
-                        <th className="text-left px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10">E-mail</th>
-                        <th className="text-left px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10 w-[180px]">Cargo</th>
-                        <th className="text-left px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10 w-[140px]">Área</th>
-                        <th className="text-center px-2 pb-2.5 align-bottom text-sm font-medium text-[#030712] opacity-40 h-10 w-[120px]">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {orgUsers.map(u => (
-                        <tr
-                          key={u.id}
-                          className="border-b border-[#e5e7eb] last:border-0 hover:bg-gray-50 transition-colors cursor-pointer"
-                          onClick={() => { setSelectedOrgUser(u); setShowOrgUserDetail(true) }}
-                        >
-                          <td className="px-2 py-2 h-[52px]">
-                            <div className="flex items-center gap-2 min-w-0">
-                              <OrgUserAvatar nome={u.nomeCompleto} />
-                              <span className="text-sm font-medium text-[#030712] truncate">{u.nomeCompleto}</span>
-                            </div>
-                          </td>
-                          <td className="px-2 py-2 h-[52px] text-sm text-[#6b7280] truncate max-w-0">
-                            <span className="block truncate">{u.email}</span>
-                          </td>
-                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712] w-[180px]">{u.cargo || '—'}</td>
-                          <td className="px-2 py-2 h-[52px] text-sm text-[#030712] w-[140px]">{u.area || '—'}</td>
-                          <td className="px-2 py-2 h-[52px] text-center w-[120px]">
-                            <Badge
-                              variant={u.status === 'Ativo' ? 'success' : 'secondary'}
-                              showIcon
-                            >
-                              {u.status}
-                            </Badge>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </>
+          {/* ── Acessos: Usuários · Grupos · Objetos ──────────────
+              A aba Usuários era uma tabela simples, sem filtros nem grupos, e
+              convivia com a tela /acessos fazendo o mesmo trabalho noutro
+              escopo — a ponto de /acessos precisar se descrever como
+              "Diferente de Usuários (visão org)". Agora é uma só, e o escopo
+              vem de onde você está. */}
+          {abasDoPainel.includes(tab) && (
+            <div className="-mx-8 -mt-8">
+              <PainelAcessos
+                orgId={id!}
+                org={org}
+                contas={contasNoEscopo}
+                aba={tab === 'objetos' ? 'instancias' : tab === 'grupos' ? 'grupos' : 'usuarios'}
+                titulo={TITULO_ABA[tab] ?? ''}
+                descricao={DESCRICAO_ABA[tab] ?? ''}
+                acoesExtras={
+                  // Criar Org Admin é do nível da organização, não do painel —
+                  // por isso vem daqui e não de dentro dele.
+                  isPlatformAdmin && tab === 'usuarios' ? (
+                    <Button variant="outline" onClick={() => setShowCriarOrgAdmin(true)}>
+                      <UserPlus className="w-4 h-4 mr-1.5" />
+                      Criar Org Admin
+                    </Button>
+                  ) : null
+                }
+              />
+            </div>
+          )}
+
+          {/* ── Componentes ──────────────────────────────────────
+              Catálogo da plataforma — não é escopado por org, igual ao Schema.
+              `embutido` esconde o cabeçalho próprio da página; o título vem
+              das abas. */}
+          {tab === 'componentes' && (
+            <div className="-mx-8">
+              <ComponentesPage embutido />
+            </div>
+          )}
+
+          {/* ── Visualização ──────────────────────────────────────
+              Canvas e Canvas Org liam a org/conta de sessionStorage; aqui o
+              contexto vem da rota, como no resto da página. */}
+          {tab === 'canvas' && (
+            <div className="-mx-8">
+              <CanvasPermissoesPage contas={contasNoEscopo} />
+            </div>
+          )}
+          {tab === 'canvas-org' && (
+            <div className="-mx-8">
+              <CanvasOrgPage orgIdFixo={id!} />
+            </div>
+          )}
+          {tab === 'schema' && (
+            <div className="-mx-8">
+              <SchemaVisualizerPage />
+            </div>
           )}
 
           {/* SOLUÇÕES TAB */}
@@ -1440,27 +1534,10 @@ export function OrganizacaoDetailPage() {
         open={showCriarUsuario}
         onClose={() => setShowCriarUsuario(false)}
       />
-      <UsuarioDetailOrgSheet
-        open={showOrgUserDetail}
-        onClose={() => setShowOrgUserDetail(false)}
-        user={selectedOrgUser}
-        contasVinculadas={selectedOrgUser ? (userAccountsMap[selectedOrgUser.id] ?? []) : []}
-        todasContas={accounts}
-        onVincularSuccess={(userId, conta) => {
-          setUserAccountsMap(prev => ({
-            ...prev,
-            [userId]: [...(prev[userId] ?? []), conta],
-          }))
-        }}
-        onPapelChange={(userId, accountId, novoPapel) => {
-          setUserAccountsMap(prev => ({
-            ...prev,
-            [userId]: (prev[userId] ?? []).map(cv =>
-              cv.account.id === accountId ? { ...cv, papel: novoPapel } : cv
-            ),
-          }))
-        }}
-      />
+      {/* UsuarioDetailOrgSheet saiu daqui: a aba Usuários virou o
+          PainelAcessos, que tem o seu próprio detalhe de usuário. O
+          componente continua no repositório para ser religado quando
+          houver a visão de usuário no nível da organização. */}
       <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </div>
   )
@@ -1531,21 +1608,3 @@ function EmptyState({ message, description }: { message: string; description: st
   )
 }
 
-const AVATAR_COLORS = [
-  { bg: 'bg-blue-100',   text: 'text-blue-700'   },
-  { bg: 'bg-green-100',  text: 'text-green-700'  },
-  { bg: 'bg-violet-100', text: 'text-violet-700' },
-  { bg: 'bg-orange-100', text: 'text-orange-700' },
-  { bg: 'bg-pink-100',   text: 'text-pink-700'   },
-  { bg: 'bg-teal-100',   text: 'text-teal-700'   },
-]
-function OrgUserAvatar({ nome }: { nome: string }) {
-  const hash = nome.split('').reduce((a, c) => a + c.charCodeAt(0), 0)
-  const { bg, text } = AVATAR_COLORS[hash % AVATAR_COLORS.length]
-  const ini = nome.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase()
-  return (
-    <div className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-semibold select-none ${bg} ${text}`}>
-      {ini}
-    </div>
-  )
-}
