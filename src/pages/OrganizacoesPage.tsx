@@ -283,6 +283,17 @@ export function OrganizacoesPage() {
         name={deleteTarget?.name ?? ''}
         onConfirm={() => deleteTarget && handleDeleteOrg(deleteTarget)}
       />
+      <ConfirmDeleteModal
+        open={!!inativarBlockedTarget}
+        onClose={() => setInativarBlockedTarget(null)}
+        variant="blocked"
+        name={inativarBlockedTarget?.name ?? ''}
+        blockedTitle="Não é possível inativar esta organização"
+        blockedDescription="Não é possível inativar esta organização. Existem contas ativas vinculadas. Inative primeiro as contas:"
+        actionLabel="inativar"
+        blocked={inativarBlockedTarget ? podeInativarOrganizacao(inativarBlockedTarget, accounts).impedimentos : []}
+        onNavegar={imp => { setInativarBlockedTarget(null); navigate(`/organizacoes/${inativarBlockedTarget?.id}`) }}
+      />
       <NewOrganizationSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
