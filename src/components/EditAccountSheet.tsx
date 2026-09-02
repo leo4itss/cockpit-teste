@@ -17,10 +17,11 @@ interface Props {
   org: Organization
   onSave: (account: Account) => void
   onUpdateContacts?: (contacts: Contact[]) => void
-  onDelete?: () => void
-  onInativar?: () => void
+  onDelete?: () => void    // exclusão — só quando a conta está inativa
+  onInativar?: () => void  // inativação — quando a conta está ativa
   onActivate?: () => void
-  canDelete?: boolean  // true quando não há contratos/soluções vinculados
+  // Validação de vínculos em src/lib/regrasCicloVida.ts; o botão sempre
+  // aparece e o modal explica o bloqueio quando houver.
 }
 
 /* ── helpers ─────────────────────────────────────────────── */
