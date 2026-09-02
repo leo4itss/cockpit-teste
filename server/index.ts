@@ -251,19 +251,30 @@ app.put('/api/accounts/:id', async (c) => {
 app.delete('/api/accounts/:id', async (c) => {
   const id = c.req.param('id')
 
-  // ── Hierarquia: conta só entra em quarentena se não tiver contratos ativos vinculados ──
+  // Regras de ciclo de vida (PAS-2507): conta só é excluída (quarentena) quando
+  //  - está inativa (hipótese 4);
+  //  - não tem NENHUMA solução vinculada (solutions.account_id);
+  //  - não tem NENHUM contrato vinculado (contratante = nome, mesma org);
+  //  - não tem NENHUM usuário vinculado (hipótese 3).
   const [existing] = await db.select().from(accounts).where(eq(accounts.id, id))
   if (!existing) return c.json({ error: 'Not found' }, 404)
-  const activeContracts = await db.select().from(contracts).where(
-    and(
-      eq(contracts.orgId, existing.orgId),
-      eq(contracts.contratante, existing.name),
-      ne(contracts.status, 'Inativo'),
-    )
-  )
-  if (activeContracts.length > 0) {
+  if (existing.status !== 'Inativo') {
+    return c.json({ error: 'A conta precisa estar inativa antes de ser excluída.' }, 422)
+  }
+
+  const [linkedSolutions, linkedContracts, linkedMembers] = await Promise.all([
+    db.select().from(solutions).where(eq(solutions.accountId, id)),
+    db.select().from(contracts).where(
+      and(eq(contracts.orgId, existing.orgId), eq(contracts.contratante, existing.name)),
+    ),
+    db.select().from(userAccountMemberships).where(eq(userAccountMemberships.accountId, id)),
+  ])
+  if (linkedSolutions.length > 0 || linkedContracts.length > 0 || linkedMembers.length > 0) {
     return c.json({
-      error: `Não é possível excluir a conta: existem ${activeContracts.length} contrato(s) ativo(s) vinculado(s). Inative os contratos primeiro.`,
+      error: 'dependencies',
+      solutionNames: linkedSolutions.map((s: any) => s.name),
+      contractNames: linkedContracts.map((ct: any) => ct.contratante),
+      memberCount: linkedMembers.length,
     }, 422)
   }
 
