@@ -401,17 +401,18 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
         footer={
           <>
             {isInactive ? (
-              onActivate && (
-                <Button variant="ghost" onClick={onActivate} className="mr-auto text-green-700 hover:bg-green-50">
-                  Ativar conta
-                </Button>
-              )
-            ) : canDelete ? (
-              onDelete && (
-                <Button variant="ghost" onClick={onDelete} className="mr-auto text-[#dc2626] hover:bg-red-50">
-                  Excluir conta
-                </Button>
-              )
+              <div className="mr-auto flex items-center gap-1">
+                {onActivate && (
+                  <Button variant="ghost" onClick={onActivate} className="text-green-700 hover:bg-green-50">
+                    Ativar conta
+                  </Button>
+                )}
+                {onDelete && (
+                  <Button variant="ghost" onClick={onDelete} className="text-[#dc2626] hover:bg-red-50">
+                    Excluir conta
+                  </Button>
+                )}
+              </div>
             ) : (
               onInativar && (
                 <Button variant="ghost" onClick={onInativar} className="mr-auto text-amber-600 hover:bg-amber-50">
