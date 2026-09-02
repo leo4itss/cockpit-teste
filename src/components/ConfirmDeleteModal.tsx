@@ -171,54 +171,6 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
     )
   }
 
-  // --- CONTRACT ---
-  if (variant === 'contract') {
-    const canConfirm = typed === name
-    return (
-      <Modal
-        open={open}
-        onClose={handleClose}
-        title="Excluir contrato"
-        maxWidth="max-w-[480px]"
-        footer={
-          <>
-            <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
-            <Button
-              variant="destructive"
-              onClick={handleConfirm}
-              disabled={!canConfirm}
-              className={!canConfirm ? 'opacity-50 cursor-not-allowed' : ''}
-            >
-              Excluir
-            </Button>
-          </>
-        }
-      >
-        <div className="flex flex-col gap-4 text-sm text-[#030712]">
-          <p>Tem certeza que deseja excluir o contrato de <strong>"{name}"</strong>?</p>
-          <div className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-            <p className="text-xs text-red-800">
-              Esta ação é <strong>irreversível</strong>. O contrato e todos os seus objetos serão removidos permanentemente.
-            </p>
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-[#030712]">
-              Digite <strong>"{name}"</strong> para confirmar:
-            </label>
-            <input
-              type="text"
-              value={typed}
-              onChange={e => setTyped(e.target.value)}
-              placeholder={name}
-              className="w-full rounded-md border border-[#e5e7eb] px-3 py-2 text-sm text-[#030712] placeholder:text-[#9ca3af] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-red-500"
-            />
-          </div>
-        </div>
-      </Modal>
-    )
-  }
-
   // --- ACCOUNT ---
   if (variant === 'account') {
     const exclusaoPermanente = new Date()
