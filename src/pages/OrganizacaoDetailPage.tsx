@@ -1401,23 +1401,22 @@ export function OrganizacaoDetailPage() {
           org={org}
           onSave={handleSaveAccount}
           onUpdateContacts={handleUpdateContacts}
-          canDelete={accountCanDelete(editingAccount)}
           onDelete={() => {
             setEditingAccount(null)
-            if (accountActiveContracts(editingAccount).length > 0) {
-              setAccountExcluirBlockedTarget(editingAccount)
-            } else {
+            if (vExcluirConta(editingAccount).permitido) {
               setAccountExcluirTarget(editingAccount)
               setAccountExcluirModal(true)
+            } else {
+              setAccountExcluirBlockedTarget(editingAccount)
             }
           }}
           onInativar={() => {
             setEditingAccount(null)
-            if (accountActiveContracts(editingAccount).length > 0) {
-              setAccountInativarBlockedTarget(editingAccount)
-            } else {
+            if (vInativarConta(editingAccount).permitido) {
               setAccountInativarTarget(editingAccount)
               setAccountInativarModal(true)
+            } else {
+              setAccountInativarBlockedTarget(editingAccount)
             }
           }}
           onActivate={() => handleActivateAccount(editingAccount)}
