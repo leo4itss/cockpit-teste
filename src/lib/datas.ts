@@ -38,6 +38,23 @@ function jaFormatada(valor: unknown): valor is string {
   return typeof valor === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(valor)
 }
 
+/**
+ * Converte para `Date` local ao meio-dia (evita o off-by-one de fuso em datas
+ * secas). Aceita `dd/mm/aaaa`, `aaaa-mm-dd` e ISO completo — os dois formatos
+ * que convivem no banco (fixtures antigos vs contratos criados pela tela).
+ * Devolve null no que o `Date` não interpreta.
+ */
+export function parsearData(valor: string | number | Date | null | undefined): Date | null {
+  if (valor === null || valor === undefined || valor === '') return null
+  if (typeof valor === 'string') {
+    const br = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(valor)
+    if (br) return new Date(Number(br[3]), Number(br[2]) - 1, Number(br[1]), 12)
+    const iso = /^(\d{4})-(\d{2})-(\d{2})$/.exec(valor)
+    if (iso) return new Date(Number(iso[1]), Number(iso[2]) - 1, Number(iso[3]), 12)
+  }
+  return parse(valor)
+}
+
 const PAD = (n: number) => String(n).padStart(2, '0')
 
 /**
