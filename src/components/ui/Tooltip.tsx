@@ -29,6 +29,7 @@ export function Tooltip({ content, children, width = 'w-52', tabIndexed = true, 
   const show = hovered || focused
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const tooltipRef = useRef<HTMLDivElement>(null)
 
   useLayoutEffect(() => {
     if (show && containerRef.current) {
