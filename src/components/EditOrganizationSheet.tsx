@@ -14,10 +14,11 @@ interface Props {
   onClose: () => void
   org: Organization
   onSave: (org: Organization) => void
-  onDelete?: () => void      // exclusão permanente (quando canDelete=true)
-  onInativar?: () => void    // inativação reversível (quando canDelete=false)
+  onDelete?: () => void      // exclusão permanente — só quando a org está inativa
+  onInativar?: () => void    // inativação reversível — quando a org está ativa
   onActivate?: () => void
-  canDelete?: boolean        // true = sem soluções/contratos → mostrar Excluir
+  // A validação de vínculos vive em src/lib/regrasCicloVida.ts; aqui o botão
+  // sempre aparece e o modal explica o bloqueio quando houver.
 }
 
 /* ── helpers ─────────────────────────────────────────────── */
