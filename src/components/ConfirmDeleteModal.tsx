@@ -214,7 +214,7 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-[#030712]">
-              Digite <strong>"{name}"</strong> para confirmar:
+              Digite <strong>"{name}"</strong> para confirmar a exclusão:
             </label>
             <input
               type="text"
