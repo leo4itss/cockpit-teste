@@ -1448,7 +1448,6 @@ export function OrganizacaoDetailPage() {
           onActivate={() => handleActivateSolution(editingSolution)}
           tiposLicenca={tiposLicenca}
           componentes={componentes}
-          contracts={contracts}
         />
       )}
       <ContractDetailSheet
