@@ -199,7 +199,7 @@ const ESTADOS = [
 
 /* ── main ─────────────────────────────────────────────────── */
 
-export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdateContacts, onDelete, onInativar, onActivate, canDelete }: Props) {
+export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdateContacts, onDelete, onInativar, onActivate }: Props) {
   const { arquitetoOptions } = useUsers()
   const { toasts, toast, dismiss } = useToast()
   const isInactive = account.status === 'Inativo'
