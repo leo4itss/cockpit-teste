@@ -162,6 +162,7 @@ export function OrganizacaoDetailPage() {
 
   // Delete solution modal
   const [solutionDeleteTarget, setSolutionDeleteTarget] = useState<Solution | null>(null)
+  const [solutionDeleteBlockedTarget, setSolutionDeleteBlockedTarget] = useState<Solution | null>(null)
 
   // Inativar solution modal
   const [solutionInativarTarget, setSolutionInativarTarget] = useState<Solution | null>(null)
