@@ -33,21 +33,21 @@ export function Tooltip({ content, children, width = 'w-52', tabIndexed = true, 
   useLayoutEffect(() => {
     if (show && containerRef.current) {
       const rect = containerRef.current.getBoundingClientRect()
+      const tip = tooltipRef.current
       // Balão centralizado no alvo, mas preso à viewport — sem isso um alvo
       // encostado na borda (ex.: botão no canto do rodapé de um Sheet) fica
-      // com metade do texto fora da tela.
-      const meiaLargura = tooltipRef.current
-        ? tooltipRef.current.offsetWidth / 2
-        : 110
+      // com metade do texto fora da tela. A meia-largura real só existe depois
+      // do 1º render do balão; até lá usa uma estimativa segura.
+      const meiaLargura = tip ? tip.offsetWidth / 2 : 128
       const centro = rect.left + window.scrollX + rect.width / 2
       const min = window.scrollX + meiaLargura + 8
       const max = window.scrollX + window.innerWidth - meiaLargura - 8
-      setPos({
-        top: rect.top + window.scrollY,
-        left: Math.min(Math.max(centro, min), max),
-      })
+      const left = Math.min(Math.max(centro, min), max)
+      if (!pos || pos.top !== rect.top + window.scrollY || pos.left !== left) {
+        setPos({ top: rect.top + window.scrollY, left })
+      }
     }
-  }, [show])
+  }, [show, pos])
 
   const portalContent = show && pos && createPortal(
     <div
