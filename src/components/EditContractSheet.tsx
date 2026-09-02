@@ -24,9 +24,9 @@ interface Props {
   /** Demais contratos da org — usados para checar exclusividade de componente por conta. */
   contracts: Contract[]
   onSave: (contract: Contract) => void
-  onDelete?: () => void
   onInativar?: () => void
   onActivate?: () => void
+  // Sem onDelete: contrato nunca é excluível (registro jurídico e fiscal).
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
