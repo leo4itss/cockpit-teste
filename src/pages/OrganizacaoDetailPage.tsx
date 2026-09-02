@@ -108,29 +108,52 @@ export function OrganizacaoDetailPage() {
   const [showOrgUserDetail, setShowOrgUserDetail] = useState(false)
   const [userAccountsMap, setUserAccountsMap] = useState<Record<string, ContaVinculada[]>>({})
   useEffect(() => {
+    // Mock imediato (mesma estratégia dos demais dados desta tela) — sem isso,
+    // rodando sem backend, a aba Usuários e a regra de exclusão de conta por
+    // usuário vinculado (hipótese 3) não teriam dados.
+    setUserCount(mockUsers.length)
+    setOrgUsers(mockUsers)
+    setLoadingMetrics(false)
     api.getUsers()
       .then((users: User[]) => {
         setUserCount(users.length)
         setOrgUsers(users)
         setLoadingMetrics(false)
       })
-      .catch(() => setLoadingMetrics(false))
+      .catch(() => {})
   }, [])
 
-  // Carrega membros por conta para montar userAccountsMap (necessário para UsuarioDetailOrgSheet)
+  // Carrega membros por conta para montar userAccountsMap (necessário para
+  // UsuarioDetailOrgSheet e para a regra de exclusão de conta).
   useEffect(() => {
     if (accounts.length === 0) return
+
+    // Fallback local a partir de accountMembrosIds — usado quando a API não responde.
+    const mapaMock = (): Record<string, ContaVinculada[]> => {
+      const map: Record<string, ContaVinculada[]> = {}
+      for (const acc of accounts) {
+        for (const userId of mockAccountMembrosIds[acc.id] ?? []) {
+          ;(map[userId] ??= []).push({ account: acc, papel: 'member' })
+        }
+      }
+      return map
+    }
+    setUserAccountsMap(mapaMock())
+
     Promise.all(
       accounts.map(acc =>
         api.getAccountMembros(acc.id)
-          .then((mems: any[]) => mems.map(m => ({ userId: m.id as string, account: acc, papel: m.papel as 'member' | 'account_admin' })))
-          .catch(() => [] as { userId: string; account: Account; papel: 'member' | 'account_admin' }[])
+          .then((mems: any[]) => ({ acc, mems, ok: true as const }))
+          .catch(() => ({ acc, mems: [] as any[], ok: false as const }))
       )
     ).then(results => {
+      // Se NENHUMA chamada respondeu, mantém o fallback local.
+      if (results.every(r => !r.ok)) return
       const map: Record<string, ContaVinculada[]> = {}
-      results.flat().forEach(({ userId, account, papel }) => {
-        if (!map[userId]) map[userId] = []
-        map[userId].push({ account, papel })
+      results.forEach(({ acc, mems }) => {
+        mems.forEach((m: any) => {
+          ;(map[m.id as string] ??= []).push({ account: acc, papel: m.papel as 'member' | 'account_admin' })
+        })
       })
       setUserAccountsMap(map)
     })
