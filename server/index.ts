@@ -630,8 +630,9 @@ app.put('/api/contracts/:id', async (c) => {
 })
 
 app.delete('/api/contracts/:id', async (c) => {
-  await db.delete(contracts).where(eq(contracts.id, c.req.param('id')))
-  return c.json({ ok: true })
+  // Contrato é registro jurídico e fiscal — nunca excluível, só inativável
+  // (PUT com status 'Inativo'). Preservado para auditoria.
+  return c.json({ error: 'Contratos não podem ser excluídos. Utilize a inativação.' }, 409)
 })
 
 // ── Users ─────────────────────────────────────────────────────
