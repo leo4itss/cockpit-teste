@@ -514,12 +514,6 @@ export function OrganizacaoDetailPage() {
     setEditingAccount(null)
   }
 
-  // Consistente com a mesma trava usada em "Inativar conta": só pode excluir
-  // (colocar em quarentena) uma conta sem contratos ativos vinculados a ela.
-  function accountCanDelete(account: Account) {
-    return accountActiveContracts(account).length === 0
-  }
-
   async function handleInativarContract(contract: Contract) {
     try {
       const updated = await api.updateContract(contract.id, { ...contract, status: 'Inativo' })
