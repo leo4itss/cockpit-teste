@@ -1371,19 +1371,15 @@ export function OrganizacaoDetailPage() {
         onClose={() => setSheetEditOrg(false)}
         org={org}
         onSave={updated => handleEditOrg(updated)}
-        canDelete={orgCanDelete()}
         onDelete={() => {
           setSheetEditOrg(false)
-          if (orgAccountsBlockingExclusao().length > 0 || orgContractsBlockingExclusao().length > 0) {
-            setOrgExcluirBlocked(true)
-          } else {
-            setOrgExcluirModal(true)
-          }
+          if (vExcluirOrg?.permitido) setOrgExcluirModal(true)
+          else setOrgExcluirBlocked(true)
         }}
         onInativar={() => {
           setSheetEditOrg(false)
-          if (orgActiveAccounts().length > 0) setOrgInativarBlocked(true)
-          else setOrgDeleteModal('inativar')
+          if (vInativarOrg?.permitido) setOrgDeleteModal('inativar')
+          else setOrgInativarBlocked(true)
         }}
         onActivate={handleActivateOrg}
       />
