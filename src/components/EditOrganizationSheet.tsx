@@ -220,17 +220,18 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete, on
         footer={
           <>
             {isInactive ? (
-              onActivate && (
-                <Button variant="ghost" onClick={onActivate} className="mr-auto text-green-700 hover:bg-green-50">
-                  Ativar organização
-                </Button>
-              )
-            ) : canDelete ? (
-              onDelete && (
-                <Button variant="ghost" onClick={onDelete} className="mr-auto text-red-600 hover:bg-red-50">
-                  Excluir organização
-                </Button>
-              )
+              <div className="mr-auto flex items-center gap-1">
+                {onActivate && (
+                  <Button variant="ghost" onClick={onActivate} className="text-green-700 hover:bg-green-50">
+                    Ativar organização
+                  </Button>
+                )}
+                {onDelete && (
+                  <Button variant="ghost" onClick={onDelete} className="text-red-600 hover:bg-red-50">
+                    Excluir organização
+                  </Button>
+                )}
+              </div>
             ) : (
               onInativar && (
                 <Button variant="ghost" onClick={onInativar} className="mr-auto text-amber-600 hover:bg-amber-50">
