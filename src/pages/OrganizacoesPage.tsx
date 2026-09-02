@@ -19,6 +19,7 @@ export function OrganizacoesPage() {
   const isAccountAdmin = useIsAccountAdmin()
   const adminOrgId = useAdminOrgId()
   const [orgs, setOrgs] = useState<Organization[]>([])
+  const [accounts, setAccounts] = useState<Account[]>([])
   const [loading, setLoading] = useState(true)
   const [error] = useState<string | null>(null)
   const [showInativas, setShowInativas] = useState(false)
@@ -26,6 +27,7 @@ export function OrganizacoesPage() {
   const [sheetOpen, setSheetOpen] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<Organization | null>(null)
   const [deleteModal, setDeleteModal] = useState<'inativar' | null>(null)
+  const [inativarBlockedTarget, setInativarBlockedTarget] = useState<Organization | null>(null)
 
   // Account Admin não tem acesso à página de Organizações
   // (só gerencia sua própria conta — usa a aba Acessos)
