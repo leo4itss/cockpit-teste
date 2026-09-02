@@ -573,6 +573,13 @@ export function OrganizacaoDetailPage() {
     setEditingSolution(null)
   }
 
+  // Contratos ativos vinculados a esta solução — bloqueiam a inativação dela.
+  // Regra pré-existente, não redefinida pela PAS-2507 (que trata de Contrato,
+  // Conta e Organização); por isso continua como checagem local.
+  function solutionActiveContracts(solution: Solution) {
+    return contracts.filter(c => c.status !== 'Inativo' && c.objetos.some(o => o.solucao === solution.name))
+  }
+
   function requestInactivateSolution(solution: Solution) {
     setEditingSolution(null)
     if (solutionActiveContracts(solution).length > 0) {
