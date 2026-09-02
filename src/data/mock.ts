@@ -1351,6 +1351,7 @@ export const accountMembrosIds: Record<string, string[]> = {
   'acc-comgas': ['usr-fernando', 'usr-marcelo-c', 'usr-neide', 'usr-leo'],
   'a1':         ['2', 'usr-pedro', 'usr-sofia', 'usr-rafael', 'usr-julia'],  // Apple: Ana + 4 membros
   'a2':         ['4', 'usr-lucas', 'usr-beatriz', 'usr-thiago'],             // Santacruz: Carla + 3 membros
+  'a2-arquivo': ['usr-lucas', 'usr-thiago'],                                 // PAS-2507: usuários bloqueiam a exclusão da conta
 }
 
 // ── Membros de grupo — fallback local ─────────────────────────
