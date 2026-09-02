@@ -709,6 +709,35 @@ export const solutions: Solution[] = [
     status: 'Ativo',
     createdAt: '01/01/2026',
   },
+  // ── Fixtures das regras de ciclo de vida (PAS-2507) ──────────────────────
+  // Cenário: solução inativa vinculada a uma conta (accountId) e a um componente,
+  // fora de qualquer contrato → exclusão bloqueada só pelo componente; e mantém
+  // a conta 'Apple Labs' sem poder ser excluída.
+  {
+    id: 's6',
+    orgId: '1',
+    accountId: 'a1-labs',
+    name: 'Apple Labs Sandbox',
+    componenteIds: ['comp-1'],
+    plans: [],
+    description: 'Ambiente de laboratório da conta Apple Labs.',
+    arquitetoPAS: 'Marcelo Gomes',
+    status: 'Inativo',
+    createdAt: '02/04/2026',
+  },
+  // Cenário: solução inativa, sem componente e fora de qualquer contrato →
+  // exclusão permitida.
+  {
+    id: 's7',
+    orgId: '2',
+    name: 'Analytics Legado',
+    componenteIds: [],
+    plans: [],
+    description: 'Versão descontinuada do Cockpit Analytics.',
+    arquitetoPAS: 'Marcelo Gomes',
+    status: 'Inativo',
+    createdAt: '10/10/2025',
+  },
 ]
 
 export const contracts: Contract[] = [
