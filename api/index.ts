@@ -108,26 +108,22 @@ app.put('/organizations/:id', async (c) => {
 })
 app.delete('/organizations/:id', async (c) => {
   const id = c.req.param('id')
-  const [orgAccounts, orgContracts] = await Promise.all([
-    db.select().from(accounts).where(eq(accounts.orgId, id)),
-    db.select().from(contracts).where(eq(contracts.orgId, id)),
-  ])
-  // Conta usa o modelo de quarentena (deletedAt), não `status` — ver CLAUDE.md.
-  const activeAccounts = orgAccounts.filter((a: any) => !a.deletedAt)
-  // Qualquer contrato não inativado bloqueia a exclusão — inclui os estados de
-  // provisionamento ('Provisionando', 'Falha no provisionamento'), que antes
-  // escapavam da trava por não serem literalmente 'Ativo'.
-  const activeContracts = orgContracts.filter((ct: any) => ct.status !== 'Inativo')
-  if (activeAccounts.length > 0 || activeContracts.length > 0) {
-    return c.json({
-      error: 'dependencies',
-      activeAccounts: activeAccounts.length,
-      activeContracts: activeContracts.length,
-      accountNames: activeAccounts.map((a: any) => a.name),
-      contractNames: activeContracts.map((ct: any) => ct.contratante),
-    }, 422)
+
+  // Regras de ciclo de vida (PAS-2507): pré-requisito, nunca cascata.
+  //  - a organização precisa estar inativa (hipótese 4);
+  //  - não pode haver NENHUMA conta vinculada — inclui contas em quarentena.
+  const [org] = await db.select().from(organizations).where(eq(organizations.id, id))
+  if (!org) return c.json({ error: 'Not found' }, 404)
+  if (org.status !== 'Inativo') {
+    return c.json({ error: 'A organização precisa estar inativa antes de ser excluída.' }, 422)
   }
-  await db.delete(accounts).where(eq(accounts.orgId, id))
+
+  const orgAccounts = await db.select().from(accounts).where(eq(accounts.orgId, id))
+  if (orgAccounts.length > 0) {
+    return c.json({ error: 'dependencies', accountNames: orgAccounts.map((a: any) => a.name) }, 422)
+  }
+
+  // Sem contas, contratos e soluções ficam inalcançáveis — limpeza física.
   await db.delete(contracts).where(eq(contracts.orgId, id))
   await db.delete(solutions).where(eq(solutions.orgId, id))
   await db.delete(organizations).where(eq(organizations.id, id))
