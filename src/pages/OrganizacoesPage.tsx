@@ -41,6 +41,11 @@ export function OrganizacoesPage() {
         setOrgs(mockOrgs)
         setLoading(false)
       })
+    // Contas — necessárias para validar a inativação da organização (todas as
+    // contas precisam estar inativas). Ver src/lib/regrasCicloVida.ts.
+    api.getAccounts()
+      .then(setAccounts)
+      .catch(() => setAccounts(mockAccounts))
   }, [])
 
   if (isAccountAdminOnly) {
