@@ -192,13 +192,18 @@ export function podeExcluirConta(
 }
 
 /** Solução: excluível apenas sem nenhum componente e sem nenhum contrato vinculado. */
-export function podeExcluirSolucao(sol: Solution, contratos: Contract[]): Veredito {
+export function podeExcluirSolucao(
+  sol: Solution,
+  componentes: Componente[],
+  contratos: Contract[],
+): Veredito {
   // HIPÓTESE 4: exclusão exige que o registro esteja inativo.
   if (!inativo(sol.status)) return { permitido: false, motivo: 'registro-ativo', impedimentos: [] }
 
   const impedimentos: Impedimento[] = [
     ...(sol.componenteIds ?? []).map((id): Impedimento => ({
-      tipo: 'componente', id, nome: id,
+      tipo: 'componente', id,
+      nome: componentes.find(c => c.id === id)?.nome ?? id,
     })),
     ...contratosDaSolucao(sol, contratos).map((c): Impedimento => ({
       tipo: 'contrato', id: c.id, nome: rotuloContrato(c),
