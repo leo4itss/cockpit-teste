@@ -181,7 +181,6 @@ export function EditSolutionSheet({
   onActivate,
   tiposLicenca,
   componentes,
-  contracts,
 }: Props) {
   const { arquitetoOptions } = useUsers()
   const { toasts, toast, dismiss } = useToast()
