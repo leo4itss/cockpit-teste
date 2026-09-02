@@ -427,16 +427,6 @@ export function EditSolutionSheet({
   // Planos inativados = histórico de versões anteriores
   const inactivePlans = (solution.plans ?? []).filter(p => p.statusVersao === 'inativo')
 
-  // Sem contratos vinculados → pode excluir direto
-  const hasLinkedContracts = (contracts ?? []).some(ct => {
-    try {
-      const objs: Array<{ solucao: string }> = Array.isArray(ct.objetos)
-        ? ct.objetos
-        : (typeof ct.objetos === 'string' ? JSON.parse(ct.objetos) : [])
-      return objs.some(obj => obj.solucao === solution.name)
-    } catch { return false }
-  })
-
   return (
     <>
       <Sheet
