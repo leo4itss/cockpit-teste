@@ -57,7 +57,14 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
   }
 
   // --- BLOCKED ---
+  // Ação barrada por pré-requisito. Explica a regra, lista os registros
+  // impeditivos agrupados por tipo e navega para cada um. Sem confirmação.
   if (variant === 'blocked') {
+    const itens = blocked ?? []
+    const grupos = GRUPO_ORDEM
+      .map(tipo => ({ tipo, itens: itens.filter(i => i.tipo === tipo) }))
+      .filter(g => g.itens.length > 0)
+
     return (
       <Modal
         open={open}
@@ -79,53 +86,38 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
             </p>
           </div>
 
-          {(blocked?.accounts?.length ?? 0) > 0 && (
-            <div className="flex flex-col gap-1.5">
-              <p className="text-sm font-medium text-[#030712]">
-                {blocked!.accounts!.length} conta{blocked!.accounts!.length !== 1 ? 's' : ''} ativa{blocked!.accounts!.length !== 1 ? 's' : ''} vinculada{blocked!.accounts!.length !== 1 ? 's' : ''}
-              </p>
-              <ul className="flex flex-col gap-1 pl-1">
-                {blocked!.accounts!.map((name, i) => (
-                  <li key={i} className="flex items-center gap-2 text-sm text-[#6b7280]">
-                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
-                    <span>{name}</span>
-                  </li>
-                ))}
+          {grupos.map(({ tipo, itens }) => (
+            <div key={tipo} className="flex flex-col gap-1.5">
+              <p className="text-sm font-medium text-[#030712]">{GRUPO_LABEL[tipo](itens.length)}</p>
+              <ul className="flex flex-col gap-1">
+                {itens.map(imp => {
+                  const linha = (
+                    <>
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+                      <span className="flex-1 min-w-0 truncate">{imp.nome}</span>
+                      {imp.detalhe && <span className="text-xs text-[#9ca3af] shrink-0">{imp.detalhe}</span>}
+                    </>
+                  )
+                  return onNavegar ? (
+                    <li key={`${imp.tipo}-${imp.id}`}>
+                      <button
+                        type="button"
+                        onClick={() => { handleClose(); onNavegar(imp) }}
+                        className="w-full flex items-center gap-2 text-left text-sm text-[#6b7280] rounded-md px-2 py-1.5 -mx-2 hover:bg-gray-50 hover:text-[#030712] transition-colors"
+                      >
+                        {linha}
+                        <ChevronRight className="w-4 h-4 text-[#9ca3af] shrink-0" />
+                      </button>
+                    </li>
+                  ) : (
+                    <li key={`${imp.tipo}-${imp.id}`} className="flex items-center gap-2 text-sm text-[#6b7280] px-0 py-1.5">
+                      {linha}
+                    </li>
+                  )
+                })}
               </ul>
             </div>
-          )}
-
-          {(blocked?.solutions?.length ?? 0) > 0 && (
-            <div className="flex flex-col gap-1.5">
-              <p className="text-sm font-medium text-[#030712]">
-                {blocked!.solutions!.length} solução{blocked!.solutions!.length !== 1 ? 'ões' : ''} ativa{blocked!.solutions!.length !== 1 ? 's' : ''} vinculada{blocked!.solutions!.length !== 1 ? 's' : ''}
-              </p>
-              <ul className="flex flex-col gap-1 pl-1">
-                {blocked!.solutions!.map((name, i) => (
-                  <li key={i} className="flex items-center gap-2 text-sm text-[#6b7280]">
-                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
-                    <span>{name}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {(blocked?.contracts?.length ?? 0) > 0 && (
-            <div className="flex flex-col gap-1.5">
-              <p className="text-sm font-medium text-[#030712]">
-                {blocked!.contracts!.length} contrato{blocked!.contracts!.length !== 1 ? 's' : ''} ativo{blocked!.contracts!.length !== 1 ? 's' : ''} vigente{blocked!.contracts!.length !== 1 ? 's' : ''}
-              </p>
-              <ul className="flex flex-col gap-1 pl-1">
-                {blocked!.contracts!.map((name, i) => (
-                  <li key={i} className="flex items-center gap-2 text-sm text-[#6b7280]">
-                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
-                    <span>{name}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          ))}
         </div>
       </Modal>
     )
