@@ -265,7 +265,7 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
 
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-[#030712]">
-              Digite <strong>"{name}"</strong> para confirmar:
+              Digite o nome da organização para confirmar a inativação:
             </label>
             <input
               type="text"
@@ -274,34 +274,6 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
               placeholder={name}
               className="w-full rounded-md border border-[#e5e7eb] px-3 py-2 text-sm text-[#030712] placeholder:text-[#9ca3af] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-amber-500"
             />
-          </div>
-        </div>
-      </Modal>
-    )
-  }
-
-  // --- EXCLUIR-CONTA ---
-  if (variant === 'excluir-conta') {
-    return (
-      <Modal
-        open={open}
-        onClose={handleClose}
-        title="Excluir conta"
-        maxWidth="max-w-[480px]"
-        footer={
-          <>
-            <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
-            <Button variant="destructive" onClick={handleConfirm}>Excluir</Button>
-          </>
-        }
-      >
-        <div className="flex flex-col gap-4 text-sm text-[#030712]">
-          <p>Tem certeza que deseja excluir a conta <strong>"{name}"</strong>?</p>
-          <div className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-            <p className="text-xs text-red-800">
-              Esta ação é <strong>irreversível</strong>. A conta e todos os seus dados serão removidos permanentemente.
-            </p>
           </div>
         </div>
       </Modal>
