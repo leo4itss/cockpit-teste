@@ -110,32 +110,26 @@ app.put('/api/organizations/:id', async (c) => {
 app.delete('/api/organizations/:id', async (c) => {
   const id = c.req.param('id')
 
-  // Verificar dependências bloqueantes — exclusão permanente só é permitida quando
-  // todas as contas já passaram pela quarentena (deletedAt preenchido) e todos os
-  // contratos estão inativos.
-  const [orgAccounts, orgContracts] = await Promise.all([
-    db.select().from(accounts).where(eq(accounts.orgId, id)),
-    db.select().from(contracts).where(eq(contracts.orgId, id)),
-  ])
-  // Conta usa o modelo de quarentena (deletedAt), não `status` — ver CLAUDE.md.
-  const activeAccounts = orgAccounts.filter((a: any) => !a.deletedAt)
-  // Qualquer contrato não inativado bloqueia a exclusão — inclui os estados de
-  // provisionamento ('Provisionando', 'Falha no provisionamento'), que antes
-  // escapavam da trava por não serem literalmente 'Ativo'.
-  const activeContracts = orgContracts.filter((ct: any) => ct.status !== 'Inativo')
+  // Regras de ciclo de vida (PAS-2507): pré-requisito, nunca cascata.
+  //  - a organização precisa estar inativa (hipótese 4);
+  //  - não pode haver NENHUMA conta vinculada — inclui contas em quarentena
+  //    (deletedAt preenchido), que continuam sendo registro vinculado.
+  const [org] = await db.select().from(organizations).where(eq(organizations.id, id))
+  if (!org) return c.json({ error: 'Not found' }, 404)
+  if (org.status !== 'Inativo') {
+    return c.json({ error: 'A organização precisa estar inativa antes de ser excluída.' }, 422)
+  }
 
-  if (activeAccounts.length > 0 || activeContracts.length > 0) {
+  const orgAccounts = await db.select().from(accounts).where(eq(accounts.orgId, id))
+  if (orgAccounts.length > 0) {
     return c.json({
       error: 'dependencies',
-      activeAccounts: activeAccounts.length,
-      activeContracts: activeContracts.length,
-      accountNames: activeAccounts.map((a: any) => a.name),
-      contractNames: activeContracts.map((ct: any) => ct.contratante),
+      accountNames: orgAccounts.map((a: any) => a.name),
     }, 422)
   }
 
-  // Cascata: excluir contas (já inativas/excluídas) e contratos
-  await db.delete(accounts).where(eq(accounts.orgId, id))
+  // Sem contas, contratos e soluções da org ficam inalcançáveis — limpeza física,
+  // não inativação em cascata (nenhum status de dependente é alterado).
   await db.delete(contracts).where(eq(contracts.orgId, id))
   await db.delete(solutions).where(eq(solutions.orgId, id))
   await db.delete(organizations).where(eq(organizations.id, id))
