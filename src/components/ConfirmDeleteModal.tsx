@@ -151,12 +151,12 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
           <div className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg">
             <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
             <p className="text-xs text-red-800">
-              Esta ação é <strong>irreversível</strong>. A solução e todos os seus planos serão removidos permanentemente.
+              Esta ação é <strong>permanente</strong>. A solução e todos os seus planos serão removidos permanentemente.
             </p>
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-[#030712]">
-              Digite <strong>"{name}"</strong> para confirmar:
+              Esta ação é permanente. Digite <strong>"{name}"</strong> para confirmar a exclusão:
             </label>
             <input
               type="text"
