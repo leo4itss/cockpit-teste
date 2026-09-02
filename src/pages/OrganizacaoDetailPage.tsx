@@ -1239,12 +1239,14 @@ export function OrganizacaoDetailPage() {
         variant="blocked"
         name={org?.name ?? ''}
         blockedTitle="Não é possível excluir esta organização"
-        blockedDescription="Uma organização só pode ser excluída permanentemente quando todas as contas vinculadas já tiverem sido excluídas (quarentena concluída) e todos os contratos estiverem inativos. Essa ação é irreversível, por isso as dependências precisam estar totalmente resolvidas antes."
+        blockedDescription={
+          vExcluirOrg?.motivo === 'registro-ativo'
+            ? 'Não é possível excluir esta organização. Ela precisa estar inativa antes de ser excluída.'
+            : 'Não é possível excluir esta organização. Existem contas vinculadas:'
+        }
         actionLabel="excluir"
-        blocked={{
-          accounts: orgAccountsBlockingExclusao().map(a => a.name),
-          contracts: orgContractsBlockingExclusao().map(c => c.contratante),
-        }}
+        blocked={vExcluirOrg?.impedimentos ?? []}
+        onNavegar={navegarParaImpedimento}
       />
       <ConfirmDeleteModal
         open={orgInativarBlocked}
@@ -1252,9 +1254,10 @@ export function OrganizacaoDetailPage() {
         variant="blocked"
         name={org?.name ?? ''}
         blockedTitle="Não é possível inativar esta organização"
-        blockedDescription="Uma organização só pode ser inativada quando todas as contas vinculadas a ela já estiverem inativas. Inative cada conta abaixo (ou aguarde a inativação delas) e tente novamente."
+        blockedDescription="Não é possível inativar esta organização. Existem contas ativas vinculadas. Inative primeiro as contas:"
         actionLabel="inativar"
-        blocked={{ accounts: orgActiveAccounts().map(a => a.name) }}
+        blocked={vInativarOrg?.impedimentos ?? []}
+        onNavegar={navegarParaImpedimento}
       />
       <ConfirmDeleteModal
         open={accountInativarModal}
@@ -1269,9 +1272,10 @@ export function OrganizacaoDetailPage() {
         variant="blocked"
         name={accountInativarBlockedTarget?.name ?? ''}
         blockedTitle="Não é possível inativar esta conta"
-        blockedDescription="Uma conta só pode ser inativada quando não houver mais nenhum contrato ativo vinculado a ela. Inative cada contrato abaixo primeiro e tente novamente."
+        blockedDescription="Não é possível inativar esta conta. Existem contratos vigentes vinculados. Inative primeiro os contratos:"
         actionLabel="inativar"
-        blocked={{ contracts: accountInativarBlockedTarget ? accountActiveContracts(accountInativarBlockedTarget).map(c => c.contratante) : [] }}
+        blocked={accountInativarBlockedTarget ? vInativarConta(accountInativarBlockedTarget).impedimentos : []}
+        onNavegar={navegarParaImpedimento}
       />
       <ConfirmDeleteModal
         open={accountExcluirModal}
@@ -1286,9 +1290,14 @@ export function OrganizacaoDetailPage() {
         variant="blocked"
         name={accountExcluirBlockedTarget?.name ?? ''}
         blockedTitle="Não é possível excluir esta conta"
-        blockedDescription="Uma conta só pode ser excluída (colocada em quarentena) quando não houver mais nenhum contrato ativo vinculado a ela. Inative cada contrato abaixo primeiro e tente novamente."
+        blockedDescription={
+          accountExcluirBlockedTarget && vExcluirConta(accountExcluirBlockedTarget).motivo === 'registro-ativo'
+            ? 'Não é possível excluir esta conta. Ela precisa estar inativa antes de ser excluída.'
+            : 'Não é possível excluir esta conta. Existem soluções ou contratos vinculados:'
+        }
         actionLabel="excluir"
-        blocked={{ contracts: accountExcluirBlockedTarget ? accountActiveContracts(accountExcluirBlockedTarget).map(c => c.contratante) : [] }}
+        blocked={accountExcluirBlockedTarget ? vExcluirConta(accountExcluirBlockedTarget).impedimentos : []}
+        onNavegar={navegarParaImpedimento}
       />
 
       <ConfirmDeleteModal
@@ -1306,6 +1315,21 @@ export function OrganizacaoDetailPage() {
         name={solutionDeleteTarget?.name ?? ''}
         onConfirm={handleDeleteSolution}
       />
+      <ConfirmDeleteModal
+        open={!!solutionDeleteBlockedTarget}
+        onClose={() => setSolutionDeleteBlockedTarget(null)}
+        variant="blocked"
+        name={solutionDeleteBlockedTarget?.name ?? ''}
+        blockedTitle="Não é possível excluir esta solução"
+        blockedDescription={
+          solutionDeleteBlockedTarget && vExcluirSolucao(solutionDeleteBlockedTarget).motivo === 'registro-ativo'
+            ? 'Não é possível excluir esta solução. Ela precisa estar inativa antes de ser excluída.'
+            : 'Não é possível excluir esta solução. Existem componentes ou contratos vinculados:'
+        }
+        actionLabel="excluir"
+        blocked={solutionDeleteBlockedTarget ? vExcluirSolucao(solutionDeleteBlockedTarget).impedimentos : []}
+        onNavegar={navegarParaImpedimento}
+      />
 
       <ConfirmDeleteModal
         open={solutionInativarModal}
@@ -1320,9 +1344,16 @@ export function OrganizacaoDetailPage() {
         variant="blocked"
         name={solutionInativarBlockedTarget?.name ?? ''}
         blockedTitle="Não é possível inativar esta solução"
-        blockedDescription="Uma solução só pode ser inativada quando não houver mais nenhum contrato ativo vinculado a ela. Inative cada contrato abaixo primeiro e tente novamente."
+        blockedDescription="Não é possível inativar esta solução. Existem contratos vigentes vinculados. Inative primeiro os contratos:"
         actionLabel="inativar"
-        blocked={{ contracts: solutionInativarBlockedTarget ? solutionActiveContracts(solutionInativarBlockedTarget).map(c => c.contratante) : [] }}
+        blocked={
+          solutionInativarBlockedTarget
+            ? solutionActiveContracts(solutionInativarBlockedTarget).map(c => ({
+                tipo: 'contrato' as const, id: c.id, nome: `Contrato · ${c.contratante}`,
+              }))
+            : []
+        }
+        onNavegar={navegarParaImpedimento}
       />
 
       {/* Create sheets */}
