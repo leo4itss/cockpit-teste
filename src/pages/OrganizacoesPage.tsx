@@ -254,7 +254,13 @@ export function OrganizacoesPage() {
                       </button>
                     ) : (
                       <button
-                        onClick={() => { setDeleteTarget(org); setDeleteModal('inativar') }}
+                        onClick={() => {
+                          if (podeInativarOrganizacao(org, accounts).permitido) {
+                            setDeleteTarget(org); setDeleteModal('inativar')
+                          } else {
+                            setInativarBlockedTarget(org)
+                          }
+                        }}
                         className="p-1.5 rounded hover:bg-amber-50 text-[#9ca3af] hover:text-amber-600 transition-colors opacity-0 group-hover/row:opacity-100"
                         title="Inativar organização"
                       >
