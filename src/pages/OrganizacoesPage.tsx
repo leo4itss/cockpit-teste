@@ -292,7 +292,11 @@ export function OrganizacoesPage() {
         blockedDescription="Não é possível inativar esta organização. Existem contas ativas vinculadas. Inative primeiro as contas:"
         actionLabel="inativar"
         blocked={inativarBlockedTarget ? podeInativarOrganizacao(inativarBlockedTarget, accounts).impedimentos : []}
-        onNavegar={imp => { setInativarBlockedTarget(null); navigate(`/organizacoes/${inativarBlockedTarget?.id}`) }}
+        onNavegar={() => {
+          const id = inativarBlockedTarget?.id
+          setInativarBlockedTarget(null)
+          if (id) navigate(`/organizacoes/${id}`)
+        }}
       />
       <NewOrganizationSheet
         open={sheetOpen}
