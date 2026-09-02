@@ -16,7 +16,7 @@
  *   Conta ──user_account_memberships──> Usuário
  */
 
-import type { Account, Contract, Organization, Solution, User } from '@/types'
+import type { Account, Componente, Contract, Organization, Solution, User } from '@/types'
 import { parsearData } from '@/lib/datas'
 
 export type TipoImpedimento = 'conta' | 'contrato' | 'solucao' | 'componente' | 'usuario'
