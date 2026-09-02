@@ -25,7 +25,6 @@ interface Props {
   onActivate?: () => void
   tiposLicenca: TipoLicenca[]
   componentes: Componente[]
-  contracts?: Contract[]
 }
 
 /* ── sub-components ─────────────────────────────────────── */
