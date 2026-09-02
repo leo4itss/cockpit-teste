@@ -9,6 +9,7 @@ import { Dialog } from './ui/Dialog'
 import { AddObjetoDialog } from './AddObjetoDialog'
 import { EditLicencaDialog } from './EditLicencaDialog'
 import { useToast, ToastContainer } from './ui/Toast'
+import { Tooltip } from './ui/Tooltip'
 import { startContractProvisioning, PROVISIONING_STATUS_BADGE } from '@/services/provisioning'
 import type { Account, Contract, Solution, ObjetoContrato, ContractHistoricoEntry } from '@/types'
 
