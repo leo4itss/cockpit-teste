@@ -406,9 +406,15 @@ export function EditContractSheet({ open, onClose, contract, solutions, accounts
         )
       ) : (
         onInativar && (
-          <Button variant="ghost" onClick={onInativar} className="mr-auto text-amber-600 hover:bg-amber-50">
-            Inativar contrato
-          </Button>
+          // Contratos não são excluíveis — registro jurídico e fiscal. A única
+          // ação de baixa é a inativação; o tooltip explica a ausência de "Excluir".
+          <div className="mr-auto">
+            <Tooltip content="Contratos não podem ser excluídos. Utilize a inativação." width="w-60">
+              <Button variant="ghost" onClick={onInativar} className="text-amber-600 hover:bg-amber-50">
+                Inativar contrato
+              </Button>
+            </Tooltip>
+          </div>
         )
       )}
       <Button variant="outline" onClick={handleClose}>Cancelar</Button>
