@@ -927,6 +927,37 @@ export const contracts: Contract[] = [
     renovacao: 'Anual',
     status: 'Ativo',
   },
+
+  // ── Fixtures das regras de ciclo de vida (PAS-2507) ──────────────────────
+  // Contrato inativo da org-vega — reforça que a inativação da org só depende
+  // do status das contas, não dos contratos.
+  {
+    id: 'ctr-vega-antigo',
+    orgId: 'org-vega',
+    contratante: 'Vega Matriz',
+    objetos: [
+      { solucao: 'Gestão Vega', plano: 'Corporativo', licenciamento: 'Usuário nominal: 100 usuários' },
+    ],
+    dataInicio: '01/10/2025',
+    dataTermino: '30/09/2026',
+    renovacao: 'Anual',
+    status: 'Inativo',
+  },
+  // Contrato inativo da conta 'Apple Labs' — sozinho não bloqueia a inativação
+  // da conta (fora de vigência por estar inativo); a solução s6 é que bloqueia
+  // a exclusão dela.
+  {
+    id: 'ctr-apple-labs',
+    orgId: '1',
+    contratante: 'Apple Labs',
+    objetos: [
+      { solucao: 'PAS Flow', plano: 'Starter', licenciamento: 'Usuário nominal: 10 usuários' },
+    ],
+    dataInicio: '02/04/2026',
+    dataTermino: '01/04/2027',
+    renovacao: 'Anual',
+    status: 'Inativo',
+  },
 ]
 
 export const users: User[] = [
