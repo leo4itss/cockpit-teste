@@ -1,38 +1,49 @@
-// Modal de confirmação de exclusão — variantes:
-// - 'org': exige digitação do nome, lista impactos
-// - 'account': apenas confirmação por botão
-// - 'blocked': informativo, lista dependências que bloqueiam
-// - 'inativar-org': inativação reversível de org
-// - 'inativar-solucao': inativação de solução (avisa sobre contratos)
-// - 'inativar-contrato': inativação simples de contrato
+// Modal de confirmação de exclusão / inativação — variantes:
+// - 'account': exclusão de conta (quarentena de 30 dias), exige digitação do nome
+// - 'solution': exclusão permanente de solução, exige digitação do nome
+// - 'excluir-org': exclusão permanente de organização, exige digitação do nome
+// - 'blocked': informativo, lista os registros impeditivos agrupados por tipo;
+//              sem botão de confirmação (double-check só nas ações permitidas)
+// - 'inativar-org': inativação reversível de org — exige digitação do nome
+// - 'inativar-conta' / 'inativar-solucao' / 'inativar-contrato': inativação simples
 // - 'excluir-componente': exclusão permanente sem vínculos
 // - 'inativar-componente': soft delete por vínculo com soluções
 // - 'reprovisionar': reexecuta o provisionamento de um tenant (infra destrutiva)
+//
+// Regra de ciclo de vida (PAS-2507): pré-requisito de baixo para cima, nunca
+// cascata. Nenhuma cópia deste arquivo pode dizer que dependentes serão
+// "automaticamente inativados/excluídos" — esse comportamento não existe mais.
 
 import { useState } from 'react'
 import { Modal } from './ui/Modal'
 import { Button } from './ui/Button'
-import { AlertTriangle, CircleAlert, RotateCcw } from 'lucide-react'
-
-interface BlockedInfo {
-  accounts?: string[]    // nomes das contas ativas que bloqueiam (ex: inativar org)
-  contracts?: string[]   // nomes/identificadores dos contratos ativos que bloqueiam (ex: inativar solução)
-  solutions?: string[]   // nomes das soluções ativas que bloqueiam (ex: inativar conta)
-}
+import { AlertTriangle, CircleAlert, RotateCcw, ChevronRight } from 'lucide-react'
+import type { Impedimento, TipoImpedimento } from '@/lib/regrasCicloVida'
 
 interface Props {
   open: boolean
   onClose: () => void
-  variant: 'org' | 'account' | 'contract' | 'solution' | 'blocked' | 'inativar-org' | 'inativar-conta' | 'excluir-conta' | 'excluir-org' | 'inativar-solucao' | 'inativar-contrato' | 'excluir-componente' | 'inativar-componente' | 'reprovisionar'
+  variant: 'account' | 'solution' | 'blocked' | 'inativar-org' | 'inativar-conta' | 'excluir-org' | 'inativar-solucao' | 'inativar-contrato' | 'excluir-componente' | 'inativar-componente' | 'reprovisionar'
   name: string            // nome da org, conta, contrato ou solução
   onConfirm?: () => void  // não usado em 'blocked'
-  blocked?: BlockedInfo   // usado em 'blocked'
-  blockedTitle?: string   // título customizável para o variant 'blocked'
-  blockedDescription?: string  // corpo de texto explicando a regra específica (ex: por que está bloqueado)
-  actionLabel?: string    // verbo usado no texto do variant 'blocked' (ex: 'excluir', 'inativar') — padrão 'excluir'
+  blocked?: Impedimento[]      // usado em 'blocked' — registros que impedem a ação
+  blockedTitle?: string        // título do variant 'blocked'
+  blockedDescription?: string  // corpo de texto explicando por que a ação está bloqueada
+  actionLabel?: string         // verbo do variant 'blocked' (ex: 'excluir', 'inativar') — padrão 'excluir'
+  onNavegar?: (imp: Impedimento) => void  // 'blocked' — abre o registro impeditivo
 }
 
-export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, blocked, blockedTitle, blockedDescription, actionLabel = 'excluir' }: Props) {
+// Rótulos de grupo por tipo, ramificados no total (sem "(s)" — ver CLAUDE.md).
+const GRUPO_LABEL: Record<TipoImpedimento, (n: number) => string> = {
+  conta:      n => (n === 1 ? '1 conta vinculada'          : `${n} contas vinculadas`),
+  contrato:   n => (n === 1 ? '1 contrato vinculado'       : `${n} contratos vinculados`),
+  solucao:    n => (n === 1 ? '1 solução vinculada'        : `${n} soluções vinculadas`),
+  componente: n => (n === 1 ? '1 componente vinculado'     : `${n} componentes vinculados`),
+  usuario:    n => (n === 1 ? '1 usuário vinculado'        : `${n} usuários vinculados`),
+}
+const GRUPO_ORDEM: TipoImpedimento[] = ['conta', 'contrato', 'solucao', 'componente', 'usuario']
+
+export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, blocked, blockedTitle, blockedDescription, actionLabel = 'excluir', onNavegar }: Props) {
   const [typed, setTyped] = useState('')
 
   function handleClose() {
