@@ -380,14 +380,14 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
           <div className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg">
             <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
             <p className="text-xs text-red-800">
-              Esta ação é <strong>irreversível</strong>. A organização e todos os seus dados (contas já
-              excluídas, contratos e soluções) serão removidos permanentemente do sistema.
+              Esta ação é <strong>permanente</strong>. A organização e seus dados serão
+              removidos permanentemente do sistema.
             </p>
           </div>
 
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-[#030712]">
-              Digite <strong>"{name}"</strong> para confirmar:
+              Esta ação é permanente. Digite <strong>"{name}"</strong> para confirmar a exclusão:
             </label>
             <input
               type="text"
