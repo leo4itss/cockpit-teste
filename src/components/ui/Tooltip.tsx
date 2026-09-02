@@ -52,6 +52,7 @@ export function Tooltip({ content, children, width = 'w-52', tabIndexed = true, 
 
   const portalContent = show && pos && createPortal(
     <div
+      ref={tooltipRef}
       role="tooltip"
       className={`fixed bg-[#1f2937] rounded-md px-3 py-1.5 text-xs text-[#f9fafb] ${width} z-[9999] shadow-lg border border-gray-700 whitespace-normal`}
       style={{
