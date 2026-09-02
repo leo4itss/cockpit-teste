@@ -447,31 +447,23 @@ export function EditSolutionSheet({
         footer={
           <>
             {isInactive ? (
-              /* Solução inativa: só permite ativar */
-              <Button
-                variant="ghost"
-                onClick={onActivate}
-                className="mr-auto text-green-700 hover:bg-green-50"
-              >
-                Ativar solução
-              </Button>
-            ) : hasLinkedContracts ? (
-              /* Tem contratos vinculados: só inativa */
+              /* Solução inativa: ativar ou excluir (o modal explica o bloqueio) */
+              <div className="mr-auto flex items-center gap-1">
+                <Button variant="ghost" onClick={onActivate} className="text-green-700 hover:bg-green-50">
+                  Ativar solução
+                </Button>
+                <Button variant="ghost" onClick={onDelete} className="text-[#dc2626] hover:bg-red-50">
+                  Excluir solução
+                </Button>
+              </div>
+            ) : (
+              /* Solução ativa: só inativa (exclusão exige registro inativo — hipótese 4) */
               <Button
                 variant="ghost"
                 onClick={onInactivate}
                 className="mr-auto text-amber-600 hover:bg-amber-50"
               >
                 Inativar solução
-              </Button>
-            ) : (
-              /* Sem contratos: pode excluir permanentemente */
-              <Button
-                variant="ghost"
-                onClick={onDelete}
-                className="mr-auto text-[#dc2626] hover:bg-red-50"
-              >
-                Excluir solução
               </Button>
             )}
             <Button variant="outline" onClick={handleClose}>Cancelar</Button>
