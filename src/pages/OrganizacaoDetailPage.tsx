@@ -1437,8 +1437,12 @@ export function OrganizacaoDetailPage() {
           solution={editingSolution}
           onSave={handleSaveSolution}
           onDelete={() => {
-            setSolutionDeleteTarget(editingSolution)
             setEditingSolution(null)
+            if (vExcluirSolucao(editingSolution).permitido) {
+              setSolutionDeleteTarget(editingSolution)
+            } else {
+              setSolutionDeleteBlockedTarget(editingSolution)
+            }
           }}
           onInactivate={() => requestInactivateSolution(editingSolution)}
           onActivate={() => handleActivateSolution(editingSolution)}
