@@ -59,7 +59,7 @@ export const api = {
   getContract: (id: string) => request<any>(`/api/contracts/${id}`),
   createContract: (data: any) => request<any>('/api/contracts', { method: 'POST', body: JSON.stringify(data) }),
   updateContract: (id: string, data: any) => request<any>(`/api/contracts/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-  deleteContract: (id: string) => request<any>(`/api/contracts/${id}`, { method: 'DELETE' }),
+  // Sem deleteContract: contrato é registro jurídico e fiscal — nunca excluível, só inativável.
 
   // Users
   getUsers: () => request<any[]>('/api/users'),
