@@ -429,35 +429,38 @@ export function OrganizacaoDetailPage() {
     }
   }
 
-  // Org pode ser excluída permanentemente quando não tem soluções nem contratos
-  function orgCanDelete() {
-    return solutions.length === 0 && contracts.length === 0
+  // ── Regras de ciclo de vida (PAS-2507) ───────────────────────
+  // A lógica de vínculo mora em src/lib/regrasCicloVida.ts — aqui só ligamos
+  // os vereditos aos modais. Pré-requisito de baixo para cima, nunca cascata.
+
+  // Usuários vinculados a uma conta — reaproveita o userAccountsMap já carregado.
+  function usuariosDaConta(acc: Account): User[] {
+    return orgUsers.filter(u => (userAccountsMap[u.id] ?? []).some(cv => cv.account.id === acc.id))
   }
 
-  // Contas que ainda não passaram pela quarentena completa (exclusão definitiva) e
-  // contratos ainda não inativados — ambos bloqueiam a exclusão permanente da org.
-  function orgAccountsBlockingExclusao() {
-    return accounts.filter(a => !a.deletedAt)
-  }
-  function orgContractsBlockingExclusao() {
-    return contracts.filter(c => c.status !== 'Inativo')
-  }
+  const vExcluirOrg   = org ? podeExcluirOrganizacao(org, accounts) : null
+  const vInativarOrg  = org ? podeInativarOrganizacao(org, accounts) : null
+  const vInativarConta = (a: Account) => podeInativarConta(a, contracts)
+  const vExcluirConta  = (a: Account) => podeExcluirConta(a, solutions, contracts, usuariosDaConta(a))
+  const vExcluirSolucao = (s: Solution) => podeExcluirSolucao(s, componentes, contracts)
 
-  // Contas ativas (não inativas, não em quarentena) que bloqueiam a inativação da org
-  function orgActiveAccounts() {
-    return accounts.filter(a => !a.deletedAt && a.status !== 'Inativo')
-  }
-
-  // Contratos ativos vinculados a esta conta (via contratante) que bloqueiam sua
-  // inativação — o vínculo conta↔solução existe apenas através do contrato.
-  // (hierarquia: Organização → Conta → Contrato — cada nível bloqueia no de baixo)
-  function accountActiveContracts(account: Account) {
-    return contracts.filter(c => c.contratante === account.name && c.status !== 'Inativo')
-  }
-
-  // Contratos ativos vinculados a esta solução que bloqueiam sua inativação
-  function solutionActiveContracts(solution: Solution) {
-    return contracts.filter(c => c.status !== 'Inativo' && c.objetos.some(o => o.solucao === solution.name))
+  // Abre o registro impeditivo listado no modal bloqueado — troca de aba e
+  // abre o sheet de detalhe correspondente (não há rotas próprias nesta tela).
+  function navegarParaImpedimento(imp: Impedimento) {
+    if (imp.tipo === 'conta') {
+      const a = accounts.find(x => x.id === imp.id)
+      if (a) { setTab('conta'); setSelectedAccount(a) }
+    } else if (imp.tipo === 'contrato') {
+      const c = contracts.find(x => x.id === imp.id)
+      if (c) { setTab('contrato'); setSelectedContract(c) }
+    } else if (imp.tipo === 'solucao') {
+      const s = solutions.find(x => x.id === imp.id)
+      if (s) { setTab('solucoes'); setSelectedSolution(s) }
+    } else if (imp.tipo === 'usuario') {
+      const u = orgUsers.find(x => x.id === imp.id)
+      if (u) { setTab('usuarios'); setSelectedOrgUser(u); setShowOrgUserDetail(true) }
+    }
+    // 'componente' não tem tela de detalhe nesta página — sem navegação.
   }
 
   async function handleActivateOrg() {
