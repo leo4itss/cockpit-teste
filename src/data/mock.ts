@@ -381,6 +381,68 @@ export const accounts: Account[] = [
     status: 'Ativo',
     createdAt: '01/01/2026',
   },
+  // ── Fixtures das regras de ciclo de vida (PAS-2507) ──────────────────────
+  // Cenário: contas inativas de uma org ativa → org-vega pode ser inativada.
+  {
+    id: 'acc-vega-matriz',
+    orgId: 'org-vega',
+    name: 'Vega Matriz',
+    subdomain: 'vega-matriz',
+    provisioningStatus: 'COMPLETED',
+    arquitetoPAS: 'Marcelo Gomes',
+    isDefault: true,
+    status: 'Inativo',
+    createdAt: '05/09/2025',
+  },
+  {
+    id: 'acc-vega-filial',
+    orgId: 'org-vega',
+    name: 'Vega Filial',
+    subdomain: 'vega-filial',
+    provisioningStatus: 'COMPLETED',
+    arquitetoPAS: 'Marcelo Gomes',
+    isDefault: false,
+    status: 'Inativo',
+    createdAt: '20/09/2025',
+  },
+  // Cenário: contratos só inativos, mas com solução vinculada (accountId) →
+  // inativação permitida; após inativar, exclusão bloqueada pela solução.
+  {
+    id: 'a1-labs',
+    orgId: '1',
+    name: 'Apple Labs',
+    subdomain: 'apple-labs',
+    provisioningStatus: 'COMPLETED',
+    arquitetoPAS: 'Marcelo Gomes',
+    isDefault: false,
+    status: 'Ativo',
+    createdAt: '02/04/2026',
+  },
+  // Cenário: conta inativa e sem nenhum vínculo → exclusão permitida.
+  {
+    id: 'a1-piloto',
+    orgId: '1',
+    name: 'Apple Piloto',
+    subdomain: 'apple-piloto',
+    provisioningStatus: 'COMPLETED',
+    arquitetoPAS: 'Marcelo Gomes',
+    isDefault: false,
+    status: 'Inativo',
+    createdAt: '18/02/2026',
+  },
+  // Cenário: conta inativa, sem contratos, mas com usuários vinculados
+  // (accountMembrosIds) → exclusão bloqueada pelos usuários (hipótese 3).
+  {
+    id: 'a2-arquivo',
+    orgId: '2',
+    name: 'Santacruz Arquivo',
+    subdomain: 'santacruz-arquivo',
+    provisioningStatus: 'COMPLETED',
+    arquitetoPAS: 'Marcelo Gomes',
+    isDefault: false,
+    status: 'Inativo',
+    createdAt: '15/12/2025',
+  },
 ]
 
 export const solutions: Solution[] = [
