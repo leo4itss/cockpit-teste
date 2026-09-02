@@ -426,15 +426,24 @@ app.delete('/solutions/:id', async (c) => {
   const [sol] = await db.select().from(solutions).where(eq(solutions.id, id))
   if (!sol) return c.json({ error: 'Not found' }, 404)
 
-  // Verifica se há contratos vinculados pelo nome da solução
+  // Regras de ciclo de vida (PAS-2507): solução só é excluída quando
+  //  - está inativa (hipótese 4);
+  //  - não usa NENHUM componente (componente_ids vazio);
+  //  - não está vinculada a NENHUM contrato (por nome, em objetos).
+  if (sol.status !== 'Inativo') {
+    return c.json({ error: 'A solução precisa estar inativa antes de ser excluída.' }, 422)
+  }
+
+  const componentesVinculados = (sol.componenteIds as string[] | null) ?? []
   const allContracts = await db.select().from(contracts)
-  const linked = allContracts.some((ct: any) =>
+  const contratosVinculados = allContracts.filter((ct: any) =>
     (ct.objetos as Array<{ solucao: string }>).some(obj => obj.solucao === sol.name)
   )
-  if (linked) {
+  if (componentesVinculados.length > 0 || contratosVinculados.length > 0) {
     return c.json({
-      error: 'linked_to_contracts',
-      message: 'Esta solução está vinculada a contratos e não pode ser excluída. Inative-a para desativá-la.',
+      error: 'dependencies',
+      componentIds: componentesVinculados,
+      contractNames: contratosVinculados.map((ct: any) => ct.contratante),
     }, 422)
   }
 
