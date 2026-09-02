@@ -7,8 +7,9 @@ import { NewOrganizationSheet } from '@/components/NewOrganizationSheet'
 import { ConfirmDeleteModal } from '@/components/ConfirmDeleteModal'
 import { api } from '@/api/client'
 import { useIsPlatformAdmin, useIsOrgAdmin, useIsAccountAdmin, useIsPasArchitect, useAdminOrgId } from '@/authz/hooks'
-import { organizations as mockOrgs } from '@/data/mock'
-import type { Organization } from '@/types'
+import { organizations as mockOrgs, accounts as mockAccounts } from '@/data/mock'
+import { podeInativarOrganizacao } from '@/lib/regrasCicloVida'
+import type { Account, Organization } from '@/types'
 
 export function OrganizacoesPage() {
   const navigate = useNavigate()
