@@ -25,6 +25,14 @@ import { useComponentes } from '@/context/ComponentesContext'
 import { useProvisioningPolling } from '@/hooks/useProvisioningPolling'
 import { formatarData } from '@/lib/datas'
 import {
+  podeInativarConta,
+  podeInativarOrganizacao,
+  podeExcluirOrganizacao,
+  podeExcluirConta,
+  podeExcluirSolucao,
+  type Impedimento,
+} from '@/lib/regrasCicloVida'
+import {
   startContractProvisioning,
   getContractProvisioning,
   deriveContractStatus,
