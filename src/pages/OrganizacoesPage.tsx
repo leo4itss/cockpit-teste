@@ -11,6 +11,9 @@ import { organizations as mockOrgs, accounts as mockAccounts } from '@/data/mock
 import { podeInativarOrganizacao } from '@/lib/regrasCicloVida'
 import type { Account, Organization } from '@/types'
 
+/** Contexto mínimo p/ a regra de inativação de org (só precisa das contas). */
+const ctxOrg = (contas: Account[]) => ({ contas, solucoes: [], contratos: [] })
+
 export function OrganizacoesPage() {
   const navigate = useNavigate()
   const isPlatformAdmin = useIsPlatformAdmin()
@@ -255,7 +258,7 @@ export function OrganizacoesPage() {
                     ) : (
                       <button
                         onClick={() => {
-                          if (podeInativarOrganizacao(org, accounts).permitido) {
+                          if (podeInativarOrganizacao(org, ctxOrg(accounts)).permitido) {
                             setDeleteTarget(org); setDeleteModal('inativar')
                           } else {
                             setInativarBlockedTarget(org)
@@ -291,7 +294,7 @@ export function OrganizacoesPage() {
         blockedTitle="Não é possível inativar esta organização"
         blockedDescription="Não é possível inativar esta organização. Existem contas ativas vinculadas. Inative primeiro as contas:"
         actionLabel="inativar"
-        blocked={inativarBlockedTarget ? podeInativarOrganizacao(inativarBlockedTarget, accounts).impedimentos : []}
+        blocked={inativarBlockedTarget ? podeInativarOrganizacao(inativarBlockedTarget, ctxOrg(accounts)).impedimentos : []}
         onNavegar={() => {
           const id = inativarBlockedTarget?.id
           setInativarBlockedTarget(null)

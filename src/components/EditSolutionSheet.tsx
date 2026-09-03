@@ -20,9 +20,6 @@ interface Props {
   onClose: () => void
   solution: Solution | null
   onSave: (solution: Solution) => void
-  onDelete?: () => void
-  onInactivate?: () => void
-  onActivate?: () => void
   tiposLicenca: TipoLicenca[]
   componentes: Componente[]
 }
@@ -176,9 +173,6 @@ export function EditSolutionSheet({
   onClose,
   solution,
   onSave,
-  onDelete,
-  onInactivate,
-  onActivate,
   tiposLicenca,
   componentes,
 }: Props) {
@@ -434,26 +428,6 @@ export function EditSolutionSheet({
         width="w-[640px]"
         footer={
           <>
-            {isInactive ? (
-              /* Solução inativa: ativar ou excluir (o modal explica o bloqueio) */
-              <div className="mr-auto flex items-center gap-1">
-                <Button variant="ghost" onClick={onActivate} className="text-green-700 hover:bg-green-50">
-                  Ativar solução
-                </Button>
-                <Button variant="ghost" onClick={onDelete} className="text-[#dc2626] hover:bg-red-50">
-                  Excluir solução
-                </Button>
-              </div>
-            ) : (
-              /* Solução ativa: só inativa (exclusão exige registro inativo — hipótese 4) */
-              <Button
-                variant="ghost"
-                onClick={onInactivate}
-                className="mr-auto text-amber-600 hover:bg-amber-50"
-              >
-                Inativar solução
-              </Button>
-            )}
             <Button variant="outline" onClick={handleClose}>Cancelar</Button>
             {!isInactive && <Button onClick={handleSave}>Salvar</Button>}
           </>

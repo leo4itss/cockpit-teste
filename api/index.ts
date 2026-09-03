@@ -109,22 +109,20 @@ app.put('/organizations/:id', async (c) => {
 app.delete('/organizations/:id', async (c) => {
   const id = c.req.param('id')
 
-  // Regras de ciclo de vida (PAS-2507): pré-requisito, nunca cascata.
-  //  - a organização precisa estar inativa (hipótese 4);
-  //  - não pode haver NENHUMA conta vinculada — inclui contas em quarentena.
+  // Exclusão física — reunião 03/09/2026. Espelha src/lib/regrasCicloVida.ts.
   const [org] = await db.select().from(organizations).where(eq(organizations.id, id))
   if (!org) return c.json({ error: 'Not found' }, 404)
-  if (org.status !== 'Inativo') {
-    return c.json({ error: 'A organização precisa estar inativa antes de ser excluída.' }, 422)
+  if (org.status === 'Inativo') {
+    return c.json({ error: 'Uma organização inativa não pode ser excluída fisicamente.' }, 422)
   }
-
-  const orgAccounts = await db.select().from(accounts).where(eq(accounts.orgId, id))
+  const [orgAccounts, orgContracts] = await Promise.all([
+    db.select().from(accounts).where(eq(accounts.orgId, id)),
+    db.select().from(contracts).where(eq(contracts.orgId, id)),
+  ])
+  if (orgContracts.length > 0) return c.json({ error: 'ja-teve-contrato' }, 422)
   if (orgAccounts.length > 0) {
     return c.json({ error: 'dependencies', accountNames: orgAccounts.map((a: any) => a.name) }, 422)
   }
-
-  // Sem contas, contratos e soluções ficam inalcançáveis — limpeza física.
-  await db.delete(contracts).where(eq(contracts.orgId, id))
   await db.delete(solutions).where(eq(solutions.orgId, id))
   await db.delete(organizations).where(eq(organizations.id, id))
   return c.json({ ok: true })
@@ -234,39 +232,34 @@ app.put('/accounts/:id', async (c) => {
 app.delete('/accounts/:id', async (c) => {
   const id = c.req.param('id')
 
-  // Regras de ciclo de vida (PAS-2507): conta só é excluída (quarentena) quando
-  //  - está inativa (hipótese 4);
-  //  - não tem NENHUMA solução vinculada (solutions.account_id);
-  //  - não tem NENHUM contrato vinculado (contratante = nome, mesma org);
-  //  - não tem NENHUM usuário vinculado (hipótese 3).
+  // Exclusão física de conta — hard delete real (reunião 03/09/2026, sem
+  // quarentena). Espelha src/lib/regrasCicloVida.ts:
+  //  - status !== 'Inativo' (Regra 5);
+  //  - nunca teve contrato, de qualquer status (Regra 4.1);
+  //  - zero soluções vinculadas via account_id (Regra 4.2);
+  //  - usuários NÃO bloqueiam (Regra 7) — o vínculo é apenas removido.
   const [existing] = await db.select().from(accounts).where(eq(accounts.id, id))
   if (!existing) return c.json({ error: 'Not found' }, 404)
-  if (existing.status !== 'Inativo') {
-    return c.json({ error: 'A conta precisa estar inativa antes de ser excluída.' }, 422)
+  if (existing.status === 'Inativo') {
+    return c.json({ error: 'Uma conta inativa não pode ser excluída fisicamente.' }, 422)
   }
 
-  const [linkedSolutions, linkedContracts, linkedMembers] = await Promise.all([
+  const [linkedSolutions, linkedContracts] = await Promise.all([
     db.select().from(solutions).where(eq(solutions.accountId, id)),
     db.select().from(contracts).where(
       and(eq(contracts.orgId, existing.orgId), eq(contracts.contratante, existing.name)),
     ),
-    db.select().from(userAccountMemberships).where(eq(userAccountMemberships.accountId, id)),
   ])
-  if (linkedSolutions.length > 0 || linkedContracts.length > 0 || linkedMembers.length > 0) {
-    return c.json({
-      error: 'dependencies',
-      solutionNames: linkedSolutions.map((s: any) => s.name),
-      contractNames: linkedContracts.map((ct: any) => ct.contratante),
-      memberCount: linkedMembers.length,
-    }, 422)
+  if (linkedContracts.length > 0) {
+    return c.json({ error: 'ja-teve-contrato', contractNames: linkedContracts.map((ct: any) => ct.contratante) }, 422)
+  }
+  if (linkedSolutions.length > 0) {
+    return c.json({ error: 'dependencies', solutionNames: linkedSolutions.map((s: any) => s.name) }, 422)
   }
 
-  const [row] = await db
-    .update(accounts)
-    .set({ deletedAt: new Date().toISOString() })
-    .where(eq(accounts.id, id))
-    .returning()
-  if (!row) return c.json({ error: 'Not found' }, 404)
+  // Remove o vínculo dos usuários e apaga a conta.
+  await db.delete(userAccountMemberships).where(eq(userAccountMemberships.accountId, id))
+  await db.delete(accounts).where(eq(accounts.id, id))
   return c.json({ ok: true })
 })
 app.patch('/accounts/:id/restaurar', async (c) => {
@@ -426,25 +419,16 @@ app.delete('/solutions/:id', async (c) => {
   const [sol] = await db.select().from(solutions).where(eq(solutions.id, id))
   if (!sol) return c.json({ error: 'Not found' }, 404)
 
-  // Regras de ciclo de vida (PAS-2507): solução só é excluída quando
-  //  - está inativa (hipótese 4);
-  //  - não usa NENHUM componente (componente_ids vazio);
-  //  - não está vinculada a NENHUM contrato (por nome, em objetos).
-  if (sol.status !== 'Inativo') {
-    return c.json({ error: 'A solução precisa estar inativa antes de ser excluída.' }, 422)
+  // Exclusão física — reunião 03/09/2026. Componente não bloqueia.
+  if (sol.status === 'Inativo') {
+    return c.json({ error: 'Uma solução inativa não pode ser excluída fisicamente.' }, 422)
   }
-
-  const componentesVinculados = (sol.componenteIds as string[] | null) ?? []
   const allContracts = await db.select().from(contracts)
   const contratosVinculados = allContracts.filter((ct: any) =>
     (ct.objetos as Array<{ solucao: string }>).some(obj => obj.solucao === sol.name)
   )
-  if (componentesVinculados.length > 0 || contratosVinculados.length > 0) {
-    return c.json({
-      error: 'dependencies',
-      componentIds: componentesVinculados,
-      contractNames: contratosVinculados.map((ct: any) => ct.contratante),
-    }, 422)
+  if (contratosVinculados.length > 0) {
+    return c.json({ error: 'ja-teve-contrato', contractNames: contratosVinculados.map((ct: any) => ct.contratante) }, 422)
   }
 
   await db.delete(solutions).where(eq(solutions.id, id))

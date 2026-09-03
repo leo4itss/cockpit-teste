@@ -166,7 +166,9 @@ export function podeInativarOrganizacao(org: Organization, ctx: ContextoVinculos
 // Implementação provisória: assume "nunca usada" toda entidade — o único gate
 // efetivo hoje é "nunca teve contrato". Pendente de validação com River antes de
 // ir para produção.
-function entidadeJaUsada(_nivel: NivelHierarquia, _id: string): boolean {
+// Assinatura futura: entidadeJaUsada(nivel, id). Enquanto o log de uso não
+// existir, ignora os argumentos e assume que nada foi usado.
+function entidadeJaUsada(): boolean {
   return false
 }
 
@@ -176,7 +178,6 @@ function entidadeJaUsada(_nivel: NivelHierarquia, _id: string): boolean {
  * qualquer status) e `itensVinculados` (os filhos diretos, de qualquer status).
  */
 function decideExclusaoFisica(
-  nivel: NivelHierarquia,
   entidade: { id: string; status: string },
   historicoContratos: Contract[],
   itensVinculados: Impedimento[],
@@ -195,7 +196,7 @@ function decideExclusaoFisica(
   if (itensVinculados.length > 0) {
     return { permitido: false, motivo: 'itens-vinculados', impedimentos: itensVinculados }
   }
-  if (entidadeJaUsada(nivel, entidade.id)) {
+  if (entidadeJaUsada()) {
     return { permitido: false, motivo: 'ja-usada', impedimentos: [] }
   }
   return OK
@@ -209,13 +210,13 @@ export function podeExcluirContrato(): Veredito {
 /** Solução: filhos = contratos que a referenciam (histórico e vínculo são o mesmo conjunto). */
 export function podeExcluirSolucao(sol: Solution, ctx: ContextoVinculos, perfil: ContextoPerfil): Veredito {
   const contratos = contratosDaSolucao(sol, ctx)
-  return decideExclusaoFisica('solucao', sol, contratos, contratos.map(impContrato), perfil)
+  return decideExclusaoFisica(sol, contratos, contratos.map(impContrato), perfil)
 }
 
 /** Conta: histórico = contratos por nome; filhos = soluções com accountId. */
 export function podeExcluirConta(conta: Account, ctx: ContextoVinculos, perfil: ContextoPerfil): Veredito {
   return decideExclusaoFisica(
-    'conta', conta,
+    conta,
     contratosDaConta(conta, ctx),
     solucoesDaConta(conta, ctx).map(impSolucao),
     perfil,
@@ -225,7 +226,7 @@ export function podeExcluirConta(conta: Account, ctx: ContextoVinculos, perfil: 
 /** Organização: histórico = contratos da org; filhos = contas da org (qualquer status). */
 export function podeExcluirOrganizacao(org: Organization, ctx: ContextoVinculos, perfil: ContextoPerfil): Veredito {
   return decideExclusaoFisica(
-    'organizacao', org,
+    org,
     contratosDaOrg(org, ctx),
     contasDaOrg(org, ctx).map(impConta),
     perfil,

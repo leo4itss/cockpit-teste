@@ -17,11 +17,6 @@ interface Props {
   org: Organization
   onSave: (account: Account) => void
   onUpdateContacts?: (contacts: Contact[]) => void
-  onDelete?: () => void    // exclusão — só quando a conta está inativa
-  onInativar?: () => void  // inativação — quando a conta está ativa
-  onActivate?: () => void
-  // Validação de vínculos em src/lib/regrasCicloVida.ts; o botão sempre
-  // aparece e o modal explica o bloqueio quando houver.
 }
 
 /* ── helpers ─────────────────────────────────────────────── */
@@ -199,7 +194,7 @@ const ESTADOS = [
 
 /* ── main ─────────────────────────────────────────────────── */
 
-export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdateContacts, onDelete, onInativar, onActivate }: Props) {
+export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdateContacts }: Props) {
   const { arquitetoOptions } = useUsers()
   const { toasts, toast, dismiss } = useToast()
   const isInactive = account.status === 'Inativo'
@@ -400,26 +395,6 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
         width="w-[640px]"
         footer={
           <>
-            {isInactive ? (
-              <div className="mr-auto flex items-center gap-1">
-                {onActivate && (
-                  <Button variant="ghost" onClick={onActivate} className="text-green-700 hover:bg-green-50">
-                    Ativar conta
-                  </Button>
-                )}
-                {onDelete && (
-                  <Button variant="ghost" onClick={onDelete} className="text-[#dc2626] hover:bg-red-50">
-                    Excluir conta
-                  </Button>
-                )}
-              </div>
-            ) : (
-              onInativar && (
-                <Button variant="ghost" onClick={onInativar} className="mr-auto text-amber-600 hover:bg-amber-50">
-                  Inativar conta
-                </Button>
-              )
-            )}
             <Button variant="outline" onClick={handleRequestClose}>Cancelar</Button>
             {!isInactive && <Button onClick={handleSave}>Salvar</Button>}
           </>

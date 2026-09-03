@@ -9,7 +9,6 @@ import { Dialog } from './ui/Dialog'
 import { AddObjetoDialog } from './AddObjetoDialog'
 import { EditLicencaDialog } from './EditLicencaDialog'
 import { useToast, ToastContainer } from './ui/Toast'
-import { Tooltip } from './ui/Tooltip'
 import { startContractProvisioning, PROVISIONING_STATUS_BADGE } from '@/services/provisioning'
 import type { Account, Contract, Solution, ObjetoContrato, ContractHistoricoEntry } from '@/types'
 
@@ -24,9 +23,6 @@ interface Props {
   /** Demais contratos da org — usados para checar exclusividade de componente por conta. */
   contracts: Contract[]
   onSave: (contract: Contract) => void
-  onInativar?: () => void
-  onActivate?: () => void
-  // Sem onDelete: contrato nunca é excluível (registro jurídico e fiscal).
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
@@ -266,7 +262,7 @@ function StepReview({
 
 // ── Sheet principal ────────────────────────────────────────────
 
-export function EditContractSheet({ open, onClose, contract, solutions, accounts, contracts, onSave, onInativar, onActivate }: Props) {
+export function EditContractSheet({ open, onClose, contract, solutions, accounts, contracts, onSave }: Props) {
   const { toasts, toast, dismiss } = useToast()
   const [dataTermino, setDataTermino] = useState(contract.dataTermino)
   const [renovacao, setRenovacao] = useState(contract.renovacao)
@@ -398,25 +394,6 @@ export function EditContractSheet({ open, onClose, contract, solutions, accounts
 
   const footerStep1 = (
     <>
-      {isInactive ? (
-        onActivate && (
-          <Button variant="ghost" onClick={onActivate} className="mr-auto text-green-700 hover:bg-green-50">
-            Ativar contrato
-          </Button>
-        )
-      ) : (
-        onInativar && (
-          // Contratos não são excluíveis — registro jurídico e fiscal. A única
-          // ação de baixa é a inativação; o tooltip explica a ausência de "Excluir".
-          <div className="mr-auto">
-            <Tooltip content="Contratos não podem ser excluídos. Utilize a inativação." width="w-60">
-              <Button variant="ghost" onClick={onInativar} className="text-amber-600 hover:bg-amber-50">
-                Inativar contrato
-              </Button>
-            </Tooltip>
-          </div>
-        )
-      )}
       <Button variant="outline" onClick={handleClose}>Cancelar</Button>
       {!isInactive && (
         <Button onClick={handlePrimaryAction}>{temSolucaoNova ? 'Revisar' : 'Salvar'}</Button>

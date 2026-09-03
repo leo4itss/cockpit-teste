@@ -1,5 +1,5 @@
 // Modal de confirmação de exclusão / inativação — variantes:
-// - 'account': exclusão de conta (quarentena de 30 dias), exige digitação do nome
+// - 'excluir-conta': exclusão física de conta (hard delete), exige digitação do nome
 // - 'solution': exclusão permanente de solução, exige digitação do nome
 // - 'excluir-org': exclusão permanente de organização, exige digitação do nome
 // - 'blocked': informativo, lista os registros impeditivos agrupados por tipo;
@@ -17,13 +17,13 @@
 import { useState } from 'react'
 import { Modal } from './ui/Modal'
 import { Button } from './ui/Button'
-import { AlertTriangle, CircleAlert, RotateCcw, ChevronRight } from 'lucide-react'
+import { AlertTriangle, CircleAlert, ChevronRight } from 'lucide-react'
 import type { Impedimento, TipoImpedimento } from '@/lib/regrasCicloVida'
 
 interface Props {
   open: boolean
   onClose: () => void
-  variant: 'account' | 'solution' | 'blocked' | 'inativar-org' | 'inativar-conta' | 'excluir-org' | 'inativar-solucao' | 'inativar-contrato' | 'excluir-componente' | 'inativar-componente' | 'reprovisionar'
+  variant: 'excluir-conta' | 'solution' | 'blocked' | 'inativar-org' | 'inativar-conta' | 'excluir-org' | 'inativar-solucao' | 'inativar-contrato' | 'excluir-componente' | 'inativar-componente' | 'reprovisionar'
   name: string            // nome da org, conta, contrato ou solução
   onConfirm?: () => void  // não usado em 'blocked'
   blocked?: Impedimento[]      // usado em 'blocked' — registros que impedem a ação
@@ -35,13 +35,11 @@ interface Props {
 
 // Rótulos de grupo por tipo, ramificados no total (sem "(s)" — ver CLAUDE.md).
 const GRUPO_LABEL: Record<TipoImpedimento, (n: number) => string> = {
-  conta:      n => (n === 1 ? '1 conta vinculada'          : `${n} contas vinculadas`),
-  contrato:   n => (n === 1 ? '1 contrato vinculado'       : `${n} contratos vinculados`),
-  solucao:    n => (n === 1 ? '1 solução vinculada'        : `${n} soluções vinculadas`),
-  componente: n => (n === 1 ? '1 componente vinculado'     : `${n} componentes vinculados`),
-  usuario:    n => (n === 1 ? '1 usuário vinculado'        : `${n} usuários vinculados`),
+  conta:    n => (n === 1 ? '1 conta vinculada'    : `${n} contas vinculadas`),
+  contrato: n => (n === 1 ? '1 contrato vinculado' : `${n} contratos vinculados`),
+  solucao:  n => (n === 1 ? '1 solução vinculada'  : `${n} soluções vinculadas`),
 }
-const GRUPO_ORDEM: TipoImpedimento[] = ['conta', 'contrato', 'solucao', 'componente', 'usuario']
+const GRUPO_ORDEM: TipoImpedimento[] = ['conta', 'solucao', 'contrato']
 
 export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, blocked, blockedTitle, blockedDescription, actionLabel = 'excluir', onNavegar }: Props) {
   const [typed, setTyped] = useState('')
@@ -79,12 +77,14 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
           {blockedDescription && (
             <p className="text-sm text-[#6b7280] leading-5">{blockedDescription}</p>
           )}
-          <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-            <p className="text-sm text-amber-800">
-              Resolva as dependências abaixo antes de {actionLabel}.
-            </p>
-          </div>
+          {onNavegar && itens.length > 0 && (
+            <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+              <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <p className="text-sm text-amber-800">
+                Resolva as dependências abaixo antes de {actionLabel}.
+              </p>
+            </div>
+          )}
 
           {grupos.map(({ tipo, itens }) => (
             <div key={tipo} className="flex flex-col gap-1.5">
@@ -171,15 +171,9 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
     )
   }
 
-  // --- ACCOUNT ---
-  if (variant === 'account') {
-    const exclusaoPermanente = new Date()
-    exclusaoPermanente.setDate(exclusaoPermanente.getDate() + 30)
-    const exclusaoFormatada = exclusaoPermanente.toLocaleDateString('pt-BR', {
-      day: '2-digit', month: 'long', year: 'numeric',
-    })
+  // --- EXCLUIR-CONTA (hard delete — reunião 03/09: sem quarentena) ---
+  if (variant === 'excluir-conta') {
     const canConfirm = typed === name
-
     return (
       <Modal
         open={open}
@@ -201,20 +195,17 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
         }
       >
         <div className="flex flex-col gap-4 text-sm text-[#030712]">
-          <p>A conta <strong>"{name}"</strong> entrará em um período de <strong>quarentena de 30 dias</strong> antes de ser excluída permanentemente.</p>
-          <div className="flex items-start gap-4 bg-blue-50 border border-blue-300 rounded-md p-4">
-            <CircleAlert className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
-            <p className="text-sm font-medium text-blue-700 leading-5">
-              Durante os 30 dias de quarentena, você poderá cancelar a exclusão ativando
-              <strong> "Exibir contas excluídas"</strong> e clicando em{' '}
-              <RotateCcw className="inline w-3 h-3 mb-0.5" /> <strong>Cancelar exclusão</strong>.
-              <br />
-              <span className="font-semibold">Exclusão permanente prevista para: {exclusaoFormatada}</span>
+          <p>Tem certeza que deseja excluir a conta <strong>"{name}"</strong>?</p>
+          <div className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+            <p className="text-xs text-red-800">
+              Esta ação é <strong>permanente</strong>. A conta e seus dados serão
+              removidos do sistema. Os usuários vinculados permanecem na base, sem o vínculo.
             </p>
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-[#030712]">
-              Digite <strong>"{name}"</strong> para confirmar a exclusão:
+              Esta ação é permanente. Digite <strong>"{name}"</strong> para confirmar a exclusão:
             </label>
             <input
               type="text"

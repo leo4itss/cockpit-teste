@@ -14,11 +14,7 @@ interface Props {
   onClose: () => void
   org: Organization
   onSave: (org: Organization) => void
-  onDelete?: () => void      // exclusão permanente — só quando a org está inativa
-  onInativar?: () => void    // inativação reversível — quando a org está ativa
-  onActivate?: () => void
-  // A validação de vínculos vive em src/lib/regrasCicloVida.ts; aqui o botão
-  // sempre aparece e o modal explica o bloqueio quando houver.
+  // Ciclo de vida vive na barra lateral do OrganizacaoDetailPage (Regra 9), não aqui.
 }
 
 /* ── helpers ─────────────────────────────────────────────── */
@@ -136,7 +132,7 @@ function buildForm(org: Organization) {
 
 /* ── main ─────────────────────────────────────────────────── */
 
-export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete, onInativar, onActivate }: Props) {
+export function EditOrganizationSheet({ open, onClose, org, onSave }: Props) {
   const { arquitetoOptions } = useUsers()
   const [form, setForm] = useState(() => buildForm(org))
   const [contacts, setContacts] = useState<Contact[]>(org.contacts ?? [])
@@ -219,26 +215,6 @@ export function EditOrganizationSheet({ open, onClose, org, onSave, onDelete, on
         width="w-[640px]"
         footer={
           <>
-            {isInactive ? (
-              <div className="mr-auto flex items-center gap-1">
-                {onActivate && (
-                  <Button variant="ghost" onClick={onActivate} className="text-green-700 hover:bg-green-50">
-                    Ativar organização
-                  </Button>
-                )}
-                {onDelete && (
-                  <Button variant="ghost" onClick={onDelete} className="text-red-600 hover:bg-red-50">
-                    Excluir organização
-                  </Button>
-                )}
-              </div>
-            ) : (
-              onInativar && (
-                <Button variant="ghost" onClick={onInativar} className="mr-auto text-amber-600 hover:bg-amber-50">
-                  Inativar organização
-                </Button>
-              )
-            )}
             <Button variant="outline" onClick={handleClose}>Cancelar</Button>
             {!isInactive && <Button onClick={handleSave}>Salvar</Button>}
           </>

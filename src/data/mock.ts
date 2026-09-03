@@ -227,8 +227,9 @@ export const organizations: Organization[] = [
     createdAt: '01/01/2026',
     contacts: [],
   },
-  // ── Fixtures das regras de ciclo de vida (PAS-2507) ──────────────────────
-  // Cenário: organização inativa e sem nenhuma conta → exclusão permitida.
+  // ── Fixtures das regras de ciclo de vida (reunião 03/09/2026) ────────────
+  // Cenário: org ATIVA, zero contas, nunca teve contrato → exclusão física
+  // permitida (platform_admin). É o caso "org criada por engano".
   {
     id: 'org-meridiano',
     name: 'Meridiano Log',
@@ -249,7 +250,7 @@ export const organizations: Organization[] = [
     complement: '',
     officialSite: 'www.meridianolog.com.br',
     arquitetoPAS: 'Marcelo Gomes',
-    status: 'Inativo',
+    status: 'Ativo',
     createdAt: '12/11/2025',
     contacts: [],
   },
@@ -405,8 +406,9 @@ export const accounts: Account[] = [
     status: 'Inativo',
     createdAt: '20/09/2025',
   },
-  // Cenário: contratos só inativos, mas com solução vinculada (accountId) →
-  // inativação permitida; após inativar, exclusão bloqueada pela solução.
+  // Cenário: conta ATIVA que já teve contrato (inativo) e tem solução vinculada.
+  // Inativação permitida (contrato inativo não bloqueia); exclusão física NÃO —
+  // "já teve contrato" trava para sempre, sobra só inativar.
   {
     id: 'a1-labs',
     orgId: '1',
@@ -418,7 +420,8 @@ export const accounts: Account[] = [
     status: 'Ativo',
     createdAt: '02/04/2026',
   },
-  // Cenário: conta inativa e sem nenhum vínculo → exclusão permitida.
+  // Cenário: conta ATIVA, nunca teve contrato, sem solução vinculada → exclusão
+  // física permitida (platform_admin). O caso Docnix/Docnix.
   {
     id: 'a1-piloto',
     orgId: '1',
@@ -427,12 +430,12 @@ export const accounts: Account[] = [
     provisioningStatus: 'COMPLETED',
     arquitetoPAS: 'Marcelo Gomes',
     isDefault: false,
-    status: 'Inativo',
+    status: 'Ativo',
     createdAt: '18/02/2026',
   },
-  // Cenário: único contrato da conta está 'Ativo' mas VENCIDO → fora de vigência,
-  // logo não bloqueia. Isola a regra de `contratoVigente` (status + dataTermino),
-  // que na conta Apple fica mascarada por um segundo contrato ainda vigente.
+  // Cenário: conta ATIVA cujo único contrato tem status 'Ativo' mas VENCEU por
+  // data. Prova que a data não importa — o contrato ativo bloqueia a inativação
+  // do mesmo jeito (Regra A: contrato válido = status !== 'Inativo').
   {
     id: 'a1-legado',
     orgId: '1',
@@ -444,22 +447,21 @@ export const accounts: Account[] = [
     status: 'Ativo',
     createdAt: '08/01/2025',
   },
-  // Cenário: conta em quarentena (soft delete) — excluída há 12 dias, ainda
-  // restaurável via "Cancelar exclusão". Só aparece com "Exibir contas excluídas".
+  // Cenário: conta ATIVA com solução vinculada (accountId), nunca teve contrato
+  // → exclusão física bloqueada por "1 solução vinculada" (Regra 4/B).
   {
-    id: 'a1-quarentena',
+    id: 'a1-com-solucao',
     orgId: '1',
-    name: 'Apple Ventures',
-    subdomain: 'apple-ventures',
+    name: 'Apple Sandbox',
+    subdomain: 'apple-sandbox',
     provisioningStatus: 'COMPLETED',
     arquitetoPAS: 'Marcelo Gomes',
     isDefault: false,
-    status: 'Inativo',
-    createdAt: '05/01/2026',
-    deletedAt: new Date(Date.now() - 12 * 86400000).toISOString(),
+    status: 'Ativo',
+    createdAt: '20/03/2026',
   },
-  // Cenário: conta inativa, sem contratos, mas com usuários vinculados
-  // (accountMembrosIds) → exclusão bloqueada pelos usuários (hipótese 3).
+  // Cenário: conta ATIVA com usuários vinculados, nunca teve contrato, sem
+  // solução → exclusão física PERMITIDA. Prova que usuário não bloqueia (Regra 7).
   {
     id: 'a2-arquivo',
     orgId: '2',
@@ -468,7 +470,7 @@ export const accounts: Account[] = [
     provisioningStatus: 'COMPLETED',
     arquitetoPAS: 'Marcelo Gomes',
     isDefault: false,
-    status: 'Inativo',
+    status: 'Ativo',
     createdAt: '15/12/2025',
   },
 ]
@@ -737,48 +739,49 @@ export const solutions: Solution[] = [
     status: 'Ativo',
     createdAt: '01/01/2026',
   },
-  // ── Fixtures das regras de ciclo de vida (PAS-2507) ──────────────────────
-  // Cenário: solução inativa vinculada a uma conta (accountId) e a um componente,
-  // fora de qualquer contrato → exclusão bloqueada só pelo componente; e mantém
-  // a conta 'Apple Labs' sem poder ser excluída.
+  // ── Fixtures das regras de ciclo de vida (reunião 03/09/2026) ────────────
+  // Cenário: solução ATIVA vinculada à conta 'Apple Sandbox' (accountId), nunca
+  // esteve em contrato, tem componente. Exclusão física bloqueada por "1
+  // contrato vinculado"? Não — não tem. Por componente? Não (Regra F: componente
+  // não é filho da hierarquia). → exclusão PERMITIDA. Também é a solução que
+  // impede a exclusão da conta 'Apple Sandbox'.
   {
     id: 's6',
     orgId: '1',
-    accountId: 'a1-labs',
-    name: 'Apple Labs Sandbox',
+    accountId: 'a1-com-solucao',
+    name: 'Apple Sandbox Core',
     componenteIds: ['comp-1'],
     plans: [],
-    description: 'Ambiente de laboratório da conta Apple Labs.',
+    description: 'Solução de laboratório da conta Apple Sandbox.',
     arquitetoPAS: 'Marcelo Gomes',
-    status: 'Inativo',
-    createdAt: '02/04/2026',
+    status: 'Ativo',
+    createdAt: '20/03/2026',
   },
-  // Cenário: solução inativa, SEM componente, mas presente num contrato (inativo)
-  // → exclusão bloqueada só pelo contrato. Sem esta fixture a regra "contrato
-  // bloqueia exclusão de solução" era inalcançável pela UI: toda solução com
-  // contrato ATIVO tem a inativação barrada antes, e exclusão exige inativa.
+  // Cenário: solução ATIVA que já esteve num contrato (inativo) → exclusão física
+  // permanentemente indisponível, sobra só inativar. Sem componente para isolar
+  // o motivo.
   {
     id: 's8',
     orgId: '1',
     name: 'Portal Legado',
     componenteIds: [],
     plans: [],
-    description: 'Portal descontinuado, mantido por contrato encerrado.',
+    description: 'Portal descontinuado, já contratado no passado.',
     arquitetoPAS: 'Marcelo Gomes',
-    status: 'Inativo',
+    status: 'Ativo',
     createdAt: '10/01/2025',
   },
-  // Cenário: solução inativa, sem componente e fora de qualquer contrato →
-  // exclusão permitida.
+  // Cenário: solução ATIVA, sem componente, nunca esteve em contrato → exclusão
+  // física permitida (platform_admin).
   {
     id: 's7',
     orgId: '2',
-    name: 'Analytics Legado',
+    name: 'Analytics Rascunho',
     componenteIds: [],
     plans: [],
-    description: 'Versão descontinuada do Cockpit Analytics.',
+    description: 'Rascunho de solução, criado por engano.',
     arquitetoPAS: 'Marcelo Gomes',
-    status: 'Inativo',
+    status: 'Ativo',
     createdAt: '10/10/2025',
   },
 ]
@@ -971,9 +974,9 @@ export const contracts: Contract[] = [
     status: 'Ativo',
   },
 
-  // ── Fixtures das regras de ciclo de vida (PAS-2507) ──────────────────────
-  // Contrato inativo da org-vega — reforça que a inativação da org só depende
-  // do status das contas, não dos contratos.
+  // ── Fixtures das regras de ciclo de vida (reunião 03/09/2026) ────────────
+  // Contrato inativo da org-vega — não afeta a inativação da org (que só olha
+  // o status das contas).
   {
     id: 'ctr-vega-antigo',
     orgId: 'org-vega',
@@ -986,8 +989,8 @@ export const contracts: Contract[] = [
     renovacao: 'Anual',
     status: 'Inativo',
   },
-  // Contrato encerrado que ainda referencia 'Portal Legado' — é o que impede a
-  // exclusão daquela solução (contrato nunca some, então o bloqueio é definitivo).
+  // Contrato inativo que já referenciou 'Portal Legado' — "jaTeveContrato" trava
+  // a exclusão física da solução para sempre.
   {
     id: 'ctr-portal-legado',
     orgId: '1',
@@ -1000,8 +1003,8 @@ export const contracts: Contract[] = [
     renovacao: 'Anual',
     status: 'Inativo',
   },
-  // Contrato 'Ativo' porém VENCIDO — fora de vigência. Único contrato da conta
-  // 'Apple Legado', que por isso pode ser inativada normalmente.
+  // Contrato com status 'Ativo' mas vencido por data. Único contrato da conta
+  // 'Apple Legado' — bloqueia a inativação dela (status manda, data não).
   {
     id: 'ctr-apple-legado',
     orgId: '1',
@@ -1014,9 +1017,8 @@ export const contracts: Contract[] = [
     renovacao: 'Anual',
     status: 'Ativo',
   },
-  // Contrato inativo da conta 'Apple Labs' — sozinho não bloqueia a inativação
-  // da conta (fora de vigência por estar inativo); a solução s6 é que bloqueia
-  // a exclusão dela.
+  // Contrato inativo da conta 'Apple Labs' — não bloqueia a inativação (status
+  // inativo), mas "jaTeveContrato" trava a exclusão física dela para sempre.
   {
     id: 'ctr-apple-labs',
     orgId: '1',
@@ -1422,7 +1424,7 @@ export const accountMembrosIds: Record<string, string[]> = {
   'acc-comgas': ['usr-fernando', 'usr-marcelo-c', 'usr-neide', 'usr-leo'],
   'a1':         ['2', 'usr-pedro', 'usr-sofia', 'usr-rafael', 'usr-julia'],  // Apple: Ana + 4 membros
   'a2':         ['4', 'usr-lucas', 'usr-beatriz', 'usr-thiago'],             // Santacruz: Carla + 3 membros
-  'a2-arquivo': ['usr-lucas', 'usr-thiago'],                                 // PAS-2507: usuários bloqueiam a exclusão da conta
+  'a2-arquivo': ['usr-lucas', 'usr-thiago'],                                 // 03/09: usuários NÃO bloqueiam exclusão (Regra 7)
 }
 
 // ── Membros de grupo — fallback local ─────────────────────────
