@@ -1,215 +1,285 @@
 /**
- * Regras de inativação e exclusão de Organização, Conta, Solução e Contrato.
+ * Regras de ciclo de vida — inativação, reativação e exclusão física das quatro
+ * entidades da hierarquia Organização → Conta → Solução → Contrato.
  *
- * Ponto único — nenhum componente calcula vínculo por conta própria. Mesma
- * ideia de `src/authz/engine.ts`: funções puras, sem React, sem side effects.
+ * Fonte: reunião "Definições em aberto do UH de Contratos" — 03/09/2026
+ * (Neide, River, Leonardo, Pedro Vitor, Mateus Gandi).
  *
- * Modelo: **pré-requisito de baixo para cima**, nunca cascata. Um nível só é
- * inativado ou excluído quando os níveis dependentes já foram resolvidos.
- * Nenhuma ação altera o status de registros dependentes.
+ * Ponto único, funções puras — mesmo padrão de `src/authz/engine.ts`. Os
+ * componentes só ligam os vereditos à UI; não recalculam vínculo.
  *
- * Hierarquia dos vínculos (joins por nome onde não há FK — ver CLAUDE.md):
- *   Organização ──orgId──> Conta ──(contratante = conta.name)──> Contrato
- *   Contrato.objetos[].solucao ──(= solucao.name)──> Solução
- *   Solução ──accountId──> Conta        (vínculo direto de catálogo por conta)
- *   Solução ──componenteIds[]──> Componente
- *   Conta ──user_account_memberships──> Usuário
+ * ── Modelo (uniforme para as quatro entidades — condição do River) ──
+ *
+ * INATIVAÇÃO — bottom-up. Uma entidade só inativa quando não há nenhum filho
+ *   ATIVO (`status !== 'Inativo'`) no nível de baixo. O bloqueio exibe a lista
+ *   dos filhos; o usuário inativa item a item e volta. Nunca cascateia. Não há
+ *   diálogo de confirmação forte nem "palavra de segurança".
+ *
+ * REATIVAÇÃO — sempre manual, item a item. Nunca cascateia: antes da inativação
+ *   o conjunto podia ter itens ativos e inativos misturados, e reativar em bloco
+ *   destruiria esse estado. (Aplicada nos handlers `handleActivate*` das páginas.)
+ *
+ * EXCLUSÃO FÍSICA — hard delete, mecanismo de correção de erro operacional.
+ *   Privilégio exclusivo de `platform_admin`. Também bottom-up. Exige as TRÊS
+ *   condições simultâneas:
+ *     1. jaTeveContrato === false  — nunca teve contrato, nem já finalizado
+ *     2. zero itens vinculados     — filhos diretos, de qualquer status
+ *     3. status !== 'Inativo'      — se foi inativada, esteve em uso, e "em uso"
+ *                                    não é caso de correção de erro
+ *   Contrato NUNCA é excluível fisicamente, em perfil nenhum.
+ *
+ * ── "Contrato válido" tem três leituras que NÃO se misturam ──
+ *   contratoAtivo(c)     → status !== 'Inativo'.  Bloqueia inativação do pai.
+ *   jaTeveContrato(...)  → qualquer contrato na história (qualquer status).
+ *                          Bloqueia a exclusão física, permanentemente.
+ *   dataTermino          → sem efeito nenhum em ciclo de vida. Contrato vencido
+ *                          por data permanece "válido" enquanto o status não for
+ *                          'Inativo' (Marcelo: preservar para negociação; churn
+ *                          é quando o cliente sai e o contrato é inativado).
  */
 
-import type { Account, Componente, Contract, Organization, Solution, User } from '@/types'
-import { parsearData } from '@/lib/datas'
+import type { Account, Contract, Organization, Solution } from '@/types'
 
-export type TipoImpedimento = 'conta' | 'contrato' | 'solucao' | 'componente' | 'usuario'
+export type NivelHierarquia = 'organizacao' | 'conta' | 'solucao' | 'contrato'
+export type TipoImpedimento = 'conta' | 'solucao' | 'contrato'
 
 export interface Impedimento {
   tipo: TipoImpedimento
   id: string
   nome: string
-  /** Texto curto de contexto — ex.: "vigente até 31/12/2026", "em quarentena". */
   detalhe?: string
 }
 
+export type MotivoBloqueio =
+  | 'filhos-ativos'     // inativação: há filhos com status !== 'Inativo'
+  | 'itens-vinculados'  // exclusão: há filhos (qualquer status) — resolver primeiro
+  | 'ja-teve-contrato'  // exclusão: histórico de contrato — indisponível para sempre
+  | 'ja-inativada'      // exclusão: entidade inativa nunca mais é excluível
+  | 'ja-usada'          // exclusão: HIPÓTESE 1 — critério indefinido
+  | 'sem-permissao'     // exclusão: perfil != platform_admin
+  | 'nao-aplicavel'     // contrato nunca é excluível
+
 export interface Veredito {
   permitido: boolean
-  /**
-   * 'vinculos'       → há registros dependentes a resolver (lista em `impedimentos`).
-   * 'registro-ativo' → HIPÓTESE 4: exclusão exige que o registro esteja inativo.
-   * 'nunca'          → ação não existe para esta entidade (contrato não é excluível).
-   */
-  motivo?: 'vinculos' | 'registro-ativo' | 'nunca'
+  motivo?: MotivoBloqueio
+  /** Registros a exibir. Navegáveis apenas quando `motivo` é resolúvel pelo usuário. */
   impedimentos: Impedimento[]
 }
 
 const OK: Veredito = { permitido: true, impedimentos: [] }
 
-// ── Helpers de estado ────────────────────────────────────────
+/** 'Criado' e 'Ativo' contam como ativo; só 'Inativo' não. */
+const ativo = (status: string) => status !== 'Inativo'
 
-/**
- * Um contrato "prende" a conta/solução enquanto não estiver inativo E dentro da
- * vigência. Contrato 'Ativo' com `dataTermino` no passado está fora de vigência
- * e não bloqueia — é o caso do fixture `6e20fc54…`.
- */
-export function contratoVigente(c: Contract): boolean {
-  if (c.status === 'Inativo') return false
-  const termino = parsearData(c.dataTermino)
-  if (!termino) return true // sem data legível → trata como vigente (conservador)
-  const hoje = new Date()
-  hoje.setHours(0, 0, 0, 0)
-  return termino.getTime() >= hoje.getTime()
+// ── Contexto de vínculos ─────────────────────────────────────
+// As páginas montam a partir do que já têm carregado.
+
+export interface ContextoVinculos {
+  contas: Account[]
+  solucoes: Solution[]
+  contratos: Contract[]
 }
 
-// HIPÓTESE: status 'Criado' conta como não-inativo — bloqueia a inativação do
-// nível acima e impede a exclusão direta (hipótese 4). Consistente com o
-// `status !== 'Inativo'` já usado no resto do código.
-const inativo = (status: string) => status === 'Inativo'
-
-const rotuloContrato = (c: Contract) => `Contrato · ${c.contratante}`
-const detalheVigencia = (c: Contract) => {
-  const termino = parsearData(c.dataTermino)
-  return termino
-    ? `vigente até ${String(termino.getDate()).padStart(2, '0')}/${String(termino.getMonth() + 1).padStart(2, '0')}/${termino.getFullYear()}`
-    : 'vigente'
+export interface ContextoPerfil {
+  isPlatformAdmin: boolean
 }
 
-// ── Consultas de vínculo (exportadas p/ os sheets decidirem o rótulo do botão) ──
+// ── Consultas (exportadas p/ a UI decidir rótulos de botão) ──
 
-export function contratosDaConta(conta: Account, contratos: Contract[]): Contract[] {
+/** Contrato "prende" enquanto o status não for 'Inativo'. Data de término não importa. */
+export const contratoAtivo = (c: Contract) => c.status !== 'Inativo'
+
+export function contratosDaConta(conta: Account, ctx: ContextoVinculos): Contract[] {
   // Sem FK: contracts.contratante = accounts.name, escopado por org (nomes não são únicos).
-  return contratos.filter(c => c.orgId === conta.orgId && c.contratante === conta.name)
+  return ctx.contratos.filter(c => c.orgId === conta.orgId && c.contratante === conta.name)
 }
 
-export function contratosVigentesDaConta(conta: Account, contratos: Contract[]): Contract[] {
-  return contratosDaConta(conta, contratos).filter(contratoVigente)
+export function contratosDaSolucao(sol: Solution, ctx: ContextoVinculos): Contract[] {
+  return ctx.contratos.filter(c => c.objetos.some(o => o.solucao === sol.name))
 }
 
-export function contratosDaSolucao(sol: Solution, contratos: Contract[]): Contract[] {
-  return contratos.filter(c => c.objetos.some(o => o.solucao === sol.name))
+export function contratosDaOrg(org: Organization, ctx: ContextoVinculos): Contract[] {
+  return ctx.contratos.filter(c => c.orgId === org.id)
 }
 
-// HIPÓTESE: solução é entidade de catálogo comercial (hipótese 2) — inativar
-// conta ou organização não a afeta. O vínculo direto solução↔conta existe só
-// para a regra de exclusão de conta ("sem nenhuma solução vinculada").
-export function solucoesDaConta(conta: Account, solucoes: Solution[]): Solution[] {
-  return solucoes.filter(s => s.accountId === conta.id)
+/** Vínculo direto solução↔conta (Solution.accountId). */
+export function solucoesDaConta(conta: Account, ctx: ContextoVinculos): Solution[] {
+  return ctx.solucoes.filter(s => s.accountId === conta.id)
 }
 
-export function contasAtivasDaOrg(org: Organization, contas: Account[]): Account[] {
-  return contas.filter(a => a.orgId === org.id && !inativo(a.status))
+export function contasDaOrg(org: Organization, ctx: ContextoVinculos): Account[] {
+  return ctx.contas.filter(a => a.orgId === org.id)
 }
 
-// ── INATIVAÇÃO (reversível, não altera dependentes) ──────────
+// ── Builders de Impedimento ──────────────────────────────────
+
+const impContrato = (c: Contract): Impedimento => ({
+  tipo: 'contrato', id: c.id, nome: `Contrato · ${c.contratante}`,
+  detalhe: c.status === 'Inativo' ? 'inativo' : 'ativo',
+})
+const impConta = (a: Account): Impedimento => ({
+  tipo: 'conta', id: a.id, nome: a.name,
+  detalhe: a.status === 'Inativo' ? 'inativa' : 'ativa',
+})
+const impSolucao = (s: Solution): Impedimento => ({
+  tipo: 'solucao', id: s.id, nome: s.name,
+  detalhe: s.status === 'Inativo' ? 'inativa' : 'ativa',
+})
+
+// ── INATIVAÇÃO ───────────────────────────────────────────────
+
+function vereditoInativacao(filhosAtivos: Impedimento[]): Veredito {
+  return filhosAtivos.length === 0
+    ? OK
+    : { permitido: false, motivo: 'filhos-ativos', impedimentos: filhosAtivos }
+}
 
 /** Contrato é o único nível inativável diretamente, sem pré-requisito. */
 export function podeInativarContrato(): Veredito {
   return OK
 }
 
-/** Conta só inativa se todos os contratos vinculados estiverem inativos ou fora de vigência. */
-export function podeInativarConta(conta: Account, contratos: Contract[]): Veredito {
-  const bloqueiam = contratosVigentesDaConta(conta, contratos)
-  if (bloqueiam.length === 0) return OK
-  return {
-    permitido: false,
-    motivo: 'vinculos',
-    impedimentos: bloqueiam.map(c => ({
-      tipo: 'contrato',
-      id: c.id,
-      nome: rotuloContrato(c),
-      detalhe: detalheVigencia(c),
-    })),
-  }
+/** Solução: bloqueada por contrato ativo que a referencia. */
+export function podeInativarSolucao(sol: Solution, ctx: ContextoVinculos): Veredito {
+  return vereditoInativacao(contratosDaSolucao(sol, ctx).filter(contratoAtivo).map(impContrato))
 }
 
-/** Organização só inativa se todas as contas vinculadas estiverem inativas. */
-export function podeInativarOrganizacao(org: Organization, contas: Account[]): Veredito {
-  const bloqueiam = contasAtivasDaOrg(org, contas)
-  if (bloqueiam.length === 0) return OK
-  return {
-    permitido: false,
-    motivo: 'vinculos',
-    impedimentos: bloqueiam.map(a => ({
-      tipo: 'conta',
-      id: a.id,
-      nome: a.name,
-      detalhe: a.status === 'Criado' ? 'aguardando provisionamento' : 'ativa',
-    })),
-  }
+/** Conta: bloqueada por contrato ativo vinculado (por nome). */
+export function podeInativarConta(conta: Account, ctx: ContextoVinculos): Veredito {
+  return vereditoInativacao(contratosDaConta(conta, ctx).filter(contratoAtivo).map(impContrato))
 }
 
-// ── EXCLUSÃO (permanente, nunca cascateia, exige registro inativo) ──
+/** Organização: bloqueada por conta com status !== 'Inativo'. */
+export function podeInativarOrganizacao(org: Organization, ctx: ContextoVinculos): Veredito {
+  return vereditoInativacao(
+    contasDaOrg(org, ctx).filter(a => ativo(a.status)).map(impConta),
+  )
+}
 
-/** Contrato NUNCA é excluível — registro jurídico e fiscal, sobrevive para auditoria. */
+// ── EXCLUSÃO FÍSICA ──────────────────────────────────────────
+
+// HIPÓTESE 1 — critério de "entidade nunca usada" não definido na reunião de
+// 03/09/2026. River sinalizou que pode ser necessário um histórico/log de uso
+// ainda inexistente; Pedro Vitor mencionou tabelas criadas no primeiro acesso à
+// home, River considerou insuficiente. Sem esse dado a Regra 4 não é totalmente
+// implementável.
+// Implementação provisória: assume "nunca usada" toda entidade — o único gate
+// efetivo hoje é "nunca teve contrato". Pendente de validação com River antes de
+// ir para produção.
+function entidadeJaUsada(_nivel: NivelHierarquia, _id: string): boolean {
+  return false
+}
+
+/**
+ * Núcleo uniforme (Regra 10). A única variação por entidade são os dois últimos
+ * argumentos: `historicoContratos` (todos os contratos que a entidade teve, de
+ * qualquer status) e `itensVinculados` (os filhos diretos, de qualquer status).
+ */
+function decideExclusaoFisica(
+  nivel: NivelHierarquia,
+  entidade: { id: string; status: string },
+  historicoContratos: Contract[],
+  itensVinculados: Impedimento[],
+  perfil: ContextoPerfil,
+): Veredito {
+  if (!perfil.isPlatformAdmin) {
+    return { permitido: false, motivo: 'sem-permissao', impedimentos: [] }
+  }
+  if (!ativo(entidade.status)) {
+    return { permitido: false, motivo: 'ja-inativada', impedimentos: [] }
+  }
+  if (historicoContratos.length > 0) {
+    // Contratos são imortais (Regra 3) — nada a resolver, exclusão indisponível para sempre.
+    return { permitido: false, motivo: 'ja-teve-contrato', impedimentos: historicoContratos.map(impContrato) }
+  }
+  if (itensVinculados.length > 0) {
+    return { permitido: false, motivo: 'itens-vinculados', impedimentos: itensVinculados }
+  }
+  if (entidadeJaUsada(nivel, entidade.id)) {
+    return { permitido: false, motivo: 'ja-usada', impedimentos: [] }
+  }
+  return OK
+}
+
+/** Contrato NUNCA é excluível fisicamente — registro jurídico e fiscal. */
 export function podeExcluirContrato(): Veredito {
-  return { permitido: false, motivo: 'nunca', impedimentos: [] }
+  return { permitido: false, motivo: 'nao-aplicavel', impedimentos: [] }
 }
 
-/** Organização: excluível apenas sem nenhuma conta vinculada (inclui contas em quarentena). */
-export function podeExcluirOrganizacao(org: Organization, contas: Account[]): Veredito {
-  // HIPÓTESE 4: exclusão exige que o registro esteja inativo.
-  if (!inativo(org.status)) return { permitido: false, motivo: 'registro-ativo', impedimentos: [] }
+/** Solução: filhos = contratos que a referenciam (histórico e vínculo são o mesmo conjunto). */
+export function podeExcluirSolucao(sol: Solution, ctx: ContextoVinculos, perfil: ContextoPerfil): Veredito {
+  const contratos = contratosDaSolucao(sol, ctx)
+  return decideExclusaoFisica('solucao', sol, contratos, contratos.map(impContrato), perfil)
+}
 
-  // Decisão: conta em quarentena (deletedAt preenchido) ainda é registro vinculado
-  // e bloqueia — "exclusão nunca cascateia".
-  const vinculadas = contas.filter(a => a.orgId === org.id)
-  if (vinculadas.length === 0) return OK
-  return {
-    permitido: false,
-    motivo: 'vinculos',
-    impedimentos: vinculadas.map(a => ({
-      tipo: 'conta',
-      id: a.id,
-      nome: a.name,
-      detalhe: a.deletedAt ? 'em quarentena' : inativo(a.status) ? 'inativa' : 'ativa',
-    })),
+/** Conta: histórico = contratos por nome; filhos = soluções com accountId. */
+export function podeExcluirConta(conta: Account, ctx: ContextoVinculos, perfil: ContextoPerfil): Veredito {
+  return decideExclusaoFisica(
+    'conta', conta,
+    contratosDaConta(conta, ctx),
+    solucoesDaConta(conta, ctx).map(impSolucao),
+    perfil,
+  )
+}
+
+/** Organização: histórico = contratos da org; filhos = contas da org (qualquer status). */
+export function podeExcluirOrganizacao(org: Organization, ctx: ContextoVinculos, perfil: ContextoPerfil): Veredito {
+  return decideExclusaoFisica(
+    'organizacao', org,
+    contratosDaOrg(org, ctx),
+    contasDaOrg(org, ctx).map(impConta),
+    perfil,
+  )
+}
+
+// ── Copy dos vereditos de bloqueio (fonte única) ─────────────
+
+/** Título + descrição do modal bloqueado, por motivo. `nome` é o da entidade-alvo. */
+export function textoBloqueio(
+  nivel: Exclude<NivelHierarquia, 'contrato'>,
+  motivo: MotivoBloqueio,
+): { titulo: string; descricao: string; verbo: 'inativar' | 'excluir' } {
+  const N = { organizacao: 'organização', conta: 'conta', solucao: 'solução' }[nivel]
+  switch (motivo) {
+    case 'filhos-ativos': {
+      const filho = nivel === 'organizacao' ? 'contas ativas' : 'contratos ativos'
+      return {
+        titulo: `Não é possível inativar esta ${N}`,
+        descricao: `Não é possível inativar esta ${N}. Existem ${filho} vinculados. Inative primeiro os itens abaixo:`,
+        verbo: 'inativar',
+      }
+    }
+    case 'itens-vinculados': {
+      const filho = nivel === 'organizacao' ? 'contas' : 'soluções'
+      return {
+        titulo: `Não é possível excluir esta ${N}`,
+        descricao: `A exclusão física exige que não haja nenhum item vinculado. Exclua primeiro as ${filho} abaixo:`,
+        verbo: 'excluir',
+      }
+    }
+    case 'ja-teve-contrato':
+      return {
+        titulo: `Não é possível excluir esta ${N}`,
+        descricao: `Esta ${N} já teve contrato vinculado. A exclusão física fica permanentemente indisponível — a única ação possível é a inativação.`,
+        verbo: 'excluir',
+      }
+    case 'ja-inativada':
+      return {
+        titulo: `Não é possível excluir esta ${N}`,
+        descricao: `Uma ${N} inativa não pode ser excluída fisicamente. A exclusão física é um mecanismo de correção de erro e só se aplica a registros ativos que nunca foram usados.`,
+        verbo: 'excluir',
+      }
+    case 'ja-usada':
+      return {
+        titulo: `Não é possível excluir esta ${N}`,
+        descricao: `Esta ${N} já foi utilizada e não pode ser excluída fisicamente. A única ação possível é a inativação.`,
+        verbo: 'excluir',
+      }
+    default:
+      return {
+        titulo: `Não é possível excluir esta ${N}`,
+        descricao: `A exclusão física não está disponível.`,
+        verbo: 'excluir',
+      }
   }
-}
-
-/** Conta: excluível apenas sem nenhuma solução e sem nenhum contrato vinculado. */
-export function podeExcluirConta(
-  conta: Account,
-  solucoes: Solution[],
-  contratos: Contract[],
-  usuarios: User[],
-): Veredito {
-  // HIPÓTESE 4: exclusão exige que o registro esteja inativo.
-  if (!inativo(conta.status)) return { permitido: false, motivo: 'registro-ativo', impedimentos: [] }
-
-  const impedimentos: Impedimento[] = [
-    ...solucoesDaConta(conta, solucoes).map((s): Impedimento => ({
-      tipo: 'solucao', id: s.id, nome: s.name,
-    })),
-    ...contratosDaConta(conta, contratos).map((c): Impedimento => ({
-      tipo: 'contrato', id: c.id, nome: rotuloContrato(c),
-      detalhe: c.status === 'Inativo' ? 'inativo' : detalheVigencia(c),
-    })),
-    // HIPÓTESE 3: usuários vinculados entram na lista de impedimentos.
-    ...usuarios.map((u): Impedimento => ({
-      tipo: 'usuario', id: u.id, nome: u.nomeCompleto,
-    })),
-  ]
-  if (impedimentos.length === 0) return OK
-  return { permitido: false, motivo: 'vinculos', impedimentos }
-}
-
-/** Solução: excluível apenas sem nenhum componente e sem nenhum contrato vinculado. */
-export function podeExcluirSolucao(
-  sol: Solution,
-  componentes: Componente[],
-  contratos: Contract[],
-): Veredito {
-  // HIPÓTESE 4: exclusão exige que o registro esteja inativo.
-  if (!inativo(sol.status)) return { permitido: false, motivo: 'registro-ativo', impedimentos: [] }
-
-  const impedimentos: Impedimento[] = [
-    ...(sol.componenteIds ?? []).map((id): Impedimento => ({
-      tipo: 'componente', id,
-      nome: componentes.find(c => c.id === id)?.nome ?? id,
-    })),
-    ...contratosDaSolucao(sol, contratos).map((c): Impedimento => ({
-      tipo: 'contrato', id: c.id, nome: rotuloContrato(c),
-      detalhe: c.status === 'Inativo' ? 'inativo' : detalheVigencia(c),
-    })),
-  ]
-  if (impedimentos.length === 0) return OK
-  return { permitido: false, motivo: 'vinculos', impedimentos }
 }
