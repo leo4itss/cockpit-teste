@@ -538,13 +538,22 @@ export function OrganizacaoDetailPage() {
     }
   }
 
+  // Reativação. Simétrica à inativação: confirma no toast. Sem backend a mudança
+  // é aplicada localmente e ainda assim é sucesso (ver `semBackend`); com backend
+  // respondendo erro, o estado não muda e o toast diz isso.
   async function handleActivateOrg() {
     if (!org) return
     try {
       const updated = await api.updateOrganization(org.id, { ...org, status: 'Ativo' })
       setOrg(updated)
-    } catch {
-      setOrg(prev => prev ? { ...prev, status: 'Ativo' } : prev)
+      toast('Organização ativada com sucesso.', 'success')
+    } catch (err) {
+      if (semBackend(err)) {
+        setOrg(prev => prev ? { ...prev, status: 'Ativo' } : prev)
+        toast('Organização ativada com sucesso.', 'success')
+      } else {
+        toast('Não foi possível ativar a organização. Tente novamente.', 'error')
+      }
     }
     setSheetEditOrg(false)
   }
@@ -566,11 +575,18 @@ export function OrganizacaoDetailPage() {
   }
 
   async function handleActivateAccount(account: Account) {
+    const aplicar = () => setAccounts(prev => prev.map(a => a.id === account.id ? { ...account, status: 'Ativo' } : a))
     try {
       const updated = await api.updateAccount(account.id, { ...account, status: 'Ativo' })
       setAccounts(prev => prev.map(a => a.id === updated.id ? updated : a))
-    } catch {
-      setAccounts(prev => prev.map(a => a.id === account.id ? { ...account, status: 'Ativo' } : a))
+      toast('Conta ativada com sucesso.', 'success')
+    } catch (err) {
+      if (semBackend(err)) {
+        aplicar()
+        toast('Conta ativada com sucesso.', 'success')
+      } else {
+        toast('Não foi possível ativar a conta. Tente novamente.', 'error')
+      }
     }
     setEditingAccount(null); setSelectedAccount(null)
   }
@@ -619,11 +635,18 @@ export function OrganizacaoDetailPage() {
   }
 
   async function handleActivateContract(contract: Contract) {
+    const aplicar = () => setContracts(prev => prev.map(c => c.id === contract.id ? { ...contract, status: 'Ativo' } : c))
     try {
       const updated = await api.updateContract(contract.id, { ...contract, status: 'Ativo' })
       setContracts(prev => prev.map(c => c.id === updated.id ? updated : c))
-    } catch {
-      setContracts(prev => prev.map(c => c.id === contract.id ? { ...contract, status: 'Ativo' } : c))
+      toast('Contrato ativado com sucesso.', 'success')
+    } catch (err) {
+      if (semBackend(err)) {
+        aplicar()
+        toast('Contrato ativado com sucesso.', 'success')
+      } else {
+        toast('Não foi possível ativar o contrato. Tente novamente.', 'error')
+      }
     }
     setEditingContract(null); setSelectedContract(null)
   }
@@ -675,11 +698,18 @@ export function OrganizacaoDetailPage() {
   }
 
   async function handleActivateSolution(solution: Solution) {
+    const aplicar = () => setSolutions(prev => prev.map(s => s.id === solution.id ? { ...solution, status: 'Ativo' } : s))
     try {
       const updated = await api.updateSolution(solution.id, { ...solution, status: 'Ativo' })
       setSolutions(prev => prev.map(s => s.id === updated.id ? updated : s))
-    } catch {
-      setSolutions(prev => prev.map(s => s.id === solution.id ? { ...solution, status: 'Ativo' } : s))
+      toast('Solução ativada com sucesso.', 'success')
+    } catch (err) {
+      if (semBackend(err)) {
+        aplicar()
+        toast('Solução ativada com sucesso.', 'success')
+      } else {
+        toast('Não foi possível ativar a solução. Tente novamente.', 'error')
+      }
     }
     setEditingSolution(null); setSelectedSolution(null)
   }
