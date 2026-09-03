@@ -430,6 +430,20 @@ export const accounts: Account[] = [
     status: 'Inativo',
     createdAt: '18/02/2026',
   },
+  // Cenário: conta em quarentena (soft delete) — excluída há 12 dias, ainda
+  // restaurável via "Cancelar exclusão". Só aparece com "Exibir contas excluídas".
+  {
+    id: 'a1-quarentena',
+    orgId: '1',
+    name: 'Apple Ventures',
+    subdomain: 'apple-ventures',
+    provisioningStatus: 'COMPLETED',
+    arquitetoPAS: 'Marcelo Gomes',
+    isDefault: false,
+    status: 'Inativo',
+    createdAt: '05/01/2026',
+    deletedAt: new Date(Date.now() - 12 * 86400000).toISOString(),
+  },
   // Cenário: conta inativa, sem contratos, mas com usuários vinculados
   // (accountMembrosIds) → exclusão bloqueada pelos usuários (hipótese 3).
   {

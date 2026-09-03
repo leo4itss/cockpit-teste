@@ -23,7 +23,7 @@ import { api } from '@/api/client'
 import { useAuthz, useIsPlatformAdmin, useIsOrgAdmin, useIsPasArchitect } from '@/authz/hooks'
 import { useComponentes } from '@/context/ComponentesContext'
 import { useProvisioningPolling } from '@/hooks/useProvisioningPolling'
-import { formatarData } from '@/lib/datas'
+import { formatarData, previsaoExclusaoPermanente } from '@/lib/datas'
 import {
   podeInativarConta,
   podeInativarOrganizacao,
@@ -61,6 +61,11 @@ export function OrganizacaoDetailPage() {
   const [tab, setTab] = useState<Tab>('conta')
   const [org, setOrg] = useState<Organization | null>(null)
   const [accounts, setAccounts] = useState<Account[]>([])
+  // Contas em quarentena (soft delete). Mantidas FORA de `accounts` de propósito:
+  // treze consumidores desse array assumem contas vivas (métricas, seletor de
+  // contratante, vínculo de usuário…). Só a listagem e a regra de exclusão da
+  // organização enxergam as excluídas.
+  const [accountsExcluidas, setAccountsExcluidas] = useState<Account[]>([])
   const [solutions, setSolutions] = useState<Solution[]>([])
   const [contracts, setContracts] = useState<Contract[]>([])
   const [tiposLicenca, setTiposLicenca] = useState<TipoLicenca[]>([])
@@ -77,7 +82,9 @@ export function OrganizacaoDetailPage() {
     // A página nunca fica em branco — o usuário vê dados reais ou de demonstração
     // em menos de 1ms, e os dados reais substituem quando a API responder.
     setOrg(mockOrgs.find(o => o.id === id) ?? null)
-    setAccounts(mockAccounts.filter(a => a.orgId === id))
+    const mockDaOrg = mockAccounts.filter(a => a.orgId === id)
+    setAccounts(mockDaOrg.filter(a => !a.deletedAt))
+    setAccountsExcluidas(mockDaOrg.filter(a => a.deletedAt))
     setSolutions(mockSolutions.filter(s => s.orgId === id))
     setContracts(mockContracts.filter(c => c.orgId === id))
     setTiposLicenca(mockTiposLicenca)
@@ -86,13 +93,16 @@ export function OrganizacaoDetailPage() {
     // ── Passo 2: tenta API em background; atualiza silenciosamente se vier ──
     Promise.allSettled([
       api.getOrganization(id),
-      api.getAccounts(id),
+      api.getAccounts(id, true),
       api.getSolutions(id),
       api.getContracts(id),
       api.getTiposLicenca(),
     ]).then(([orgRes, accsRes, solsRes, contsRes, tiposRes]) => {
       if (orgRes.status   === 'fulfilled' && orgRes.value)   setOrg(orgRes.value)
-      if (accsRes.status  === 'fulfilled')                   setAccounts(accsRes.value)
+      if (accsRes.status  === 'fulfilled') {
+        setAccounts(accsRes.value.filter((a: Account) => !a.deletedAt))
+        setAccountsExcluidas(accsRes.value.filter((a: Account) => a.deletedAt))
+      }
       if (solsRes.status  === 'fulfilled')                   setSolutions(solsRes.value)
       if (contsRes.status === 'fulfilled')                   setContracts(contsRes.value)
       if (tiposRes.status === 'fulfilled')                   setTiposLicenca(tiposRes.value)
@@ -180,6 +190,7 @@ export function OrganizacaoDetailPage() {
   const [accountExcluirModal, setAccountExcluirModal] = useState(false)
   const [accountExcluirBlockedTarget, setAccountExcluirBlockedTarget] = useState<Account | null>(null)
   const [showInativosAccount, setShowInativosAccount] = useState(false)
+  const [showExcluidasAccount, setShowExcluidasAccount] = useState(false)
 
   // Inativar contract modal
   const [contractInativarTarget, setContractInativarTarget] = useState<Contract | null>(null)
@@ -463,7 +474,10 @@ export function OrganizacaoDetailPage() {
     return orgUsers.filter(u => (userAccountsMap[u.id] ?? []).some(cv => cv.account.id === acc.id))
   }
 
-  const vExcluirOrg   = org ? podeExcluirOrganizacao(org, accounts) : null
+  // Decisão do produto: conta em quarentena ainda é registro vinculado e bloqueia
+  // a exclusão da organização. Sem `accountsExcluidas` aqui a regra nunca disparava
+  // no front — só o backend barrava, e a UI abria o modal de confirmação à toa.
+  const vExcluirOrg   = org ? podeExcluirOrganizacao(org, [...accounts, ...accountsExcluidas]) : null
   const vInativarOrg  = org ? podeInativarOrganizacao(org, accounts) : null
   const vInativarConta = (a: Account) => podeInativarConta(a, contracts)
   const vExcluirConta  = (a: Account) => podeExcluirConta(a, solutions, contracts, usuariosDaConta(a))
@@ -525,18 +539,60 @@ export function OrganizacaoDetailPage() {
     setEditingAccount(null)
   }
 
+  // `true` quando não houve resposta do backend — fetch rejeitado (offline) ou
+  // 5xx do proxy do Vite quando `npm run dev:server` não está rodando. Só nesse
+  // caso vale aplicar a mudança localmente, para o protótipo funcionar com o
+  // mock. Se o servidor RESPONDEU recusando (422 com motivo), a tela não pode
+  // fingir que a operação aconteceu — o erro real vai para o toast.
+  const semBackend = (e: unknown) =>
+    e instanceof TypeError || /^API error 5\d\d/.test(e instanceof Error ? e.message : '')
+
+  // Exclusão de conta é soft delete: o registro entra em quarentena de 30 dias
+  // (deletedAt) e continua restaurável por "Cancelar exclusão".
   async function handleDeleteAccount(account: Account) {
+    const emQuarentena: Account = { ...account, deletedAt: new Date().toISOString() }
+    const aplicar = () => {
+      setAccounts(prev => prev.filter(a => a.id !== account.id))
+      setAccountsExcluidas(prev => [...prev.filter(a => a.id !== account.id), emQuarentena])
+    }
     try {
       await api.deleteAccount(account.id)
-      setAccounts(prev => prev.filter(a => a.id !== account.id))
+      aplicar()
       toast('Conta excluída com sucesso.', 'success')
-    } catch {
-      setAccounts(prev => prev.filter(a => a.id !== account.id))
-      toast('Não foi possível excluir a conta. Verifique se existem soluções ou contratos vinculados.', 'error')
+    } catch (err) {
+      if (semBackend(err)) {
+        aplicar()
+        toast('Conta excluída com sucesso.', 'success')
+      } else {
+        toast(err instanceof Error ? err.message : 'Não foi possível excluir a conta. Verifique se existem soluções ou contratos vinculados.', 'error')
+      }
     }
     setAccountExcluirModal(false)
     setAccountExcluirTarget(null)
     setEditingAccount(null)
+  }
+
+  // Cancela a exclusão durante a quarentena — limpa deletedAt e devolve a conta
+  // à listagem. A conta volta com o status que tinha (inativa, pela hipótese 4).
+  async function handleRestoreAccount(account: Account) {
+    const restaurada: Account = { ...account, deletedAt: undefined }
+    const aplicar = () => {
+      setAccountsExcluidas(prev => prev.filter(a => a.id !== account.id))
+      setAccounts(prev => [...prev.filter(a => a.id !== account.id), restaurada])
+    }
+    try {
+      const saved = await api.restoreAccount(account.id)
+      setAccountsExcluidas(prev => prev.filter(a => a.id !== account.id))
+      setAccounts(prev => [...prev.filter(a => a.id !== account.id), saved ?? restaurada])
+      toast('Exclusão cancelada. A conta foi restaurada.', 'success')
+    } catch (err) {
+      if (semBackend(err)) {
+        aplicar()
+        toast('Exclusão cancelada. A conta foi restaurada.', 'success')
+      } else {
+        toast('Não foi possível cancelar a exclusão. Tente novamente.', 'error')
+      }
+    }
   }
 
   async function handleInativarContract(contract: Contract) {
@@ -778,18 +834,31 @@ export function OrganizacaoDetailPage() {
 
               <div className="flex items-center gap-8">
                 {tab === 'conta' && (() => {
-                  const hasInativas = accounts.some(a => a.status === 'Inativo')
+                  const hasInativas  = accounts.some(a => a.status === 'Inativo')
+                  const hasExcluidas = accountsExcluidas.length > 0
                   return (
-                    <label className={`flex items-start gap-2 ${hasInativas ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'}`}>
-                      <input
-                        type="checkbox"
-                        checked={showInativosAccount && hasInativas}
-                        onChange={e => hasInativas && setShowInativosAccount(e.target.checked)}
-                        disabled={!hasInativas}
-                        className="w-4 h-4 mt-[1px] rounded border border-[#e5e7eb] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] shrink-0 accent-[#2563eb] cursor-pointer"
-                      />
-                      <span className="text-sm font-medium text-[#030712] leading-none">Exibir contas inativadas</span>
-                    </label>
+                    <div className="flex items-center gap-6">
+                      <label className={`flex items-start gap-2 ${hasInativas ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'}`}>
+                        <input
+                          type="checkbox"
+                          checked={showInativosAccount && hasInativas}
+                          onChange={e => hasInativas && setShowInativosAccount(e.target.checked)}
+                          disabled={!hasInativas}
+                          className="w-4 h-4 mt-[1px] rounded border border-[#e5e7eb] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] shrink-0 accent-[#2563eb] cursor-pointer"
+                        />
+                        <span className="text-sm font-medium text-[#030712] leading-none">Exibir contas inativadas</span>
+                      </label>
+                      <label className={`flex items-start gap-2 ${hasExcluidas ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'}`}>
+                        <input
+                          type="checkbox"
+                          checked={showExcluidasAccount && hasExcluidas}
+                          onChange={e => hasExcluidas && setShowExcluidasAccount(e.target.checked)}
+                          disabled={!hasExcluidas}
+                          className="w-4 h-4 mt-[1px] rounded border border-[#e5e7eb] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] shrink-0 accent-[#2563eb] cursor-pointer"
+                        />
+                        <span className="text-sm font-medium text-[#030712] leading-none">Exibir contas excluídas</span>
+                      </label>
+                    </div>
                   )
                 })()}
                 {tab === 'solucoes' && (() => {
@@ -874,7 +943,11 @@ export function OrganizacaoDetailPage() {
               </div>
 
               {(() => {
-                const visibleAccounts = accounts.filter(a => showInativosAccount || a.status !== 'Inativo')
+                // Contas em quarentena vão para o fim da lista e só aparecem sob demanda.
+                const visibleAccounts = [
+                  ...accounts.filter(a => showInativosAccount || a.status !== 'Inativo'),
+                  ...(showExcluidasAccount ? accountsExcluidas : []),
+                ]
                 return visibleAccounts.length === 0 ? (
                   <EmptyState message="Nenhuma conta criada" description="Crie uma conta para provisionar o sistema." />
                 ) : (
@@ -892,7 +965,9 @@ export function OrganizacaoDetailPage() {
                       </thead>
                       <tbody>
                         {visibleAccounts.map(a => {
-                          const isInativo = a.status === 'Inativo'
+                          const isExcluida = !!a.deletedAt
+                          const isInativo = a.status === 'Inativo' || isExcluida
+                          const expurgo = isExcluida ? previsaoExclusaoPermanente(a.deletedAt) : null
                           return (
                             <tr
                               key={a.id}
@@ -902,7 +977,18 @@ export function OrganizacaoDetailPage() {
                               <td className="px-2 py-2 h-[52px]">
                                 <div className="flex items-center gap-2">
                                   <div className={`w-8 h-8 rounded-full bg-[#f3f4f6] border border-[#e5e7eb] flex items-center justify-center text-sm font-medium text-[#6b7280] shrink-0 ${isInativo ? 'opacity-40' : ''}`}>{a.name.charAt(0)}</div>
-                                  <span className={`text-sm font-medium ${isInativo ? 'text-[#9ca3af]' : 'text-[#030712]'}`}>{a.name}</span>
+                                  <div className="min-w-0">
+                                    <span className={`text-sm font-medium block ${isInativo ? 'text-[#9ca3af]' : 'text-[#030712]'}`}>{a.name}</span>
+                                    {expurgo && (
+                                      <span className="text-xs text-red-600 block leading-4">
+                                        {expurgo.diasRestantes === 0
+                                          ? 'Exclusão permanente pendente'
+                                          : expurgo.diasRestantes === 1
+                                            ? 'Exclusão permanente em 1 dia'
+                                            : `Exclusão permanente em ${expurgo.diasRestantes} dias`}
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
                               </td>
                               <td className="px-2 py-2 h-[52px]">
@@ -919,14 +1005,23 @@ export function OrganizacaoDetailPage() {
                               <td className={`px-2 py-2 h-[52px] text-sm text-center ${isInativo ? 'text-[#9ca3af]' : 'text-[#030712]'}`}>{a.arquitetoPAS}</td>
                               <td className="px-2 py-2 h-[52px] text-center">
                                 <Badge
-                                  variant={a.status === 'Inativo' ? 'secondary' : 'success'}
+                                  variant={isExcluida ? 'error' : a.status === 'Inativo' ? 'secondary' : 'success'}
                                   showIcon
                                 >
-                                  {a.status === 'Inativo' ? 'Inativo' : 'Ativo'}
+                                  {isExcluida ? 'Em quarentena' : a.status === 'Inativo' ? 'Inativo' : 'Ativo'}
                                 </Badge>
                               </td>
                               <td className="px-2 py-2 h-[52px] text-center" onClick={e => e.stopPropagation()}>
-                                {isInativo ? (
+                                {isExcluida ? (
+                                  <button
+                                    type="button"
+                                    title="Cancelar exclusão"
+                                    onClick={() => handleRestoreAccount(a)}
+                                    className="w-8 h-8 flex items-center justify-center mx-auto rounded-md text-gray-400 hover:text-green-600 hover:bg-green-50 transition-colors opacity-0 group-hover/row:opacity-100"
+                                  >
+                                    <RotateCcw className="w-4 h-4" />
+                                  </button>
+                                ) : isInativo ? (
                                   <button
                                     type="button"
                                     title="Ativar conta"

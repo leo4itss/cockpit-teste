@@ -85,3 +85,23 @@ export function formatarDataHora(valor: string | number | Date | null | undefine
     ` ${PAD(d.getHours())}:${PAD(d.getMinutes())}:${PAD(d.getSeconds())}`
   )
 }
+
+/** Dias de quarentena antes da exclusão permanente de uma conta. */
+export const QUARENTENA_DIAS = 30
+
+/**
+ * Previsão de exclusão permanente de um registro em quarentena (soft delete).
+ * `diasRestantes` é arredondado para cima e nunca negativo — 0 significa que o
+ * prazo venceu e o expurgo está pendente (o worker é quem apaga de fato).
+ */
+export function previsaoExclusaoPermanente(
+  deletedAt: string | number | Date | null | undefined,
+  dias: number = QUARENTENA_DIAS,
+): { data: Date | null; diasRestantes: number } {
+  const base = parsearData(deletedAt)
+  if (!base) return { data: null, diasRestantes: 0 }
+  const data = new Date(base)
+  data.setDate(data.getDate() + dias)
+  const restante = Math.ceil((data.getTime() - Date.now()) / 86400000)
+  return { data, diasRestantes: Math.max(0, restante) }
+}

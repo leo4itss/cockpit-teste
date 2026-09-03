@@ -206,7 +206,7 @@ export function ConfirmDeleteModal({ open, onClose, variant, name, onConfirm, bl
             <CircleAlert className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
             <p className="text-sm font-medium text-blue-700 leading-5">
               Durante os 30 dias de quarentena, você poderá cancelar a exclusão ativando
-              <strong> "Exibir contas deletadas"</strong> e clicando em{' '}
+              <strong> "Exibir contas excluídas"</strong> e clicando em{' '}
               <RotateCcw className="inline w-3 h-3 mb-0.5" /> <strong>Cancelar exclusão</strong>.
               <br />
               <span className="font-semibold">Exclusão permanente prevista para: {exclusaoFormatada}</span>
