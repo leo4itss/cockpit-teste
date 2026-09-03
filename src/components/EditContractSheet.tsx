@@ -23,6 +23,9 @@ interface Props {
   /** Demais contratos da org — usados para checar exclusividade de componente por conta. */
   contracts: Contract[]
   onSave: (contract: Contract) => void
+  // Contrato: só inativa/ativa, nunca exclui (Regra 3).
+  onInativar?: () => void
+  onAtivar?: () => void
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
@@ -262,7 +265,7 @@ function StepReview({
 
 // ── Sheet principal ────────────────────────────────────────────
 
-export function EditContractSheet({ open, onClose, contract, solutions, accounts, contracts, onSave }: Props) {
+export function EditContractSheet({ open, onClose, contract, solutions, accounts, contracts, onSave, onInativar, onAtivar }: Props) {
   const { toasts, toast, dismiss } = useToast()
   const [dataTermino, setDataTermino] = useState(contract.dataTermino)
   const [renovacao, setRenovacao] = useState(contract.renovacao)
@@ -394,6 +397,17 @@ export function EditContractSheet({ open, onClose, contract, solutions, accounts
 
   const footerStep1 = (
     <>
+      {isInactive
+        ? onAtivar && (
+            <Button variant="ghost" onClick={onAtivar} className="mr-auto text-green-700 hover:bg-green-50">
+              Ativar contrato
+            </Button>
+          )
+        : onInativar && (
+            <Button variant="ghost" onClick={onInativar} className="mr-auto text-amber-600 hover:bg-amber-50">
+              Inativar contrato
+            </Button>
+          )}
       <Button variant="outline" onClick={handleClose}>Cancelar</Button>
       {!isInactive && (
         <Button onClick={handlePrimaryAction}>{temSolucaoNova ? 'Revisar' : 'Salvar'}</Button>

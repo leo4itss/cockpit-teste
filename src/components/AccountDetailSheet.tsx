@@ -67,10 +67,6 @@ interface Props {
   account: Account | null
   org:     Organization | null
   onEdit?: () => void
-  // Ciclo de vida — Regra 9: acessível no detalhe, sem entrar em edição.
-  onInativar?: () => void
-  onAtivar?: () => void
-  onExcluir?: () => void  // fornecido só para platform_admin
 }
 
 type DetailTab = 'detalhes' | 'capacidades'
@@ -120,7 +116,7 @@ function StatusBadge({ status }: { status: Account['status'] }) {
 
 /* ── main component ─────────────────────────────────────────── */
 
-export function AccountDetailSheet({ open, onClose, account, org, onEdit, onInativar, onAtivar, onExcluir }: Props) {
+export function AccountDetailSheet({ open, onClose, account, org, onEdit }: Props) {
   const navigate = useNavigate()
   const { toasts, toast, dismiss } = useToast()
   const [tab, setTab] = useState<DetailTab>('detalhes')
@@ -196,12 +192,6 @@ export function AccountDetailSheet({ open, onClose, account, org, onEdit, onInat
             Ver provisionamento
           </Button>
           {onEdit && <Button variant="outline" size="sm" onClick={onEdit}>Editar</Button>}
-          {account.status === 'Inativo'
-            ? onAtivar && <Button variant="outline" size="sm" className="text-green-700" onClick={onAtivar}>Ativar</Button>
-            : <>
-                {onInativar && <Button variant="outline" size="sm" className="text-amber-600" onClick={onInativar}>Inativar</Button>}
-                {onExcluir && <Button variant="outline" size="sm" className="text-red-600" onClick={onExcluir}>Excluir</Button>}
-              </>}
         </div>
       }
     >

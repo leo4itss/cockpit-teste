@@ -11,9 +11,6 @@ interface Props {
   solution: Solution | null
   componentes?: Componente[]
   onEdit?: () => void
-  onInativar?: () => void
-  onAtivar?: () => void
-  onExcluir?: () => void
 }
 
 function Field({ label, value, required }: { label: string; value?: string; required?: boolean }) {
@@ -123,7 +120,7 @@ function PlanItem({ plan, inactive = false }: { plan: Plan; inactive?: boolean }
   )
 }
 
-export function SolutionDetailSheet({ open, onClose, solution, componentes = [], onEdit, onInativar, onAtivar, onExcluir }: Props) {
+export function SolutionDetailSheet({ open, onClose, solution, componentes = [], onEdit }: Props) {
   const [historyOpen, setHistoryOpen] = useState(false)
 
   if (!solution) return null
@@ -142,17 +139,9 @@ export function SolutionDetailSheet({ open, onClose, solution, componentes = [],
       onClose={onClose}
       title="Detalhe da solução"
       width="w-[640px]"
-      headerAction={
-        <div className="flex items-center gap-2">
-          {onEdit && <Button variant="outline" size="sm" onClick={onEdit}>Editar</Button>}
-          {solution.status === 'Inativo'
-            ? onAtivar && <Button variant="outline" size="sm" className="text-green-700" onClick={onAtivar}>Ativar</Button>
-            : <>
-                {onInativar && <Button variant="outline" size="sm" className="text-amber-600" onClick={onInativar}>Inativar</Button>}
-                {onExcluir && <Button variant="outline" size="sm" className="text-red-600" onClick={onExcluir}>Excluir</Button>}
-              </>}
-        </div>
-      }
+      headerAction={onEdit ? (
+        <Button variant="outline" size="sm" onClick={onEdit}>Editar</Button>
+      ) : undefined}
     >
       <div className="flex flex-col gap-6">
 

@@ -14,7 +14,13 @@ interface Props {
   onClose: () => void
   org: Organization
   onSave: (org: Organization) => void
-  // Ciclo de vida vive na barra lateral do OrganizacaoDetailPage (Regra 9), não aqui.
+  // Ciclo de vida no rodapé do Editar (definição de 03/09, ajustada em conversa
+  // posterior — as ações NÃO ficam no detail sheet). Exclusão física só aparece
+  // para entidade ATIVA (Regra 5) e só quando o pai passa `onExcluir`
+  // (platform_admin — Regra 6).
+  onInativar?: () => void
+  onAtivar?: () => void
+  onExcluir?: () => void
 }
 
 /* ── helpers ─────────────────────────────────────────────── */
@@ -132,7 +138,7 @@ function buildForm(org: Organization) {
 
 /* ── main ─────────────────────────────────────────────────── */
 
-export function EditOrganizationSheet({ open, onClose, org, onSave }: Props) {
+export function EditOrganizationSheet({ open, onClose, org, onSave, onInativar, onAtivar, onExcluir }: Props) {
   const { arquitetoOptions } = useUsers()
   const [form, setForm] = useState(() => buildForm(org))
   const [contacts, setContacts] = useState<Contact[]>(org.contacts ?? [])
@@ -215,6 +221,24 @@ export function EditOrganizationSheet({ open, onClose, org, onSave }: Props) {
         width="w-[640px]"
         footer={
           <>
+            {isInactive
+              ? onAtivar && (
+                  <Button variant="ghost" onClick={onAtivar} className="mr-auto text-green-700 hover:bg-green-50">
+                    Ativar organização
+                  </Button>
+                )
+              : <div className="mr-auto flex items-center gap-1">
+                  {onInativar && (
+                    <Button variant="ghost" onClick={onInativar} className="text-amber-600 hover:bg-amber-50">
+                      Inativar organização
+                    </Button>
+                  )}
+                  {onExcluir && (
+                    <Button variant="ghost" onClick={onExcluir} className="text-red-600 hover:bg-red-50">
+                      Excluir organização
+                    </Button>
+                  )}
+                </div>}
             <Button variant="outline" onClick={handleClose}>Cancelar</Button>
             {!isInactive && <Button onClick={handleSave}>Salvar</Button>}
           </>

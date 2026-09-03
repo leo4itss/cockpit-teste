@@ -20,6 +20,11 @@ interface Props {
   onClose: () => void
   solution: Solution | null
   onSave: (solution: Solution) => void
+  // Ciclo de vida no rodapé (03/09, sem detail sheet). Excluir só p/ ativo (Regra 5)
+  // e só quando o pai passa onExcluir (platform_admin — Regra 6).
+  onInativar?: () => void
+  onAtivar?: () => void
+  onExcluir?: () => void
   tiposLicenca: TipoLicenca[]
   componentes: Componente[]
 }
@@ -173,6 +178,9 @@ export function EditSolutionSheet({
   onClose,
   solution,
   onSave,
+  onInativar,
+  onAtivar,
+  onExcluir,
   tiposLicenca,
   componentes,
 }: Props) {
@@ -428,6 +436,24 @@ export function EditSolutionSheet({
         width="w-[640px]"
         footer={
           <>
+            {isInactive
+              ? onAtivar && (
+                  <Button variant="ghost" onClick={onAtivar} className="mr-auto text-green-700 hover:bg-green-50">
+                    Ativar solução
+                  </Button>
+                )
+              : <div className="mr-auto flex items-center gap-1">
+                  {onInativar && (
+                    <Button variant="ghost" onClick={onInativar} className="text-amber-600 hover:bg-amber-50">
+                      Inativar solução
+                    </Button>
+                  )}
+                  {onExcluir && (
+                    <Button variant="ghost" onClick={onExcluir} className="text-[#dc2626] hover:bg-red-50">
+                      Excluir solução
+                    </Button>
+                  )}
+                </div>}
             <Button variant="outline" onClick={handleClose}>Cancelar</Button>
             {!isInactive && <Button onClick={handleSave}>Salvar</Button>}
           </>

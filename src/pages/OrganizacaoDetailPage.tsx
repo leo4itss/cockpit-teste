@@ -526,11 +526,14 @@ export function OrganizacaoDetailPage() {
   ) {
     const tb = v?.motivo ? textoBloqueio(nivel, v.motivo) : { titulo: '', descricao: '', verbo: 'excluir' as const }
     const navegavel = v?.motivo === 'filhos-ativos' || v?.motivo === 'itens-vinculados'
+    // Em 'já teve contrato' / 'já inativada' não há nada a fazer — a descrição
+    // basta e listar os contratos (imortais) só polui.
+    const mostraLista = navegavel
     return {
       blockedTitle: tb.titulo,
       blockedDescription: tb.descricao,
       actionLabel: tb.verbo,
-      blocked: v?.impedimentos ?? [],
+      blocked: mostraLista ? (v?.impedimentos ?? []) : [],
       onNavegar: navegavel ? navegarParaImpedimento : undefined,
     }
   }
@@ -704,39 +707,12 @@ export function OrganizacaoDetailPage() {
                 <p className="text-base font-medium text-[#030712] leading-6 truncate">{org.name}</p>
               </div>
             </div>
-            <div className="flex items-center gap-2 shrink-0 ml-4">
-              <button
-                onClick={() => setSheetEditOrg(true)}
-                className="text-sm font-medium text-[#030712] bg-white border border-[#e5e7eb] rounded-md px-4 py-2 h-9 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:bg-gray-50 transition-colors"
-              >
-                Editar
-              </button>
-              {org.status === 'Inativo' ? (
-                <button
-                  onClick={handleActivateOrg}
-                  className="text-sm font-medium text-green-700 bg-white border border-[#e5e7eb] rounded-md px-4 py-2 h-9 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:bg-green-50 transition-colors"
-                >
-                  Ativar
-                </button>
-              ) : (
-                <>
-                  <button
-                    onClick={requestInativarOrg}
-                    className="text-sm font-medium text-amber-600 bg-white border border-[#e5e7eb] rounded-md px-4 py-2 h-9 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:bg-amber-50 transition-colors"
-                  >
-                    Inativar
-                  </button>
-                  {isPlatformAdmin && (
-                    <button
-                      onClick={requestExcluirOrg}
-                      className="text-sm font-medium text-red-600 bg-white border border-[#e5e7eb] rounded-md px-4 py-2 h-9 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:bg-red-50 transition-colors"
-                    >
-                      Excluir
-                    </button>
-                  )}
-                </>
-              )}
-            </div>
+            <button
+              onClick={() => setSheetEditOrg(true)}
+              className="text-sm font-medium text-[#030712] bg-white border border-[#e5e7eb] rounded-md px-4 py-2 h-9 shrink-0 ml-4 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:bg-gray-50 transition-colors"
+            >
+              Editar
+            </button>
           </div>
         </div>
 
@@ -1426,6 +1402,9 @@ export function OrganizacaoDetailPage() {
         onClose={() => setSheetEditOrg(false)}
         org={org}
         onSave={updated => handleEditOrg(updated)}
+        onInativar={requestInativarOrg}
+        onAtivar={handleActivateOrg}
+        onExcluir={isPlatformAdmin ? requestExcluirOrg : undefined}
       />
 
       {/* Detail sheets */}
@@ -1435,9 +1414,6 @@ export function OrganizacaoDetailPage() {
         account={selectedAccount}
         org={org}
         onEdit={() => selectedAccount && handleEditAccountFromDetail(selectedAccount)}
-        onInativar={() => selectedAccount && requestInativarConta(selectedAccount)}
-        onAtivar={() => selectedAccount && handleActivateAccount(selectedAccount)}
-        onExcluir={isPlatformAdmin && selectedAccount ? () => requestExcluirConta(selectedAccount) : undefined}
       />
       {editingAccount && (
         <EditAccountSheet
@@ -1448,6 +1424,9 @@ export function OrganizacaoDetailPage() {
           org={org}
           onSave={handleSaveAccount}
           onUpdateContacts={handleUpdateContacts}
+          onInativar={() => requestInativarConta(editingAccount)}
+          onAtivar={() => handleActivateAccount(editingAccount)}
+          onExcluir={isPlatformAdmin ? () => requestExcluirConta(editingAccount) : undefined}
         />
       )}
       <SolutionDetailSheet
@@ -1456,9 +1435,6 @@ export function OrganizacaoDetailPage() {
         solution={selectedSolution}
         componentes={componentes}
         onEdit={() => selectedSolution && handleEditSolutionFromDetail(selectedSolution)}
-        onInativar={() => selectedSolution && requestInactivateSolution(selectedSolution)}
-        onAtivar={() => selectedSolution && handleActivateSolution(selectedSolution)}
-        onExcluir={isPlatformAdmin && selectedSolution ? () => requestExcluirSolucao(selectedSolution) : undefined}
       />
       {editingSolution && (
         <EditSolutionSheet
@@ -1467,6 +1443,9 @@ export function OrganizacaoDetailPage() {
           onClose={() => setEditingSolution(null)}
           solution={editingSolution}
           onSave={handleSaveSolution}
+          onInativar={() => requestInactivateSolution(editingSolution)}
+          onAtivar={() => handleActivateSolution(editingSolution)}
+          onExcluir={isPlatformAdmin ? () => requestExcluirSolucao(editingSolution) : undefined}
           tiposLicenca={tiposLicenca}
           componentes={componentes}
         />
@@ -1476,8 +1455,6 @@ export function OrganizacaoDetailPage() {
         onClose={() => setSelectedContract(null)}
         contract={selectedContract}
         onEdit={() => selectedContract && handleEditContractFromDetail(selectedContract)}
-        onInativar={() => { if (selectedContract) { setContractInativarTarget(selectedContract); setContractInativarModal(true); setSelectedContract(null) } }}
-        onAtivar={() => selectedContract && handleActivateContract(selectedContract)}
         provisionamentoHref={(() => {
           // Vínculo conta↔contrato por nome — mesmo join usado no resto do app.
           const conta = accounts.find(a => a.name === selectedContract?.contratante)
@@ -1494,6 +1471,8 @@ export function OrganizacaoDetailPage() {
           accounts={accounts}
           contracts={contracts}
           onSave={handleSaveContract}
+          onInativar={() => { setContractInativarTarget(editingContract); setContractInativarModal(true); setEditingContract(null) }}
+          onAtivar={() => handleActivateContract(editingContract)}
         />
       )}
       <CriarUsuarioSheet

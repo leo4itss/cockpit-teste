@@ -13,9 +13,6 @@ interface Props {
   onClose: () => void
   contract: Contract | null
   onEdit?: () => void
-  // Ciclo de vida — contrato só inativa/ativa, nunca exclui (Regra 3).
-  onInativar?: () => void
-  onAtivar?: () => void
   /** Rota da tela de provisionamento do tenant — caminho até o diagnóstico da Fase 2. */
   provisionamentoHref?: string
 }
@@ -60,7 +57,7 @@ function ObjetoField({ label, value }: { label: string; value?: string | number 
 }
 
 
-export function ContractDetailSheet({ open, onClose, contract, onEdit, onInativar, onAtivar, provisionamentoHref }: Props) {
+export function ContractDetailSheet({ open, onClose, contract, onEdit, provisionamentoHref }: Props) {
   // Detalhe da Fase 2 buscado aqui, e não recebido por prop: o sheet já conhece
   // o contrato, e assim quem o renderiza não precisa saber de provisionamento.
   // Mesmo padrão de LogsSheet.
@@ -90,14 +87,9 @@ export function ContractDetailSheet({ open, onClose, contract, onEdit, onInativa
       onClose={onClose}
       title="Detalhe Contrato"
       width="w-[640px]"
-      headerAction={
-        <div className="flex items-center gap-2">
-          {onEdit && <Button variant="outline" size="sm" onClick={onEdit}>Editar</Button>}
-          {contract.status === 'Inativo'
-            ? onAtivar && <Button variant="outline" size="sm" className="text-green-700" onClick={onAtivar}>Ativar</Button>
-            : onInativar && <Button variant="outline" size="sm" className="text-amber-600" onClick={onInativar}>Inativar</Button>}
-        </div>
-      }
+      headerAction={onEdit ? (
+        <Button variant="outline" size="sm" onClick={onEdit}>Editar</Button>
+      ) : undefined}
     >
       <div className="flex flex-col gap-6">
 

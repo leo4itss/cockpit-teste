@@ -17,6 +17,13 @@ interface Props {
   org: Organization
   onSave: (account: Account) => void
   onUpdateContacts?: (contacts: Contact[]) => void
+  // Ciclo de vida no rodapé do Editar (definição de 03/09, ajustada em conversa
+  // posterior — as ações NÃO ficam no detail sheet). Exclusão física só aparece
+  // para entidade ATIVA (Regra 5) e só quando o pai passa `onExcluir`
+  // (platform_admin — Regra 6).
+  onInativar?: () => void
+  onAtivar?: () => void
+  onExcluir?: () => void
 }
 
 /* ── helpers ─────────────────────────────────────────────── */
@@ -194,7 +201,7 @@ const ESTADOS = [
 
 /* ── main ─────────────────────────────────────────────────── */
 
-export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdateContacts }: Props) {
+export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdateContacts, onInativar, onAtivar, onExcluir }: Props) {
   const { arquitetoOptions } = useUsers()
   const { toasts, toast, dismiss } = useToast()
   const isInactive = account.status === 'Inativo'
@@ -395,6 +402,24 @@ export function EditAccountSheet({ open, onClose, account, org, onSave, onUpdate
         width="w-[640px]"
         footer={
           <>
+            {isInactive
+              ? onAtivar && (
+                  <Button variant="ghost" onClick={onAtivar} className="mr-auto text-green-700 hover:bg-green-50">
+                    Ativar conta
+                  </Button>
+                )
+              : <div className="mr-auto flex items-center gap-1">
+                  {onInativar && (
+                    <Button variant="ghost" onClick={onInativar} className="text-amber-600 hover:bg-amber-50">
+                      Inativar conta
+                    </Button>
+                  )}
+                  {onExcluir && (
+                    <Button variant="ghost" onClick={onExcluir} className="text-[#dc2626] hover:bg-red-50">
+                      Excluir conta
+                    </Button>
+                  )}
+                </div>}
             <Button variant="outline" onClick={handleRequestClose}>Cancelar</Button>
             {!isInactive && <Button onClick={handleSave}>Salvar</Button>}
           </>
