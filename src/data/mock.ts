@@ -430,6 +430,20 @@ export const accounts: Account[] = [
     status: 'Inativo',
     createdAt: '18/02/2026',
   },
+  // Cenário: único contrato da conta está 'Ativo' mas VENCIDO → fora de vigência,
+  // logo não bloqueia. Isola a regra de `contratoVigente` (status + dataTermino),
+  // que na conta Apple fica mascarada por um segundo contrato ainda vigente.
+  {
+    id: 'a1-legado',
+    orgId: '1',
+    name: 'Apple Legado',
+    subdomain: 'apple-legado',
+    provisioningStatus: 'COMPLETED',
+    arquitetoPAS: 'Marcelo Gomes',
+    isDefault: false,
+    status: 'Ativo',
+    createdAt: '08/01/2025',
+  },
   // Cenário: conta em quarentena (soft delete) — excluída há 12 dias, ainda
   // restaurável via "Cancelar exclusão". Só aparece com "Exibir contas excluídas".
   {
@@ -739,6 +753,21 @@ export const solutions: Solution[] = [
     status: 'Inativo',
     createdAt: '02/04/2026',
   },
+  // Cenário: solução inativa, SEM componente, mas presente num contrato (inativo)
+  // → exclusão bloqueada só pelo contrato. Sem esta fixture a regra "contrato
+  // bloqueia exclusão de solução" era inalcançável pela UI: toda solução com
+  // contrato ATIVO tem a inativação barrada antes, e exclusão exige inativa.
+  {
+    id: 's8',
+    orgId: '1',
+    name: 'Portal Legado',
+    componenteIds: [],
+    plans: [],
+    description: 'Portal descontinuado, mantido por contrato encerrado.',
+    arquitetoPAS: 'Marcelo Gomes',
+    status: 'Inativo',
+    createdAt: '10/01/2025',
+  },
   // Cenário: solução inativa, sem componente e fora de qualquer contrato →
   // exclusão permitida.
   {
@@ -956,6 +985,34 @@ export const contracts: Contract[] = [
     dataTermino: '30/09/2026',
     renovacao: 'Anual',
     status: 'Inativo',
+  },
+  // Contrato encerrado que ainda referencia 'Portal Legado' — é o que impede a
+  // exclusão daquela solução (contrato nunca some, então o bloqueio é definitivo).
+  {
+    id: 'ctr-portal-legado',
+    orgId: '1',
+    contratante: 'Apple Legado',
+    objetos: [
+      { solucao: 'Portal Legado', plano: 'Starter', licenciamento: 'Usuário nominal: 5 usuários' },
+    ],
+    dataInicio: '10/01/2024',
+    dataTermino: '09/01/2025',
+    renovacao: 'Anual',
+    status: 'Inativo',
+  },
+  // Contrato 'Ativo' porém VENCIDO — fora de vigência. Único contrato da conta
+  // 'Apple Legado', que por isso pode ser inativada normalmente.
+  {
+    id: 'ctr-apple-legado',
+    orgId: '1',
+    contratante: 'Apple Legado',
+    objetos: [
+      { solucao: 'Base de Conhecimento PAS', plano: 'Enterprise', licenciamento: 'Usuário nominal: 10 usuários' },
+    ],
+    dataInicio: '10/01/2025',
+    dataTermino: '09/01/2026',
+    renovacao: 'Anual',
+    status: 'Ativo',
   },
   // Contrato inativo da conta 'Apple Labs' — sozinho não bloqueia a inativação
   // da conta (fora de vigência por estar inativo); a solução s6 é que bloqueia
